@@ -7,11 +7,12 @@
     <span [style.color]="'red'">{{ totalAmount }} $</span>
   </div>
   <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
-  <span *ngFor="let item of expenses">
+  <span *ngFor="let item of expenses; let i = index">
     Amount: {{ item.amount }}€
     <br />
     Category: {{ item.category }}
-    <br />
+    <br /><br />
+    <span [style.color]="'orange'" [style.cursor]="'pointer'" (click)="onDelete(i)">DELETE</span>
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   </span>
 </div>
