@@ -1,76 +1,103 @@
-.expense-container {
+.container {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  justify-content: space-between;
 }
 
-.top-bar {
+.header {
   display: flex;
   justify-content: space-between;
-  padding: 16px;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+}
+
+.menu-icon, .clock-icon {
   font-size: 24px;
-  background-color: #ff6347;
-  color: white;
-  position: fixed;
-  top: 0;
-  width: 100%;
+}
+
+.expense-info {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+}
+
+.title {
+  text-align: center;
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .categories {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  padding: 80px 20px 20px;
-  flex-grow: 1;
+  padding: 10px;
 }
 
 .category {
-  text-align: center;
-  margin: 10px;
-  font-size: 18px;
-  width: 80px;
-}
-
-.add-expense-button {
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  align-items: center;
+  width: 70px;
+  margin: 10px;
+  text-align: center;
 }
 
-.add-expense-button button {
-  background-color: #ff6347;
-  color: white;
-  border-radius: 50%;
-  border: none;
-  width: 60px;
-  height: 60px;
-  font-size: 24px;
+.category i {
+  font-size: 36px;
+  margin-bottom: 5px;
 }
 
-.number-pad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 20px;
-  background-color: #ff6347;
-  color: white;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-.number, .delete {
+.add-expense {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50px;
-  font-size: 24px;
-  border: 1px solid #ff6347;
-  background-color: white;
-  color: #ff6347;
-  cursor: pointer;
+  font-size: 36px;
+  background-color: #ff6f61;
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  align-self: center;
+  margin: 20px 0;
 }
 
-.delete {
-  grid-column: 3 / span 1;
+.number-board {
+  background-color: #f8d7da;
+  padding: 10px;
+}
+
+.number-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.number-board-body {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.number {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8d7da;
+  font-size: 24px;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.number i {
+  font-size: 24px;
 }

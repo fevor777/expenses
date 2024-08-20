@@ -1,34 +1,88 @@
-<div class="expense-container">
-  <!-- Top Section -->
-  <div class="top-bar">
-    <div class="daily-expense">5 000 $ - 229 500 ₽</div>
-    <div class="time-icon">
-      <fa-icon [icon]="faClock"></fa-icon>
+<div class="container">
+  <div class="header">
+    <div class="menu-icon">
+      <i class="fas fa-bars"></i>
+    </div>
+    <div class="expense-info">
+      <span>5 000 $</span>
+      <span> - </span>
+      <span>229 500 ₽</span>
+    </div>
+    <div class="clock-icon">
+      <i class="fas fa-clock"></i>
     </div>
   </div>
-
-  <!-- Category Icons -->
-  <div class="categories">
-    <div class="category" *ngFor="let category of categories">
-      <fa-icon [icon]="category.icon" size="2x"></fa-icon>
-      <span>{{ category.name }}</span>
+  <div class="title">
+    <span>РАСХОД ЗА ДЕНЬ</span>
+  </div>
+  <div class="scrollable-content">
+    <div class="categories">
+      <div class="category">
+        <i class="fas fa-utensils"></i>
+        <span>Еда и напитки</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-tshirt"></i>
+        <span>Одежда</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-paint-roller"></i>
+        <span>Ремонт</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-music"></i>
+        <span>Развлечения</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-dumbbell"></i>
+        <span>Спорт</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-car"></i>
+        <span>Авто</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-home"></i>
+        <span>Дом</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-baby-carriage"></i>
+        <span>Дети</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-random"></i>
+        <span>Разное</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-plane"></i>
+        <span>Путешествия</span>
+      </div>
+      <div class="category">
+        <i class="fas fa-credit-card"></i>
+        <span>Кредит</span>
+      </div>
+    </div>
+    <div class="add-expense">
+      <i class="fas fa-plus"></i>
     </div>
   </div>
-
-  <!-- Add Expense Button -->
-  <div class="add-expense-button">
-    <button>
-      <fa-icon [icon]="faPlus"></fa-icon>
-    </button>
-  </div>
-
-  <!-- Number Pad -->
-  <div class="number-pad">
-    <div class="number" *ngFor="let number of numbers" (click)="addDigit(number)">
-      {{ number }}
+  <div class="number-board">
+    <div class="number-board-header">
+      <span>ВВЕДИТЕ РАСХОД</span>
+      <i class="fas fa-edit"></i>
     </div>
-    <div class="delete" (click)="deleteDigit()">
-      <fa-icon [icon]="faBackspace"></fa-icon>
+    <div class="number-board-body">
+      <div class="number">1</div>
+      <div class="number">2</div>
+      <div class="number">3</div>
+      <div class="number">4</div>
+      <div class="number">5</div>
+      <div class="number">6</div>
+      <div class="number">7</div>
+      <div class="number">8</div>
+      <div class="number">9</div>
+      <div class="number">0</div>
+      <div class="number"><i class="fas fa-backspace"></i></div>
     </div>
   </div>
 </div>
