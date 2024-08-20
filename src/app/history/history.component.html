@@ -1,11 +1,17 @@
 <div>
-    <span [style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'">< Back</span><br>
-    <hr [style.background]="'#f8d7da'" [style.height]="'2px'">
-    <span *ngFor="let item of expenses">
-        Amount: {{ item.amount }}€ 
-        <br>
-        Category: {{ item.category }}
-        <br>
-        <hr [style.background]="'#f8d7da'" [style.height]="'2px'">
-    </span>
+  <span [style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'"
+    >< Back</span
+  ><br />
+  <div [style.margin.px]="'10'">
+    <span>Общий расход: </span>
+    <span [style.color]="'red'">{{ totalAmount }} $</span>
+  </div>
+  <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
+  <span *ngFor="let item of expenses">
+    Amount: {{ item.amount }}€
+    <br />
+    Category: {{ item.category }}
+    <br />
+    <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
+  </span>
 </div>
