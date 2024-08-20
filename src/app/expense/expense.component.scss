@@ -1,0 +1,60 @@
+.expense-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  font-size: 24px;
+  background-color: #ff6347;
+  color: white;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.category {
+  text-align: center;
+  margin: 10px;
+  font-size: 24px;
+}
+
+.add-expense-button {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 20px;
+  background-color: #ff6347;
+  color: white;
+}
+
+.number,
+.delete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  font-size: 24px;
+  border: 1px solid #ff6347;
+  background-color: white;
+  color: #ff6347;
+  cursor: pointer;
+}
+
+.delete {
+  grid-column: 3 / span 1;
+}
