@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 100dvh;
   justify-content: space-between;
+  user-select: none;
 }
 
 .header {
@@ -21,6 +22,7 @@
   display: flex;
   align-items: center;
   font-size: 24px;
+  color: #ff6f61;
 }
 
 .title {
@@ -45,7 +47,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 70px;
+  width: 60px;
   margin: 10px;
   text-align: center;
 }
@@ -71,7 +73,6 @@
 
 .number-board {
   background-color: #f8d7da;
-  padding: 10px;
 }
 
 .number-board-header {
@@ -79,13 +80,23 @@
   justify-content: space-between;
   align-items: center;
   font-size: 18px;
-  margin-bottom: 10px;
+  padding-bottom: 10px;
+  position: relative;
+  border: #fff 1px solid;
+}
+
+.number-board-header input {
+  flex: 1;
+  text-align: center;
+  border: none;
+  background: none;
+  font-size: 18px;
+  outline: none;
 }
 
 .number-board-body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
 }
 
 .number {
@@ -93,9 +104,9 @@
   justify-content: center;
   align-items: center;
   background-color: #f8d7da;
+  border: #fff 1px solid;
   font-size: 24px;
-  padding: 20px;
-  border-radius: 5px;
+  padding: 15px;
 }
 
 .number i {

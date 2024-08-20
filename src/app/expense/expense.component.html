@@ -1,88 +1,85 @@
 <div class="container">
   <div class="header">
     <div class="menu-icon">
-      <i class="fas fa-bars"></i>
+      <!-- <i class="fas fa-bars"></i> -->
+    </div>
+    <div class="title">
+      <span>ОБЩИЙ РАСХОД</span>
     </div>
     <div class="expense-info">
-      <span>5 000 $</span>
-      <span> - </span>
-      <span>229 500 ₽</span>
+      <span>{{ totalAmount }}</span>
+      <span>$</span>
     </div>
-    <div class="clock-icon">
+    <div class="clock-icon" [routerLink]="'/history'">
       <i class="fas fa-clock"></i>
     </div>
   </div>
-  <div class="title">
-    <span>РАСХОД ЗА ДЕНЬ</span>
-  </div>
+
   <div class="scrollable-content">
     <div class="categories">
-      <div class="category">
+      <div (click)="onCategoryClick('meal')" class="category">
         <i class="fas fa-utensils"></i>
         <span>Еда и напитки</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('clothes')" class="category">
         <i class="fas fa-tshirt"></i>
         <span>Одежда</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('repair')" class="category">
         <i class="fas fa-paint-roller"></i>
         <span>Ремонт</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('entertainments')" class="category">
         <i class="fas fa-music"></i>
         <span>Развлечения</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('sport')" class="category">
         <i class="fas fa-dumbbell"></i>
         <span>Спорт</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('car')" class="category">
         <i class="fas fa-car"></i>
         <span>Авто</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('home')" class="category">
         <i class="fas fa-home"></i>
         <span>Дом</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('children')" class="category">
         <i class="fas fa-baby-carriage"></i>
         <span>Дети</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('another')" class="category">
         <i class="fas fa-random"></i>
         <span>Разное</span>
       </div>
-      <div class="category">
+      <div (click)="onCategoryClick('travel')" class="category">
         <i class="fas fa-plane"></i>
         <span>Путешествия</span>
       </div>
-      <div class="category">
-        <i class="fas fa-credit-card"></i>
-        <span>Кредит</span>
-      </div>
     </div>
-    <div class="add-expense">
+    <!-- <div class="add-expense">
       <i class="fas fa-plus"></i>
-    </div>
+    </div> -->
   </div>
   <div class="number-board">
     <div class="number-board-header">
-      <span>ВВЕДИТЕ РАСХОД</span>
-      <i class="fas fa-edit"></i>
+      <input type="text" [(ngModel)]="enteredAmount" name="input" placeholder="ВВЕДИТЕ РАСХОД" />
+      <!-- <i class="fas fa-edit"></i> -->
     </div>
     <div class="number-board-body">
-      <div class="number">1</div>
-      <div class="number">2</div>
-      <div class="number">3</div>
-      <div class="number">4</div>
-      <div class="number">5</div>
-      <div class="number">6</div>
-      <div class="number">7</div>
-      <div class="number">8</div>
-      <div class="number">9</div>
-      <div class="number">0</div>
-      <div class="number"><i class="fas fa-backspace"></i></div>
+      <div (click)="onNumberClick('1')" class="number">1</div>
+      <div (click)="onNumberClick('2')" class="number">2</div>
+      <div (click)="onNumberClick('3')" class="number">3</div>
+      <div (click)="onNumberClick('4')" class="number">4</div>
+      <div (click)="onNumberClick('5')" class="number">5</div>
+      <div (click)="onNumberClick('6')" class="number">6</div>
+      <div (click)="onNumberClick('7')" class="number">7</div>
+      <div (click)="onNumberClick('8')" class="number">8</div>
+      <div (click)="onNumberClick('9')" class="number">9</div>
+      <div (click)="onNumberClick('.')" class="number">.</div>
+      <div (click)="onNumberClick('0')" class="number">0</div>
+      <div (click)="onDeleteClick()" class="number"><i class="fas fa-backspace"></i></div>
     </div>
   </div>
 </div>

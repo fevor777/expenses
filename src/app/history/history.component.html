@@ -1,0 +1,11 @@
+<div>
+    <span [style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'">< Back</span><br>
+    <hr [style.background]="'#f8d7da'" [style.height]="'2px'">
+    <span *ngFor="let item of expenses">
+        Amount: {{ item.amount }}€ 
+        <br>
+        Category: {{ item.category }}
+        <br>
+        <hr [style.background]="'#f8d7da'" [style.height]="'2px'">
+    </span>
+</div>
