@@ -95,6 +95,7 @@ export class ExpenseComponent implements OnInit {
       this.sumValues(expenseList);
       this.enteredAmount = '';
       this.enteredAmountAsNumber = 0;
+      this.showKeyBoard = true;
     }
   }
 
