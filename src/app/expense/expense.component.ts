@@ -91,14 +91,8 @@ export class ExpenseComponent implements OnInit {
       let expenseList = jsonInLocalStorage
         ? JSON.parse(jsonInLocalStorage)
         : [];
-      expenseList = expenseList.map((expense: Expense) => ({
-        id: expense?.id ? expense.id : uuidv4(),
-        amount: expense.amount,
-        category: expense.category,
-        currency: expense.currency,
-        date: expense.date ? expense.date : Date.now(),
-      }));
-      expenseList.push({
+        expenseList.reverse();
+      expenseList.unshift({
         id: uuidv4(),
         category: categoryName,
         amount: this.enteredAmountAsNumber,

@@ -8,13 +8,25 @@
   </div>
   <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   <span *ngFor="let item of expenses; let i = index">
+    <span
+      [style.background]="'#f8d7da'"
+      [style.width]="'100%'"
+      [style.display]="'block'"
+      *ngIf="item.showDateTitle"
+      >{{ item.date | date : "dd-MM-YYYY" }}</span
+    >
+    <br />
     Amount: {{ item.amount }}€
     <br />
     Category: {{ item.category }}
     <br />
-    Date: {{ item.date | date: 'dd-MM-YYYY HH:mm' }}
-    <br /><br />
-    <span [style.color]="'orange'" [style.cursor]="'pointer'" (click)="onDelete(i)">DELETE</span>
+    Date: {{ item.date | date : "dd-MM-YYYY HH:mm" }} <br /><br />
+    <span
+      [style.color]="'orange'"
+      [style.cursor]="'pointer'"
+      (click)="onDelete(i)"
+      >DELETE</span
+    >
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   </span>
 </div>
