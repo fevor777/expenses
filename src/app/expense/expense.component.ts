@@ -53,10 +53,7 @@ export class ExpenseComponent implements OnInit {
 
   ngOnInit(): void {
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    this.totalAmount = expenses.reduce(
-      (total: number, expense: { amount: number }) => total + expense.amount,
-      0
-    );
+    this.sumValues(expenses);
   }
 
   onNumberClick(numberValue: string) {
@@ -95,10 +92,7 @@ export class ExpenseComponent implements OnInit {
         currency: 'EUR',
       });
       localStorage.setItem('expenses', JSON.stringify(expenseList));
-      this.totalAmount = expenseList.reduce(
-        (total: number, expense: { amount: number }) => total + expense.amount,
-        0
-      );
+      this.sumValues(expenseList);
       this.enteredAmount = '';
       this.enteredAmountAsNumber = 0;
     }
@@ -113,5 +107,15 @@ export class ExpenseComponent implements OnInit {
   }
   onHideKeyboard(): void {
     this.showKeyBoard = false;
+  }
+
+  private sumValues(expenses: { amount: number }[]): void {
+    this.totalAmount = expenses.reduce(
+      (total: number, expense: { amount: number }) => { 
+        const result = total + expense.amount;
+        return Math.round(result * 100) / 100; 
+      },
+      0
+    );
   }
 }

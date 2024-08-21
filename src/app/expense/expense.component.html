@@ -1,4 +1,4 @@
-<div class="container" appSwipe (swipeLeft)="onSwipeLeft()" (swipeUp)="onShowKeyboard()" (swipeDown)="onHideKeyboard()">
+<div class="container">
   <div class="header">
     <div class="menu-icon">
       <!-- <i class="fas fa-bars"></i> -->
@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div class="scrollable-content">
+  <div class="scrollable-content" appSwipe (swipeDown)="onHideKeyboard()"  (swipeLeft)="onSwipeLeft()">
     <div class="categories">
       <div (click)="onCategoryClick('meal')" class="category">
         <i class="fas fa-utensils"></i>
@@ -63,7 +63,7 @@
     </div> -->
   </div>
   <div class="number-board" *ngIf="showKeyBoard">
-    <div class="number-board-header">
+    <div class="number-board-header" appSwipe (swipeLeft)="onDeleteClick()">
       <input type="text" [(ngModel)]="enteredAmount" name="input" placeholder="ВВЕДИТЕ РАСХОД" />
       <!-- <i class="fas fa-edit"></i> -->
     </div>

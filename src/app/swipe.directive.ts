@@ -6,6 +6,7 @@ import * as Hammer from 'hammerjs';
 })
 export class SwipeDirective implements OnInit {
   @Output() swipeLeft = new EventEmitter<void>();
+  @Output() swipeRight = new EventEmitter<void>();
   @Output() swipeDown = new EventEmitter<void>();
   @Output() swipeUp = new EventEmitter<void>();
 
@@ -15,16 +16,20 @@ export class SwipeDirective implements OnInit {
 
   ngOnInit() {
     this.hammer = new Hammer.Manager(this.el.nativeElement);
-    this.hammer.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_HORIZONTAL }));
-    this.hammer.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_VERTICAL }));
+    this.hammer.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_ALL }));
 
     this.hammer.on('swipeleft', () => this.onSwipeLeft());
+    this.hammer.on('swiperight', () => this.onSwipeRight());
     this.hammer.on('swipeup', () => this.onSwipeUp());
     this.hammer.on('swipedown', () => this.onSwipeDown());
   }
 
   onSwipeLeft() {
     this.swipeLeft.emit();
+  }
+
+  onSwipeRight() {
+    this.swipeRight.emit();
   }
 
   onSwipeDown() {

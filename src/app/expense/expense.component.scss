@@ -33,7 +33,6 @@
 
 .scrollable-content {
   flex: 1;
-  overflow-y: auto;
 }
 
 .categories {
@@ -80,7 +79,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 18px;
-  padding-bottom: 10px;
+  padding: 12px;
   position: relative;
   border: #fff 1px solid;
 }

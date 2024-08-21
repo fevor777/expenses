@@ -14,24 +14,28 @@ export class HistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    this.totalAmount = this.expenses.reduce(
-      (total: number, expense: { amount: number }) => total + expense.amount,
-      0
-    );
+    this.sumValues();
   }
 
   onDelete(index: number) {
     if (confirm('Press a button!\nEither OK or Cancel.') == true) {
       this.expenses.splice(index, 1);
       localStorage.setItem('expenses', JSON.stringify(this.expenses));
-      this.totalAmount = this.expenses.reduce(
-        (total: number, expense: { amount: number }) => total + expense.amount,
-        0
-      );
+      this.sumValues()
     }
   }
 
   onSwipeRight(): void {
     this.router.navigate(['/']);
+  }
+
+  private sumValues(): void {
+    this.totalAmount = this.expenses.reduce(
+      (total: number, expense: { amount: number }) => { 
+        const result = total + expense.amount;
+        return Math.round(result * 100) / 100; 
+      },
+      0
+    );
   }
 }
