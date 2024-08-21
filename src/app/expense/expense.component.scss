@@ -34,8 +34,6 @@
 
 .scrollable-content {
   display: flex;
-  touch-action: pan-y;
-  overflow-y: scroll;
   .scrollable-content-down {
     align-items: end;
   }
