@@ -1,4 +1,4 @@
-<div class="history-container" (swiperight)="onSwipeRight()">
+<div class="history-container">
   <span [style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'"
     >< Back</span
   ><br />
@@ -7,7 +7,7 @@
     <span [style.color]="'red'">{{ totalAmount }} $</span>
   </div>
   <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
-  <span *ngFor="let item of expenses; let i = index">
+  <span *ngFor="let item of expenses; let i = index" >
     <span
       [style.background]="'#f8d7da'"
       [style.width]="'100%'"
