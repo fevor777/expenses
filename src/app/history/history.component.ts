@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Expense } from '../common/expense.model';
 
@@ -52,6 +52,47 @@ export class HistoryComponent implements OnInit {
       return true;
     }
   }
+  touchStartX: number = 0;
+  touchStartY: number = 0;
+  touchEndX: number = 0;
+  touchEndY: number = 0;
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    this.touchStartX = event.changedTouches[0].screenX;
+    this.touchStartY = event.changedTouches[0].screenY;
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(event: TouchEvent) {
+    this.touchEndX = event.changedTouches[0].screenX;
+    this.touchEndY = event.changedTouches[0].screenY;
+    this.handleSwipeGesture();
+  }
+
+  handleSwipeGesture() {
+    const deltaX = this.touchEndX - this.touchStartX;
+    const deltaY = this.touchEndY - this.touchStartY;
+
+    // Detect horizontal swipe only if it is more significant than vertical swipe
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 50) {
+        this.onSwipeRight();
+      } else if (deltaX < -50) {
+        this.onSwipeLeft();
+      }
+    }
+  }
+
+  onSwipeLeft() {
+    console.log('Swiped left');
+    // Handle the left swipe action here
+  }
+
+  // onSwipeRight() {
+  //   console.log('Swiped right');
+  //   // Handle the right swipe action here
+  // }
 
   private sumValues(): void {
     this.totalAmount = this.expenses.reduce(

@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ExpenseComponent } from './expense/expense.component';
 import { SwipeDirective } from './common/swipe.directive';
+import { CustomHammerConfig } from './common/custom-hammer.config';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -31,7 +32,7 @@ export class HammerConfig extends HammerGestureConfig {
   providers: [
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: HammerConfig,
+      useClass: CustomHammerConfig,
     },
   ],
   bootstrap: [AppComponent],
