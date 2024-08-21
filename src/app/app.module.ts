@@ -11,6 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ExpenseComponent } from './expense/expense.component';
+import { SwipeDirective } from './swipe.directive';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -19,7 +20,7 @@ export class HammerConfig extends HammerGestureConfig {
 }
 
 @NgModule({
-  declarations: [AppComponent, ExpenseComponent],
+  declarations: [AppComponent, ExpenseComponent, SwipeDirective],
   imports: [
     BrowserModule,
     AppRoutingModule,
