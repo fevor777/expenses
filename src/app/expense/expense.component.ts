@@ -91,7 +91,6 @@ export class ExpenseComponent implements OnInit {
       let expenseList = jsonInLocalStorage
         ? JSON.parse(jsonInLocalStorage)
         : [];
-        expenseList.reverse();
       expenseList.unshift({
         id: uuidv4(),
         category: categoryName,
