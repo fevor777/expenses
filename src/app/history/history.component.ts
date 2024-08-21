@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-history',
   templateUrl: './history.component.html',
+  styleUrls: ['./history.component.scss'],
 })
 export class HistoryComponent implements OnInit {
   expenses: { category: string; currency: string; amount: number }[] = [];
   totalAmount: number = 0;
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
@@ -25,5 +29,9 @@ export class HistoryComponent implements OnInit {
         0
       );
     }
+  }
+
+  onSwipeRight(): void {
+    this.router.navigate(['/']);
   }
 }

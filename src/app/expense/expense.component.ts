@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   faUtensils,
   faTshirt,
@@ -46,6 +47,9 @@ export class ExpenseComponent implements OnInit {
   enteredAmount = '';
   enteredAmountAsNumber: number = 0;
   totalAmount: number = 0;
+  showKeyBoard: boolean = true;
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
@@ -98,5 +102,16 @@ export class ExpenseComponent implements OnInit {
       this.enteredAmount = '';
       this.enteredAmountAsNumber = 0;
     }
+  }
+
+  onSwipeLeft(): void {
+    this.router.navigate(['/history']);
+  }
+
+  onShowKeyboard(): void {
+    this.showKeyBoard = true;
+  }
+  onHideKeyboard(): void {
+    this.showKeyBoard = false;
   }
 }
