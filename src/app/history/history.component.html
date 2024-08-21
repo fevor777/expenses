@@ -11,6 +11,8 @@
     Amount: {{ item.amount }}€
     <br />
     Category: {{ item.category }}
+    <br />
+    Date: {{ item.date | date: 'dd-MM-YYYY HH:mm' }}
     <br /><br />
     <span [style.color]="'orange'" [style.cursor]="'pointer'" (click)="onDelete(i)">DELETE</span>
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />

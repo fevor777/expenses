@@ -4,10 +4,17 @@
       <!-- <i class="fas fa-bars"></i> -->
     </div>
     <div class="title">
-      <span>ОБЩИЙ РАСХОД</span>
+      <span>СЕГОДНЯ</span>
     </div>
     <div class="expense-info">
-      <span>{{ totalAmount }}</span>
+      <span>{{ currentAmount }}</span>
+      <span>$</span>
+    </div>
+    <div class="title">
+      <span>МЕСЯЦ</span>
+    </div>
+    <div class="expense-info" [style.color]="'blue'">
+      <span>{{ monthAmount }}</span>
       <span>$</span>
     </div>
     <div class="clock-icon" [routerLink]="'/history'">

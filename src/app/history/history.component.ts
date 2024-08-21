@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Expense } from '../common/expense.model';
 
 @Component({
   selector: 'app-history',
@@ -7,13 +8,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./history.component.scss'],
 })
 export class HistoryComponent implements OnInit {
-  expenses: { category: string; currency: string; amount: number }[] = [];
+  expenses: Expense[] = [];
   totalAmount: number = 0;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    this.expenses = JSON.parse(localStorage.getItem('expenses') || '[]').reverse();
     this.sumValues();
   }
 

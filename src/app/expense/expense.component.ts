@@ -17,6 +17,9 @@ import {
   faPlus,
   faBackspace,
 } from '@fortawesome/free-solid-svg-icons';
+import { v4 as uuidv4 } from 'uuid';
+
+import { Expense } from '../common/expense.model';
 
 @Component({
   selector: 'app-expense',
@@ -46,13 +49,15 @@ export class ExpenseComponent implements OnInit {
   numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
   enteredAmount = '';
   enteredAmountAsNumber: number = 0;
-  totalAmount: number = 0;
+  currentAmount: number = 0;
+  monthAmount: number = 0;
   showKeyBoard: boolean = true;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    console.log('expenses', expenses);
     this.sumValues(expenses);
   }
 
@@ -83,13 +88,22 @@ export class ExpenseComponent implements OnInit {
   onCategoryClick(categoryName: string) {
     if (this.enteredAmountAsNumber > 0) {
       const jsonInLocalStorage = localStorage.getItem('expenses');
-      const expenseList = jsonInLocalStorage
+      let expenseList = jsonInLocalStorage
         ? JSON.parse(jsonInLocalStorage)
         : [];
+      expenseList = expenseList.map((expense: Expense) => ({
+        id: expense?.id ? expense.id : uuidv4(),
+        amount: expense.amount,
+        category: expense.category,
+        currency: expense.currency,
+        date: expense.date ? expense.date : Date.now(),
+      }));
       expenseList.push({
+        id: uuidv4(),
         category: categoryName,
         amount: this.enteredAmountAsNumber,
         currency: 'EUR',
+        date: Date.now(),
       });
       localStorage.setItem('expenses', JSON.stringify(expenseList));
       this.sumValues(expenseList);
@@ -110,13 +124,22 @@ export class ExpenseComponent implements OnInit {
     this.showKeyBoard = false;
   }
 
-  private sumValues(expenses: { amount: number }[]): void {
-    this.totalAmount = expenses.reduce(
-      (total: number, expense: { amount: number }) => { 
-        const result = total + expense.amount;
-        return Math.round(result * 100) / 100; 
-      },
-      0
-    );
+  private sumValues(expenses: Expense[]): void {
+    this.currentAmount = 0;
+    this.monthAmount = 0;
+    expenses.forEach((expense: Expense) => {
+      if (new Date(expense.date).toDateString() === new Date().toDateString()) {
+        const currentSum = this.currentAmount + expense.amount;
+        this.currentAmount = Math.round(currentSum * 100) / 100;
+      }
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const expenseMonth = new Date(expense.date).getMonth();
+      const expenseYear = new Date(expense.date).getFullYear();
+      if (currentMonth === expenseMonth && currentYear === expenseYear) {
+        const monthSum = this.monthAmount + expense.amount;
+        this.monthAmount = Math.round(monthSum * 100) / 100;
+      }
+    });
   }
 }
