@@ -72,7 +72,7 @@ export class ExpenseComponent implements OnInit {
         date: Date.now(),
       });
       const balance = Number(localStorage.getItem('balance') || 0);
-      const newBalance = balance - this.enteredAmountAsNumber;
+      const newBalance = Math.round((balance - this.enteredAmountAsNumber) * 100) / 100;
       localStorage.setItem('balance', newBalance.toString());
       this.balance = newBalance;
       localStorage.setItem('expenses', JSON.stringify(expenseList));

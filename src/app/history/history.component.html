@@ -7,7 +7,7 @@
     <span [style.color]="'red'">{{ totalAmount }} $</span>
   </div>
   <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
-  <span *ngFor="let item of expenses; let i = index" >
+  <span *ngFor="let item of expenses; let i = index">
     <span
       [style.background]="'#f8d7da'"
       [style.width]="'100%'"
@@ -25,7 +25,13 @@
       [style.color]="'orange'"
       [style.cursor]="'pointer'"
       (click)="onDelete(i)"
-      >DELETE</span
+      >Delete</span
+    >
+    <span
+      [style.color]="'green'"
+      [style.cursor]="'pointer'"
+      (click)="updateBalance(i)"
+      > Delete from balance</span
     >
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   </span>

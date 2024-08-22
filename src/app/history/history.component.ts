@@ -28,13 +28,18 @@ export class HistoryComponent implements OnInit {
 
   onDelete(index: number) {
     if (confirm('Press a button!\nEither OK or Cancel.') == true) {
-      const balance = Number(localStorage.getItem('balance')) || 0;
-      if (balance) {
-        localStorage.setItem('balance', (balance + this.expenses[index].amount).toString());
-      }
+      this.updateBalance(index);
       this.expenses.splice(index, 1);
       localStorage.setItem('expenses', JSON.stringify(this.expenses));
       this.sumValues();
+    }
+  }
+
+  updateBalance(index: number): void {
+    const balance = Number(localStorage.getItem('balance')) || 0;
+    if (balance) {
+      const newBalance = Math.round((balance + this.expenses[index].amount) * 100) / 100;
+      localStorage.setItem('balance', newBalance.toString());
     }
   }
 
