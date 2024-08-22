@@ -100,6 +100,10 @@ export class ExpenseComponent implements OnInit {
     }
   }
 
+  onDisableRefresh(event: Event): void {
+    event.stopPropagation();
+  }
+
   onSwipeLeft(): void {
     this.router.navigate(['/history']);
   }

@@ -121,7 +121,7 @@
       />
       <!-- <i class="fas fa-edit"></i> -->
     </div>
-    <div class="number-board-body">
+    <div class="number-board-body" (swipedown)="onDisableRefresh($event)">
       <div (click)="onNumberClick('1')" class="number">1</div>
       <div (click)="onNumberClick('2')" class="number">2</div>
       <div (click)="onNumberClick('3')" class="number">3</div>
