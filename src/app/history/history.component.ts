@@ -27,7 +27,7 @@ export class HistoryComponent implements OnInit {
   }
 
   onDelete(index: number) {
-    if (confirm('Press a button!\nEither OK or Cancel.') == true) {
+    if (confirm('Delete?')) {
       this.updateBalance(index);
       this.expenses.splice(index, 1);
       localStorage.setItem('expenses', JSON.stringify(this.expenses));
@@ -40,6 +40,12 @@ export class HistoryComponent implements OnInit {
     if (balance) {
       const newBalance = Math.round((balance + this.expenses[index].amount) * 100) / 100;
       localStorage.setItem('balance', newBalance.toString());
+    }
+  }
+
+  onDeleteFromBalance(index: number): void {
+    if (confirm('Return to balance?')) {
+      this.updateBalance(index);
     }
   }
 
