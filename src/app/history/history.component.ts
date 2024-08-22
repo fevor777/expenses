@@ -56,6 +56,12 @@ export class HistoryComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
+  showCategoryDetails(categoryId: string): void {
+    this.router.navigate(['/details'], {
+      queryParams: { 'category-id': categoryId, 'back-url': '/history' },
+    });
+  }
+
   isDatePanelVisible(timestamp: number): boolean {
     if (this.temporaryDate === 0) {
       this.temporaryDate = timestamp;

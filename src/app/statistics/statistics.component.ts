@@ -23,6 +23,15 @@ export class StatisticsComponent implements OnInit {
     this.calculateCategoryTotals();
   }
 
+  showCategoryDetails(categoryId: string): void {
+    this.router.navigate(['/details'], {
+      queryParams: {
+        'category-id': categoryId,
+        'back-url': '/statistics',
+      },
+    });
+  }
+
   calculateCategoryTotals(): void {
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 

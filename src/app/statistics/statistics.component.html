@@ -2,11 +2,11 @@
   <div class="statistics-title">Статистика по категориям за сегодня:</div>
   Всего потрачено: {{ totalAmount }}€<br /><br />
   <div *ngFor="let categoryTotal of categoryTotals" class="category-summary">
-    <div class="category-header">
-      <span>{{ getCategoryNameByIdFunc(categoryTotal.category) }}</span>
+    <div class="category-header" (click)="showCategoryDetails(categoryTotal.category)">
+      <span [style.color]="'blue'">{{ getCategoryNameByIdFunc(categoryTotal.category) }}</span>
       <span>{{ categoryTotal.amount}}€</span>
     </div>
-    <div class="progress-bar-container">
+    <div class="progress-bar-container" (click)="showCategoryDetails(categoryTotal.category)">
       <div
         class="progress-bar"
         [style.width.%]="categoryTotal.percentage"

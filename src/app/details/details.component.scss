@@ -1,0 +1,15 @@
+.details {
+  height: 100dvh;
+  margin: 15px;
+  &-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+  }
+
+  .amount {
+    font-size: 18px;
+    color: #ff6f61;
+  }
+}
