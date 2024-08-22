@@ -10,15 +10,19 @@
 
     <div class="title">-</div>
     <div class="title">
-      <div>{{ currentDate }} </div>
-      <span [style.color]="'#DB2C07'" class="title-total">{{ currentAmount }}</span>
+      <div>{{ currentDate }}</div>
+      <span [style.color]="'#DB2C07'" class="title-total">{{
+        currentAmount
+      }}</span>
       <span [style.color]="'#DB2C07'">€</span>
     </div>
     <div class="title">-</div>
     <div class="title">
-      <div (click)="onBalanceDateChange()">до {{ balanceDate }} </div>
-      <span [style.color]="'green'"  (click)="onBalanceChange()">{{ balance }}</span>
-      <span [style.color]="'green'"  (click)="onBalanceChange()">€ </span>
+      <div (click)="onBalanceDateChange()">до {{ balanceDate }}</div>
+      <span [style.color]="'green'" (click)="onBalanceChange()">{{
+        balance
+      }}</span>
+      <span [style.color]="'green'" (click)="onBalanceChange()">€ </span>
     </div>
     <div class="clock-icon" [routerLink]="'/history'">
       <i class="fas fa-clock"></i>
@@ -35,8 +39,12 @@
     (swipeRight)="onSwipeRight()"
   >
     <div class="categories">
-      <div *ngFor="let category of categories" class="category" (click)="onCategoryClick(category.id)">
-        <i [style.color]="'#DB872C'" [class]="category.icon" ></i>
+      <div
+        *ngFor="let category of categories"
+        class="category"
+        (click)="onCategoryClick(category.id)"
+      >
+        <i [style.color]="'#DB872C'" [class]="category.icon"></i>
         <span>{{ category.name }}</span>
       </div>
     </div>
@@ -58,7 +66,12 @@
       />
       <!-- <i class="fas fa-edit"></i> -->
     </div>
-    <div class="number-board-body" (swipedown)="onDisableRefresh($event)">
+    <div
+      class="number-board-body"
+      (swipedown)="onDisableRefresh($event)"
+      (swipeleft)="onSwipeLeft()"
+      (swiperight)="onSwipeRight()"
+    >
       <div (click)="onNumberClick('1')" class="number">1</div>
       <div (click)="onNumberClick('2')" class="number">2</div>
       <div (click)="onNumberClick('3')" class="number">3</div>
