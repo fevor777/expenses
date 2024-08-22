@@ -59,6 +59,7 @@ export class ExpenseComponent implements OnInit {
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
     console.log('expenses', expenses);
     this.sumValues(expenses);
+    console.log('currentAmount', this.currentAmount);
   }
 
   onNumberClick(numberValue: string) {
