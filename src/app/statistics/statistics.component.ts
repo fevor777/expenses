@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { getCategoryNameById } from '../common/categories';
 
 @Component({
   selector: 'app-statistics',
@@ -14,6 +15,7 @@ export class StatisticsComponent implements OnInit {
     color: string;
   }[] = [];
   totalAmount: number = 0;
+  readonly getCategoryNameByIdFunc = getCategoryNameById;
 
   constructor(private router: Router) {}
 
@@ -51,6 +53,7 @@ export class StatisticsComponent implements OnInit {
       const percentage = (amount / this.totalAmount) * 100;
       const color = this.getColor(percentage);
       this.categoryTotals.push({ category, amount, percentage, color });
+      this.categoryTotals.sort((a, b) => a.amount - b.amount);
     }
   }
 

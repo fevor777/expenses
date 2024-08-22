@@ -15,23 +15,23 @@
       *ngIf="item.showDateTitle"
       >{{ item.date | date : "dd-MM-YYYY" }}</span
     >
+    <br />Цена:
+    <span [style.color]="'red'">{{ item.amount }}€</span>
     <br />
-    Amount: {{ item.amount }}€
-    <br />
-    Category: {{ item.category }}
-    <br />
-    Date: {{ item.date | date : "dd-MM-YYYY HH:mm" }} <br /><br />
+    <div>Category: <span [style.color]="'blue'">{{ getCategoryNameByIdFunc(item.category) }}</span></div>
+    Date: {{ item.date | date : "HH:mm" }} <br /><br />
     <span
-      [style.color]="'orange'"
+      [style.color]="'grey'"
       [style.cursor]="'pointer'"
       (click)="onDelete(i)"
-      >Delete</span
+      >Delete |</span
     >
     <span
-      [style.color]="'green'"
+      [style.color]="'grey'"
       [style.cursor]="'pointer'"
       (click)="onDeleteFromBalance(i)"
-      > Delete from balance</span
+    >
+      Delete from balance</span
     >
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   </span>

@@ -11,7 +11,7 @@
     <div class="title">-</div>
     <div class="title">
       <div>{{ currentDate }} </div>
-      <span [style.color]="'red'">{{ currentAmount }}</span>
+      <span [style.color]="'red'" class="title-total">{{ currentAmount }}</span>
       <span [style.color]="'red'">€</span>
     </div>
     <div class="title">-</div>
@@ -36,7 +36,7 @@
   >
     <div class="categories">
       <div *ngFor="let category of categories" class="category" (click)="onCategoryClick(category.id)">
-        <i [style.color]="category.color" [class]="category.icon" ></i>
+        <i [style.color]="'#DB872C'" [class]="category.icon" ></i>
         <span>{{ category.name }}</span>
       </div>
     </div>

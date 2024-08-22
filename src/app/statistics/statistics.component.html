@@ -1,9 +1,10 @@
 <div class="statistics">
   <div class="statistics-title">Статистика по категориям за сегодня:</div>
+  Всего потрачено: {{ totalAmount }}€<br /><br />
   <div *ngFor="let categoryTotal of categoryTotals" class="category-summary">
     <div class="category-header">
-      <span>{{ categoryTotal.category }}</span>
-      <span>{{ categoryTotal.amount | currency }}</span>
+      <span>{{ getCategoryNameByIdFunc(categoryTotal.category) }}</span>
+      <span>{{ categoryTotal.amount}}€</span>
     </div>
     <div class="progress-bar-container">
       <div
