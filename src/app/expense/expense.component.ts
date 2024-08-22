@@ -1,22 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  faUtensils,
-  faTshirt,
-  faTools,
-  faMusic,
-  faDumbbell,
-  faCar,
-  faLightbulb,
-  faBaby,
-  faHome,
-  faQuestion,
-  faPlane,
-  faCreditCard,
-  faClock,
-  faPlus,
-  faBackspace,
-} from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Expense } from '../common/expense.model';
@@ -27,36 +10,18 @@ import { Expense } from '../common/expense.model';
   styleUrls: ['./expense.component.scss'],
 })
 export class ExpenseComponent implements OnInit {
-  faClock = faClock;
-  faPlus = faPlus;
-  faBackspace = faBackspace;
-
-  categories = [
-    { name: 'Еда и напитки', icon: faUtensils },
-    { name: 'Одежда', icon: faTshirt },
-    { name: 'Ремонт', icon: faTools },
-    { name: 'Развлечения', icon: faMusic },
-    { name: 'Спорт', icon: faDumbbell },
-    { name: 'Авто', icon: faCar },
-    { name: 'Коммуналка', icon: faLightbulb },
-    { name: 'Дети', icon: faBaby },
-    { name: 'Дом', icon: faHome },
-    { name: 'Разное', icon: faQuestion },
-    { name: 'Путешествия', icon: faPlane },
-    { name: 'Кредит', icon: faCreditCard },
-  ];
-
-  numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
   enteredAmount = '';
   enteredAmountAsNumber: number = 0;
   currentAmount: number = 0;
   monthAmount: number = 0;
+  balance: number = 0;
+  balanceDate: string = '';
   showKeyBoard: boolean = true;
   currentDate: string = new Date().toLocaleDateString('ru-RU', {
     weekday: 'short', // 'Thu'
-    month: 'short',   // 'Aug'
-    day: 'numeric'    // '12'
-  });;
+    month: 'short', // 'Aug'
+    day: 'numeric', // '12'
+  });
 
   constructor(private router: Router) {}
 
@@ -65,6 +30,8 @@ export class ExpenseComponent implements OnInit {
     console.log('expenses', expenses);
     this.sumValues(expenses);
     console.log('currentAmount', this.currentAmount);
+    this.balance = Number(localStorage.getItem('balance')) || 0;
+    this.balanceDate = localStorage.getItem('balanceDate');
   }
 
   onNumberClick(numberValue: string) {
@@ -104,11 +71,32 @@ export class ExpenseComponent implements OnInit {
         currency: 'EUR',
         date: Date.now(),
       });
+      const balance = Number(localStorage.getItem('balance') || 0);
+      const newBalance = balance - this.enteredAmountAsNumber;
+      localStorage.setItem('balance', newBalance.toString());
+      this.balance = newBalance;
       localStorage.setItem('expenses', JSON.stringify(expenseList));
       this.sumValues(expenseList);
       this.enteredAmount = '';
       this.enteredAmountAsNumber = 0;
       this.showKeyBoard = true;
+
+    }
+  }
+
+  onBalanceChange(): void {
+    const newBalance = prompt('Enter new balance', this.balance.toString());
+    if (newBalance) {
+      localStorage.setItem('balance', newBalance);
+      this.balance = Number(newBalance);
+    }
+  }
+
+  onBalanceDateChange(): void {
+    const newBalanceDate = prompt('Enter new balance date', this.balanceDate || '');
+    if (newBalanceDate) {
+      localStorage.setItem('balanceDate', newBalanceDate);
+      this.balanceDate = newBalanceDate;
     }
   }
 
