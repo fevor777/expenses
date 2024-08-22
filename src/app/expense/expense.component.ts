@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Expense } from '../common/expense.model';
+import { Categories, Category } from '../common/categories';
 
 @Component({
   selector: 'app-expense',
@@ -22,6 +23,7 @@ export class ExpenseComponent implements OnInit {
     month: 'short', // 'Aug'
     day: 'numeric', // '12'
   });
+  categories: Category[] = Categories;
 
   constructor(private router: Router) {}
 
@@ -106,6 +108,10 @@ export class ExpenseComponent implements OnInit {
 
   onSwipeLeft(): void {
     this.router.navigate(['/history']);
+  }
+
+  onSwipeRight(): void {
+    this.router.navigate(['/statistics']);
   }
 
   onShowKeyboard(): void {

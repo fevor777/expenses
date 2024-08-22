@@ -32,75 +32,12 @@
     (swipeDown)="onHideKeyboard()"
     (swipeUp)="onShowKeyboard()"
     (swipeLeft)="onSwipeLeft()"
+    (swipeRight)="onSwipeRight()"
   >
     <div class="categories">
-      <div class="category" (click)="onCategoryClick('meal')">
-        <i class="fas fa-apple-alt"></i>
-        <span>Продукты</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('canteen')">
-        <i class="fas fa-utensils"></i>
-        <span>Столовая</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('clothes')">
-        <i class="fas fa-tshirt"></i>
-        <span>Одежда</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('entertainments')">
-        <i class="fas fa-film"></i>
-        <span>Развлечение</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('sport')">
-        <i class="fas fa-dumbbell"></i>
-        <span>Спорт</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('utility-bills')">
-        <i class="fas fa-water"></i>
-        <span>Коммуналка</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('home')">
-        <i class="fas fa-home"></i>
-        <span>Для дома</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('rental-payment')">
-        <i class="fas fa-building"></i>
-        <span>Аренда жилья</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('bus')">
-        <i class="fas fa-bus"></i>
-        <span>Общ. транспорт</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('pharmacy')">
-        <i class="fas fa-pills"></i>
-        <span>Аптека</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('travel')">
-        <i class="fas fa-plane"></i>
-        <span>Путешествие</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('barbershop')">
-        <i class="fas fa-cut"></i>
-        <span>Парикмахерская</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('bar')">
-        <i class="fas fa-coffee"></i>
-        <span>Бар(кафе)</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('alcohol')">
-        <i class="fas fa-wine-bottle"></i>
-        <span>Выпивка</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('nicotine')">
-        <i class="fas fa-smoking"></i>
-        <span>Сигареты</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('subscriptions')">
-        <i class="fas fa-newspaper"></i>
-        <span>Подписка</span>
-      </div>
-      <div class="category" (click)="onCategoryClick('another')">
-        <i class="fas fa-random"></i>
-        <span>Разное</span>
+      <div *ngFor="let category of categories" class="category" (click)="onCategoryClick(category.id)">
+        <i [style.color]="category.color" [class]="category.icon" ></i>
+        <span>{{ category.name }}</span>
       </div>
     </div>
     <!-- <div class="add-expense">

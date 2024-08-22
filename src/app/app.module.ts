@@ -13,6 +13,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ExpenseComponent } from './expense/expense.component';
 import { SwipeDirective } from './common/swipe.directive';
 import { CustomHammerConfig } from './common/custom-hammer.config';
+import { StatisticsComponent } from './statistics/statistics.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -21,7 +22,7 @@ export class HammerConfig extends HammerGestureConfig {
 }
 
 @NgModule({
-  declarations: [AppComponent, ExpenseComponent, SwipeDirective],
+  declarations: [AppComponent, ExpenseComponent, SwipeDirective, StatisticsComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

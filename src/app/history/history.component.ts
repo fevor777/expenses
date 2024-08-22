@@ -100,14 +100,9 @@ export class HistoryComponent implements OnInit {
   }
 
   onSwipeLeft() {
-    console.log('Swiped left');
+    this.router.navigate(['/statistics']);
     // Handle the left swipe action here
   }
-
-  // onSwipeRight() {
-  //   console.log('Swiped right');
-  //   // Handle the right swipe action here
-  // }
 
   private sumValues(): void {
     this.totalAmount = this.expenses.reduce(
