@@ -38,7 +38,7 @@ export class HistoryComponent implements OnInit {
   updateBalance(index: number): void {
     const balance = Number(localStorage.getItem('balance')) || 0;
     if (balance) {
-      const newBalance = Math.round((balance - this.expenses[index].amount) * 100) / 100;
+      const newBalance = Math.round((balance + this.expenses[index].amount) * 100) / 100;
       localStorage.setItem('balance', newBalance.toString());
     }
   }
