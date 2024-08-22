@@ -4,6 +4,7 @@
   height: 100dvh;
   justify-content: space-between;
   user-select: none;
+  overflow: hidden;
 }
 
 .header {
@@ -30,7 +31,6 @@
   text-align: center;
   font-size: 18px;
   margin: 10px 0;
-  max-width: 74px;
 }
 
 .scrollable-content {
