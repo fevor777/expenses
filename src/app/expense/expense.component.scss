@@ -103,6 +103,7 @@
 .number-board-body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
 }
 
 .number {
@@ -113,6 +114,7 @@
   border: #fff 1px solid;
   font-size: 24px;
   padding: 15px;
+  overflow: hidden;
 }
 
 .number i {
