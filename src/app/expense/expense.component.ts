@@ -52,6 +52,11 @@ export class ExpenseComponent implements OnInit {
   currentAmount: number = 0;
   monthAmount: number = 0;
   showKeyBoard: boolean = true;
+  currentDate: string = new Date().toLocaleDateString('ru-RU', {
+    weekday: 'short', // 'Thu'
+    month: 'short',   // 'Aug'
+    day: 'numeric'    // '12'
+  });;
 
   constructor(private router: Router) {}
 

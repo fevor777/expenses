@@ -4,18 +4,21 @@
       <!-- <i class="fas fa-bars"></i> -->
     </div>
     <div class="title">
-      <span>СЕГОДНЯ</span>
+      <span [style.color]="'#ff6f61'">{{ monthAmount }}</span>
+      <span [style.color]="'#ff6f61'">€</span>
     </div>
-    <div class="expense-info">
-      <span>{{ currentAmount }}</span>
-      <span>$</span>
-    </div>
+
+    <div class="title">-</div>
     <div class="title">
-      <span>МЕСЯЦ</span>
+      <span>{{ currentDate }} </span>
+      <span [style.color]="'#ff6f61'">{{ currentAmount }}</span>
+      <span [style.color]="'#ff6f61'">€</span>
     </div>
-    <div class="expense-info" [style.color]="'blue'">
-      <span>{{ monthAmount }}</span>
-      <span>$</span>
+    <div class="title">-</div>
+    <div class="title">
+      <span [style.color]="'green'">{{ monthAmount }}</span>
+      <span [style.color]="'green'">$ </span>
+      <span>до 12/12</span>
     </div>
     <div class="clock-icon" [routerLink]="'/history'">
       <i class="fas fa-clock"></i>
