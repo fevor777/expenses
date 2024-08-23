@@ -1,6 +1,6 @@
 .container {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 72px 1fr 287px;
   // flex-direction: column;
   height: 100vh;
   overflow: hidden;
@@ -20,6 +20,11 @@
 .categ {
   overflow: hidden;
 }
+
+.categ-a {
+  overflow: auto;
+}
+
 
 .menu-icon,
 .clock-icon {

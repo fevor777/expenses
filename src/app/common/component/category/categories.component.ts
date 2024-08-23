@@ -4,7 +4,9 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { Categories, Category } from '../../categories';
 
@@ -13,7 +15,7 @@ import { Categories, Category } from '../../categories';
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss'],
 })
-export class CategoriesComponent implements AfterViewInit {
+export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Input() isContentDown: boolean;
 
   @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
@@ -24,6 +26,15 @@ export class CategoriesComponent implements AfterViewInit {
 
   categories: Category[] = [...Categories, ...Categories];
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isContentDown']) {
+      if (this.isContentDown) {
+        this.categories = [...Categories, ...Categories];
+      } else {
+        this.updateVisibleCategories();
+      }
+    }
+  }
   onCategoryClick(category: string) {
     this.categoryClick.emit(category);
   }
@@ -32,6 +43,7 @@ export class CategoriesComponent implements AfterViewInit {
     this.categorySwipeDown.emit();
   }
   onSwipeUp(): void {
+    this.categories = [...Categories, ...Categories];
     this.categorySwipeUp.emit();
   }
   onSwipeLeft(): void {
@@ -41,8 +53,8 @@ export class CategoriesComponent implements AfterViewInit {
     this.categorySwipeRight.emit();
   }
 
-  private categoryWidth = 110; // 200px width + 20px margin
-  private categoryHeight = 104; // 100px height + 20px margin
+  private categoryWidth = 100; // 70px width + 15px margin
+  private categoryHeight = 94; // 64px height + 15px margin
   private containerWidth = 0;
   private containerHeight = 0;
 
@@ -70,7 +82,10 @@ export class CategoriesComponent implements AfterViewInit {
       const maxRows = Math.floor(this.containerHeight / this.categoryHeight);
       const maxVisibleCategories = maxColumns * maxRows;
 
-      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
+      this.categories = [...Categories, ...Categories].slice(
+        0,
+        maxVisibleCategories
+      );
     }
   }
 }
