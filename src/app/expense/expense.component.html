@@ -32,8 +32,8 @@
   <app-categories
     [style.overflow]="showKeyBoard ? 'hidden' : 'scroll'"
     (categoryClick)="onCategoryClick($event)"
-    (categorySwipeDown)="onHideKeyboard()"
-    (categorySwipeUp)="onShowKeyboard()"
+    (categorySwipeDown)="onSwipeDown()"
+    (categorySwipeUp)="onSwipeUp()"
     (categorySwipeLeft)="onSwipeLeft()"
     (categorySwipeRight)="onSwipeRight()"
     [isContentDown]="!showKeyBoard"

@@ -1,9 +1,9 @@
 .container {
   display: grid;
-  grid-template-rows: 72px 1fr 287px;
+  grid-template-rows: auto 1fr auto;
   // flex-direction: column;
   height: 100dvh;
-  overflow: hidden;
+  // overflow: hidden;
   // justify-content: space-between;
   user-select: none;
 }
