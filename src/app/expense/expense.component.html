@@ -3,7 +3,7 @@
     <div class="menu-icon">
       <i [style.color]="'#BDA4A7'" class="fas fa-bars"></i>
     </div>
-    <div [style.color]="'grey'" class="title">
+    <div [style.color]="'#343434'" class="title">
       <span>{{ monthAmount }}€</span>
     </div>
 
@@ -16,7 +16,7 @@
     <div class="title" [style.color]="'grey'">-</div>
     <div class="title" [style.color]="'grey'">
       <div (click)="onBalanceDateChange()">до {{ balanceDate }}</div>
-      <span (click)="onBalanceChange()">{{ balance }}€</span>
+      <span (click)="onBalanceChange()" [style.color]="'#343434'">{{ balance }}€</span>
     </div>
     <div class="clock-icon" [routerLink]="'/history'">
       <i class="fas fa-clock" [style.color]="'#BDA4A7'"></i>

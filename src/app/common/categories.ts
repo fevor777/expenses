@@ -15,13 +15,13 @@ export const Categories: Category[] = [
     id: 'meal',
     name: 'Питание',
     icon: 'fa-solid fa-bell-concierge',
-    color: '#4CAF50',
+    color: '#474747',
   },
   {
     id: 'clothes',
     name: 'Одежда',
     icon: 'fas fa-tshirt',
-    color: '#FF5722',
+    color: '#a99e00',
   },
   {
     id: 'entertainments',
