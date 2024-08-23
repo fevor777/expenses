@@ -18,12 +18,6 @@ export const Categories: Category[] = [
     color: '#4CAF50',
   },
   {
-    id: 'canteen',
-    name: 'Столовая',
-    icon: 'fas fa-utensils',
-    color: '#FF9800',
-  },
-  {
     id: 'clothes',
     name: 'Одежда',
     icon: 'fas fa-tshirt',
@@ -82,12 +76,6 @@ export const Categories: Category[] = [
     name: 'Парикмахерская',
     icon: 'fas fa-cut',
     color: '#FFC107',
-  },
-  {
-    id: 'bar',
-    name: 'Бар(кафе)',
-    icon: 'fas fa-coffee',
-    color: '#FF5722',
   },
   {
     id: 'alcohol',

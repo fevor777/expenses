@@ -21,18 +21,6 @@ export class HistoryComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    const exp = JSON.parse(localStorage.getItem('expenses') || '[]')
-      .map((expense: Expense) => {
-        if (expense.category === 'canteen' || expense.category === 'bar') {
-          return {
-            ...expense,
-            category: 'meal',
-          };
-        }
-        return expense;
-      }
-    );
-    localStorage.setItem('expenses', JSON.stringify(exp));
     this.expenses = (
       JSON.parse(localStorage.getItem('expenses') || '[]') as HistoryExpense[]
     ).map((expense) => {
