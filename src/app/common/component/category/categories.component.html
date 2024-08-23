@@ -2,13 +2,17 @@
   class="scrollable-content"
   [style.overflow]="isContentDown ? 'scroll' : 'hidden'"
 >
-  <div class="categories" [ngClass]="{ 'scrollable-content-down': isContentDown }">
+  <div
+    class="categories"
+    [ngClass]="{ 'scrollable-content-down': isContentDown }"
+  >
     <div
       *ngFor="let category of categories"
       class="category"
+      (click)="onCategoryClick(category.id)"
     >
-      <i (click)="onCategoryClick(category.id)" [style.color]="'#DB872C'" [class]="category.icon"></i>
-      <span (click)="onCategoryClick(category.id)">{{ category.name }}</span>
+      <i [style.color]="'#DB872C'" [class]="category.icon"></i>
+      <span>{{ category.name }}</span>
     </div>
   </div>
   <!-- <div class="add-expense">
