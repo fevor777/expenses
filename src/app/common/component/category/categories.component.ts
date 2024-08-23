@@ -19,6 +19,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Input() isContentDown: boolean;
 
   @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
+  @Output() categorySwipeRight: EventEmitter<void> = new EventEmitter<void>();
+  @Output() categorySwipeLeft: EventEmitter<void> = new EventEmitter<void>();
 
   categories: Category[] = [...Categories, ...Categories];
 
@@ -71,4 +73,42 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     }
   }
 
+  touchStartX: number = 0;
+  touchStartY: number = 0;
+  touchEndX: number = 0;
+  touchEndY: number = 0;
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    this.touchStartX = event.changedTouches[0].screenX;
+    this.touchStartY = event.changedTouches[0].screenY;
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(event: TouchEvent) {
+    this.touchEndX = event.changedTouches[0].screenX;
+    this.touchEndY = event.changedTouches[0].screenY;
+    this.handleSwipeGesture();
+  }
+
+  handleSwipeGesture() {
+    const deltaX = this.touchEndX - this.touchStartX;
+    const deltaY = this.touchEndY - this.touchStartY;
+
+    // Detect horizontal swipe only if it is more significant than vertical swipe
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 150) {
+        this.onSwipeRight();
+      } else if (deltaX < -150) {
+        this.onSwipeRight();
+      }
+    }
+  }
+
+  onSwipeRight() {
+    this.categorySwipeRight.emit();
+  }
+  onSwipeLeft() {
+    this.categorySwipeLeft.emit();
+  }
 }

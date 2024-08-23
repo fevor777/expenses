@@ -1,6 +1,7 @@
 <div
   class="scrollable-content"
   [ngClass]="{ 'scrollable-content-down': isContentDown }"
+  [style.overflow]="isContentDown ? 'scroll' : 'hidden'"
 >
   <div class="categories">
     <div
