@@ -125,7 +125,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     this.router.navigate(['/statistics']);
   }
 
-  onSwipeUp(): void {
+  onShowKeyBoard(): void {
     this.showKeyBoard = true;
   }
   onSwipeDown(): void {

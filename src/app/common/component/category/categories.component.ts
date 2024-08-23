@@ -19,10 +19,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Input() isContentDown: boolean;
 
   @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
-  @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
-  @Output() categorySwipeUp: EventEmitter<void> = new EventEmitter<void>();
-  @Output() categorySwipeLeft: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeRight: EventEmitter<void> = new EventEmitter<void>();
+  @Output() categorySwipeLeft: EventEmitter<void> = new EventEmitter<void>();
 
   categories: Category[] = [...Categories, ...Categories];
 
@@ -37,20 +35,6 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
   onCategoryClick(category: string) {
     this.categoryClick.emit(category);
-  }
-
-  onSwipeDown(): void {
-    this.categorySwipeDown.emit();
-  }
-  onSwipeUp(): void {
-    this.categories = [...Categories, ...Categories];
-    this.categorySwipeUp.emit();
-  }
-  onSwipeLeft(): void {
-    this.categorySwipeLeft.emit();
-  }
-  onSwipeRight(): void {
-    this.categorySwipeRight.emit();
   }
 
   private categoryWidth = 100; // 70px width + 15px margin
@@ -87,5 +71,44 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
         maxVisibleCategories
       );
     }
+  }
+
+  touchStartX: number = 0;
+  touchStartY: number = 0;
+  touchEndX: number = 0;
+  touchEndY: number = 0;
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    this.touchStartX = event.changedTouches[0].screenX;
+    this.touchStartY = event.changedTouches[0].screenY;
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(event: TouchEvent) {
+    this.touchEndX = event.changedTouches[0].screenX;
+    this.touchEndY = event.changedTouches[0].screenY;
+    this.handleSwipeGesture();
+  }
+
+  handleSwipeGesture() {
+    const deltaX = this.touchEndX - this.touchStartX;
+    const deltaY = this.touchEndY - this.touchStartY;
+
+    // Detect horizontal swipe only if it is more significant than vertical swipe
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 50) {
+        this.onSwipeRight();
+      } else if (deltaX < -50) {
+        this.onSwipeRight();
+      }
+    }
+  }
+
+  onSwipeRight() {
+    this.categorySwipeRight.emit();
+  }
+  onSwipeLeft() {
+    this.categorySwipeLeft.emit();
   }
 }

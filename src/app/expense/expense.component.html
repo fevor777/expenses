@@ -30,13 +30,23 @@
   </div>
 
   <app-categories
-    [style.overflow]="showKeyBoard ? 'hidden' : 'scroll'"
+    *ngIf="showKeyBoard"
+    [style.overflow]="'hidden'"
     (categoryClick)="onCategoryClick($event)"
-    (categorySwipeDown)="onSwipeDown()"
-    (categorySwipeUp)="onSwipeUp()"
-    (categorySwipeLeft)="onSwipeLeft()"
-    (categorySwipeRight)="onSwipeRight()"
-    [isContentDown]="!showKeyBoard"
+    appSwipe
+    (swipeDown)="onSwipeDown()"
+    (swipeUp)="onShowKeyBoard()"
+    (swipeLeft)="onSwipeLeft()"
+    (swipeRight)="onSwipeRight()"
+  >
+  </app-categories>
+  <app-categories
+    *ngIf="!showKeyBoard"
+    [style.overflow]="'scroll'"
+    (categoryClick)="onCategoryClick($event)"
+    (categorySwipeLeft)="onShowKeyBoard()"
+    (categorySwipeRight)="onShowKeyBoard()"
+    [isContentDown]="true"
   >
   </app-categories>
   <div class="number-board" *ngIf="showKeyBoard">
