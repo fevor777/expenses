@@ -30,7 +30,7 @@
   </div>
 
   <app-categories
-    *ngIf="showKeyBoard"
+    *ngIf="showKeyBoard; else categoriesWithScroll"
     [style.overflow]="'hidden'"
     (categoryClick)="onCategoryClick($event)"
     appSwipe
@@ -40,15 +40,18 @@
     (swipeRight)="onSwipeRight()"
   >
   </app-categories>
-  <app-categories
-    *ngIf="!showKeyBoard"
-    [style.overflow]="'scroll'"
-    (categoryClick)="onCategoryClick($event)"
-    (categorySwipeLeft)="onShowKeyBoard()"
-    (categorySwipeRight)="onShowKeyBoard()"
-    [isContentDown]="true"
-  >
-  </app-categories>
+  <ng-template #categoriesWithScroll>
+    <app-categories
+      *ngIf="!showKeyBoard"
+      [style.overflow-y]="'scroll'"
+      (categoryClick)="onCategoryClick($event)"
+      (swipeleft)="onShowKeyBoard()"
+      (swiperight)="onShowKeyBoard()"
+      [isContentDown]="true"
+    >
+    </app-categories>
+  </ng-template>
+
   <div class="number-board" *ngIf="showKeyBoard">
     <div
       class="number-board-header"

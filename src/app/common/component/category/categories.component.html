@@ -6,10 +6,9 @@
     <div
       *ngFor="let category of categories"
       class="category"
-      (click)="onCategoryClick(category.id)"
     >
-      <i [style.color]="'#DB872C'" [class]="category.icon"></i>
-      <span>{{ category.name }}</span>
+      <i (click)="onCategoryClick(category.id)" [style.color]="'#DB872C'" [class]="category.icon"></i>
+      <span (click)="onCategoryClick(category.id)">{{ category.name }}</span>
     </div>
   </div>
   <!-- <div class="add-expense">
