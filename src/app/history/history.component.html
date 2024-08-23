@@ -4,7 +4,7 @@
   ><br />
   <div [style.margin.px]="'10'">
     <span>Общий расход: </span>
-    <span [style.color]="'#DB2C07'">{{ totalAmount }}€</span>
+    <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
   </div>
   <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   <span *ngFor="let item of expenses; let i = index">
@@ -13,12 +13,20 @@
       [style.width]="'100%'"
       [style.display]="'block'"
       *ngIf="item.showDateTitle"
-      >{{ item.date | date : "dd-MM-YYYY" }} - {{ getTotalAmountPerDay(item.date) }}€</span
+      ><span>{{ item.date | date : "dd-MM-YYYY" }} - </span
+      ><span [style.font-weight]="'600'">{{ getTotalAmountPerDay(item.date) }}€</span></span
     >
     <br />Цена:
-    <span [style.color]="'#DB2C07'">{{ item.amount }}€</span>
-    <br />
-    <div>Category: <span [style.color]="'blue'" (click)="showCategoryDetails(item.category)">{{ getCategoryNameByIdFunc(item.category) }}</span></div>
+    <span [style.color]="'#ff6f61'">{{ item.amount }}€</span>
+    <br /><br />
+    <div>
+      Category:
+      <span
+        [style.color]="'blue'"
+        (click)="showCategoryDetails(item.category)"
+        >{{ getCategoryNameByIdFunc(item.category) }}</span
+      >
+    </div>
     Date: {{ item.date | date : "HH:mm" }} <br /><br />
     <span
       [style.color]="'grey'"

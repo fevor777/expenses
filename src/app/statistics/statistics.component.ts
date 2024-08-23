@@ -52,8 +52,8 @@ export class StatisticsComponent implements OnInit {
         if (!categoryMap[expense.category]) {
           categoryMap[expense.category] = 0;
         }
-        categoryMap[expense.category] += expense.amount;
-        this.totalAmount += expense.amount;
+        categoryMap[expense.category] = Math.round((categoryMap[expense.category] + expense.amount) * 100) / 100;
+        this.totalAmount = Math.round((this.totalAmount + expense.amount) * 100) / 100;;
       });
 
     // Calculate percentage for each category

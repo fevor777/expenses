@@ -37,13 +37,13 @@ export class DetailsComponent implements OnInit {
       const expenseYear = date.getFullYear();
       if (categoryId === expense.category) {
         if (currentDate === expenseDate && currentMonth === expenseMonth && currentYear === expenseYear) {
-          this.amountForDay += expense.amount;
+          this.amountForDay = Math.round((this.amountForDay + expense.amount) * 100) / 100;
         }
         if (currentMonth === expenseMonth && currentYear === expenseYear) {
-          this.amountForMonth += expense.amount;
+          this.amountForMonth = Math.round((this.amountForMonth + expense.amount) * 100) / 100;
         }
         if (currentYear === expenseYear) {
-          this.amountForYear += expense.amount;
+          this.amountForYear = Math.round((this.amountForYear + expense.amount) * 100) / 100;
         }
       }
     });
