@@ -13,8 +13,8 @@ export const getCategoryNameById = (id: string): string => {
 export const Categories: Category[] = [
   {
     id: 'meal',
-    name: 'Продукты',
-    icon: 'fas fa-apple-alt',
+    name: 'Питание',
+    icon: 'fa-solid fa-bell-concierge',
     color: '#4CAF50',
   },
   {
