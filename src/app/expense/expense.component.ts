@@ -26,15 +26,14 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   categories: Category[] = Categories;
 
   constructor(private router: Router) {}
+
   ngAfterViewChecked(): void {
     this.categoriesVisible = true;
   }
 
   ngOnInit(): void {
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    console.log('expenses', expenses);
     this.sumValues(expenses);
-    console.log('currentAmount', this.currentAmount);
     this.balance = Number(localStorage.getItem('balance')) || 0;
     this.balanceDate = localStorage.getItem('balanceDate');
   }
@@ -52,9 +51,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.enteredAmount += numberValue;
     }
     this.enteredAmountAsNumber = Number(this.enteredAmount);
-
-    console.log(this.enteredAmount);
-    console.log(Number(this.enteredAmount));
   }
 
   onDeleteClick() {
@@ -62,7 +58,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.enteredAmount = this.enteredAmount.slice(0, -1);
     }
     this.enteredAmountAsNumber = Number(this.enteredAmount);
-    console.log(this.enteredAmount);
   }
 
   onCategoryClick(categoryName: string) {
