@@ -97,9 +97,9 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 150) {
+      if (deltaX > 50) {
         this.onSwipeRight();
-      } else if (deltaX < -150) {
+      } else if (deltaX < -50) {
         this.onSwipeRight();
       }
     }
