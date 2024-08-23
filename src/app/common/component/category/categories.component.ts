@@ -22,7 +22,7 @@ export class CategoriesComponent implements AfterViewInit {
   @Output() categorySwipeLeft: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeRight: EventEmitter<void> = new EventEmitter<void>();
 
-  categories: Category[] = [...Categories];
+  categories: Category[] = [...Categories, ...Categories];
 
   onCategoryClick(category: string) {
     this.categoryClick.emit(category);
@@ -41,13 +41,13 @@ export class CategoriesComponent implements AfterViewInit {
     this.categorySwipeRight.emit();
   }
 
-  private categoryWidth = 90; // 200px width + 20px margin
-  private categoryHeight = 84; // 100px height + 20px margin
+  private categoryWidth = 110; // 200px width + 20px margin
+  private categoryHeight = 104; // 100px height + 20px margin
   private containerWidth = 0;
   private containerHeight = 0;
 
   ngOnInit(): void {
-    this.updateVisibleCategories();
+    // this.updateVisibleCategories();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -70,7 +70,7 @@ export class CategoriesComponent implements AfterViewInit {
       const maxRows = Math.floor(this.containerHeight / this.categoryHeight);
       const maxVisibleCategories = maxColumns * maxRows;
 
-      this.categories = Categories.slice(0, maxVisibleCategories);
+      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
     }
   }
 }
