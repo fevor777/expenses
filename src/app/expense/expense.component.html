@@ -3,26 +3,20 @@
     <div class="menu-icon">
       <i [style.color]="'#BDA4A7'" class="fas fa-bars"></i>
     </div>
-    <div class="title">
-      <span [style.color]="'#ff6f61'">{{ monthAmount }}</span>
-      <span [style.color]="'#ff6f61'">€</span>
+    <div [style.color]="'grey'" class="title">
+      <span>{{ monthAmount }}€</span>
     </div>
 
-    <div class="title">-</div>
+    <div class="title" [style.color]="'grey'">-</div>
     <div class="title">
       <div [style.color]="'grey'">{{ currentDate }}</div>
-      <span class="title-total">{{
-        currentAmount
-      }}</span>
+      <span class="title-total">{{ currentAmount }}</span>
       <span class="title-total">€</span>
     </div>
-    <div class="title">-</div>
-    <div class="title">
+    <div class="title" [style.color]="'grey'">-</div>
+    <div class="title" [style.color]="'grey'">
       <div (click)="onBalanceDateChange()">до {{ balanceDate }}</div>
-      <span [style.color]="'green'" (click)="onBalanceChange()">{{
-        balance
-      }}</span>
-      <span [style.color]="'green'" (click)="onBalanceChange()">€ </span>
+      <span (click)="onBalanceChange()">{{ balance }}€</span>
     </div>
     <div class="clock-icon" [routerLink]="'/history'">
       <i class="fas fa-clock" [style.color]="'#BDA4A7'"></i>
