@@ -41,7 +41,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   private categoryWidth = 120; // 70px width + 15px margin
-  private categoryHeight = 114; // 64px height + 15px margin
+  private categoryHeight = 104; // 64px height + 15px margin
   private containerWidth = 0;
   private containerHeight = 0;
 
