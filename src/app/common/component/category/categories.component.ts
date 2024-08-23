@@ -40,8 +40,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     this.categoryClick.emit(category);
   }
 
-  private categoryWidth = 100; // 70px width + 15px margin
-  private categoryHeight = 94; // 64px height + 15px margin
+  private categoryWidth = 120; // 70px width + 15px margin
+  private categoryHeight = 114; // 64px height + 15px margin
   private containerWidth = 0;
   private containerHeight = 0;
 
