@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Expense } from '../common/expense.model';
 import { getCategoryNameById } from '../common/categories';
 
-type HistoryExpense = Expense & { showDateTitle: boolean };
+type HistoryExpense = Expense & { showDateTitle: boolean, amountPerDay: number };
 
 @Component({
   selector: 'app-history',
@@ -14,6 +14,7 @@ export class HistoryComponent implements OnInit {
   expenses: HistoryExpense[] = [];
   totalAmount: number = 0;
   temporaryDate: number = 0;
+  totalAmountPerDays: Map<number, number> = new Map();
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
@@ -22,11 +23,26 @@ export class HistoryComponent implements OnInit {
   ngOnInit(): void {
     this.expenses = (
       JSON.parse(localStorage.getItem('expenses') || '[]') as HistoryExpense[]
-    ).map((expense) => ({
+    ).map((expense) => {
+      const showDateTitle = this.isDatePanelVisible(expense.date);
+      if (showDateTitle) {
+        this.totalAmountPerDays.set(expense.date, expense.amount);
+        
+      } else {
+        const amount = this.totalAmountPerDays.get(this.temporaryDate) || 0;
+        const newAmount = Math.round((amount + expense.amount) * 100) / 100;
+        this.totalAmountPerDays.set(this.temporaryDate, newAmount);
+      }
+       return{
       ...expense,
-      showDateTitle: this.isDatePanelVisible(expense.date),
-    }));
+      showDateTitle
+      }
+    });
     this.sumValues();
+  }
+
+  getTotalAmountPerDay(date: number): number {
+    return this.totalAmountPerDays.get(date) || 0;
   }
 
   onDelete(index: number) {

@@ -13,7 +13,7 @@
       [style.width]="'100%'"
       [style.display]="'block'"
       *ngIf="item.showDateTitle"
-      >{{ item.date | date : "dd-MM-YYYY" }}</span
+      >{{ item.date | date : "dd-MM-YYYY" }} - {{ getTotalAmountPerDay(item.date) }}€</span
     >
     <br />Цена:
     <span [style.color]="'#DB2C07'">{{ item.amount }}€</span>
