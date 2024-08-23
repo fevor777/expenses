@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,7 +10,7 @@ import { Categories, Category } from '../common/categories';
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
 })
-export class ExpenseComponent implements OnInit {
+export class ExpenseComponent implements OnInit, AfterViewChecked {
   enteredAmount = '';
   enteredAmountAsNumber: number = 0;
   currentAmount: number = 0;
@@ -26,6 +26,9 @@ export class ExpenseComponent implements OnInit {
   categories: Category[] = Categories;
 
   constructor(private router: Router) {}
+  ngAfterViewChecked(): void {
+    this.categoriesVisible = true;
+  }
 
   ngOnInit(): void {
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
@@ -35,6 +38,8 @@ export class ExpenseComponent implements OnInit {
     this.balance = Number(localStorage.getItem('balance')) || 0;
     this.balanceDate = localStorage.getItem('balanceDate');
   }
+
+  categoriesVisible = false;
 
   onNumberClick(numberValue: string) {
     if (numberValue === '.') {
@@ -74,7 +79,8 @@ export class ExpenseComponent implements OnInit {
         date: Date.now(),
       });
       const balance = Number(localStorage.getItem('balance') || 0);
-      const newBalance = Math.round((balance - this.enteredAmountAsNumber) * 100) / 100;
+      const newBalance =
+        Math.round((balance - this.enteredAmountAsNumber) * 100) / 100;
       localStorage.setItem('balance', newBalance.toString());
       this.balance = newBalance;
       localStorage.setItem('expenses', JSON.stringify(expenseList));
@@ -82,8 +88,10 @@ export class ExpenseComponent implements OnInit {
       this.enteredAmount = '';
       this.enteredAmountAsNumber = 0;
       this.showKeyBoard = true;
-
     }
+  }
+
+  ngAfterViewInit(): void {
   }
 
   onBalanceChange(): void {
@@ -95,7 +103,10 @@ export class ExpenseComponent implements OnInit {
   }
 
   onBalanceDateChange(): void {
-    const newBalanceDate = prompt('Enter new balance date', this.balanceDate || '');
+    const newBalanceDate = prompt(
+      'Enter new balance date',
+      this.balanceDate || ''
+    );
     if (newBalanceDate) {
       localStorage.setItem('balanceDate', newBalanceDate);
       this.balanceDate = newBalanceDate;

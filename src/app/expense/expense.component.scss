@@ -1,18 +1,24 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  justify-content: space-between;
-  user-select: none;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  // flex-direction: column;
+  height: 100vh;
   overflow: hidden;
+  // justify-content: space-between;
+  user-select: none;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  // align-items: center;
   padding: 10px;
+  height: 72px;
   background-color: #fff;
+}
+
+.categ {
+  overflow: hidden;
 }
 
 .menu-icon,
@@ -53,7 +59,8 @@
 
 .number-board {
   background-color: #f8d7da;
-  overflow: hidden;
+  // overflow: hidden;
+  height: 287px;
 }
 
 .number-board-header {
