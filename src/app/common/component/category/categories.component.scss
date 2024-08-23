@@ -2,9 +2,6 @@
     display: flex;
     height: 100%;
     width: 100%;
-    .scrollable-content-down {
-      align-items: end;
-    }
   }
   
   .categories {
@@ -29,4 +26,8 @@
   .category i {
     font-size: 25px;
     margin-bottom: 5px;
+  }
+
+  .scrollable-content-down {
+    align-self: flex-end;
   }

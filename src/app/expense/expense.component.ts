@@ -87,8 +87,8 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.sumValues(expenseList);
       this.enteredAmount = '';
       this.enteredAmountAsNumber = 0;
+      this.showKeyBoard = true;
     }
-    this.showKeyBoard = true;
   }
 
   ngAfterViewInit(): void {

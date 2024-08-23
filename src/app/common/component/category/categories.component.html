@@ -1,9 +1,8 @@
 <div
   class="scrollable-content"
-  [ngClass]="{ 'scrollable-content-down': isContentDown }"
   [style.overflow]="isContentDown ? 'scroll' : 'hidden'"
 >
-  <div class="categories">
+  <div class="categories" [ngClass]="{ 'scrollable-content-down': isContentDown }">
     <div
       *ngFor="let category of categories"
       class="category"
