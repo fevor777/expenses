@@ -33,6 +33,7 @@
     *ngIf="showKeyBoard; else categoriesWithScroll"
     [style.overflow]="'hidden'"
     (categoryClick)="onCategoryClick($event)"
+    (clickMore)="onSwipeDown()"
     appSwipe
     (swipeDown)="onSwipeDown()"
     (swipeUp)="onShowKeyBoard()"

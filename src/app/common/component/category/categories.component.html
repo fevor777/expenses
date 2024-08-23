@@ -1,6 +1,7 @@
 <div
   class="scrollable-content"
   [style.overflow]="isContentDown ? 'scroll' : 'hidden'"
+  [style.height]="showMore ? 'calc(100% - 40px)' : '100%'"
 >
   <div
     class="categories"
@@ -15,7 +16,15 @@
       <span>{{ category.name }}</span>
     </div>
   </div>
+
   <!-- <div class="add-expense">
       <i class="fas fa-plus"></i>
     </div> -->
+
 </div>
+<div class="categories-more" *ngIf="showMore" (click)="onClickMore()">
+  <div>Еще</div>
+  <i class="fa-solid fa-chevron-down"></i>
+</div>
+
+

@@ -1,6 +1,6 @@
 .scrollable-content {
     display: flex;
-    height: 100%;
+    height: calc(100% - 30px);
     width: 100%;
   }
   
@@ -30,4 +30,9 @@
 
   .scrollable-content-down {
     align-self: flex-end;
+  }
+
+  .categories-more {
+    text-align: center;
+    color: grey;
   }
