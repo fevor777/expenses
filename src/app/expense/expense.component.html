@@ -29,29 +29,13 @@
     </div>
   </div>
 
-  <div
-    class="scrollable-content"
-    [ngClass]="{ 'scrollable-content-down': !showKeyBoard }"
-    appSwipe
-    (swipeDown)="onHideKeyboard()"
-    (swipeUp)="onShowKeyboard()"
-    (swipeLeft)="onSwipeLeft()"
-    (swipeRight)="onSwipeRight()"
+  <app-categories
+    (categorySwipeDown)="onHideKeyboard()"
+    (categorySwipeUp)="onShowKeyboard()"
+    (categorySwipeLeft)="onSwipeLeft()"
+    (categorySwipeRight)="onSwipeRight()"
   >
-    <div class="categories">
-      <div
-        *ngFor="let category of categories"
-        class="category"
-        (click)="onCategoryClick(category.id)"
-      >
-        <i [style.color]="'#DB872C'" [class]="category.icon"></i>
-        <span>{{ category.name }}</span>
-      </div>
-    </div>
-    <!-- <div class="add-expense">
-      <i class="fas fa-plus"></i>
-    </div> -->
-  </div>
+  </app-categories>
   <div class="number-board" *ngIf="showKeyBoard">
     <div
       class="number-board-header"

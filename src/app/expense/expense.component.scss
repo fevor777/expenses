@@ -37,36 +37,6 @@
   }
 }
 
-.scrollable-content {
-  display: flex;
-  .scrollable-content-down {
-    align-items: end;
-  }
-}
-
-.categories {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  padding: 10px;
-}
-
-.category {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 70px;
-  margin: 10px;
-  text-align: center;
-  font-size: 15px;
-
-}
-
-.category i {
-  font-size: 25px;
-  margin-bottom: 5px;
-}
-
 .add-expense {
   display: flex;
   justify-content: center;

@@ -1,0 +1,23 @@
+<div
+  class="scrollable-content"
+  [ngClass]="{ 'scrollable-content-down': isContentDown }"
+  appSwipe
+  (swipeDown)="onSwipeDown()"
+  (swipeUp)="onSwipeUp()"
+  (swipeLeft)="onSwipeLeft()"
+  (swipeRight)="onSwipeRight()"
+>
+  <div class="categories">
+    <div
+      *ngFor="let category of categories"
+      class="category"
+      (click)="onCategoryClick(category.id)"
+    >
+      <i [style.color]="'#DB872C'" [class]="category.icon"></i>
+      <span>{{ category.name }}</span>
+    </div>
+  </div>
+  <!-- <div class="add-expense">
+      <i class="fas fa-plus"></i>
+    </div> -->
+</div>
