@@ -1,10 +1,10 @@
-import { Directive, ElementRef, EventEmitter, OnInit, Output } from '@angular/core';
+import {Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import * as Hammer from 'hammerjs';
 
 @Directive({
   selector: '[appSwipe]'
 })
-export class SwipeDirective implements OnInit {
+export class SwipeDirective implements OnInit, OnDestroy {
   @Output() swipeLeft = new EventEmitter<void>();
   @Output() swipeRight = new EventEmitter<void>();
   @Output() swipeDown = new EventEmitter<void>();

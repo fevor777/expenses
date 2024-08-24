@@ -2,6 +2,12 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { getCategoryNameById } from '../common/categories';
 
+enum Mode {
+  TODAY = 'today',
+  WEEK = 'week',
+  MONTH = 'month',
+}
+
 @Component({
   selector: 'app-statistics',
   templateUrl: './statistics.component.html',
@@ -16,6 +22,8 @@ export class StatisticsComponent implements OnInit {
   }[] = [];
   totalAmount: number = 0;
   readonly getCategoryNameByIdFunc = getCategoryNameById;
+  mode = 'today';
+  title = 'за сегодня';
 
   constructor(private router: Router) {}
 
@@ -32,7 +40,14 @@ export class StatisticsComponent implements OnInit {
     });
   }
 
-  calculateCategoryTotals(): void {
+  calculateCategoryTotals(mode?: Mode): void {
+    let sinceWhen = new Date();
+    if (mode === Mode.WEEK) {
+      sinceWhen = new Date(sinceWhen.setDate(sinceWhen.getDate() - sinceWhen.getDay()));
+    }
+    if (mode === Mode.MONTH) {
+      sinceWhen = new Date(sinceWhen.setDate(1));
+    }
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 
     const categoryMap: { [key: string]: number } = {};
@@ -41,11 +56,10 @@ export class StatisticsComponent implements OnInit {
     expenses
       .filter((expense: { date: number }) => {
         const date = new Date(expense.date);
-        const today = new Date();
         return (
-          date.getDate() === today.getDate() &&
-          date.getMonth() === today.getMonth() &&
-          date.getFullYear() === today.getFullYear()
+          date.getDate() >= sinceWhen.getDate() &&
+          date.getMonth() === sinceWhen.getMonth() &&
+          date.getFullYear() === sinceWhen.getFullYear()
         );
       })
       .forEach((expense) => {
@@ -53,7 +67,7 @@ export class StatisticsComponent implements OnInit {
           categoryMap[expense.category] = 0;
         }
         categoryMap[expense.category] = Math.round((categoryMap[expense.category] + expense.amount) * 100) / 100;
-        this.totalAmount = Math.round((this.totalAmount + expense.amount) * 100) / 100;;
+        this.totalAmount = Math.round((this.totalAmount + expense.amount) * 100) / 100;
       });
 
     // Calculate percentage for each category
@@ -112,4 +126,14 @@ export class StatisticsComponent implements OnInit {
     const red = Math.min(255, Math.round(percentage * 2.55));
     return `rgb(${red}, ${green}, 0)`; // RGB color with variable red and green
   }
+
+  changeMode(mode: Mode): void {
+    this.mode = mode;
+    this.categoryTotals = [];
+    this.totalAmount = 0;
+    this.calculateCategoryTotals(mode);
+    this.title = mode === Mode.TODAY ? 'за сегодня' : mode === Mode.WEEK ? 'на этой неделе' : 'в этом месяце';
+  }
+
+  protected readonly Mode = Mode;
 }
