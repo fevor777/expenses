@@ -1,19 +1,18 @@
 <div class="statistics">
   <div class="statistics-title">Статистика по категориям за сегодня:</div>
-  Всего потрачено: {{ totalAmount }}€<br /><br />
-  <div *ngFor="let categoryTotal of categoryTotals" class="category-summary">
-    <div class="category-header" (click)="showCategoryDetails(categoryTotal.category)">
-      <span [style.color]="'blue'">{{ getCategoryNameByIdFunc(categoryTotal.category) }}</span>
-      <span>{{ categoryTotal.amount}}€</span>
-    </div>
-    <div class="progress-bar-container" (click)="showCategoryDetails(categoryTotal.category)">
-      <div
-        class="progress-bar"
-        [style.width.%]="categoryTotal.percentage"
-        [style.backgroundColor]="categoryTotal.color"
-      >
-        {{ categoryTotal.percentage.toFixed(2) }}%
-      </div>
-    </div>
+  Всего потрачено: <span [style.color]="'#870024'">{{ totalAmount }}€</span
+  ><br /><br />
+  <div *ngIf="excludedCategories?.length > 0">
+    <span>(За исключением: {{ excludedCategories.join(", ") }}) </span>
+    <i (click)="onRefresh()" class="fas fa-redo-alt"></i>
   </div>
+  <app-statistics-bar
+    *ngFor="let categoryTotal of categoryTotals"
+    [amount]="categoryTotal.amount"
+    [category]="categoryTotal.category"
+    [percentage]="categoryTotal.percentage"
+    [color]="categoryTotal.color"
+    (close)="onBarClose($event)"
+  >
+  </app-statistics-bar>
 </div>

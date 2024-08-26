@@ -15,21 +15,13 @@ export class StatisticsComponent implements OnInit {
     color: string;
   }[] = [];
   totalAmount: number = 0;
-  readonly getCategoryNameByIdFunc = getCategoryNameById;
+
+  excludedCategories: string[] = [];
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.calculateCategoryTotals();
-  }
-
-  showCategoryDetails(categoryId: string): void {
-    this.router.navigate(['/details'], {
-      queryParams: {
-        'category-id': categoryId,
-        'back-url': '/statistics',
-      },
-    });
   }
 
   calculateCategoryTotals(): void {
@@ -52,8 +44,11 @@ export class StatisticsComponent implements OnInit {
         if (!categoryMap[expense.category]) {
           categoryMap[expense.category] = 0;
         }
-        categoryMap[expense.category] = Math.round((categoryMap[expense.category] + expense.amount) * 100) / 100;
-        this.totalAmount = Math.round((this.totalAmount + expense.amount) * 100) / 100;;
+        categoryMap[expense.category] =
+          Math.round((categoryMap[expense.category] + expense.amount) * 100) /
+          100;
+        this.totalAmount =
+          Math.round((this.totalAmount + expense.amount) * 100) / 100;
       });
 
     // Calculate percentage for each category
@@ -111,5 +106,19 @@ export class StatisticsComponent implements OnInit {
     const green = Math.min(255, Math.round((100 - percentage) * 2.55));
     const red = Math.min(180, Math.round(percentage * 1.8));
     return `rgb(${red}, ${green}, 0)`; // RGB color with variable red and green
+  }
+
+  onRefresh(): void {
+    this.categoryTotals = [];
+    this.totalAmount = 0;
+    this.excludedCategories = [];
+    this.calculateCategoryTotals();
+  }
+
+  onBarClose(category: string): void {
+    this.excludedCategories = [...this.excludedCategories, category];
+    this.totalAmount = this.categoryTotals
+      .filter((c) => !this.excludedCategories.includes(c.category))
+      .reduce((total, c) => Math.round((total + c.amount) * 100) / 100, 0);
   }
 }
