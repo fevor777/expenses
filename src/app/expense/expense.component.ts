@@ -57,6 +57,8 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
+    this.enteredAmount = localStorage.getItem('enteredAmount') || '';
+    this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
   categoriesVisible = false;
@@ -71,6 +73,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     } else {
       this.enteredAmount += numberValue;
     }
+    localStorage.setItem('enteredAmount', this.enteredAmount);
     this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
@@ -78,6 +81,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     if (this.enteredAmount.length > 0) {
       this.enteredAmount = this.enteredAmount.slice(0, -1);
     }
+    localStorage.setItem('enteredAmount', this.enteredAmount);
     this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
@@ -105,6 +109,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.sumValues(expenseList);
       this.enteredAmount = '';
       this.enteredAmountAsNumber = 0;
+      localStorage.setItem('enteredAmount', this.enteredAmount);
       this.showKeyBoard = true;
     }
   }

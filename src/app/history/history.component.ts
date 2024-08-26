@@ -3,7 +3,10 @@ import { Router } from '@angular/router';
 import { Expense } from '../common/expense.model';
 import { getCategoryNameById } from '../common/categories';
 
-type HistoryExpense = Expense & { showDateTitle: boolean, amountPerDay: number };
+type HistoryExpense = Expense & {
+  showDateTitle: boolean;
+  amountPerDay: number;
+};
 
 @Component({
   selector: 'app-history',
@@ -27,16 +30,15 @@ export class HistoryComponent implements OnInit {
       const showDateTitle = this.isDatePanelVisible(expense.date);
       if (showDateTitle) {
         this.totalAmountPerDays.set(expense.date, expense.amount);
-        
       } else {
         const amount = this.totalAmountPerDays.get(this.temporaryDate) || 0;
         const newAmount = Math.round((amount + expense.amount) * 100) / 100;
         this.totalAmountPerDays.set(this.temporaryDate, newAmount);
       }
-       return{
-      ...expense,
-      showDateTitle
-      }
+      return {
+        ...expense,
+        showDateTitle,
+      };
     });
     this.sumValues();
   }
@@ -54,17 +56,22 @@ export class HistoryComponent implements OnInit {
     }
   }
 
-  updateBalance(index: number): void {
+  updateBalance(index: number, isDeleteFromBalance?: boolean): void {
     const balance = Number(localStorage.getItem('balance')) || 0;
-    if (balance) {
-      const newBalance = Math.round((balance + this.expenses[index].amount) * 100) / 100;
+    if (balance && !this.expenses[index]?.isDeletedFromBalance) {
+      const newBalance =
+        Math.round((balance + this.expenses[index].amount) * 100) / 100;
+      if (isDeleteFromBalance) {
+        this.expenses[index].isDeletedFromBalance = isDeleteFromBalance;
+        localStorage.setItem('expenses', JSON.stringify(this.expenses));
+      }
       localStorage.setItem('balance', newBalance.toString());
     }
   }
 
   onDeleteFromBalance(index: number): void {
     if (confirm('Return to balance?')) {
-      this.updateBalance(index);
+      this.updateBalance(index, true);
     }
   }
 
