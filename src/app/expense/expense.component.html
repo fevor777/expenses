@@ -4,7 +4,11 @@
       <i [style.color]="'#BDA4A7'" class="fas fa-bars"></i>
     </div>
     <div [style.color]="'#343434'" class="title">
-      <span>{{ monthAmount }}€</span>
+      <span *ngIf="!showSavings; else savingsTemplate" (click)="onShowSavings()">{{ monthAmount }}€</span>
+      <ng-template #savingsTemplate>
+        <span class=expense-savings (click)="onShowSavings()">{{ savings }}</span> 
+        <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
+      </ng-template>
     </div>
 
     <div class="title" [style.color]="'grey'">-</div>

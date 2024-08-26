@@ -34,6 +34,8 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   categories: Category[] = Categories;
 
   currency: Currency;
+  showSavings: boolean;
+  savings: string = '0';
 
   getCurrencySymbol(): string {
     return getCurrencySymbol(this.currency.code, 'narrow');
@@ -62,6 +64,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
+    this.savings = localStorage.getItem('savings') || '0';
   }
 
   categoriesVisible = false;
@@ -157,6 +160,18 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   }
   onSwipeDown(): void {
     this.showKeyBoard = false;
+  }
+
+  onShowSavings(): void {
+    this.showSavings = !this.showSavings;
+  }
+
+  changeSavings(): void {
+    const newSavings = prompt('Enter new savings', this.savings);
+    if (newSavings) {
+      localStorage.setItem('savings', newSavings);
+      this.savings = newSavings;
+    }
   }
 
   onCurrencyClick(): void {
