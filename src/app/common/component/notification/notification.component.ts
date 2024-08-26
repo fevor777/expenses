@@ -26,7 +26,7 @@ export class NotificationComponent implements OnDestroy {
     this.show = true;
     setTimeout(() => {
       this.show = false;
-    }, 3000);
+    }, 5000);
   }
 
   onCloseNotification() {
