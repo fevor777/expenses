@@ -6,7 +6,7 @@
     <div [style.color]="'#343434'" class="title">
       <span *ngIf="!showSavings; else savingsTemplate" (click)="onShowSavings()">{{ monthAmount }}€</span>
       <ng-template #savingsTemplate>
-        <span class=expense-savings (click)="onShowSavings()">{{ savings }}</span> 
+        <span class=expense-savings (click)="onShowSavings()">{{ savings }}€</span> 
         <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
       </ng-template>
     </div>
