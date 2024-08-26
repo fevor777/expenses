@@ -57,7 +57,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
-    this.enteredAmount = localStorage.getItem('enteredAmount') || '';
   }
 
   categoriesVisible = false;
@@ -72,14 +71,12 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     } else {
       this.enteredAmount += numberValue;
     }
-    localStorage.setItem('enteredAmount', this.enteredAmount);
   }
 
   onDeleteClick() {
     if (this.enteredAmount.length > 0) {
       this.enteredAmount = this.enteredAmount.slice(0, -1);
     }
-    localStorage.setItem('enteredAmount', this.enteredAmount);
   }
 
   onCategoryClick(categoryName: string) {
@@ -106,7 +103,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       localStorage.setItem('expenses', JSON.stringify(expenseList));
       this.sumValues(expenseList);
       this.enteredAmount = '';
-      localStorage.setItem('enteredAmount', this.enteredAmount);
       this.showKeyBoard = true;
     }
   }
