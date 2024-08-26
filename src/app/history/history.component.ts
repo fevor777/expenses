@@ -60,7 +60,8 @@ export class HistoryComponent implements OnInit {
 
   updateBalance(index: number, isDeleteFromBalance?: boolean): void {
     const balance = Number(localStorage.getItem('balance')) || 0;
-    if (balance && !this.expenses[index]?.isDeletedFromBalance) {
+    const category = getCategoryById(this.expenses[index].category);
+    if (balance && !this.expenses[index]?.isDeletedFromBalance  && category?.includeInBalance) {
       const newBalance =
         Math.round((balance + this.expenses[index].amount) * 100) / 100;
       if (isDeleteFromBalance) {

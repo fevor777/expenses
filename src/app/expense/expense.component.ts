@@ -110,12 +110,12 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.sumValues(expenseList);
       this.enteredAmount = '';
       this.showKeyBoard = true;
+      this.notificationService.showMessage(
+        `Добавлено: ${getCategoryNameById(
+          categoryName
+        )}, ${amount} ${this.getCurrencySymbol()}`
+      );
     }
-    this.notificationService.showMessage(
-      `Добавлено: ${getCategoryNameById(
-        categoryName
-      )}, ${amount} ${this.getCurrencySymbol()}`
-    );
   }
 
   ngAfterViewInit(): void {}
