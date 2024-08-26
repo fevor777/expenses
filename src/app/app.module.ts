@@ -16,6 +16,7 @@ import { CustomHammerConfig } from './common/custom-hammer.config';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { DetailsComponent } from './details/details.component';
 import { CategoriesComponent } from './common/component/category/categories.component';
+import { NotificationComponent } from './common/component/notification/notification.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -24,7 +25,15 @@ export class HammerConfig extends HammerGestureConfig {
 }
 
 @NgModule({
-  declarations: [AppComponent, ExpenseComponent, SwipeDirective, StatisticsComponent, DetailsComponent, CategoriesComponent],
+  declarations: [
+    AppComponent,
+    ExpenseComponent,
+    SwipeDirective,
+    StatisticsComponent,
+    DetailsComponent,
+    CategoriesComponent,
+    NotificationComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

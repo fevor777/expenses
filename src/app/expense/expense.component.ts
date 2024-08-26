@@ -3,10 +3,16 @@ import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Expense } from '../common/expense.model';
-import { Categories, Category, getCategoryById } from '../common/categories';
+import {
+  Categories,
+  Category,
+  getCategoryById,
+  getCategoryNameById,
+} from '../common/categories';
 import { getCurrencySymbol } from '@angular/common';
 import { Currency } from '../common/currency';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
+import { NotificationService } from '../common/component/notification/notification.service';
 
 @Component({
   selector: 'app-expense',
@@ -33,7 +39,10 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     return getCurrencySymbol(this.currency.code, 'narrow');
   }
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   ngAfterViewChecked(): void {
     this.categoriesVisible = true;
@@ -102,6 +111,11 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.enteredAmount = '';
       this.showKeyBoard = true;
     }
+    this.notificationService.showMessage(
+      `Добавлено: ${getCategoryNameById(
+        categoryName
+      )}, ${amount} ${this.getCurrencySymbol()}`
+    );
   }
 
   ngAfterViewInit(): void {}
