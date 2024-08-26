@@ -1,13 +1,9 @@
-import {
-  AfterViewChecked,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { AfterViewChecked, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Expense } from '../common/expense.model';
-import { Categories, Category } from '../common/categories';
+import { Categories, Category, getCategoryById } from '../common/categories';
 import { getCurrencySymbol } from '@angular/common';
 import { Currency } from '../common/currency';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
@@ -81,9 +77,8 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
 
   onCategoryClick(categoryName: string) {
     const exchangeRate = this.currency?.exchangeRate || 1;
-    const calculatedAmount = ExpressionEvaluator.evaluate(this.enteredAmount)
-    const amount =
-      Math.round((calculatedAmount / exchangeRate) * 100) / 100;
+    const calculatedAmount = ExpressionEvaluator.evaluate(this.enteredAmount);
+    const amount = Math.round((calculatedAmount / exchangeRate) * 100) / 100;
     if (amount > 0) {
       const jsonInLocalStorage = localStorage.getItem('expenses');
       let expenseList = jsonInLocalStorage
@@ -96,10 +91,12 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
         currency: this.currency?.code,
         date: Date.now(),
       });
-      const balance = Number(localStorage.getItem('balance') || 0);
-      const newBalance = Math.round((balance - amount) * 100) / 100;
-      localStorage.setItem('balance', newBalance.toString());
-      this.balance = newBalance;
+      if (getCategoryById(categoryName)?.includeInBalance) {
+        const balance = Number(localStorage.getItem('balance') || 0);
+        const newBalance = Math.round((balance - amount) * 100) / 100;
+        localStorage.setItem('balance', newBalance.toString());
+        this.balance = newBalance;
+      }
       localStorage.setItem('expenses', JSON.stringify(expenseList));
       this.sumValues(expenseList);
       this.enteredAmount = '';

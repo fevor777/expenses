@@ -35,14 +35,15 @@
         [style.color]="'grey'"
         [style.cursor]="'pointer'"
         (click)="onDelete(i)"
-        >Delete |</span
+        >Delete</span
       >
       <span
+        *ngIf="!item.isDeletedFromBalance && getCategoryByIdFunc(item.category).includeInBalance"
         [style.color]="'grey'"
         [style.cursor]="'pointer'"
         (click)="onDeleteFromBalance(i)"
       >
-        Delete from balance</span
+       | Delete from balance</span
       >
     </div>
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />

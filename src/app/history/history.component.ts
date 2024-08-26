@@ -1,7 +1,8 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { getCategoryById, getCategoryNameById } from '../common/categories';
 import { Expense } from '../common/expense.model';
-import { getCategoryNameById } from '../common/categories';
 
 type HistoryExpense = Expense & {
   showDateTitle: boolean;
@@ -18,6 +19,7 @@ export class HistoryComponent implements OnInit {
   totalAmount: number = 0;
   temporaryDate: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
+  getCategoryByIdFunc = getCategoryById;
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
