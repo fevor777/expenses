@@ -10,6 +10,7 @@ import { Expense } from '../common/expense.model';
 import { Categories, Category } from '../common/categories';
 import { getCurrencySymbol } from '@angular/common';
 import { Currency } from '../common/currency';
+import { ExpressionEvaluator } from '../common/expression-evaluator';
 
 @Component({
   selector: 'app-expense',
@@ -18,7 +19,6 @@ import { Currency } from '../common/currency';
 })
 export class ExpenseComponent implements OnInit, AfterViewChecked {
   enteredAmount = '';
-  enteredAmountAsNumber: number = 0;
   currentAmount: number = 0;
   monthAmount: number = 0;
   balance: number = 0;
@@ -58,7 +58,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
     this.enteredAmount = localStorage.getItem('enteredAmount') || '';
-    this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
   categoriesVisible = false;
@@ -74,7 +73,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.enteredAmount += numberValue;
     }
     localStorage.setItem('enteredAmount', this.enteredAmount);
-    this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
   onDeleteClick() {
@@ -82,13 +80,13 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.enteredAmount = this.enteredAmount.slice(0, -1);
     }
     localStorage.setItem('enteredAmount', this.enteredAmount);
-    this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
   onCategoryClick(categoryName: string) {
     const exchangeRate = this.currency?.exchangeRate || 1;
+    const calculatedAmount = ExpressionEvaluator.evaluate(this.enteredAmount)
     const amount =
-      Math.round((this.enteredAmountAsNumber / exchangeRate) * 100) / 100;
+      Math.round((calculatedAmount / exchangeRate) * 100) / 100;
     if (amount > 0) {
       const jsonInLocalStorage = localStorage.getItem('expenses');
       let expenseList = jsonInLocalStorage
@@ -108,7 +106,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       localStorage.setItem('expenses', JSON.stringify(expenseList));
       this.sumValues(expenseList);
       this.enteredAmount = '';
-      this.enteredAmountAsNumber = 0;
       localStorage.setItem('enteredAmount', this.enteredAmount);
       this.showKeyBoard = true;
     }
