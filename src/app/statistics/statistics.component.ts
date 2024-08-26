@@ -109,7 +109,7 @@ export class StatisticsComponent implements OnInit {
 
   getColor(percentage: number): string {
     const green = Math.min(255, Math.round((100 - percentage) * 2.55));
-    const red = Math.min(255, Math.round(percentage * 2.55));
+    const red = Math.min(180, Math.round(percentage * 1.8));
     return `rgb(${red}, ${green}, 0)`; // RGB color with variable red and green
   }
 }
