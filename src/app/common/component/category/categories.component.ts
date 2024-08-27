@@ -41,7 +41,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   private categoryWidth = 120; // 70px width + 15px margin
-  private categoryHeight = 94; 
+  private categoryHeight = 94;
   private containerWidth = 0;
   private containerHeight = 0;
 
@@ -69,10 +69,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       const maxRows = Math.floor(this.containerHeight / this.categoryHeight);
       const maxVisibleCategories = maxColumns * maxRows;
 
-      this.categories = [...Categories].slice(
-        0,
-        maxVisibleCategories
-      );
+      this.categories = [...Categories].slice(0, maxVisibleCategories);
       this.showMore = Categories.length > maxVisibleCategories;
     }
   }
@@ -118,5 +115,46 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   onClickMore() {
     this.clickMore.emit();
+  }
+
+  // ----------------
+  menuVisible = false;
+  menuPosition = { top: '0px', left: '0px' };
+  selectedIconIndex: number | null = null;
+
+  onPress(event: any, index: number) {
+    const domEvent = event.srcEvent as MouseEvent;
+    domEvent.preventDefault(); // Prevent the default context menu
+    domEvent.stopPropagation();
+    this.selectedIconIndex = index;
+    this.menuVisible = true;
+
+    // Get the bounding rect of the pressed icon
+    const iconElement = (event.target as HTMLElement).getBoundingClientRect();
+
+    // Adjust the menu position based on the icon's position
+    this.menuPosition = {
+      top: `${iconElement.bottom + window.scrollY}px`,
+      left: `${iconElement.left + window.scrollX}px`,
+    };
+  }
+
+  updateIcon() {
+    // console.log('Update icon:', this.icons[this.selectedIconIndex!]);
+    this.menuVisible = false;
+  }
+
+  deleteIcon() {
+    // console.log('Delete icon:', this.icons[this.selectedIconIndex!]);
+    // this.icons.splice(this.selectedIconIndex!, 1);
+    this.menuVisible = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Hide the menu if a click is detected outside of the menu
+    // if (this.menuVisible) {
+    //   this.menuVisible = false;
+    // }
   }
 }

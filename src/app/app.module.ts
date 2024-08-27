@@ -22,6 +22,7 @@ import { StatisticsBarComponent } from './statistics/bar/statistics-bar.componen
 export class HammerConfig extends HammerGestureConfig {
   override = {
     swipe: { direction: Hammer.DIRECTION_ALL },
+    press: { time: 500 },
   };
 }
 

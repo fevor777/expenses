@@ -8,9 +8,10 @@
     [ngClass]="{ 'scrollable-content-down': isContentDown }"
   >
     <div
-      *ngFor="let category of categories"
+      *ngFor="let category of categories; let i = index"
       class="category"
       (click)="onCategoryClick(category.id)"
+      (press)="onPress($event, i)"
     >
       <i [style.color]="category.color" [class]="category.icon"></i>
       <span>{{ category.name }}</span>
@@ -20,11 +21,18 @@
   <!-- <div class="add-expense">
       <i class="fas fa-plus"></i>
     </div> -->
-
 </div>
 <div class="categories-more" *ngIf="showMore" (click)="onClickMore()">
   <div>Еще</div>
   <i class="fa-solid fa-chevron-down"></i>
 </div>
 
-
+<div
+  *ngIf="menuVisible"
+  class="menu"
+  [ngStyle]="menuPosition"
+  (click)="$event.stopPropagation()"
+>
+  <button mat-menu-item (click)="updateIcon()">Update</button>
+  <button mat-menu-item (click)="deleteIcon()">Delete</button>
+</div>
