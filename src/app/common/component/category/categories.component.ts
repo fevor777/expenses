@@ -103,7 +103,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       if (deltaX > 50) {
         this.onSwipeRight();
       } else if (deltaX < -50) {
-        this.onSwipeRight();
+        this.onSwipeLeft();
       }
     } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
       if (deltaY < -50) {
