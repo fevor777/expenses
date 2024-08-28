@@ -5,6 +5,7 @@
 >
   <div
     class="categories"
+    [ngClass]="{ 'scrollable-content-down': isContentDown && !showMore }"
   >
     <div
       *ngFor="let category of categories; let i = index"

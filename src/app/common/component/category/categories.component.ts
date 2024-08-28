@@ -25,14 +25,14 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
 
-  categories: Category[] = [...Categories, ...Categories];
+  categories: Category[] = [...Categories];
 
   showMore: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
-        this.categories = [...Categories, ...Categories];
+        this.categories = [...Categories];
       } else {
         this.updateVisibleCategories();
       }
@@ -67,16 +67,25 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       this.containerWidth = containerElement.clientWidth;
       this.containerHeight = containerElement.clientHeight;
 
-      let maxVisibleCategories = this.calculateRows(this.containerWidth, this.containerHeight);
+      let maxVisibleCategories = this.calculateRows(
+        this.containerWidth,
+        this.containerHeight
+      );
       this.showMore = Categories.length > maxVisibleCategories;
       if (this.showMore) {
-        maxVisibleCategories = this.calculateRows(this.containerWidth, this.containerHeight - 40);
+        maxVisibleCategories = this.calculateRows(
+          this.containerWidth,
+          this.containerHeight - 40
+        );
       }
-      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
+      this.categories = [...Categories].slice(0, maxVisibleCategories);
     }
   }
 
-  private calculateRows(containerWidth: number, containerHeight: number): number {
+  private calculateRows(
+    containerWidth: number,
+    containerHeight: number
+  ): number {
     const maxColumns = Math.floor(containerWidth / this.categoryWidth);
     const maxRows = Math.floor(containerHeight / this.categoryHeight);
     return maxColumns * maxRows;
@@ -131,26 +140,37 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   onSwipeUp(): void {
-    if (this.isScrolledUp()) {
-      if (this.isDown) {
-        this.categorySwipeUp.emit();
+    if (this.showMore) {
+      if (this.isScrolledUp()) {
+        if (this.isDown) {
+          this.categorySwipeUp.emit();
+        } else {
+          this.isDown = true;
+        }
       } else {
-        this.isDown = true;
+        this.isDown = false;
       }
     } else {
-      this.isDown = false;
+      this.categorySwipeUp.emit();
     }
   }
 
-  onSwipeDown(): void {
-
-  }
+  onSwipeDown(): void {}
 
   isScrolledUp(): boolean {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-    const clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
-  
+    const scrollTop =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0;
+    const scrollHeight =
+      document.documentElement.scrollHeight || document.body.scrollHeight || 0;
+    const clientHeight =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight ||
+      0;
+
     // If the difference between scrollHeight and scrollTop is greater than the clientHeight, then it's scrolled up
     return scrollTop === scrollHeight - clientHeight;
   }
