@@ -1,9 +1,18 @@
-import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Expense } from '../common/expense.model';
-import { Categories, Category } from '../common/categories';
+import {
+  Categories,
+  Category,
+  getCategoryById,
+  getCategoryNameById,
+} from '../common/categories';
+import { getCurrencySymbol } from '@angular/common';
+import { Currency } from '../common/currency';
+import { ExpressionEvaluator } from '../common/expression-evaluator';
+import { NotificationService } from '../common/component/notification/notification.service';
 
 @Component({
   selector: 'app-expense',
@@ -12,7 +21,6 @@ import { Categories, Category } from '../common/categories';
 })
 export class ExpenseComponent implements OnInit, AfterViewChecked {
   enteredAmount = '';
-  enteredAmountAsNumber: number = 0;
   currentAmount: number = 0;
   monthAmount: number = 0;
   balance: number = 0;
@@ -25,7 +33,18 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   });
   categories: Category[] = Categories;
 
-  constructor(private router: Router) {}
+  currency: Currency;
+  showSavings: boolean;
+  savings: string = '0';
+
+  getCurrencySymbol(): string {
+    return getCurrencySymbol(this.currency.code, 'narrow');
+  }
+
+  constructor(
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   ngAfterViewChecked(): void {
     this.categoriesVisible = true;
@@ -36,6 +55,16 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     this.sumValues(expenses);
     this.balance = Number(localStorage.getItem('balance')) || 0;
     this.balanceDate = localStorage.getItem('balanceDate');
+    const currencyInLocalStorage = localStorage.getItem('currency');
+    if (currencyInLocalStorage) {
+      this.currency = JSON.parse(currencyInLocalStorage);
+    } else {
+      this.currency = {
+        code: 'EUR',
+      };
+      localStorage.setItem('currency', JSON.stringify(this.currency));
+    }
+    this.savings = localStorage.getItem('savings') || '0';
   }
 
   categoriesVisible = false;
@@ -50,18 +79,19 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     } else {
       this.enteredAmount += numberValue;
     }
-    this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
   onDeleteClick() {
     if (this.enteredAmount.length > 0) {
       this.enteredAmount = this.enteredAmount.slice(0, -1);
     }
-    this.enteredAmountAsNumber = Number(this.enteredAmount);
   }
 
   onCategoryClick(categoryName: string) {
-    if (this.enteredAmountAsNumber > 0) {
+    const exchangeRate = this.currency?.exchangeRate || 1;
+    const calculatedAmount = ExpressionEvaluator.evaluate(this.enteredAmount);
+    const amount = Math.round((calculatedAmount / exchangeRate) * 100) / 100;
+    if (amount > 0) {
       const jsonInLocalStorage = localStorage.getItem('expenses');
       let expenseList = jsonInLocalStorage
         ? JSON.parse(jsonInLocalStorage)
@@ -69,25 +99,30 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       expenseList.unshift({
         id: uuidv4(),
         category: categoryName,
-        amount: this.enteredAmountAsNumber,
-        currency: 'EUR',
+        amount: amount,
+        currency: this.currency?.code,
         date: Date.now(),
       });
-      const balance = Number(localStorage.getItem('balance') || 0);
-      const newBalance =
-        Math.round((balance - this.enteredAmountAsNumber) * 100) / 100;
-      localStorage.setItem('balance', newBalance.toString());
-      this.balance = newBalance;
+      if (getCategoryById(categoryName)?.includeInBalance) {
+        const balance = Number(localStorage.getItem('balance') || 0);
+        const newBalance = Math.round((balance - amount) * 100) / 100;
+        localStorage.setItem('balance', newBalance.toString());
+        this.balance = newBalance;
+      }
       localStorage.setItem('expenses', JSON.stringify(expenseList));
       this.sumValues(expenseList);
       this.enteredAmount = '';
-      this.enteredAmountAsNumber = 0;
       this.showKeyBoard = true;
+      this.notificationService.showMessage(
+        `Добавлено: ${getCategoryNameById(
+          categoryName
+        )}, ${amount} ${this.getCurrencySymbol()}
+        (${this.currentAmount}€)`
+      );
     }
   }
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void {}
 
   onBalanceChange(): void {
     const newBalance = prompt('Enter new balance', this.balance.toString());
@@ -125,6 +160,36 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   }
   onSwipeDown(): void {
     this.showKeyBoard = false;
+  }
+
+  onShowSavings(): void {
+    this.showSavings = !this.showSavings;
+  }
+
+  changeSavings(): void {
+    const newSavings = prompt('Enter new savings', this.savings);
+    if (newSavings) {
+      localStorage.setItem('savings', newSavings);
+      this.savings = newSavings;
+    }
+  }
+
+  onCurrencyClick(): void {
+    const newCurrency = prompt('Enter new currency', this.currency.code);
+    if (newCurrency) {
+      let newExchangeRate = '1';
+      if (newCurrency !== 'EUR') {
+        newExchangeRate = prompt(
+          'Enter exchange rate',
+          this.currency?.exchangeRate?.toString() || '1'
+        );
+      }
+      this.currency = {
+        code: newCurrency,
+        exchangeRate: Number(newExchangeRate),
+      };
+      localStorage.setItem('currency', JSON.stringify(this.currency));
+    }
   }
 
   private sumValues(expenses: Expense[]): void {

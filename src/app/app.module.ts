@@ -16,15 +16,27 @@ import { CustomHammerConfig } from './common/custom-hammer.config';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { DetailsComponent } from './details/details.component';
 import { CategoriesComponent } from './common/component/category/categories.component';
+import { NotificationComponent } from './common/component/notification/notification.component';
+import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
     swipe: { direction: Hammer.DIRECTION_ALL },
+    press: { time: 500 },
   };
 }
 
 @NgModule({
-  declarations: [AppComponent, ExpenseComponent, SwipeDirective, StatisticsComponent, DetailsComponent, CategoriesComponent],
+  declarations: [
+    AppComponent,
+    ExpenseComponent,
+    SwipeDirective,
+    StatisticsComponent,
+    DetailsComponent,
+    CategoriesComponent,
+    NotificationComponent,
+    StatisticsBarComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

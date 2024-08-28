@@ -57,31 +57,34 @@
         >{{ getTotalAmountPerDay(item.date) }}€</span
       ></span
     >
-    <br />Цена:
-    <span [style.color]="'#ff6f61'">{{ item.amount }}€</span>
-    <br /><br />
-    <div>
-      Category:
+    <div class="history-item">
+      <br />Цена:
+      <span [style.color]="'#ff6f61'">{{ item.amount }}€</span>
+      <br /><br />
+      <div>
+        Category:
+        <span
+          class="app-link"
+          (click)="showCategoryDetails(item.category)"
+          >{{ getCategoryNameByIdFunc(item.category) }}</span
+        >
+      </div>
+      Date: {{ item.date | date : "HH:mm" }} <br /><br />
       <span
-        [style.color]="'blue'"
-        (click)="showCategoryDetails(item.category)"
-        >{{ getCategoryNameByIdFunc(item.category) }}</span
+        [style.color]="'grey'"
+        [style.cursor]="'pointer'"
+        (click)="onDelete(i)"
+        >Delete</span
+      >
+      <span
+        *ngIf="!item.isDeletedFromBalance && getCategoryByIdFunc(item.category).includeInBalance"
+        [style.color]="'grey'"
+        [style.cursor]="'pointer'"
+        (click)="onDeleteFromBalance(i)"
+      >
+       | Delete from balance</span
       >
     </div>
-    Date: {{ item.date | date : "HH:mm" }} <br /><br />
-    <span
-      [style.color]="'grey'"
-      [style.cursor]="'pointer'"
-      (click)="onDelete(i)"
-      >Delete |</span
-    >
-    <span
-      [style.color]="'grey'"
-      [style.cursor]="'pointer'"
-      (click)="onDeleteFromBalance(i)"
-    >
-      Delete from balance</span
-    >
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   </span>
 </div>

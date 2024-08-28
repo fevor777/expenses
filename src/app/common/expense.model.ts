@@ -4,4 +4,5 @@ export class Expense {
   category: string;
   currency: string;
   date: number;
+  isDeletedFromBalance?: boolean;
 }

@@ -21,16 +21,18 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
   @Output() categorySwipeRight: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeLeft: EventEmitter<void> = new EventEmitter<void>();
+  @Output() categorySwipeUp: EventEmitter<void> = new EventEmitter<void>();
+  @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
 
-  categories: Category[] = [...Categories];
+  categories: Category[] = [...Categories, ...Categories];
 
   showMore: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
-        this.categories = [...Categories];
+        this.categories = [...Categories, ...Categories];
       } else {
         this.updateVisibleCategories();
       }
@@ -41,7 +43,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   private categoryWidth = 120; // 70px width + 15px margin
-  private categoryHeight = 94; 
+  private categoryHeight = 94;
   private containerWidth = 0;
   private containerHeight = 0;
 
@@ -65,16 +67,19 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       this.containerWidth = containerElement.clientWidth;
       this.containerHeight = containerElement.clientHeight;
 
-      const maxColumns = Math.floor(this.containerWidth / this.categoryWidth);
-      const maxRows = Math.floor(this.containerHeight / this.categoryHeight);
-      const maxVisibleCategories = maxColumns * maxRows;
-
-      this.categories = [...Categories].slice(
-        0,
-        maxVisibleCategories
-      );
+      let maxVisibleCategories = this.calculateRows(this.containerWidth, this.containerHeight);
       this.showMore = Categories.length > maxVisibleCategories;
+      if (this.showMore) {
+        maxVisibleCategories = this.calculateRows(this.containerWidth, this.containerHeight - 40);
+      }
+      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
     }
+  }
+
+  private calculateRows(containerWidth: number, containerHeight: number): number {
+    const maxColumns = Math.floor(containerWidth / this.categoryWidth);
+    const maxRows = Math.floor(containerHeight / this.categoryHeight);
+    return maxColumns * maxRows;
   }
 
   touchStartX: number = 0;
@@ -104,19 +109,86 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       if (deltaX > 50) {
         this.onSwipeRight();
       } else if (deltaX < -50) {
-        this.onSwipeRight();
+        this.onSwipeLeft();
+      }
+    } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      if (deltaY < -50) {
+        // Swiping up decreases Y coordinate
+        this.onSwipeUp();
+      } else if (deltaY > 50) {
+        // Swiping down increases Y coordinate
+        this.onSwipeDown();
       }
     }
   }
 
-  onSwipeRight() {
+  onSwipeRight(): void {
     this.categorySwipeRight.emit();
   }
-  onSwipeLeft() {
+  onSwipeLeft(): void {
     this.categorySwipeLeft.emit();
+  }
+
+  onSwipeUp(): void {
+    if (this.isScrolledUp()) {
+      this.categorySwipeUp.emit();
+    }
+  }
+
+  onSwipeDown(): void {
+
+  }
+
+  isScrolledUp(): boolean {
+    // Check if the user is not scrolled to the bottom
+    const scrollableHeight = document.documentElement.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight;
+    const scrollPosition = window.scrollY;
+    return scrollPosition === scrollableHeight - clientHeight;
   }
 
   onClickMore() {
     this.clickMore.emit();
+  }
+
+  // ----------------
+  menuVisible = false;
+  menuPosition = { top: '0px', left: '0px' };
+  selectedIconIndex: number | null = null;
+
+  onPress(event: any, index: number) {
+    const domEvent = event.srcEvent as MouseEvent;
+    domEvent.preventDefault(); // Prevent the default context menu
+    domEvent.stopPropagation();
+    this.selectedIconIndex = index;
+    this.menuVisible = true;
+
+    // Get the bounding rect of the pressed icon
+    const iconElement = (event.target as HTMLElement).getBoundingClientRect();
+
+    // Adjust the menu position based on the icon's position
+    this.menuPosition = {
+      top: `${iconElement.bottom + window.scrollY}px`,
+      left: `${iconElement.left + window.scrollX}px`,
+    };
+  }
+
+  updateIcon() {
+    // console.log('Update icon:', this.icons[this.selectedIconIndex!]);
+    this.menuVisible = false;
+  }
+
+  deleteIcon() {
+    // console.log('Delete icon:', this.icons[this.selectedIconIndex!]);
+    // this.icons.splice(this.selectedIconIndex!, 1);
+    this.menuVisible = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Hide the menu if a click is detected outside of the menu
+    // if (this.menuVisible) {
+    //   this.menuVisible = false;
+    // }
   }
 }

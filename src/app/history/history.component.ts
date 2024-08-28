@@ -1,5 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { getCategoryById, getCategoryNameById } from '../common/categories';
 import { Expense } from '../common/expense.model';
 import { Categories, getCategoryNameById } from '../common/categories';
 
@@ -18,6 +20,7 @@ export class HistoryComponent implements OnInit {
   totalAmount: number = 0;
   temporaryDate: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
+  getCategoryByIdFunc = getCategoryById;
 
   filterDate: string = '';
   categories = Categories;
@@ -134,18 +137,23 @@ export class HistoryComponent implements OnInit {
     }
   }
 
-  updateBalance(index: number): void {
+  updateBalance(index: number, isDeleteFromBalance?: boolean): void {
     const balance = Number(localStorage.getItem('balance')) || 0;
-    if (balance) {
+    const category = getCategoryById(this.expenses[index].category);
+    if (balance && !this.expenses[index]?.isDeletedFromBalance  && category?.includeInBalance) {
       const newBalance =
         Math.round((balance + this.expenses[index].amount) * 100) / 100;
+      if (isDeleteFromBalance) {
+        this.expenses[index].isDeletedFromBalance = isDeleteFromBalance;
+        localStorage.setItem('expenses', JSON.stringify(this.expenses));
+      }
       localStorage.setItem('balance', newBalance.toString());
     }
   }
 
   onDeleteFromBalance(index: number): void {
     if (confirm('Return to balance?')) {
-      this.updateBalance(index);
+      this.updateBalance(index, true);
     }
   }
 

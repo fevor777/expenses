@@ -26,6 +26,10 @@
       <span [style.color]="'blue'">{{ getCategoryNameByIdFunc(categoryTotal.category) }}</span>
       <span>{{ categoryTotal.amount }}€</span>
     </div>
+    <div *ngIf="excludedCategories?.length > 0">
+      <span>(За исключением: {{ excludedCategories.join(", ") }}) </span>
+      <i (click)="onRefresh()" class="fas fa-redo-alt"></i>
+    </div>
     <div class="progress-bar-container" (click)="showCategoryDetails(categoryTotal.category)">
       <div
         class="progress-bar"
@@ -36,4 +40,13 @@
       </div>
     </div>
   </div>
+  <app-statistics-bar
+    *ngFor="let categoryTotal of categoryTotals"
+    [amount]="categoryTotal.amount"
+    [category]="categoryTotal.category"
+    [percentage]="categoryTotal.percentage"
+    [color]="categoryTotal.color"
+    (close)="onBarClose($event)"
+  >
+  </app-statistics-bar>
 </div>
