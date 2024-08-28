@@ -124,11 +124,21 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   onSwipeUp(): void {
-    this.categorySwipeUp.emit();
+    if (this.isScrolledUp()) {
+      this.categorySwipeUp.emit();
+    }
   }
 
   onSwipeDown(): void {
-    this.categorySwipeDown.emit();
+
+  }
+
+  isScrolledUp(): boolean {
+    // Check if the user is not scrolled to the bottom
+    const scrollableHeight = document.documentElement.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight;
+    const scrollPosition = window.scrollY;
+    return scrollPosition === scrollableHeight - clientHeight;
   }
 
   onClickMore() {
