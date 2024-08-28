@@ -147,11 +147,12 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   isScrolledUp(): boolean {
-    // Check if the user is not scrolled to the bottom
-    const scrollableHeight = document.documentElement.scrollHeight;
-    const clientHeight = document.documentElement.clientHeight;
-    const scrollPosition = window.scrollY;
-    return scrollPosition === scrollableHeight - clientHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
+    const clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
+  
+    // If the difference between scrollHeight and scrollTop is greater than the clientHeight, then it's scrolled up
+    return scrollTop === scrollHeight - clientHeight;
   }
 
   onClickMore() {
