@@ -42,8 +42,8 @@
   <ng-template #categoriesWithScroll>
     <app-categories
       *ngIf="!showKeyBoard"
-      (categorySwipeRight)="onShowKeyBoard()"
-      (categorySwipeLeft)="onShowKeyBoard()"
+      (categorySwipeRight)="onSwipeRight()"
+      (categorySwipeLeft)="onSwipeLeft()"
       (categorySwipeUp)="onShowKeyBoard()"
       (categoryClick)="onCategoryClick($event)"
       [isContentDown]="true"

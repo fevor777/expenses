@@ -25,14 +25,14 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
 
-  categories: Category[] = [...Categories, ...Categories];
+  categories: Category[] = [...Categories];
 
   showMore: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
-        this.categories = [...Categories, ...Categories];
+        this.categories = [...Categories];
       } else {
         this.updateVisibleCategories();
       }
@@ -67,13 +67,19 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       this.containerWidth = containerElement.clientWidth;
       this.containerHeight = containerElement.clientHeight;
 
-      const maxColumns = Math.floor(this.containerWidth / this.categoryWidth);
-      const maxRows = Math.floor(this.containerHeight / this.categoryHeight);
-      const maxVisibleCategories = maxColumns * maxRows;
-
-      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
+      let maxVisibleCategories = this.calculateRows(this.containerWidth, this.containerHeight);
       this.showMore = Categories.length > maxVisibleCategories;
+      if (this.showMore) {
+        maxVisibleCategories = this.calculateRows(this.containerWidth, this.containerHeight - 40);
+      }
+      this.categories = [...Categories].slice(0, maxVisibleCategories);
     }
+  }
+
+  private calculateRows(containerWidth: number, containerHeight: number): number {
+    const maxColumns = Math.floor(containerWidth / this.categoryWidth);
+    const maxRows = Math.floor(containerHeight / this.categoryHeight);
+    return maxColumns * maxRows;
   }
 
   touchStartX: number = 0;
