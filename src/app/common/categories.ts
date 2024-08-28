@@ -74,8 +74,8 @@ export const Categories: Category[] = [
   },
   {
     id: 'pharmacy',
-    name: 'Аптека',
-    icon: 'fas fa-pills',
+    name: 'Медицина',
+    icon: 'fas fa-prescription-bottle-alt',
     color: '#2196F3',
     includeInBalance: true,
   },
@@ -112,6 +112,13 @@ export const Categories: Category[] = [
     name: 'Подписка',
     icon: 'fas fa-newspaper',
     color: '#FF5722',
+    includeInBalance: false,
+  },
+  {
+    id: 'electronics',
+    name: 'Электроника',
+    icon: 'fas fa-tablet-alt',
+    color: '#9E9E9E',
     includeInBalance: false,
   },
   {
