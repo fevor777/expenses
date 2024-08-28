@@ -78,7 +78,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
           this.containerHeight - 40
         );
       }
-      this.categories = [...Categories].slice(0, maxVisibleCategories);
+      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
     }
   }
 
