@@ -43,7 +43,9 @@ export class StatisticsComponent implements OnInit {
   calculateCategoryTotals(mode?: Mode): void {
     let sinceWhen = new Date();
     if (mode === Mode.WEEK) {
-      sinceWhen = new Date(sinceWhen.setDate(sinceWhen.getDate() - sinceWhen.getDay()));
+      const dayOfWeek = sinceWhen.getDay();
+      const daysUntilMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      sinceWhen.setDate(sinceWhen.getDate() - daysUntilMonday);
     }
     if (mode === Mode.MONTH) {
       sinceWhen = new Date(sinceWhen.setDate(1));
@@ -66,8 +68,11 @@ export class StatisticsComponent implements OnInit {
         if (!categoryMap[expense.category]) {
           categoryMap[expense.category] = 0;
         }
-        categoryMap[expense.category] = Math.round((categoryMap[expense.category] + expense.amount) * 100) / 100;
-        this.totalAmount = Math.round((this.totalAmount + expense.amount) * 100) / 100;
+        categoryMap[expense.category] =
+          Math.round((categoryMap[expense.category] + expense.amount) * 100) /
+          100;
+        this.totalAmount =
+          Math.round((this.totalAmount + expense.amount) * 100) / 100;
       });
 
     // Calculate percentage for each category
@@ -132,7 +137,12 @@ export class StatisticsComponent implements OnInit {
     this.categoryTotals = [];
     this.totalAmount = 0;
     this.calculateCategoryTotals(mode);
-    this.title = mode === Mode.TODAY ? 'за сегодня' : mode === Mode.WEEK ? 'на этой неделе' : 'в этом месяце';
+    this.title =
+      mode === Mode.TODAY
+        ? 'за сегодня'
+        : mode === Mode.WEEK
+        ? 'на этой неделе'
+        : 'в этом месяце';
   }
 
   protected readonly Mode = Mode;

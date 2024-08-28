@@ -1,9 +1,12 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Expense } from '../common/expense.model';
-import { getCategoryNameById } from '../common/categories';
+import { Categories, getCategoryNameById } from '../common/categories';
 
-type HistoryExpense = Expense & { showDateTitle: boolean, amountPerDay: number };
+type HistoryExpense = Expense & {
+  showDateTitle: boolean;
+  amountPerDay: number;
+};
 
 @Component({
   selector: 'app-history',
@@ -16,29 +19,106 @@ export class HistoryComponent implements OnInit {
   temporaryDate: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
 
+  filterDate: string = '';
+  categories = Categories;
+  filterCategories = this.categories.reduce((acc, category) => {
+    acc[category.id] = false;
+    return acc;
+  }, {});
+  expandFilters: boolean = true;
+
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
+    this.initiateExpenses();
+    this.sumValues();
+  }
+
+  initiateExpenses(): void {
     this.expenses = (
       JSON.parse(localStorage.getItem('expenses') || '[]') as HistoryExpense[]
     ).map((expense) => {
       const showDateTitle = this.isDatePanelVisible(expense.date);
       if (showDateTitle) {
         this.totalAmountPerDays.set(expense.date, expense.amount);
-        
       } else {
         const amount = this.totalAmountPerDays.get(this.temporaryDate) || 0;
         const newAmount = Math.round((amount + expense.amount) * 100) / 100;
         this.totalAmountPerDays.set(this.temporaryDate, newAmount);
       }
-       return{
-      ...expense,
-      showDateTitle
-      }
+      return {
+        ...expense,
+        showDateTitle,
+      };
     });
+  }
+
+  applyFilters(): void {
+    console.log(this.filterCategories);
+    this.initiateExpenses();
+    if (
+      this.filterDate === '' &&
+      Object.values(this.filterCategories).every((value) => !value)
+    ) {
+      this.sumValues();
+      return;
+    }
+
+    // Filter by category
+    this.expenses = this.expenses.filter((expense) => {
+      return (
+        Object.values(this.filterCategories).every((value) => !value) ||
+        Object.keys(this.filterCategories).some((key) => {
+          return this.filterCategories[key] && expense.category === key;
+        })
+      );
+    });
+
+    // Filter by date
+    if (this.filterDate === '') {
+      this.sumValues();
+      return;
+    }
+
+    let sinceWhen = new Date();
+    if (this.filterDate === 'thisWeek') {
+      const dayOfWeek = sinceWhen.getDay();
+      const daysUntilMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      sinceWhen.setDate(sinceWhen.getDate() - daysUntilMonday);
+    }
+    if (this.filterDate === 'thisMonth') {
+      sinceWhen = new Date(sinceWhen.setDate(1));
+    }
+    this.expenses = this.expenses.filter((expense: { date: number }) => {
+      const date = new Date(expense.date);
+      return (
+        date.getDate() >= sinceWhen.getDate() &&
+        date.getMonth() === sinceWhen.getMonth() &&
+        date.getFullYear() === sinceWhen.getFullYear()
+      );
+    });
+    this.expandFilters = false;
     this.sumValues();
+  }
+
+  initiateFilterCategory(): void {
+    this.filterCategories = this.categories.reduce((acc, category) => {
+      acc[category.id] = false;
+      return acc;
+    }, {});
+  }
+
+  clearFilters(): void {
+    this.initiateFilterCategory();
+    this.filterDate = '';
+    this.applyFilters();
+  }
+
+  toggleExpandFilters(): void {
+    this.applyFilters();
+    this.expandFilters = !this.expandFilters;
   }
 
   getTotalAmountPerDay(date: number): number {
@@ -57,7 +137,8 @@ export class HistoryComponent implements OnInit {
   updateBalance(index: number): void {
     const balance = Number(localStorage.getItem('balance')) || 0;
     if (balance) {
-      const newBalance = Math.round((balance + this.expenses[index].amount) * 100) / 100;
+      const newBalance =
+        Math.round((balance + this.expenses[index].amount) * 100) / 100;
       localStorage.setItem('balance', newBalance.toString());
     }
   }
