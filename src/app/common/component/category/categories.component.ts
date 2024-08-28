@@ -21,16 +21,18 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
   @Output() categorySwipeRight: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeLeft: EventEmitter<void> = new EventEmitter<void>();
+  @Output() categorySwipeUp: EventEmitter<void> = new EventEmitter<void>();
+  @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
 
-  categories: Category[] = [...Categories];
+  categories: Category[] = [...Categories, ...Categories];
 
   showMore: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
-        this.categories = [...Categories];
+        this.categories = [...Categories, ...Categories];
       } else {
         this.updateVisibleCategories();
       }
@@ -69,7 +71,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       const maxRows = Math.floor(this.containerHeight / this.categoryHeight);
       const maxVisibleCategories = maxColumns * maxRows;
 
-      this.categories = [...Categories].slice(0, maxVisibleCategories);
+      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
       this.showMore = Categories.length > maxVisibleCategories;
     }
   }
@@ -103,14 +105,30 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       } else if (deltaX < -50) {
         this.onSwipeRight();
       }
+    } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      if (deltaY < -50) {
+        // Swiping up decreases Y coordinate
+        this.onSwipeUp();
+      } else if (deltaY > 50) {
+        // Swiping down increases Y coordinate
+        this.onSwipeDown();
+      }
     }
   }
 
-  onSwipeRight() {
+  onSwipeRight(): void {
     this.categorySwipeRight.emit();
   }
-  onSwipeLeft() {
+  onSwipeLeft(): void {
     this.categorySwipeLeft.emit();
+  }
+
+  onSwipeUp(): void {
+    this.categorySwipeUp.emit();
+  }
+
+  onSwipeDown(): void {
+    this.categorySwipeDown.emit();
   }
 
   onClickMore() {
