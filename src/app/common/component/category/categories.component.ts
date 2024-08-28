@@ -25,14 +25,14 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
 
-  categories: Category[] = [...Categories];
+  categories: Category[] = [...Categories, ...Categories];
 
   showMore: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
-        this.categories = [...Categories];
+        this.categories = [...Categories, ...Categories];
       } else {
         this.updateVisibleCategories();
       }
@@ -72,7 +72,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       if (this.showMore) {
         maxVisibleCategories = this.calculateRows(this.containerWidth, this.containerHeight - 40);
       }
-      this.categories = [...Categories].slice(0, maxVisibleCategories);
+      this.categories = [...Categories, ...Categories].slice(0, maxVisibleCategories);
     }
   }
 
