@@ -156,22 +156,22 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   menuPosition = { top: '0px', left: '0px' };
   selectedIconIndex: number | null = null;
 
-  onPress(event: any, index: number) {
-    const domEvent = event.srcEvent as MouseEvent;
-    domEvent.preventDefault(); // Prevent the default context menu
-    domEvent.stopPropagation();
-    this.selectedIconIndex = index;
-    this.menuVisible = true;
+  // onPress(event: any, index: number) {
+  //   const domEvent = event.srcEvent as MouseEvent;
+  //   domEvent.preventDefault(); // Prevent the default context menu
+  //   domEvent.stopPropagation();
+  //   this.selectedIconIndex = index;
+  //   this.menuVisible = true;
 
-    // Get the bounding rect of the pressed icon
-    const iconElement = (event.target as HTMLElement).getBoundingClientRect();
+  //   // Get the bounding rect of the pressed icon
+  //   const iconElement = (event.target as HTMLElement).getBoundingClientRect();
 
-    // Adjust the menu position based on the icon's position
-    this.menuPosition = {
-      top: `${iconElement.bottom + window.scrollY}px`,
-      left: `${iconElement.left + window.scrollX}px`,
-    };
-  }
+  //   // Adjust the menu position based on the icon's position
+  //   this.menuPosition = {
+  //     top: `${iconElement.bottom + window.scrollY}px`,
+  //     left: `${iconElement.left + window.scrollX}px`,
+  //   };
+  // }
 
   updateIcon() {
     // console.log('Update icon:', this.icons[this.selectedIconIndex!]);
