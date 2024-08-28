@@ -86,6 +86,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   touchStartY: number = 0;
   touchEndX: number = 0;
   touchEndY: number = 0;
+  isDown: boolean = false;
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -131,7 +132,13 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   onSwipeUp(): void {
     if (this.isScrolledUp()) {
-      this.categorySwipeUp.emit();
+      if (this.isDown) {
+        this.categorySwipeUp.emit();
+      } else {
+        this.isDown = true;
+      }
+    } else {
+      this.isDown = false;
     }
   }
 
