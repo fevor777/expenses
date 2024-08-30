@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { getCategoryById, getCategoryNameById } from '../common/categories';
+import { getCategoryById } from '../common/categories';
 import { Expense } from '../common/expense.model';
 import { Categories, getCategoryNameById } from '../common/categories';
 
@@ -23,12 +23,16 @@ export class HistoryComponent implements OnInit {
   getCategoryByIdFunc = getCategoryById;
 
   filterDate: string = '';
-  categories = Categories;
-  filterCategories = this.categories.reduce((acc, category) => {
+  categories = {
+    regular: Categories.filter((category) => !category.includeInBalance),
+    irregular: Categories.filter((category) => category.includeInBalance),
+  };
+  filterCategories: any = Categories.reduce((acc, category) => {
     acc[category.id] = false;
     return acc;
   }, {});
-  expandFilters: boolean = true;
+
+  expandFilters: boolean = false;
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
@@ -37,6 +41,9 @@ export class HistoryComponent implements OnInit {
   ngOnInit(): void {
     this.initiateExpenses();
     this.sumValues();
+
+    this.filterCategories.irregular = false;
+    this.filterCategories.regular = false;
   }
 
   initiateExpenses(): void {
@@ -59,8 +66,8 @@ export class HistoryComponent implements OnInit {
   }
 
   applyFilters(): void {
-    console.log(this.filterCategories);
     this.initiateExpenses();
+    this.checkMainCategory();
     if (
       this.filterDate === '' &&
       Object.values(this.filterCategories).every((value) => !value)
@@ -102,15 +109,55 @@ export class HistoryComponent implements OnInit {
         date.getFullYear() === sinceWhen.getFullYear()
       );
     });
-    this.expandFilters = false;
     this.sumValues();
   }
 
+  applyFiltersAndClose(): void {
+    this.applyFilters();
+    this.expandFilters = false;
+  }
+
+  checkMainCategory(): { regularChecked: boolean; irregularChecked: boolean } {
+    const regularIds = this.categories.regular.map((category) => category.id);
+    const irregularIds = this.categories.irregular.map(
+      (category) => category.id
+    );
+    const regularChecked = regularIds.every((id) => this.filterCategories[id]);
+    const irregularChecked = irregularIds.every(
+      (id) => this.filterCategories[id]
+    );
+    this.filterCategories.regular = regularChecked;
+    this.filterCategories.irregular = irregularChecked;
+    return {
+      regularChecked,
+      irregularChecked,
+    };
+  }
+
+  filterMass(what: string): void {
+    let idList: any[] =
+      what === 'regular' ? this.categories.regular : this.categories.irregular;
+    idList = idList.map((category) => category.id);
+
+    if (this.filterCategories[what]) {
+      idList.forEach((id) => {
+        this.filterCategories[id] = false;
+      });
+    }
+
+    for (const key in this.filterCategories) {
+      if (idList.includes(key)) {
+        this.filterCategories[key] = !this.filterCategories[key];
+      }
+    }
+
+    this.applyFilters();
+  }
+
   initiateFilterCategory(): void {
-    this.filterCategories = this.categories.reduce((acc, category) => {
-      acc[category.id] = false;
-      return acc;
-    }, {});
+    for (const key in this.filterCategories) {
+      this.filterCategories[key] = false;
+    }
   }
 
   clearFilters(): void {
@@ -140,7 +187,11 @@ export class HistoryComponent implements OnInit {
   updateBalance(index: number, isDeleteFromBalance?: boolean): void {
     const balance = Number(localStorage.getItem('balance')) || 0;
     const category = getCategoryById(this.expenses[index].category);
-    if (balance && !this.expenses[index]?.isDeletedFromBalance  && category?.includeInBalance) {
+    if (
+      balance &&
+      !this.expenses[index]?.isDeletedFromBalance &&
+      category?.includeInBalance
+    ) {
       const newBalance =
         Math.round((balance + this.expenses[index].amount) * 100) / 100;
       if (isDeleteFromBalance) {

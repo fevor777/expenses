@@ -18,6 +18,8 @@ import { DetailsComponent } from './details/details.component';
 import { CategoriesComponent } from './common/component/category/categories.component';
 import { NotificationComponent } from './common/component/notification/notification.component';
 import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
+import { BaseChartDirective } from 'ng2-charts';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -43,12 +45,14 @@ export class HammerConfig extends HammerGestureConfig {
     FontAwesomeModule,
     FormsModule,
     HammerModule,
+    BaseChartDirective,
   ],
   providers: [
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: CustomHammerConfig,
     },
+    provideCharts(withDefaultRegisterables()),
   ],
   bootstrap: [AppComponent],
 })

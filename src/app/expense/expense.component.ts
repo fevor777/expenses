@@ -116,7 +116,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.notificationService.showMessage(
         `Добавлено: ${getCategoryNameById(
           categoryName
-        )}, ${amount} ${this.getCurrencySymbol()}
+        )}, ${amount} €
         (${this.currentAmount}€)`
       );
     }

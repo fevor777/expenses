@@ -21,24 +21,11 @@
   </header>
   <div class="statistics-title">Статистика по категориям {{title}}:</div>
   Всего потрачено: {{ totalAmount }}€<br/><br/>
-  <div *ngFor="let categoryTotal of categoryTotals" class="category-summary">
-    <div class="category-header" (click)="showCategoryDetails(categoryTotal.category)">
-      <span [style.color]="'blue'">{{ getCategoryNameByIdFunc(categoryTotal.category) }}</span>
-      <span>{{ categoryTotal.amount }}€</span>
-    </div>
-    <div *ngIf="excludedCategories?.length > 0">
-      <span>(За исключением: {{ excludedCategories.join(", ") }}) </span>
-      <i (click)="onRefresh()" class="fas fa-redo-alt"></i>
-    </div>
-    <div class="progress-bar-container" (click)="showCategoryDetails(categoryTotal.category)">
-      <div
-        class="progress-bar"
-        [style.width.%]="categoryTotal.percentage"
-        [style.backgroundColor]="categoryTotal.color"
-      >
-        {{ categoryTotal.percentage.toFixed(2) }}%
-      </div>
-    </div>
+  <div *ngIf="excludedCategories?.length > 0">
+    <span>(За исключением: {{ excludedCategories.join(", ") }}) </span>
+    <i (click)="onRefresh()" class="fas fa-redo-alt"></i>
+    <br/>
+    <br/>
   </div>
   <app-statistics-bar
     *ngFor="let categoryTotal of categoryTotals"
@@ -49,4 +36,15 @@
     (close)="onBarClose($event)"
   >
   </app-statistics-bar>
+
+  <div style="display: block;">
+    <canvas baseChart
+            [datasets]="chartOptions.datasets"
+            [labels]="chartOptions.labels"
+            [options]="chartOptions.options"
+            [legend]="chartOptions.legend"
+            type="line"
+            >
+    </canvas>
+  </div>
 </div>
