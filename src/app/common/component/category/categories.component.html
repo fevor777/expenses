@@ -5,12 +5,12 @@
 >
   <div
     class="categories"
+    [ngClass]="{ 'scrollable-content-down': isContentDown && !showMore }"
   >
     <div
       *ngFor="let category of categories; let i = index"
       class="category"
       (click)="onCategoryClick(category.id)"
-      (press)="onPress($event, i)"
     >
       <i [style.color]="category.color" [class]="category.icon"></i>
       <span>{{ category.name }}</span>
