@@ -1,6 +1,13 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { getCategoryNameById } from '../common/categories';
+import { BehaviorSubject } from 'rxjs';
+
+enum Mode {
+  TODAY = 'today',
+  WEEK = 'week',
+  MONTH = 'month',
+}
 
 @Component({
   selector: 'app-statistics',
@@ -15,8 +22,37 @@ export class StatisticsComponent implements OnInit {
     color: string;
   }[] = [];
   totalAmount: number = 0;
-
+  readonly getCategoryNameByIdFunc = getCategoryNameById;
   excludedCategories: string[] = [];
+
+  // chartData = new BehaviorSubject<any[]>([]);
+  // chartLabels = new BehaviorSubject<string[]>([]);
+
+  // chartData$ = this.chartData.asObservable();
+  // chartLabels$ = this.chartLabels.asObservable();
+
+  chartOptions: any = {
+    datasets: [
+      {
+        data: [1],
+        label: 'Expenses',
+      }
+    ],
+    labels: ['1'],
+    options: {
+      responsive: true,
+    },
+    colors: [
+      {
+        borderColor: 'black',
+        backgroundColor: 'rgba(255,0,0,0.3)',
+      },
+    ],
+    legend: false,
+  };
+
+  mode = 'today';
+  title = 'за сегодня';
 
   constructor(private router: Router) {}
 
@@ -24,23 +60,94 @@ export class StatisticsComponent implements OnInit {
     this.calculateCategoryTotals();
   }
 
-  calculateCategoryTotals(): void {
+  showCategoryDetails(categoryId: string): void {
+    this.router.navigate(['/details'], {
+      queryParams: {
+        'category-id': categoryId,
+        'back-url': '/statistics',
+      },
+    });
+  }
+
+  calculateCategoryTotals(mode?: Mode): void {
+    let sinceWhen = new Date();
+    if (mode === Mode.WEEK) {
+      const dayOfWeek = sinceWhen.getDay();
+      const daysUntilMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      sinceWhen.setDate(sinceWhen.getDate() - daysUntilMonday);
+    }
+    if (mode === Mode.MONTH) {
+      sinceWhen = new Date(sinceWhen.setDate(1));
+    }
     const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 
     const categoryMap: { [key: string]: number } = {};
+
+    if (!mode || mode === Mode.TODAY) {
+      this.chartOptions.labels = new Array(24).fill(0).map((_, i) => {
+        return i + ':00';
+      });
+      this.chartOptions.datasets[0].data = new Array(24).fill(0);
+
+      //data on hours after current make null
+      for (let i = new Date().getHours(); i < 24; i++) {
+        this.chartOptions.datasets[0].data[i] = null;
+      }
+    }
+
+    if (mode === Mode.WEEK) {
+      this.chartOptions.labels = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+      this.chartOptions.datasets[0].data = new Array(7).fill(0);
+
+      //data on days after current make null
+      for (let i = new Date().getDay(); i < 7; i++) {
+        this.chartOptions.datasets[0].data[i] = null;
+      }
+    }
+
+    if (mode === Mode.MONTH) {
+      this.chartOptions.labels = new Array(31).fill(0).map((_, i) => {
+        return i + 1;
+      });
+      this.chartOptions.datasets[0].data = new Array(31).fill(0);
+
+      //data on days after current make null
+      for (let i = new Date().getDate(); i < 31; i++) {
+        this.chartOptions.datasets[0].data[i] = null;
+      }
+    }
 
     // Calculate total amount per category
     expenses
       .filter((expense: { date: number }) => {
         const date = new Date(expense.date);
-        const today = new Date();
         return (
-          date.getDate() === today.getDate() &&
-          date.getMonth() === today.getMonth() &&
-          date.getFullYear() === today.getFullYear()
+          date.getDate() >= sinceWhen.getDate() &&
+          date.getMonth() === sinceWhen.getMonth() &&
+          date.getFullYear() === sinceWhen.getFullYear()
         );
       })
       .forEach((expense) => {
+        //sum data for chart
+        if (!mode || mode === Mode.TODAY) {
+          const hour = new Date(expense.date).getHours();
+          this.chartOptions.datasets[0].data[hour] =
+            Math.round((this.chartOptions.datasets[0].data[hour] + expense.amount) * 100) / 100;
+        }
+
+        if (mode === Mode.WEEK) {
+          const day = new Date(expense.date).getDay();
+          this.chartOptions.datasets[0].data[day] =
+            Math.round((this.chartOptions.datasets[0].data[day] + expense.amount) * 100) / 100;
+        }
+
+        if (mode === Mode.MONTH) {
+          const day = new Date(expense.date).getDate();
+          this.chartOptions.datasets[0].data[day - 1] =
+            Math.round((this.chartOptions.datasets[0].data[day - 1] + expense.amount) * 100) / 100;
+        }
+
+
         if (!categoryMap[expense.category]) {
           categoryMap[expense.category] = 0;
         }
@@ -59,7 +166,21 @@ export class StatisticsComponent implements OnInit {
       this.categoryTotals.push({ category, amount, percentage, color });
       this.categoryTotals.sort((a, b) => a.amount - b.amount);
     }
+
+    if (mode === Mode.WEEK) {
+      this.chartOptions.labels.push(this.chartOptions.labels.shift());
+      this.chartOptions.datasets[0].data.push(this.chartOptions.datasets[0].data.shift());
+
+      //make null for sunday if its not sunday
+      if (new Date().getDay() !== 0) {
+        this.chartOptions.datasets[0].data[6] = null;
+      }
+    }
+
+    console.log(this.chartOptions);
   }
+
+  calculateChartValues(): void {}
 
   touchStartX: number = 0;
   touchStartY: number = 0;
@@ -121,4 +242,19 @@ export class StatisticsComponent implements OnInit {
       .filter((c) => !this.excludedCategories.includes(c.category))
       .reduce((total, c) => Math.round((total + c.amount) * 100) / 100, 0);
   }
+
+  changeMode(mode: Mode): void {
+    this.mode = mode;
+    this.categoryTotals = [];
+    this.totalAmount = 0;
+    this.calculateCategoryTotals(mode);
+    this.title =
+      mode === Mode.TODAY
+        ? 'за сегодня'
+        : mode === Mode.WEEK
+        ? 'на этой неделе'
+        : 'в этом месяце';
+  }
+
+  protected readonly Mode = Mode;
 }

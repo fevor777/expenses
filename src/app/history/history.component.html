@@ -2,11 +2,97 @@
   <span [style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'"
     >< Back</span
   ><br />
-  <div [style.margin.px]="'10'">
-    <span>Общий расход: </span>
-    <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+  <div class="history-container-top">
+    <div [style.margin.px]="'10'">
+      <span>Общий расход: </span>
+      <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+    </div>
+    <button
+      class="history-expand-filter-button"
+      [ngClass]="{ 'history-expand-filter-button-active': expandFilters }"
+      (click)="toggleExpandFilters()"
+    >
+      <i class="fas fa-filter"></i>
+    </button>
+  </div>
+  <div class="history-expand-filter-container" *ngIf="expandFilters">
+    <div class="history-expand-filter">
+      <div class="history-expand-filter-date">
+        <span>Период:</span>
+        <select (change)="applyFilters()" [(ngModel)]="filterDate">
+          <option value="">Показать все</option>
+          <option value="today">Сегодня</option>
+          <option value="thisWeek">Эта неделя</option>
+          <option value="thisMonth">Этот месяц</option>
+        </select>
+      </div>
+      <div class="history-expand-filter-category">
+        <span>Категория:</span>
+        <br />
+        <button (click)="clearFilters()" class="history-button-clear-filters">Очистить все фильтры</button>
+        <br />
+        <div class="category-checkbox category-checkbox-main">
+          <input
+            type="checkbox"
+            (change)="filterMass('regular')"
+            value="regular"
+            id="category-regular"
+            [checked]="filterCategories.regular"
+            [(ngModel)]="filterCategories.regular"
+          />
+          <label for="category-regular">Регулярное</label>
+        </div>
+        <div class="sub-category-items">
+          <ng-container *ngFor="let category of categories.regular">
+            <div class="category-checkbox category-checkbox-sub">
+              <input
+                type="checkbox"
+                (change)="applyFilters()"
+                [value]="category.id"
+                [id]="category.id"
+                [checked]="filterCategories[category.id]"
+                [(ngModel)]="filterCategories[category.id]"
+              />
+              <label [for]="category.id">{{ category.name }}</label>
+            </div>
+          </ng-container>
+        </div>
+        <div class="category-checkbox category-checkbox-main">
+          <input
+            type="checkbox"
+            (change)="filterMass('irregular')"
+            value="irregular"
+            id="category-irregular"
+            [checked]="filterCategories.irregular"
+            [(ngModel)]="filterCategories.irregular"
+          />
+          <label for="category-irregular">Нерегулярное</label>
+        </div>
+        <div class="sub-category-items">
+          <ng-container *ngFor="let category of categories.irregular">
+            <div class="category-checkbox category-checkbox-sub">
+              <input
+                type="checkbox"
+                (change)="applyFilters()"
+                [value]="category.id"
+                [id]="category.id"
+                [checked]="filterCategories[category.id]"
+                [(ngModel)]="filterCategories[category.id]"
+              />
+              <label [for]="category.id">{{ category.name }}</label>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+    <div class="history-expand-filter-buttons">
+      <button (click)="applyFiltersAndClose()">Применить</button>
+    </div>
   </div>
   <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
+  <div *ngIf="!expenses.length" class="history-empty">
+    <span>Для этих категорий и периода трат нет</span>
+  </div>
   <span *ngFor="let item of expenses; let i = index">
     <span
       [style.background]="'#f8d7da'"
@@ -24,11 +110,9 @@
       <br /><br />
       <div>
         Category:
-        <span
-          class="app-link"
-          (click)="showCategoryDetails(item.category)"
-          >{{ getCategoryNameByIdFunc(item.category) }}</span
-        >
+        <span class="app-link" (click)="showCategoryDetails(item.category)">{{
+          getCategoryNameByIdFunc(item.category)
+        }}</span>
       </div>
       Date: {{ item.date | date : "HH:mm" }} <br /><br />
       <span
@@ -38,12 +122,15 @@
         >Delete</span
       >
       <span
-        *ngIf="!item.isDeletedFromBalance && getCategoryByIdFunc(item.category).includeInBalance"
+        *ngIf="
+          !item.isDeletedFromBalance &&
+          getCategoryByIdFunc(item.category).includeInBalance
+        "
         [style.color]="'grey'"
         [style.cursor]="'pointer'"
         (click)="onDeleteFromBalance(i)"
       >
-       | Delete from balance</span
+        | Delete from balance</span
       >
     </div>
     <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
