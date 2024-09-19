@@ -20,6 +20,7 @@ import { NotificationComponent } from './common/component/notification/notificat
 import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
 import { BaseChartDirective } from 'ng2-charts';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { ExportComponent } from './export/export.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -38,6 +39,7 @@ export class HammerConfig extends HammerGestureConfig {
     CategoriesComponent,
     NotificationComponent,
     StatisticsBarComponent,
+    ExportComponent,
   ],
   imports: [
     BrowserModule,

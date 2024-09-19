@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ExpenseComponent } from './expense/expense.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { DetailsComponent } from './details/details.component';
+import { ExportComponent } from './export/export.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,10 @@ const routes: Routes = [
   {
     path: 'statistics',
     component: StatisticsComponent,
+  },
+  {
+    path: 'export',
+    component: ExportComponent,
   },
   {
     path: 'details',
