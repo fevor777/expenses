@@ -1,3 +1,17 @@
 <div>
-  <button (click)="exportCSV()">Export</button>
+  <button (click)="exportCSV()">Export CSV</button>
 </div>
+
+<div *ngIf="user$ | async">
+  <button (click)="exportFirebase()">Export Firebase</button>
+</div>
+
+
+<div *ngIf="(user$ | async) as user; else loginButton">
+  <h3>Welcome, {{ user.displayName }}!</h3>
+  <button (click)="logout()">Sign Out</button>
+</div>
+
+<ng-template #loginButton>
+  <button (click)="login()">Sign in with Google</button>
+</ng-template>

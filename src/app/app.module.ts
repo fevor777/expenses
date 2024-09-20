@@ -7,6 +7,11 @@ import {
 } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 
+
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { firebaseConfig } from '../environments/environment';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -48,6 +53,8 @@ export class HammerConfig extends HammerGestureConfig {
     FormsModule,
     HammerModule,
     BaseChartDirective,
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFirestoreModule
   ],
   providers: [
     {
