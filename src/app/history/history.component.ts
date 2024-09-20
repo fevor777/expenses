@@ -1,9 +1,15 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, Subject, map, of, switchMap, takeUntil, tap } from 'rxjs';
 
-import { getCategoryById } from '../common/categories';
+import {
+  Categories,
+  getCategoryById,
+  getCategoryNameById,
+} from '../common/categories';
 import { Expense } from '../common/expense.model';
-import { Categories, getCategoryNameById } from '../common/categories';
+import { ExpenseService } from '../common/expense.service';
+import { BalanceService } from '../common/balance.service';
 
 type HistoryExpense = Expense & {
   showDateTitle: boolean;
@@ -15,7 +21,7 @@ type HistoryExpense = Expense & {
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss'],
 })
-export class HistoryComponent implements OnInit {
+export class HistoryComponent implements OnInit, OnDestroy {
   expenses: HistoryExpense[] = [];
   totalAmount: number = 0;
   temporaryDate: number = 0;
@@ -36,80 +42,89 @@ export class HistoryComponent implements OnInit {
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
-  constructor(private router: Router) {}
+  private readonly destroySubject: Subject<void> = new Subject();
+
+  constructor(
+    private router: Router,
+    private expenseService: ExpenseService,
+    private balanceService: BalanceService
+  ) {}
 
   ngOnInit(): void {
-    this.initiateExpenses();
-    this.sumValues();
-
-    this.filterCategories.irregular = false;
-    this.filterCategories.regular = false;
+    this.initiateExpenses().pipe(takeUntil(this.destroySubject)).subscribe(() => {
+      this.sumValues();
+      this.filterCategories.irregular = false;
+      this.filterCategories.regular = false;
+    });
   }
 
-  initiateExpenses(): void {
-    this.expenses = (
-      JSON.parse(localStorage.getItem('expenses') || '[]') as HistoryExpense[]
-    ).map((expense) => {
-      const showDateTitle = this.isDatePanelVisible(expense.date);
-      if (showDateTitle) {
-        this.totalAmountPerDays.set(expense.date, expense.amount);
-      } else {
-        const amount = this.totalAmountPerDays.get(this.temporaryDate) || 0;
-        const newAmount = Math.round((amount + expense.amount) * 100) / 100;
-        this.totalAmountPerDays.set(this.temporaryDate, newAmount);
-      }
-      return {
-        ...expense,
-        showDateTitle,
-      };
-    });
+  initiateExpenses(): Observable<Expense[]> {
+    return this.expenseService.getExpenses().pipe(
+      tap((expenses) => {
+        this.expenses = expenses.map((expense) => {
+          const showDateTitle = this.isDatePanelVisible(expense.date);
+          if (showDateTitle) {
+            this.totalAmountPerDays.set(expense.date, expense.amount);
+          } else {
+            const amount = this.totalAmountPerDays.get(this.temporaryDate) || 0;
+            const newAmount = Math.round((amount + expense.amount) * 100) / 100;
+            this.totalAmountPerDays.set(this.temporaryDate, newAmount);
+          }
+          return {
+            ...expense,
+            showDateTitle,
+          } as HistoryExpense;
+        });
+      })
+    );
   }
 
   applyFilters(): void {
-    this.initiateExpenses();
-    this.checkMainCategory();
-    if (
-      this.filterDate === '' &&
-      Object.values(this.filterCategories).every((value) => !value)
-    ) {
+    this.initiateExpenses().pipe(takeUntil(this.destroySubject)).subscribe(() => {
+      this.checkMainCategory();
+      if (
+        this.filterDate === '' &&
+        Object.values(this.filterCategories).every((value) => !value)
+      ) {
+        this.sumValues();
+        return;
+      }
+
+      // Filter by category
+      this.expenses = this.expenses.filter((expense) => {
+        return (
+          Object.values(this.filterCategories).every((value) => !value) ||
+          Object.keys(this.filterCategories).some((key) => {
+            return this.filterCategories[key] && expense.category === key;
+          })
+        );
+      });
+
+      // Filter by date
+      if (this.filterDate === '') {
+        this.sumValues();
+        return;
+      }
+
+      let sinceWhen = new Date();
+      if (this.filterDate === 'thisWeek') {
+        const dayOfWeek = sinceWhen.getDay();
+        const daysUntilMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        sinceWhen.setDate(sinceWhen.getDate() - daysUntilMonday);
+      }
+      if (this.filterDate === 'thisMonth') {
+        sinceWhen = new Date(sinceWhen.setDate(1));
+      }
+      this.expenses = this.expenses.filter((expense: { date: number }) => {
+        const date = new Date(expense.date);
+        return (
+          date.getDate() >= sinceWhen.getDate() &&
+          date.getMonth() === sinceWhen.getMonth() &&
+          date.getFullYear() === sinceWhen.getFullYear()
+        );
+      });
       this.sumValues();
-      return;
-    }
-
-    // Filter by category
-    this.expenses = this.expenses.filter((expense) => {
-      return (
-        Object.values(this.filterCategories).every((value) => !value) ||
-        Object.keys(this.filterCategories).some((key) => {
-          return this.filterCategories[key] && expense.category === key;
-        })
-      );
     });
-
-    // Filter by date
-    if (this.filterDate === '') {
-      this.sumValues();
-      return;
-    }
-
-    let sinceWhen = new Date();
-    if (this.filterDate === 'thisWeek') {
-      const dayOfWeek = sinceWhen.getDay();
-      const daysUntilMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-      sinceWhen.setDate(sinceWhen.getDate() - daysUntilMonday);
-    }
-    if (this.filterDate === 'thisMonth') {
-      sinceWhen = new Date(sinceWhen.setDate(1));
-    }
-    this.expenses = this.expenses.filter((expense: { date: number }) => {
-      const date = new Date(expense.date);
-      return (
-        date.getDate() >= sinceWhen.getDate() &&
-        date.getMonth() === sinceWhen.getMonth() &&
-        date.getFullYear() === sinceWhen.getFullYear()
-      );
-    });
-    this.sumValues();
   }
 
   applyFiltersAndClose(): void {
@@ -178,9 +193,14 @@ export class HistoryComponent implements OnInit {
   onDelete(index: number) {
     if (confirm('Delete?')) {
       this.updateBalance(index);
-      this.expenses.splice(index, 1);
-      localStorage.setItem('expenses', JSON.stringify(this.expenses));
-      this.sumValues();
+      const id = this.expenses[index].id;
+      this.expenseService
+        .deleteExpense(id)
+        .pipe(
+          switchMap(() => this.initiateExpenses()),
+          takeUntil(this.destroySubject),
+        )
+        .subscribe(() => this.sumValues());
     }
   }
 
@@ -194,11 +214,12 @@ export class HistoryComponent implements OnInit {
     ) {
       const newBalance =
         Math.round((balance + this.expenses[index].amount) * 100) / 100;
-      if (isDeleteFromBalance) {
-        this.expenses[index].isDeletedFromBalance = isDeleteFromBalance;
-        localStorage.setItem('expenses', JSON.stringify(this.expenses));
-      }
-      localStorage.setItem('balance', newBalance.toString());
+      this.balanceService.addBalance(newBalance).pipe(takeUntil(this.destroySubject)).subscribe();
+      
+    }
+    if (isDeleteFromBalance) {
+      this.expenses[index].isDeletedFromBalance = isDeleteFromBalance;
+      this.expenseService.updateExpense(this.expenses[index]).pipe(takeUntil(this.destroySubject)).subscribe();
     }
   }
 
@@ -267,6 +288,11 @@ export class HistoryComponent implements OnInit {
   onSwipeLeft() {
     this.router.navigate(['/statistics']);
     // Handle the left swipe action here
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
   }
 
   private sumValues(): void {

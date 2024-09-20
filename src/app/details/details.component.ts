@@ -1,21 +1,29 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Expense } from '../common/expense.model';
 import { getCategoryNameById } from '../common/categories';
+import { ExpenseService } from '../common/expense.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-details',
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
 })
-export class DetailsComponent implements OnInit {
+export class DetailsComponent implements OnInit, OnDestroy {
   amountForDay: number = 0;
   amountForMonth: number = 0;
   amountForYear: number = 0;
   backUrl: string = '';
   selectedCategory: string = '';
 
-  constructor(private activatedRoute: ActivatedRoute, private router: Router) {}
+  private readonly destroySubject: Subject<void> = new Subject();
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private expenseService: ExpenseService
+  ) {}
 
   ngOnInit(): void {
     this.initDetails();
@@ -26,26 +34,34 @@ export class DetailsComponent implements OnInit {
       this.activatedRoute.snapshot.queryParamMap.get('category-id');
     this.selectedCategory = getCategoryNameById(categoryId);
     this.backUrl = this.activatedRoute.snapshot.queryParamMap.get('back-url');
-    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    const currentDate = new Date().getDate();
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    expenses.forEach((expense: Expense) => {
-      const date = new Date(expense.date);
-      const expenseDate = date.getDate();
-      const expenseMonth = date.getMonth();
-      const expenseYear = date.getFullYear();
-      if (categoryId === expense.category) {
-        if (currentDate === expenseDate && currentMonth === expenseMonth && currentYear === expenseYear) {
-          this.amountForDay = Math.round((this.amountForDay + expense.amount) * 100) / 100;
+    this.expenseService.getExpenses().pipe(takeUntil(this.destroySubject)).subscribe((expenses) => {
+      const currentDate = new Date().getDate();
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      expenses.forEach((expense: Expense) => {
+        const date = new Date(expense.date);
+        const expenseDate = date.getDate();
+        const expenseMonth = date.getMonth();
+        const expenseYear = date.getFullYear();
+        if (categoryId === expense.category) {
+          if (
+            currentDate === expenseDate &&
+            currentMonth === expenseMonth &&
+            currentYear === expenseYear
+          ) {
+            this.amountForDay =
+              Math.round((this.amountForDay + expense.amount) * 100) / 100;
+          }
+          if (currentMonth === expenseMonth && currentYear === expenseYear) {
+            this.amountForMonth =
+              Math.round((this.amountForMonth + expense.amount) * 100) / 100;
+          }
+          if (currentYear === expenseYear) {
+            this.amountForYear =
+              Math.round((this.amountForYear + expense.amount) * 100) / 100;
+          }
         }
-        if (currentMonth === expenseMonth && currentYear === expenseYear) {
-          this.amountForMonth = Math.round((this.amountForMonth + expense.amount) * 100) / 100;
-        }
-        if (currentYear === expenseYear) {
-          this.amountForYear = Math.round((this.amountForYear + expense.amount) * 100) / 100;
-        }
-      }
+      });
     });
   }
 
@@ -84,5 +100,10 @@ export class DetailsComponent implements OnInit {
   navigateBack() {
     this.router.navigate([this.backUrl]);
     // Handle the left swipe action here
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
   }
 }

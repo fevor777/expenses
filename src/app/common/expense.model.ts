@@ -1,5 +1,6 @@
 export class Expense {
-  id: string;
+  id?: string;
+  uid?: string;
   amount: number;
   category: string;
   currency: string;

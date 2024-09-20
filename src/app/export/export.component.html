@@ -1,13 +1,15 @@
+<span [style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'"
+  >< Back</span
+><br /><br /><br />
 <div>
   <button (click)="exportCSV()">Export CSV</button>
 </div>
-
+<br /><br />
 <div *ngIf="user$ | async">
   <button (click)="exportFirebase()">Export Firebase</button>
 </div>
-
-
-<div *ngIf="(user$ | async) as user; else loginButton">
+<br /><br />
+<div *ngIf="user$ | async as user; else loginButton">
   <h3>Welcome, {{ user.displayName }}!</h3>
   <button (click)="logout()">Sign Out</button>
 </div>

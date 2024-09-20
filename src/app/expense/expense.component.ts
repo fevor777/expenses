@@ -1,25 +1,38 @@
-import { AfterViewChecked, Component, OnInit } from '@angular/core';
+import { Saving } from './../../../.history/src/app/common/saving.model_20240920211406';
+import { getCurrencySymbol } from '@angular/common';
+import { AfterViewChecked, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { v4 as uuidv4 } from 'uuid';
+import {
+  forkJoin,
+  map,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+} from 'rxjs';
 
-import { Expense } from '../common/expense.model';
+import { BalanceService } from '../common/balance.service';
 import {
   Categories,
   Category,
   getCategoryById,
   getCategoryNameById,
 } from '../common/categories';
-import { getCurrencySymbol } from '@angular/common';
-import { Currency } from '../common/currency';
-import { ExpressionEvaluator } from '../common/expression-evaluator';
 import { NotificationService } from '../common/component/notification/notification.service';
+import { Currency } from '../common/currency';
+import { Expense } from '../common/expense.model';
+import { ExpenseService } from '../common/expense.service';
+import { ExpressionEvaluator } from '../common/expression-evaluator';
+import { BalanceDateService } from '../common/balance-date.service';
+import { SavingService } from '../common/saving.service';
 
 @Component({
   selector: 'app-expense',
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
 })
-export class ExpenseComponent implements OnInit, AfterViewChecked {
+export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   enteredAmount = '';
   currentAmount: number = 0;
   monthAmount: number = 0;
@@ -37,13 +50,19 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   showSavings: boolean;
   savings: string = '0';
 
+  private unsubscribe: Subject<void> = new Subject();
+
   getCurrencySymbol(): string {
     return getCurrencySymbol(this.currency.code, 'narrow');
   }
 
   constructor(
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private expenseService: ExpenseService,
+    private balanceService: BalanceService,
+    private balanceDateService: BalanceDateService,
+    private savingService: SavingService
   ) {}
 
   ngAfterViewChecked(): void {
@@ -51,10 +70,30 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit(): void {
-    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    this.sumValues(expenses);
+    this.expenseService
+      .getExpenses()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((expenses) => {
+        this.sumValues(expenses);
+        this.savings = localStorage.getItem('savings') || '0';
+      });
+
+    this.balanceDateService
+      .getBalanceDate()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((balanceDate) => {
+        this.balanceDate = balanceDate;
+      });
+
+    this.savingService
+      .getSavings()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((savings) => {
+        this.savings = savings?.toString() || '0';
+      });
+
     this.balance = Number(localStorage.getItem('balance')) || 0;
-    this.balanceDate = localStorage.getItem('balanceDate');
+
     const currencyInLocalStorage = localStorage.getItem('currency');
     if (currencyInLocalStorage) {
       this.currency = JSON.parse(currencyInLocalStorage);
@@ -64,7 +103,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
-    this.savings = localStorage.getItem('savings') || '0';
   }
 
   categoriesVisible = false;
@@ -92,33 +130,39 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
     const calculatedAmount = ExpressionEvaluator.evaluate(this.enteredAmount);
     const amount = Math.round((calculatedAmount / exchangeRate) * 100) / 100;
     if (amount > 0) {
-      const jsonInLocalStorage = localStorage.getItem('expenses');
-      let expenseList = jsonInLocalStorage
-        ? JSON.parse(jsonInLocalStorage)
-        : [];
-      expenseList.unshift({
-        id: uuidv4(),
+      const newExpense: Expense = {
         category: categoryName,
         amount: amount,
         currency: this.currency?.code,
         date: Date.now(),
-      });
-      if (getCategoryById(categoryName)?.includeInBalance) {
-        const balance = Number(localStorage.getItem('balance') || 0);
-        const newBalance = Math.round((balance - amount) * 100) / 100;
-        localStorage.setItem('balance', newBalance.toString());
-        this.balance = newBalance;
-      }
-      localStorage.setItem('expenses', JSON.stringify(expenseList));
-      this.sumValues(expenseList);
+      };
       this.enteredAmount = '';
-      this.showKeyBoard = true;
-      this.notificationService.showMessage(
-        `Добавлено: ${getCategoryNameById(
-          categoryName
-        )}, ${amount} €
-        (${this.currentAmount}€)`
-      );
+      this.expenseService
+        .addExpense(newExpense)
+        .pipe(
+          switchMap(() => {
+            let balanceObs: Observable<number> = of(this.balance);
+            let newBalance = this.balance;
+            if (getCategoryById(categoryName)?.includeInBalance) {
+              newBalance = Math.round((this.balance - amount) * 100) / 100;
+              this.balance = newBalance;
+              balanceObs = this.balanceService.addBalance(newBalance);
+            }
+            return balanceObs;
+          }),
+          switchMap(() => {
+            return this.expenseService.getExpenses();
+          }),
+          takeUntil(this.unsubscribe)
+        )
+        .subscribe((expenseList) => {
+          this.showKeyBoard = true;
+          this.notificationService.showMessage(
+            `Добавлено: ${getCategoryNameById(categoryName)}, ${amount} €
+          (${this.currentAmount}€)`
+          );
+          this.sumValues(expenseList);
+        });
     }
   }
 
@@ -127,7 +171,10 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   onBalanceChange(): void {
     const newBalance = prompt('Enter new balance', this.balance.toString());
     if (newBalance) {
-      localStorage.setItem('balance', newBalance);
+      this.balanceService
+        .addBalance(Number(newBalance))
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe();
       this.balance = Number(newBalance);
     }
   }
@@ -138,8 +185,12 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       this.balanceDate || ''
     );
     if (newBalanceDate) {
-      localStorage.setItem('balanceDate', newBalanceDate);
-      this.balanceDate = newBalanceDate;
+      this.balanceDateService
+        .addBalanceDate(newBalanceDate)
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(() => {
+          this.balanceDate = newBalanceDate;
+        });
     }
   }
 
@@ -169,8 +220,12 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
   changeSavings(): void {
     const newSavings = prompt('Enter new savings', this.savings);
     if (newSavings) {
-      localStorage.setItem('savings', newSavings);
-      this.savings = newSavings;
+      this.savingService
+        .addSaving(Number(newSavings))
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(() => {
+          this.savings = newSavings;
+        });
     }
   }
 
@@ -190,6 +245,11 @@ export class ExpenseComponent implements OnInit, AfterViewChecked {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 
   private sumValues(expenses: Expense[]): void {

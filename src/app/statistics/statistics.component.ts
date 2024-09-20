@@ -1,7 +1,8 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { getCategoryNameById } from '../common/categories';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { ExpenseService } from '../common/expense.service';
 
 enum Mode {
   TODAY = 'today',
@@ -14,7 +15,7 @@ enum Mode {
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss'],
 })
-export class StatisticsComponent implements OnInit {
+export class StatisticsComponent implements OnInit, OnDestroy {
   categoryTotals: {
     category: string;
     amount: number;
@@ -24,6 +25,8 @@ export class StatisticsComponent implements OnInit {
   totalAmount: number = 0;
   readonly getCategoryNameByIdFunc = getCategoryNameById;
   excludedCategories: string[] = [];
+
+  private readonly destroySubject: Subject<void> = new Subject();
 
   // chartData = new BehaviorSubject<any[]>([]);
   // chartLabels = new BehaviorSubject<string[]>([]);
@@ -36,7 +39,7 @@ export class StatisticsComponent implements OnInit {
       {
         data: [1],
         label: 'Expenses',
-      }
+      },
     ],
     labels: ['1'],
     options: {
@@ -54,7 +57,7 @@ export class StatisticsComponent implements OnInit {
   mode = 'today';
   title = 'за сегодня';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private expenseService: ExpenseService) {}
 
   ngOnInit(): void {
     this.calculateCategoryTotals();
@@ -79,7 +82,6 @@ export class StatisticsComponent implements OnInit {
     if (mode === Mode.MONTH) {
       sinceWhen = new Date(sinceWhen.setDate(1));
     }
-    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 
     const categoryMap: { [key: string]: number } = {};
 
@@ -118,66 +120,77 @@ export class StatisticsComponent implements OnInit {
     }
 
     // Calculate total amount per category
-    expenses
-      .filter((expense: { date: number }) => {
-        const date = new Date(expense.date);
-        return (
-          date.getDate() >= sinceWhen.getDate() &&
-          date.getMonth() === sinceWhen.getMonth() &&
-          date.getFullYear() === sinceWhen.getFullYear()
-        );
-      })
-      .forEach((expense) => {
-        //sum data for chart
-        if (!mode || mode === Mode.TODAY) {
-          const hour = new Date(expense.date).getHours();
-          this.chartOptions.datasets[0].data[hour] =
-            Math.round((this.chartOptions.datasets[0].data[hour] + expense.amount) * 100) / 100;
-        }
+    this.expenseService.getExpenses().pipe(takeUntil(this.destroySubject)).subscribe((expenses) => {
+      expenses
+        .filter((expense: { date: number }) => {
+          const date = new Date(expense.date);
+          return (
+            date.getDate() >= sinceWhen.getDate() &&
+            date.getMonth() === sinceWhen.getMonth() &&
+            date.getFullYear() === sinceWhen.getFullYear()
+          );
+        })
+        .forEach((expense) => {
+          //sum data for chart
+          if (!mode || mode === Mode.TODAY) {
+            const hour = new Date(expense.date).getHours();
+            this.chartOptions.datasets[0].data[hour] =
+              Math.round(
+                (this.chartOptions.datasets[0].data[hour] + expense.amount) *
+                  100
+              ) / 100;
+          }
 
-        if (mode === Mode.WEEK) {
-          const day = new Date(expense.date).getDay();
-          this.chartOptions.datasets[0].data[day] =
-            Math.round((this.chartOptions.datasets[0].data[day] + expense.amount) * 100) / 100;
-        }
+          if (mode === Mode.WEEK) {
+            const day = new Date(expense.date).getDay();
+            this.chartOptions.datasets[0].data[day] =
+              Math.round(
+                (this.chartOptions.datasets[0].data[day] + expense.amount) * 100
+              ) / 100;
+          }
 
-        if (mode === Mode.MONTH) {
-          const day = new Date(expense.date).getDate();
-          this.chartOptions.datasets[0].data[day - 1] =
-            Math.round((this.chartOptions.datasets[0].data[day - 1] + expense.amount) * 100) / 100;
-        }
+          if (mode === Mode.MONTH) {
+            const day = new Date(expense.date).getDate();
+            this.chartOptions.datasets[0].data[day - 1] =
+              Math.round(
+                (this.chartOptions.datasets[0].data[day - 1] + expense.amount) *
+                  100
+              ) / 100;
+          }
 
-
-        if (!categoryMap[expense.category]) {
-          categoryMap[expense.category] = 0;
-        }
-        categoryMap[expense.category] =
-          Math.round((categoryMap[expense.category] + expense.amount) * 100) /
-          100;
-        this.totalAmount =
-          Math.round((this.totalAmount + expense.amount) * 100) / 100;
-      });
-
-    // Calculate percentage for each category
-    for (const category in categoryMap) {
-      const amount = categoryMap[category];
-      const percentage = (amount / this.totalAmount) * 100;
-      const color = this.getColor(percentage);
-      this.categoryTotals.push({ category, amount, percentage, color });
-      this.categoryTotals.sort((a, b) => a.amount - b.amount);
-    }
-
-    if (mode === Mode.WEEK) {
-      this.chartOptions.labels.push(this.chartOptions.labels.shift());
-      this.chartOptions.datasets[0].data.push(this.chartOptions.datasets[0].data.shift());
-
-      //make null for sunday if its not sunday
-      if (new Date().getDay() !== 0) {
-        this.chartOptions.datasets[0].data[6] = null;
+          if (!categoryMap[expense.category]) {
+            categoryMap[expense.category] = 0;
+          }
+          categoryMap[expense.category] =
+            Math.round((categoryMap[expense.category] + expense.amount) * 100) /
+            100;
+          this.totalAmount =
+            Math.round((this.totalAmount + expense.amount) * 100) / 100;
+        });
+      // Calculate percentage for each category
+      for (const category in categoryMap) {
+        const amount = categoryMap[category];
+        const percentage = (amount / this.totalAmount) * 100;
+        const color = this.getColor(percentage);
+        this.categoryTotals.push({ category, amount, percentage, color });
+        this.categoryTotals.sort((a, b) => a.amount - b.amount);
       }
-    }
 
-    console.log(this.chartOptions);
+      if (mode === Mode.WEEK) {
+        this.chartOptions.labels.push(this.chartOptions.labels.shift());
+        this.chartOptions.datasets[0].data.push(
+          this.chartOptions.datasets[0].data.shift()
+        );
+
+        //make null for sunday if its not sunday
+        if (new Date().getDay() !== 0) {
+          this.chartOptions.datasets[0].data[6] = null;
+        }
+      }
+      this.chartOptions = { ...this.chartOptions, datasets: [ ...this.chartOptions.datasets] };
+
+      console.log(this.chartOptions);
+    });
   }
 
   calculateChartValues(): void {}
@@ -257,4 +270,9 @@ export class StatisticsComponent implements OnInit {
   }
 
   protected readonly Mode = Mode;
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
+  }
 }

@@ -1,29 +1,40 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ExpenseService } from '../common/expense.service';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, Subject, forkJoin, pipe, switchMap, takeUntil, tap } from 'rxjs';
 import { AuthService } from '../common/auth.service';
 import { User } from 'firebase/auth';
+import { BalanceService } from '../common/balance.service';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
 })
-export class ExportComponent {
-
+export class ExportComponent implements OnDestroy {
   user$: Observable<User>; // Observable to track the logged-in user
 
-  constructor(private expenseService: ExpenseService, private authService: AuthService) {
+  private readonly destroySubject: Subject<void> = new Subject();
+
+  constructor(
+    private expenseService: ExpenseService,
+    private authService: AuthService,
+    private balanceService: BalanceService
+  ) {
     this.user$ = this.authService.user$;
   }
 
   // Method to trigger Google Sign-in
   login() {
-    this.authService.signInWithGoogle().then(res => {
-      console.log('Logged in with Google:', res);
-    }).catch(err => {
-      console.error('Google Sign-in Error:', err);
-    });
+    this.authService
+      .signInWithGoogle()
+      .pipe(
+        switchMap(() => this.balanceService.getBalance()),
+        tap((balance) => localStorage.setItem('balance', balance.toString())),
+        takeUntil(this.destroySubject)
+      )
+      .subscribe((res) => {
+        console.log('Logged in with Google:', res);
+      });
   }
 
   // Method to trigger Sign-out
@@ -75,10 +86,20 @@ export class ExportComponent {
   exportFirebase(): void {
     const data = JSON.parse(localStorage.getItem('expenses') || '[]');
     if (data.length > 0) {
-      const responses = data.map((expense) => this.expenseService.addExpense(expense));
-      forkJoin(responses).subscribe(() => {
-        console.log('Data migrated successfully to Firestore');
-      });
+      const responses = data
+        .map((expense) => ({ ...expense, uid: this.authService.user.uid }))
+        .map((expense) => this.expenseService.addExpense(expense));
+      forkJoin(responses)
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe(() => {
+          localStorage.removeItem('expenses');
+          console.log('Data migrated successfully to Firestore');
+        });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
   }
 }

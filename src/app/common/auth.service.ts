@@ -1,26 +1,30 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
-import { Observable } from 'rxjs';
+import { GoogleAuthProvider, User } from 'firebase/auth';
+import { Observable, from, tap } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
-  user$: Observable<any>;
+  user$: Observable<User>;
+  user: User;
 
   constructor(private afAuth: AngularFireAuth) {
-    this.user$ = this.afAuth.authState; // Observable to track user auth state
+    this.user$ = this.afAuth.authState.pipe(
+      tap((user) => this.updateUser(user))
+    );
   }
 
-  // Google sign-in
   signInWithGoogle() {
-    return this.afAuth.signInWithPopup(new GoogleAuthProvider());
+    return from(this.afAuth.signInWithPopup(new GoogleAuthProvider()));
   }
 
-  // Sign out
   signOut() {
     return this.afAuth.signOut();
+  }
+
+  updateUser(user: User) {
+    this.user = user;
   }
 }
