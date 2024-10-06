@@ -1,10 +1,7 @@
-import { Saving } from './../../../.history/src/app/common/saving.model_20240920211406';
 import { getCurrencySymbol } from '@angular/common';
 import { AfterViewChecked, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  forkJoin,
-  map,
   Observable,
   of,
   Subject,

@@ -1,50 +1,27 @@
 <div class="statistics">
-  <header class="statistics-period">
-    <button
-      class="statistics-period-button"
-      [class.statistics-period-button-active]="mode === Mode.TODAY"
-      (click)="changeMode(Mode.TODAY);"
-    >За сегодня
-    </button>
-    <button
-      class="statistics-period-button"
-      [class.statistics-period-button-active]="mode === Mode.WEEK"
-      (click)="changeMode(Mode.WEEK);"
-    >За неделю
-    </button>
-    <button
-      class="statistics-period-button"
-      [class.statistics-period-button-active]="mode === Mode.MONTH"
-      (click)="changeMode(Mode.MONTH);"
-    >За месяц
-    </button>
-  </header>
-  <div class="statistics-title">Статистика по категориям {{title}}:</div>
-  Всего потрачено: {{ totalAmount }}€<br/><br/>
+  <button class="expand-filter-button" [ngClass]="{ 'expand-filter-button-active': showFilters }"
+    (click)="toggleExpandFilters()">
+    <i class="fas fa-filter"></i>
+  </button>
+  @if (showFilters) {
+  <app-date-filter (changeDayEvent)="calculateCategoryTotals()"></app-date-filter>
+  }
+  <div class="statistics-title">Статистика по категориям за {{(currentDateFrame | async).display}}:</div>
+  Всего потрачено: {{ totalAmount }}€<br /><br />
   <div *ngIf="excludedCategories?.length > 0">
     <span>(За исключением: {{ excludedCategories.join(", ") }}) </span>
     <i (click)="onRefresh()" class="fas fa-redo-alt"></i>
-    <br/>
-    <br/>
+    <br />
+    <br />
   </div>
-  <app-statistics-bar
-    *ngFor="let categoryTotal of categoryTotals"
-    [amount]="categoryTotal.amount"
-    [category]="categoryTotal.category"
-    [percentage]="categoryTotal.percentage"
-    [color]="categoryTotal.color"
-    (close)="onBarClose($event)"
-  >
+  <app-statistics-bar *ngFor="let categoryTotal of categoryTotals" [amount]="categoryTotal.amount"
+    [category]="categoryTotal.category" [percentage]="categoryTotal.percentage" [color]="categoryTotal.color"
+    (close)="onBarClose($event)">
   </app-statistics-bar>
 
   <div style="display: block;">
-    <canvas baseChart
-            [datasets]="chartOptions.datasets"
-            [labels]="chartOptions.labels"
-            [options]="chartOptions.options"
-            [legend]="chartOptions.legend"
-            type="line"
-            >
+    <canvas baseChart [datasets]="chartOptions.datasets" [labels]="chartOptions.labels" [options]="chartOptions.options"
+      [legend]="chartOptions.legend" type="line">
     </canvas>
   </div>
 </div>

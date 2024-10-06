@@ -31,6 +31,9 @@
 .statistics {
   padding: 15px;
   min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+
 
   &-title {
     text-align: center;
@@ -39,23 +42,19 @@
   }
 }
 
-.statistics-period {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+.expand-filter-button {
+  font-family: "Montserrat", sans-serif;
+  color: #000;
+  border: 2px solid #f8d7da;
+  background-color: transparent;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem;
+  cursor: pointer;
+  width: 4rem;
+  align-self: self-end;
+}
 
-  &-button {
-    margin: 0 10px;
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    font-family: "Montserrat", sans-serif;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    background-color: transparent;
-    cursor: pointer;
-  }
-
-  &-button-active {
-    background-color: #f8d7da;
-  }
+.expand-filter-button-active {
+  background-color: #f8d7da;
 }
