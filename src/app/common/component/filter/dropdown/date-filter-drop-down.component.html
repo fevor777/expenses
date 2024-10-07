@@ -2,12 +2,12 @@
   <button class="date-filter-drop-down-button" (click)="onDisplayValueClick()" [ngClass]="{'date-filter-drop-down-dropdown-active': isActivated }">
     {{ selectedOption?.display }}
   </button>
-  <button class="date-filter-drop-down-button" (click)="toggleDropdown()">
+  <button class="date-filter-drop-down-button date-filter-drop-down-button-toggle" (click)="toggleDropdown()">
     v
   </button>
   <ul *ngIf="dropdownOpen" class="date-filter-drop-down-dropdown">
     @for(option of options; track option.value) {
-    <li *ngFor="let option of options" (click)="onSelectValue(option)">
+    <li (click)="onSelectValue(option)">
       {{ option?.display }}
     </li>
     }
