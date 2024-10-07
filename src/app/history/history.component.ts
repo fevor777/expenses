@@ -84,9 +84,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    console.log('apply filters')
     this.initiateExpenses().pipe(takeUntil(this.destroySubject)).subscribe(() => {
-      console.log('apply filters subscribe')
       this.checkMainCategory();
 
       // Filter by category
@@ -102,7 +100,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
       // Filter by date
       const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
       this.currentPeriod = currentDateFrame.display;
-      console.log('history', currentDateFrame);
       this.expenses = getExpensesFromTo(this.expenses, currentDateFrame.start, currentDateFrame.finish);
      
       this.sumValues();

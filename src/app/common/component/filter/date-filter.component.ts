@@ -13,7 +13,7 @@ import { CommonModule } from "@angular/common";
 })
 export class DateFilterComponent implements OnInit {
   @Output()
-  changeDayEvent: EventEmitter<null> = new EventEmitter();
+  changeDateFrameEvent: EventEmitter<null> = new EventEmitter();
   readonly Mode = Mode;
 
   pastDays: DateFrame[] = [];
@@ -63,9 +63,25 @@ export class DateFilterComponent implements OnInit {
 
   updateDateFrameEvent(frame: DateFrame): void {
     this.currentFrame = frame;
-    console.log('changeModeEvent', frame);
 
     this.dateFilterService.setDateFrame(this.currentFrame);
-    this.changeDayEvent.emit();
+    this.changeDateFrameEvent.emit();
+  }
+
+  selectChange(event: any, mode: Mode) {
+    const display = event.target.value;
+    let chosenFrame: DateFrame;
+    switch (mode) {
+      case Mode.DAY: 
+        chosenFrame = this.pastDays.filter((frame: DateFrame) => frame.display === display)[0]; 
+        break;
+      case Mode.WEEK: 
+        chosenFrame = this.pastWeeks.filter((frame: DateFrame) => frame.display === display)[0]; 
+        break;
+      case Mode.MONTH: 
+        chosenFrame = this.pastMonths.filter((frame: DateFrame) => frame.display === display)[0];
+        break;
+    }
+    this.updateDateFrameEvent(chosenFrame);
   }
 }

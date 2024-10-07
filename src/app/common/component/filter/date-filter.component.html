@@ -1,27 +1,27 @@
 <div class="statistics-period">
-  <select class="statistics-period-button 'statistics-period-button-active'"
+  <select (change)="selectChange($event, Mode.DAY)" class="statistics-period-button 'statistics-period-button-active'"
     [ngClass]="{'statistics-period-button-active': currentFrame.mode === Mode.DAY}"
   >
     @for(day of pastDays; track day.start) {
-    <option (click)="updateDateFrameEvent(day)">
+    <option>
       {{day.display}}
     </option>
     }
   </select>
-  <select class="statistics-period-button"
+  <select (change)="selectChange($event, Mode.WEEK)" class="statistics-period-button"
     [ngClass]="{'statistics-period-button-active': currentFrame.mode === Mode.WEEK}"
   >
     @for(week of pastWeeks; track week.start) {
-    <option (click)="updateDateFrameEvent(week)">
+    <option>
       {{week.display}}
     </option>
     }
   </select>
-  <select class="statistics-period-button"
+  <select (change)="selectChange($event, Mode.MONTH)" class="statistics-period-button"
     [ngClass]="{'statistics-period-button-active': currentFrame.mode === Mode.MONTH}"
   >
     @for(month of pastMonths; track month.start) {
-    <option (click)="updateDateFrameEvent(month)">
+    <option>
       {{month.display}}
     </option>
     }
