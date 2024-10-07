@@ -98,7 +98,7 @@ export const Categories: Category[] = [
     name: 'Электроника',
     icon: 'fas fa-tablet-alt',
     color: '#9E9E9E',
-    includeInBalance: false,
+    includeInBalance: true,
   },
   {
     id: 'clothes',

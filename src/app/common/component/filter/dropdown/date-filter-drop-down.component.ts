@@ -5,6 +5,7 @@ import {
   HostListener,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
 } from '@angular/core';
@@ -19,28 +20,30 @@ import { Mode } from '../dateFrame.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
 })
-export class DateFilterDropDownComponent<T> implements OnChanges {
+export class DateFilterDropDownComponent<T> implements OnChanges, OnInit {
   @Input() options: SelectOption<T>[] = [];
   @Input() mode: Mode;
   @Input() activatedMode: Mode;
+  @Input() defaultValue: SelectOption<T>;
+  @Input() hideOptions: boolean = false;
 
   @Output() select: EventEmitter<T> = new EventEmitter();
   @Output() active: EventEmitter<Mode> = new EventEmitter();
+  @Output() toggleClick: EventEmitter<Mode> = new EventEmitter();
 
   selectedOption: SelectOption<T>;
   dropdownOpen: boolean = false;
   isActivated: boolean = false;
 
-  toggleDropdown(): void {
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-
-  onSelectValue(selected: SelectOption<T>): void {
-    this.selectedOption = selected;
-    this.select.emit(selected.value);
-    this.isActivated = true;
-    this.active.emit(this.mode);
-    this.dropdownOpen = false;
+  ngOnInit(): void {
+    if (
+      this.defaultValue &&
+      this.mode &&
+      this.activatedMode &&
+      this.activatedMode === this.mode
+    ) {
+      this.selectedOption = this.defaultValue;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -54,6 +57,9 @@ export class DateFilterDropDownComponent<T> implements OnChanges {
     if (changes?.['activatedMode'] && this.activatedMode) {
       this.isActivated = this.activatedMode === this.mode;
     }
+    if (changes?.['hideOptions'] && this.hideOptions) {
+      this.dropdownOpen = false;
+    }
   }
 
   @HostListener('document:click', ['$event'])
@@ -63,13 +69,28 @@ export class DateFilterDropDownComponent<T> implements OnChanges {
     }
   }
 
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+    this.toggleClick.emit(this.mode);
+  }
+
+  onSelectValue(selected: SelectOption<T>): void {
+    this.selectedOption = selected;
+    this.select.emit(selected.value);
+    this.isActivated = true;
+    this.active.emit(this.mode);
+    this.dropdownOpen = false;
+  }
+
   onClick(event: MouseEvent): void {
     event.stopPropagation();
   }
 
   onDisplayValueClick(): void {
     if (this.isActivated) {
-      this.dropdownOpen = true;
+      this.dropdownOpen = !this.dropdownOpen;
+    } else if (this.dropdownOpen) {
+      this.dropdownOpen = false;
     }
     this.isActivated = true;
     this.active.emit(this.mode);

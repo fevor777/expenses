@@ -3,7 +3,7 @@
     {{ selectedOption?.display }}
   </button>
   <button class="date-filter-drop-down-button" (click)="toggleDropdown()">
-    &#9660;
+    v
   </button>
   <ul *ngIf="dropdownOpen" class="date-filter-drop-down-dropdown">
     @for(option of options; track option.value) {

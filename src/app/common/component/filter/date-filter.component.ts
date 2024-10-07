@@ -19,10 +19,13 @@ export class DateFilterComponent implements OnInit {
   readonly Mode = Mode;
 
   currentMode: Mode = Mode.DAY;
+  clickedMode: Mode;
 
   optionsForDaysSelect: SelectOption<DateFrame>[] = [];
   optionsForWeeksSelect: SelectOption<DateFrame>[] = [];
   optionsForMonthsSelect: SelectOption<DateFrame>[] = [];
+
+  defaultValue: SelectOption<DateFrame>;
 
   firstDayOption: SelectOption<DateFrame> = {
     value: {
@@ -39,7 +42,7 @@ export class DateFilterComponent implements OnInit {
       start: DateTime.now().startOf('week'),
       finish: DateTime.now().endOf('week'),
       mode: Mode.WEEK,
-      display: 'неделю',
+      display: 'эта неделя',
     },
     display: 'эта неделя',
   };
@@ -49,7 +52,7 @@ export class DateFilterComponent implements OnInit {
       start: DateTime.now().startOf('month'),
       finish: DateTime.now().endOf('month'),
       mode: Mode.MONTH,
-      display: 'месяц',
+      display: 'этот месяц',
     },
     display: 'этот месяц',
   };
@@ -57,9 +60,39 @@ export class DateFilterComponent implements OnInit {
   constructor(private dateFilterService: DateFilterService) {}
 
   ngOnInit(): void {
+    this.initOptions();
+    const currentFrame = this.dateFilterService.getCurrentDateFrame();
+    if (currentFrame) {
+      this.defaultValue = {
+        value: currentFrame,
+        display: currentFrame?.display,
+      };
+      this.currentMode = currentFrame.mode;
+    }
+  }
+
+  onValueChange(frame: DateFrame): void {
+    this.dateFilterService.setDateFrame(frame);
+    this.changeDateFrameEvent.emit();
+  }
+
+  onDropdownActive(mode: Mode): void {
+    this.currentMode = mode;
+    this.clickedMode = mode;
+  }
+
+  onDropdownToggleClick(mode: Mode): void {
+    this.clickedMode = mode;
+  }
+
+  private initOptions(): void {
+    this.initDayOptions();
+    this.initWeekOptions();
+    this.initMonthOptions();
+  }
+
+  private initDayOptions(): void {
     const now = DateTime.now();
-    const thisWeekStart = now.startOf('week');
-    const thisMonthStart = now.startOf('month');
     const daysOptions: SelectOption<DateFrame>[] = [this.firstDayOption];
     for (let i = 1; i < 31; i++) {
       const displayDayValue = now
@@ -77,6 +110,11 @@ export class DateFilterComponent implements OnInit {
       });
     }
     this.optionsForDaysSelect = daysOptions;
+  }
+
+  private initWeekOptions(): void {
+    const now = DateTime.now();
+    const thisWeekStart = now.startOf('week');
     const weeksOptions: SelectOption<DateFrame>[] = [this.firstWeekOption];
     for (let i = 1; i < 5; i++) {
       const displayWeekValue =
@@ -98,6 +136,11 @@ export class DateFilterComponent implements OnInit {
       });
     }
     this.optionsForWeeksSelect = weeksOptions;
+  }
+
+  private initMonthOptions(): void {
+    const now = DateTime.now();
+    const thisMonthStart = now.startOf('month');
     const monthsOptions: SelectOption<DateFrame>[] = [this.firstMonthOption];
     for (let i = 1; i < 12; i++) {
       const displayMonthValue = thisMonthStart
@@ -115,14 +158,5 @@ export class DateFilterComponent implements OnInit {
       });
     }
     this.optionsForMonthsSelect = monthsOptions;
-  }
-
-  onValueChange(frame: DateFrame): void {
-    this.dateFilterService.setDateFrame(frame);
-    this.changeDateFrameEvent.emit();
-  }
-
-  onDropdownActive(mode: Mode): void {
-    this.currentMode = mode;
   }
 }

@@ -3,23 +3,32 @@
     [options]="optionsForDaysSelect"
     [mode]="Mode.DAY"
     [activatedMode]="currentMode"
+    [defaultValue]="defaultValue"
+    [hideOptions]="clickedMode !== Mode.DAY"
     (select)="onValueChange($event)"
     (active)="onDropdownActive($event)"
+    (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
   <app-date-filter-drop-down
     [options]="optionsForWeeksSelect"
     [mode]="Mode.WEEK"
     [activatedMode]="currentMode"
+    [defaultValue]="defaultValue"
+    [hideOptions]="clickedMode !== Mode.WEEK"
     (select)="onValueChange($event)"
     (active)="onDropdownActive($event)"
+    (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
   <app-date-filter-drop-down
     [options]="optionsForMonthsSelect"
     [mode]="Mode.MONTH"
     [activatedMode]="currentMode"
+    [defaultValue]="defaultValue"
+    [hideOptions]="clickedMode !== Mode.MONTH"
     (select)="onValueChange($event)"
     (active)="onDropdownActive($event)"
+    (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 </div>
