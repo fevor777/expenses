@@ -10,6 +10,8 @@ import {
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { BalanceService } from '../common/balance.service';
+import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
+import { DateFilterService } from '../common/component/filter/date-filter.service';
 
 type HistoryExpense = Expense & {
   showDateTitle: boolean;
@@ -28,7 +30,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
   totalAmountPerDays: Map<number, number> = new Map();
   getCategoryByIdFunc = getCategoryById;
 
-  filterDate: string = '';
   categories = {
     regular: Categories.filter((category) => !category.includeInBalance),
     irregular: Categories.filter((category) => category.includeInBalance),
@@ -37,6 +38,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     acc[category.id] = false;
     return acc;
   }, {});
+  currentPeriod: string = 'за сегодня';
 
   expandFilters: boolean = false;
 
@@ -47,7 +49,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private expenseService: ExpenseService,
-    private balanceService: BalanceService
+    private balanceService: BalanceService,
+    private dateFilterService: DateFilterService
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +59,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
       this.filterCategories.irregular = false;
       this.filterCategories.regular = false;
     });
+    this.currentPeriod = this.dateFilterService.getCurrentDateFrame().display;
   }
 
   initiateExpenses(): Observable<Expense[]> {
@@ -80,15 +84,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
+    console.log('apply filters')
     this.initiateExpenses().pipe(takeUntil(this.destroySubject)).subscribe(() => {
+      console.log('apply filters subscribe')
       this.checkMainCategory();
-      if (
-        this.filterDate === '' &&
-        Object.values(this.filterCategories).every((value) => !value)
-      ) {
-        this.sumValues();
-        return;
-      }
 
       // Filter by category
       this.expenses = this.expenses.filter((expense) => {
@@ -101,28 +100,11 @@ export class HistoryComponent implements OnInit, OnDestroy {
       });
 
       // Filter by date
-      if (this.filterDate === '') {
-        this.sumValues();
-        return;
-      }
-
-      let sinceWhen = new Date();
-      if (this.filterDate === 'thisWeek') {
-        const dayOfWeek = sinceWhen.getDay();
-        const daysUntilMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-        sinceWhen.setDate(sinceWhen.getDate() - daysUntilMonday);
-      }
-      if (this.filterDate === 'thisMonth') {
-        sinceWhen = new Date(sinceWhen.setDate(1));
-      }
-      this.expenses = this.expenses.filter((expense: { date: number }) => {
-        const date = new Date(expense.date);
-        return (
-          date.getDate() >= sinceWhen.getDate() &&
-          date.getMonth() === sinceWhen.getMonth() &&
-          date.getFullYear() === sinceWhen.getFullYear()
-        );
-      });
+      const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
+      this.currentPeriod = currentDateFrame.display;
+      console.log('history', currentDateFrame);
+      this.expenses = getExpensesFromTo(this.expenses, currentDateFrame.start, currentDateFrame.finish);
+     
       this.sumValues();
     });
   }
@@ -177,7 +159,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   clearFilters(): void {
     this.initiateFilterCategory();
-    this.filterDate = '';
+    this.dateFilterService.refreshDateFrame();
     this.applyFilters();
   }
 

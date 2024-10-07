@@ -18,13 +18,8 @@
   <div class="history-expand-filter-container" *ngIf="expandFilters">
     <div class="history-expand-filter">
       <div class="history-expand-filter-date">
-        <span>Период:</span>
-        <select (change)="applyFilters()" [(ngModel)]="filterDate">
-          <option value="">Показать все</option>
-          <option value="today">Сегодня</option>
-          <option value="thisWeek">Эта неделя</option>
-          <option value="thisMonth">Этот месяц</option>
-        </select>
+        <span>Период: {{currentPeriod}}</span>
+        <app-date-filter (changeDayEvent)="applyFilters()"></app-date-filter>
       </div>
       <div class="history-expand-filter-category">
         <span>Категория:</span>

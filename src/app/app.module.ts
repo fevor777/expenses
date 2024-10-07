@@ -28,6 +28,7 @@ import { ExportComponent } from './export/export.component';
 import { AuthService } from './common/auth.service';
 import { take, tap } from 'rxjs';
 import { BalanceService } from './common/balance.service';
+import { DateFilterComponent } from "./common/component/filter/date-filter.component";
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -57,7 +58,8 @@ export class HammerConfig extends HammerGestureConfig {
     BaseChartDirective,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
-  ],
+    DateFilterComponent
+],
   providers: [
     {
       provide: HAMMER_GESTURE_CONFIG,
