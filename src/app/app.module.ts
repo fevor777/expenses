@@ -29,6 +29,7 @@ import { AuthService } from './common/auth.service';
 import { take, tap } from 'rxjs';
 import { BalanceService } from './common/balance.service';
 import { DateFilterComponent } from "./common/component/filter/date-filter.component";
+import { DateFilterService } from './common/component/filter/date-filter.service';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -90,6 +91,7 @@ export class HammerConfig extends HammerGestureConfig {
       },
       deps: [BalanceService],
     },
+    DateFilterService,
   ],
   bootstrap: [AppComponent],
 })

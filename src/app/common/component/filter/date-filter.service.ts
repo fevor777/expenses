@@ -3,9 +3,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { DateFrame, Mode } from "./dateFrame.model";
 import { DateTime } from "luxon";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class DateFilterService {
   private initialValue: DateFrame = {
     start: DateTime.now().startOf('day'),
