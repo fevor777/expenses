@@ -1,29 +1,25 @@
 <div class="statistics-period">
-  <select (change)="selectChange($event, Mode.DAY)" class="statistics-period-button 'statistics-period-button-active'"
-    [ngClass]="{'statistics-period-button-active': currentFrame.mode === Mode.DAY}"
-  >
-    @for(day of pastDays; track day.start) {
-    <option>
-      {{day.display}}
-    </option>
-    }
-  </select>
-  <select (change)="selectChange($event, Mode.WEEK)" class="statistics-period-button"
-    [ngClass]="{'statistics-period-button-active': currentFrame.mode === Mode.WEEK}"
-  >
-    @for(week of pastWeeks; track week.start) {
-    <option>
-      {{week.display}}
-    </option>
-    }
-  </select>
-  <select (change)="selectChange($event, Mode.MONTH)" class="statistics-period-button"
-    [ngClass]="{'statistics-period-button-active': currentFrame.mode === Mode.MONTH}"
-  >
-    @for(month of pastMonths; track month.start) {
-    <option>
-      {{month.display}}
-    </option>
-    }
-  </select>
+  <app-date-filter-drop-down
+    [options]="optionsForDaysSelect"
+    [mode]="Mode.DAY"
+    [activatedMode]="currentMode"
+    (select)="onValueChange($event)"
+    (active)="onDropdownActive($event)"
+  ></app-date-filter-drop-down>
+
+  <app-date-filter-drop-down
+    [options]="optionsForWeeksSelect"
+    [mode]="Mode.WEEK"
+    [activatedMode]="currentMode"
+    (select)="onValueChange($event)"
+    (active)="onDropdownActive($event)"
+  ></app-date-filter-drop-down>
+
+  <app-date-filter-drop-down
+    [options]="optionsForMonthsSelect"
+    [mode]="Mode.MONTH"
+    [activatedMode]="currentMode"
+    (select)="onValueChange($event)"
+    (active)="onDropdownActive($event)"
+  ></app-date-filter-drop-down>
 </div>
