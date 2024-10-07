@@ -9,6 +9,6 @@ export enum Mode {
 export type DateFrame = {
   start: DateTime;
   finish: DateTime;
-  display: string;
+  display?: string;
   mode?: Mode;
 }

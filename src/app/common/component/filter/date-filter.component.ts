@@ -1,87 +1,128 @@
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { DateTime } from "luxon";
-import { DateFrame, Mode } from "./dateFrame.model";
-import { DateFilterService } from "./date-filter.service";
-import { CommonModule } from "@angular/common";
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { DateTime } from 'luxon';
+import { DateFrame, Mode } from './dateFrame.model';
+import { DateFilterService } from './date-filter.service';
+import { CommonModule } from '@angular/common';
+import { DateFilterDropDownComponent } from './dropdown/date-filter-drop-down.component';
+import { SelectOption } from '../../model/select-option';
 
 @Component({
   selector: 'app-date-filter',
   templateUrl: './date-filter.component.html',
   styleUrl: './date-filter.component.scss',
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, DateFilterDropDownComponent],
 })
 export class DateFilterComponent implements OnInit {
   @Output()
   changeDateFrameEvent: EventEmitter<null> = new EventEmitter();
   readonly Mode = Mode;
 
-  pastDays: DateFrame[] = [];
-  pastWeeks: DateFrame[] = [];
-  pastMonths: DateFrame[] = [];
+  currentMode: Mode = Mode.DAY;
 
-  currentFrame: DateFrame = {
-    start: DateTime.now().startOf('day'),
-    finish: DateTime.now().endOf('day'),
+  optionsForDaysSelect: SelectOption<DateFrame>[] = [];
+  optionsForWeeksSelect: SelectOption<DateFrame>[] = [];
+  optionsForMonthsSelect: SelectOption<DateFrame>[] = [];
+
+  firstDayOption: SelectOption<DateFrame> = {
+    value: {
+      start: DateTime.now().startOf('day'),
+      finish: DateTime.now().endOf('day'),
+      mode: Mode.DAY,
+      display: 'сегодня',
+    },
     display: 'сегодня',
-    mode: Mode.DAY,
   };
 
-  constructor(
-    private dateFilterService: DateFilterService,
-  ) { }
+  firstWeekOption: SelectOption<DateFrame> = {
+    value: {
+      start: DateTime.now().startOf('week'),
+      finish: DateTime.now().endOf('week'),
+      mode: Mode.WEEK,
+      display: 'неделю',
+    },
+    display: 'эта неделя',
+  };
+
+  firstMonthOption: SelectOption<DateFrame> = {
+    value: {
+      start: DateTime.now().startOf('month'),
+      finish: DateTime.now().endOf('month'),
+      mode: Mode.MONTH,
+      display: 'месяц',
+    },
+    display: 'этот месяц',
+  };
+
+  constructor(private dateFilterService: DateFilterService) {}
 
   ngOnInit(): void {
     const now = DateTime.now();
     const thisWeekStart = now.startOf('week');
     const thisMonthStart = now.startOf('month');
-    for (let i = 0; i < 31; i++) {
-      this.pastDays.push({
-        start: now.minus({ days: i }).startOf('day'),
-        finish: now.minus({ days: i }).endOf('day'),
-        display: now.minus({ days: i }).setLocale('ru').toFormat('d MMMM'),
-        mode: Mode.DAY,
-      })
+    const daysOptions: SelectOption<DateFrame>[] = [this.firstDayOption];
+    for (let i = 1; i < 31; i++) {
+      const displayDayValue = now
+        .minus({ days: i })
+        .setLocale('ru')
+        .toFormat('d MMMM');
+      daysOptions.push({
+        value: {
+          start: now.minus({ days: i }).startOf('day'),
+          finish: now.minus({ days: i }).endOf('day'),
+          mode: Mode.DAY,
+          display: displayDayValue,
+        },
+        display: displayDayValue,
+      });
     }
-    for (let i = 0; i < 5; i++) {
-      this.pastWeeks.push({
-        start: thisWeekStart.minus({ weeks: i }),
-        finish: thisWeekStart.minus({ weeks: i }).endOf('week'),
-        display: thisWeekStart.minus({ weeks: i }).setLocale('ru').toFormat('d MMMM') + ' - ' + thisWeekStart.minus({ weeks: i }).endOf('week').setLocale('ru').toFormat('d MMMM'),
-        mode: Mode.WEEK,
-      })
+    this.optionsForDaysSelect = daysOptions;
+    const weeksOptions: SelectOption<DateFrame>[] = [this.firstWeekOption];
+    for (let i = 1; i < 5; i++) {
+      const displayWeekValue =
+        thisWeekStart.minus({ weeks: i }).setLocale('ru').toFormat('d MMMM') +
+        ' - ' +
+        thisWeekStart
+          .minus({ weeks: i })
+          .endOf('week')
+          .setLocale('ru')
+          .toFormat('d MMMM');
+      weeksOptions.push({
+        value: {
+          start: thisWeekStart.minus({ weeks: i }),
+          finish: thisWeekStart.minus({ weeks: i }).endOf('week'),
+          mode: Mode.WEEK,
+          display: displayWeekValue,
+        },
+        display: displayWeekValue,
+      });
     }
-    for (let i = 0; i < 12; i++) {
-      this.pastMonths.push({
-        start: thisMonthStart.minus({ months: i }),
-        finish: thisMonthStart.minus({ months: i }).endOf('month'),
-        display: thisMonthStart.minus({ months: i }).setLocale('ru').toFormat('LLLL'),
-        mode: Mode.MONTH,
-      })
+    this.optionsForWeeksSelect = weeksOptions;
+    const monthsOptions: SelectOption<DateFrame>[] = [this.firstMonthOption];
+    for (let i = 1; i < 12; i++) {
+      const displayMonthValue = thisMonthStart
+        .minus({ months: i })
+        .setLocale('ru')
+        .toFormat('LLLL');
+      monthsOptions.push({
+        value: {
+          start: thisMonthStart.minus({ months: i }),
+          finish: thisMonthStart.minus({ months: i }).endOf('month'),
+          mode: Mode.MONTH,
+          display: displayMonthValue,
+        },
+        display: displayMonthValue,
+      });
     }
+    this.optionsForMonthsSelect = monthsOptions;
   }
 
-  updateDateFrameEvent(frame: DateFrame): void {
-    this.currentFrame = frame;
-
-    this.dateFilterService.setDateFrame(this.currentFrame);
+  onValueChange(frame: DateFrame): void {
+    this.dateFilterService.setDateFrame(frame);
     this.changeDateFrameEvent.emit();
   }
 
-  selectChange(event: any, mode: Mode) {
-    const display = event.target.value;
-    let chosenFrame: DateFrame;
-    switch (mode) {
-      case Mode.DAY: 
-        chosenFrame = this.pastDays.filter((frame: DateFrame) => frame.display === display)[0]; 
-        break;
-      case Mode.WEEK: 
-        chosenFrame = this.pastWeeks.filter((frame: DateFrame) => frame.display === display)[0]; 
-        break;
-      case Mode.MONTH: 
-        chosenFrame = this.pastMonths.filter((frame: DateFrame) => frame.display === display)[0];
-        break;
-    }
-    this.updateDateFrameEvent(chosenFrame);
+  onDropdownActive(mode: Mode): void {
+    this.currentMode = mode;
   }
 }

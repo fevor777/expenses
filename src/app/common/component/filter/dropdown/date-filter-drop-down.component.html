@@ -1,0 +1,15 @@
+<div class="date-filter-drop-down" (click)="onClick($event)">
+  <button class="date-filter-drop-down-button" (click)="onDisplayValueClick()" [ngClass]="{'date-filter-drop-down-dropdown-active': isActivated }">
+    {{ selectedOption?.display }}
+  </button>
+  <button class="date-filter-drop-down-button" (click)="toggleDropdown()">
+    &#9660;
+  </button>
+  <ul *ngIf="dropdownOpen" class="date-filter-drop-down-dropdown">
+    @for(option of options; track option.value) {
+    <li *ngFor="let option of options" (click)="onSelectValue(option)">
+      {{ option?.display }}
+    </li>
+    }
+  </ul>
+</div>
