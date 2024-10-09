@@ -1,11 +1,5 @@
 <div class="statistics">
-  <button class="expand-filter-button" [ngClass]="{ 'expand-filter-button-active': showFilters }"
-    (click)="toggleExpandFilters()">
-    <i class="fas fa-filter"></i>
-  </button>
-  @if (showFilters) {
   <app-date-filter (changeDateFrameEvent)="onFilterChange()"></app-date-filter>
-  }
   <div class="statistics-title">Статистика по категориям за 
     <span style="font-weight: bold;">{{(currentDateFrame | async).display}}</span>:
   </div>

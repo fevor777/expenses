@@ -25,7 +25,6 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   totalAmount: number = 0;
   readonly getCategoryNameByIdFunc = getCategoryNameById;
   excludedCategories: string[] = [];
-  showFilters: boolean = false;
   private readonly destroySubject: Subject<void> = new Subject();
 
   currentDateFrame?: Observable<DateFrame>;
@@ -122,10 +121,6 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
     };
 
     this.myChart.setOption(option);
-  }
-
-  toggleExpandFilters(): void {
-    this.showFilters = !this.showFilters;
   }
 
   showCategoryDetails(categoryId: string): void {
