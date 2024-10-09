@@ -87,7 +87,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
           label: {
             show: true,
             position: 'outside',
-            formatter: '{b}\n{d}%)',
+            formatter: '{b}\n{d}%',
           },
           labelLine: {
             show: true,
