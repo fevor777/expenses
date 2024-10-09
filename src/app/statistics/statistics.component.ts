@@ -106,7 +106,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
         left: 'center',
         top: 'center',
         style: {
-          text: totalAmount.toLocaleString() + ' €',
+          text: totalAmount.toLocaleString() + '€',
           textAlign: 'center',
           fill: '#000',
           fontSize: 25,
