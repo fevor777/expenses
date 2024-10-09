@@ -5,7 +5,7 @@ import { DateTime } from "luxon";
 
 @Injectable()
 export class DateFilterService {
-  private initialValue: DateFrame = {
+  initialValue: DateFrame = {
     start: DateTime.now().startOf('day'),
     finish: DateTime.now().endOf('day'),
     display: 'сегодня',

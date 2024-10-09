@@ -29,6 +29,8 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   currentDateFrame?: Observable<DateFrame>;
 
+  initialDateFrameLabel: string;
+
   chartDom: HTMLElement;
   myChart;
 
@@ -72,6 +74,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.currentDateFrame = this.dateFilterService.dateFrame$;
+    this.initialDateFrameLabel = this.dateFilterService.initialValue?.display;
   }
 
   initPieChart() {
@@ -327,6 +330,14 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onRefresh(): void {
+    this.categoryTotals = [];
+    this.totalAmount = 0;
+    this.excludedCategories = [];
+    this.calculateCategoryTotals();
+  }
+
+  onRefreshDateFilter(): void {
+    this.dateFilterService.refreshDateFrame();
     this.categoryTotals = [];
     this.totalAmount = 0;
     this.excludedCategories = [];

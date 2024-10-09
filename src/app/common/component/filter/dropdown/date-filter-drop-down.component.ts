@@ -56,6 +56,13 @@ export class DateFilterDropDownComponent<T> implements OnChanges, OnInit {
     }
     if (changes?.['activatedMode'] && this.activatedMode) {
       this.isActivated = this.activatedMode === this.mode;
+      if (
+        !this.isActivated &&
+        Array.isArray(this.options) &&
+        this.options.length > 0
+      ) {
+        this.selectedOption = this.options[0];
+      }
     }
     if (changes?.['hideOptions'] && this.hideOptions) {
       this.dropdownOpen = false;

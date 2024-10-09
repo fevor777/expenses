@@ -60,15 +60,16 @@ export class DateFilterComponent implements OnInit {
   constructor(private dateFilterService: DateFilterService) {}
 
   ngOnInit(): void {
-    this.initOptions();
-    const currentFrame = this.dateFilterService.getCurrentDateFrame();
-    if (currentFrame) {
-      this.defaultValue = {
-        value: currentFrame,
-        display: currentFrame?.display,
-      };
-      this.currentMode = currentFrame.mode;
-    }
+    this.dateFilterService.dateFrame$.subscribe((currentFrame) => {
+      this.initOptions();
+      if (currentFrame) {
+        this.defaultValue = {
+          value: currentFrame,
+          display: currentFrame?.display,
+        };
+        this.currentMode = currentFrame.mode;
+      }
+    });
   }
 
   onValueChange(frame: DateFrame): void {
