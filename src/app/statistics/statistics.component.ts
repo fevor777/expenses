@@ -1,12 +1,14 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import * as echarts from 'echarts';
+import { Observable, Subject, takeUntil } from 'rxjs';
+
 import { getCategoryNameById } from '../common/categories';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { ExpenseService } from '../common/expense.service';
-import { DateFrame, Mode } from '../common/component/filter/dateFrame.model';
 import { DateFilterService } from '../common/component/filter/date-filter.service';
-import { getExpensesFromTo } from './functions/expense-helpers';
+import { DateFrame, Mode } from '../common/component/filter/dateFrame.model';
 import { Expense } from '../common/expense.model';
+import { ExpenseService } from '../common/expense.service';
+import { getExpensesFromTo } from './functions/expense-helpers';
 
 @Component({
   selector: 'app-statistics',
@@ -65,6 +67,57 @@ export class StatisticsComponent implements OnInit, OnDestroy {
     this.calculateCategoryTotals();
   }
 
+  initPieChart() {
+    const chartDom = document.getElementById('donut-chart')!;
+    const myChart = echarts.init(chartDom);
+
+    const totalAmount = this.categoryTotals.reduce((sum, item) => sum + item.amount, 0);
+
+    const option = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{b}: {c}€ ({d}%)',
+      },
+      series: [
+        {
+          name: 'Category',
+          type: 'pie',
+          radius: ['50%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            show: true,
+            position: 'outside',
+            formatter: '{b}\n{d}% ({c}€)',
+          },
+          labelLine: {
+            show: true,
+            length: 20,
+            length2: 20,
+          },
+          data: this.categoryTotals
+            .map(item => ({
+              value: item.amount,
+              name: getCategoryNameById(item.category),
+          })),
+        },
+      ],
+      graphic: {
+        type: 'text',
+        left: 'center',
+        top: 'center',
+        style: {
+          text: totalAmount.toLocaleString() + ' €',
+          textAlign: 'center',
+          fill: '#000',
+          fontSize: 45,
+          fontWeight: 'bold',
+        },
+      },
+    };
+
+    myChart.setOption(option);
+  }
+
   toggleExpandFilters(): void {
     this.showFilters = !this.showFilters;
   }
@@ -108,6 +161,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
         this.categoryTotals.push({ category, amount, percentage, color });
         this.categoryTotals.sort((a, b) => a.amount - b.amount);
       }
+      this.initPieChart();
     });
   }
 
@@ -236,6 +290,22 @@ export class StatisticsComponent implements OnInit, OnDestroy {
     const green = Math.min(255, Math.round((100 - percentage) * 2.55));
     const red = Math.min(180, Math.round(percentage * 1.8));
     return `rgb(${red}, ${green}, 0)`; // RGB color with variable red and green
+  }
+
+  getColorForPieChart(): string {
+    const red = Math.floor(Math.random() * 106) + 150;
+    const green = Math.floor(Math.random() * 106) + 150;
+    // Generate a random value for the blue component (200-255) to ensure it's a soft blue
+    const blue = Math.floor(Math.random() * 56) + 200;
+    
+    // Convert the components to hexadecimal and pad with leading zeros if necessary
+    const redHex = red.toString(16).padStart(2, '0');
+    const greenHex = green.toString(16).padStart(2, '0');
+    const blueHex = blue.toString(16).padStart(2, '0');
+    
+    // Combine the components into a single color string
+    const hexColor = `#${redHex}${greenHex}${blueHex}`;
+    return hexColor;
   }
 
   onRefresh(): void {

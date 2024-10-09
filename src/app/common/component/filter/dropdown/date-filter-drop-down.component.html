@@ -1,8 +1,16 @@
 <div class="date-filter-drop-down" (click)="onClick($event)">
-  <button class="date-filter-drop-down-button" (click)="onDisplayValueClick()" [ngClass]="{'date-filter-drop-down-dropdown-active': isActivated }">
+  <button
+    class="date-filter-drop-down-button"
+    (click)="onDisplayValueClick()"
+    [ngClass]="{ 'date-filter-drop-down-dropdown-active': isActivated }"
+  >
     {{ selectedOption?.display }}
   </button>
-  <button class="date-filter-drop-down-button date-filter-drop-down-button-toggle" (click)="toggleDropdown()">
+  <button
+    class="date-filter-drop-down-button date-filter-drop-down-button-toggle"
+    [ngClass]="{ 'date-filter-drop-down-dropdown-active': isActivated }"
+    (click)="toggleDropdown()"
+  >
     v
   </button>
   <ul *ngIf="dropdownOpen" class="date-filter-drop-down-dropdown">
