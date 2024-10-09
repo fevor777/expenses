@@ -280,9 +280,9 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 50) {
+      if (deltaX > 100) {
         this.onSwipeRight();
-      } else if (deltaX < -50) {
+      } else if (deltaX < -100) {
         this.onSwipeLeft();
       }
     }
