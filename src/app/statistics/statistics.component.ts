@@ -87,7 +87,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
           label: {
             show: true,
             position: 'outside',
-            formatter: '{b}\n{d}% ({c}€)',
+            formatter: '{b}\n{d}%)',
           },
           labelLine: {
             show: true,
@@ -109,7 +109,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
           text: totalAmount.toLocaleString() + ' €',
           textAlign: 'center',
           fill: '#000',
-          fontSize: 45,
+          fontSize: 35,
           fontWeight: 'bold',
         },
       },
