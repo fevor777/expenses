@@ -5,7 +5,6 @@ import {
   HostListener,
   Input,
   OnChanges,
-  OnInit,
   Output,
   SimpleChanges,
 } from '@angular/core';
