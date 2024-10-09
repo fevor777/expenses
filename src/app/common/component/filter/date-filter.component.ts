@@ -1,10 +1,17 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { DateTime } from 'luxon';
 import { DateFrame, Mode } from './dateFrame.model';
 import { DateFilterService } from './date-filter.service';
 import { CommonModule } from '@angular/common';
 import { DateFilterDropDownComponent } from './dropdown/date-filter-drop-down.component';
 import { SelectOption } from '../../model/select-option';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-date-filter',
@@ -13,10 +20,12 @@ import { SelectOption } from '../../model/select-option';
   standalone: true,
   imports: [CommonModule, DateFilterDropDownComponent],
 })
-export class DateFilterComponent implements OnInit {
+export class DateFilterComponent implements OnInit, OnDestroy {
   @Output()
   changeDateFrameEvent: EventEmitter<null> = new EventEmitter();
   readonly Mode = Mode;
+
+  private readonly destroySubject: Subject<void> = new Subject();
 
   currentMode: Mode = Mode.DAY;
   clickedMode: Mode;
@@ -60,16 +69,18 @@ export class DateFilterComponent implements OnInit {
   constructor(private dateFilterService: DateFilterService) {}
 
   ngOnInit(): void {
-    this.dateFilterService.dateFrame$.subscribe((currentFrame) => {
-      this.initOptions();
-      if (currentFrame) {
-        this.defaultValue = {
-          value: currentFrame,
-          display: currentFrame?.display,
-        };
-        this.currentMode = currentFrame.mode;
-      }
-    });
+    this.dateFilterService.dateFrame$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe((currentFrame) => {
+        this.initOptions();
+        if (currentFrame) {
+          this.defaultValue = {
+            value: currentFrame,
+            display: currentFrame?.display,
+          };
+          this.currentMode = currentFrame.mode;
+        }
+      });
   }
 
   onValueChange(frame: DateFrame): void {
@@ -159,5 +170,10 @@ export class DateFilterComponent implements OnInit {
       });
     }
     this.optionsForMonthsSelect = monthsOptions;
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
   }
 }

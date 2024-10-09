@@ -20,7 +20,7 @@ import { Mode } from '../dateFrame.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
 })
-export class DateFilterDropDownComponent<T> implements OnChanges, OnInit {
+export class DateFilterDropDownComponent<T> implements OnChanges {
   @Input() options: SelectOption<T>[] = [];
   @Input() mode: Mode;
   @Input() activatedMode: Mode;
@@ -34,17 +34,6 @@ export class DateFilterDropDownComponent<T> implements OnChanges, OnInit {
   selectedOption: SelectOption<T>;
   dropdownOpen: boolean = false;
   isActivated: boolean = false;
-
-  ngOnInit(): void {
-    if (
-      this.defaultValue &&
-      this.mode &&
-      this.activatedMode &&
-      this.activatedMode === this.mode
-    ) {
-      this.selectedOption = this.defaultValue;
-    }
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -66,6 +55,21 @@ export class DateFilterDropDownComponent<T> implements OnChanges, OnInit {
     }
     if (changes?.['hideOptions'] && this.hideOptions) {
       this.dropdownOpen = false;
+    }
+
+    if (changes?.['defaultValue'] || changes?.['mode'] || changes?.['activatedMode']) {
+      this.updateSelectedOption();
+    }
+  }
+
+  updateSelectedOption(): void {
+    if (
+      this.defaultValue &&
+      this.mode &&
+      this.activatedMode &&
+      this.activatedMode === this.mode
+    ) {
+      this.selectedOption = this.defaultValue;
     }
   }
 
