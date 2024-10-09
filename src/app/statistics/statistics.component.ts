@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as echarts from 'echarts';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -15,7 +15,7 @@ import { getExpensesFromTo } from './functions/expense-helpers';
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss'],
 })
-export class StatisticsComponent implements OnInit, OnDestroy {
+export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   categoryTotals: {
     category: string;
     amount: number;
@@ -29,6 +29,9 @@ export class StatisticsComponent implements OnInit, OnDestroy {
   private readonly destroySubject: Subject<void> = new Subject();
 
   currentDateFrame?: Observable<DateFrame>;
+
+  chartDom: HTMLElement;
+  myChart;
 
   // chartData = new BehaviorSubject<any[]>([]);
   // chartLabels = new BehaviorSubject<string[]>([]);
@@ -62,14 +65,17 @@ export class StatisticsComponent implements OnInit, OnDestroy {
     private dateFilterService: DateFilterService
   ) { }
 
-  ngOnInit(): void {
-    this.currentDateFrame = this.dateFilterService.dateFrame$;
+  ngAfterViewInit(): void {
+    this.chartDom = document.getElementById('donut-chart')!;
+    this.myChart = echarts.init(this.chartDom);
     this.calculateCategoryTotals();
   }
 
+  ngOnInit(): void {
+    this.currentDateFrame = this.dateFilterService.dateFrame$;
+  }
+
   initPieChart() {
-    const chartDom = document.getElementById('donut-chart')!;
-    const myChart = echarts.init(chartDom);
 
     const totalAmount = this.categoryTotals.reduce((sum, item) => sum + item.amount, 0);
 
@@ -115,7 +121,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
       },
     };
 
-    myChart.setOption(option);
+    this.myChart.setOption(option);
   }
 
   toggleExpandFilters(): void {
@@ -131,6 +137,11 @@ export class StatisticsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onFilterChange(): void {
+    this.excludedCategories = [];
+    this.calculateCategoryTotals();
+  }
+
 
   calculateCategoryTotals(): void {
     const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
@@ -139,7 +150,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
     this.totalAmount = 0;
 
     this.expenseService.getExpenses().pipe(takeUntil(this.destroySubject)).subscribe((expenses) => {
-      expensesFiltered = getExpensesFromTo(expenses, currentDateFrame.start, currentDateFrame.finish);
+      expensesFiltered = getExpensesFromTo(expenses, currentDateFrame.start, currentDateFrame.finish, this.excludedCategories);
       this.calculateChartData(expensesFiltered);
       expensesFiltered.forEach((expense) => {
         if (!categoryMap[expense.category]) {
@@ -320,6 +331,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
     this.totalAmount = this.categoryTotals
       .filter((c) => !this.excludedCategories.includes(c.category))
       .reduce((total, c) => Math.round((total + c.amount) * 100) / 100, 0);
+    this.calculateCategoryTotals();
   }
 
   ngOnDestroy(): void {
