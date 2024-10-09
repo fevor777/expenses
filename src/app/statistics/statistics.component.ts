@@ -170,7 +170,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
         const percentage = (amount / this.totalAmount) * 100;
         const color = this.getColor(percentage);
         this.categoryTotals.push({ category, amount, percentage, color });
-        this.categoryTotals.sort((a, b) => a.amount - b.amount);
+        this.categoryTotals.sort((a, b) => b.amount - a.amount);
       }
       this.initPieChart();
     });
