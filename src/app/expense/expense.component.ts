@@ -32,6 +32,9 @@ import { SavingService } from '../common/saving.service';
 export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   enteredAmount = '';
   currentAmount: number = 0;
+  currentBalanceAmount: number = 0;
+  isShowCurrentBalanceAmount: boolean = false;
+  currentBalance: number = 0;
   monthAmount: number = 0;
   balance: number = 0;
   balanceDate: string = '';
@@ -100,6 +103,13 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
+    const localStorageIsShowCurrentBalanceAmount = localStorage.getItem('isShowCurrentBalanceAmount') || 'false';
+    this.isShowCurrentBalanceAmount = JSON.parse(localStorageIsShowCurrentBalanceAmount);
+  }
+
+  onCurrentAmountClick(): void {
+    this.isShowCurrentBalanceAmount = !this.isShowCurrentBalanceAmount;
+    localStorage.setItem('isShowCurrentBalanceAmount', this.isShowCurrentBalanceAmount.toString());
   }
 
   categoriesVisible = false;
@@ -251,11 +261,16 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   private sumValues(expenses: Expense[]): void {
     this.currentAmount = 0;
+    this.currentBalanceAmount = 0;
     this.monthAmount = 0;
     expenses.forEach((expense: Expense) => {
       if (new Date(expense.date).toDateString() === new Date().toDateString()) {
         const currentSum = this.currentAmount + expense.amount;
         this.currentAmount = Math.round(currentSum * 100) / 100;
+        if (getCategoryById(expense.category)?.includeInBalance && !expense.isDeletedFromBalance) {
+          const currentBalanceSum = this.currentBalanceAmount + expense.amount;
+          this.currentBalanceAmount = Math.round(currentBalanceSum * 100) / 100;
+        }
       }
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();

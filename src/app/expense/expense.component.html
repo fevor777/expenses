@@ -4,23 +4,41 @@
       <i [style.color]="'#BDA4A7'" class="fas fa-bars"></i>
     </div>
     <div [style.color]="'#343434'" class="title">
-      <span *ngIf="!showSavings; else savingsTemplate" (click)="onShowSavings()">{{ monthAmount }}€</span>
+      <span *ngIf="!showSavings; else savingsTemplate" (click)="onShowSavings()"
+        >{{ monthAmount }}€</span
+      >
       <ng-template #savingsTemplate>
-        <span class=expense-savings (click)="onShowSavings()">{{ savings }}€</span> 
+        <span class="expense-savings" (click)="onShowSavings()"
+          >{{ savings }}€</span
+        >
         <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
       </ng-template>
     </div>
 
     <div class="title" [style.color]="'grey'">-</div>
     <div class="title">
-      <div [style.color]="'grey'">{{ currentDate }}</div>
-      <span class="title-total">{{ currentAmount }}</span>
+      <div [style.color]="'grey'" (click)="onCurrentAmountClick()">{{ currentDate }}</div>
+      <span
+        class="title-total"
+        (click)="onCurrentAmountClick()"
+        *ngIf="!isShowCurrentBalanceAmount"
+        >{{ currentAmount }}</span
+      >
+      <span
+        class="title-total"
+        (click)="onCurrentAmountClick()"
+        *ngIf="isShowCurrentBalanceAmount"
+        >{{ currentBalanceAmount }}</span
+      >
       <span class="title-total">€</span>
+      <div *ngIf="isShowCurrentBalanceAmount" (click)="onCurrentAmountClick()" [style.color]="'grey'" [style.font-size.px]="12">нерегул.</div>
     </div>
     <div class="title" [style.color]="'grey'">-</div>
     <div class="title" [style.color]="'grey'">
       <div (click)="onBalanceDateChange()">до {{ balanceDate }}</div>
-      <span (click)="onBalanceChange()" [style.color]="'#343434'">{{ balance }}€</span>
+      <span (click)="onBalanceChange()" [style.color]="'#343434'"
+        >{{ balance }}€</span
+      >
     </div>
     <div class="clock-icon" [routerLink]="'/history'">
       <i class="fas fa-clock" [style.color]="'#BDA4A7'"></i>
