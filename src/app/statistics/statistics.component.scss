@@ -34,7 +34,6 @@
   display: flex;
   flex-direction: column;
 
-
   &-title {
     text-align: center;
     font-size: 18px;
@@ -52,6 +51,23 @@
 
   .statistic-excluded-category {
     font-weight: bold;
+  }
+
+  .statistics-checkbox {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 10px;
+
+    label {
+      width: 100%;
+    }
+
+    .statistics-checkbox-input {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
   }
 }
 

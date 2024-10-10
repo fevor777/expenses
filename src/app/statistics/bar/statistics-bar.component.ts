@@ -11,7 +11,7 @@ export class StatisticsBarComponent {
   @Input() category: string;
   @Input() amount: number;
   @Input() percentage: number;
-  @Input() color: string;
+  @Input() color: string = '#28C600';
 
   @Output() close: EventEmitter<string> = new EventEmitter<string>();
 

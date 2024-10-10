@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import * as echarts from 'echarts';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
-import { getCategoryNameById } from '../common/categories';
+import { getCategoryById, getCategoryNameById } from '../common/categories';
 import { DateFilterService } from '../common/component/filter/date-filter.service';
 import { DateFrame, Mode } from '../common/component/filter/dateFrame.model';
 import { Expense } from '../common/expense.model';
@@ -25,6 +25,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   totalAmount: number = 0;
   readonly getCategoryNameByIdFunc = getCategoryNameById;
   excludedCategories: string[] = [];
+  currentCategories: string[] = [];
   private readonly destroySubject: Subject<void> = new Subject();
 
   currentDateFrame?: Observable<DateFrame>;
@@ -33,6 +34,9 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   chartDom: HTMLElement;
   myChart;
+
+  regularCategoriesCheckboxValue: boolean = true;
+  irregularCategoriesCheckboxValue: boolean = true;
 
   // chartData = new BehaviorSubject<any[]>([]);
   // chartLabels = new BehaviorSubject<string[]>([]);
@@ -64,7 +68,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private expenseService: ExpenseService,
     private dateFilterService: DateFilterService
-  ) { }
+  ) {}
 
   ngAfterViewInit(): void {
     this.chartDom = document.getElementById('donut-chart')!;
@@ -78,8 +82,10 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   initPieChart() {
-
-    const totalAmount = this.categoryTotals.reduce((sum, item) => sum + item.amount, 0);
+    const totalAmount = this.categoryTotals.reduce(
+      (sum, item) => sum + item.amount,
+      0
+    );
 
     const option = {
       tooltip: {
@@ -114,10 +120,9 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
             length: 15,
             length2: 20,
           },
-          data: this.categoryTotals
-            .map(item => ({
-              value: item.amount,
-              name: getCategoryNameById(item.category),
+          data: this.categoryTotals.map((item) => ({
+            value: item.amount,
+            name: getCategoryNameById(item.category),
           })),
         },
       ],
@@ -149,41 +154,55 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onFilterChange(): void {
     this.excludedCategories = [];
+    this.irregularCategoriesCheckboxValue = true;
+    this.regularCategoriesCheckboxValue = true;
     this.calculateCategoryTotals();
   }
-
 
   calculateCategoryTotals(): void {
     const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
     const categoryMap: { [key: string]: number } = {};
-    let expensesFiltered = [];
+    let expensesFilteredByDate = [];
     this.totalAmount = 0;
 
-    this.expenseService.getExpenses().pipe(takeUntil(this.destroySubject)).subscribe((expenses) => {
-      expensesFiltered = getExpensesFromTo(expenses, currentDateFrame.start, currentDateFrame.finish, this.excludedCategories);
-      this.calculateChartData(expensesFiltered);
-      expensesFiltered.forEach((expense) => {
-        if (!categoryMap[expense.category]) {
-          categoryMap[expense.category] = 0;
-        }
-        categoryMap[expense.category] =
-          Math.round((categoryMap[expense.category] + expense.amount) * 100) /
-          100;
-        this.totalAmount =
-          Math.round((this.totalAmount + expense.amount) * 100) / 100;
-      });
+    this.expenseService
+      .getExpenses()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe((expenses) => {
+        expensesFilteredByDate = getExpensesFromTo(
+          expenses,
+          currentDateFrame.start,
+          currentDateFrame.finish
+        );
+        this.currentCategories = Array.from(
+          new Set(expensesFilteredByDate.map((expense) => expense.category))
+        );
+        const expensesFiltered = expensesFilteredByDate.filter(
+          (expense) => !this.excludedCategories.includes(expense.category)
+        );
+        this.calculateChartData(expensesFiltered);
+        expensesFiltered.forEach((expense) => {
+          if (!categoryMap[expense.category]) {
+            categoryMap[expense.category] = 0;
+          }
+          categoryMap[expense.category] =
+            Math.round((categoryMap[expense.category] + expense.amount) * 100) /
+            100;
+          this.totalAmount =
+            Math.round((this.totalAmount + expense.amount) * 100) / 100;
+        });
 
-      this.categoryTotals = [];
-      // Calculate percentage for each category
-      for (const category in categoryMap) {
-        const amount = categoryMap[category];
-        const percentage = (amount / this.totalAmount) * 100;
-        const color = this.getColor(percentage);
-        this.categoryTotals.push({ category, amount, percentage, color });
-        this.categoryTotals.sort((a, b) => b.amount - a.amount);
-      }
-      this.initPieChart();
-    });
+        this.categoryTotals = [];
+        // Calculate percentage for each category
+        for (const category in categoryMap) {
+          const amount = categoryMap[category];
+          const percentage = (amount / this.totalAmount) * 100;
+          const color = this.getColor(percentage);
+          this.categoryTotals.push({ category, amount, percentage, color });
+          this.categoryTotals.sort((a, b) => b.amount - a.amount);
+        }
+        this.initPieChart();
+      });
   }
 
   calculateChartData(expensesFiltered: Expense[]): void {
@@ -228,8 +247,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
         const hour = new Date(expense.date).getHours();
         this.chartOptions.datasets[0].data[hour] =
           Math.round(
-            (this.chartOptions.datasets[0].data[hour] + expense.amount) *
-            100
+            (this.chartOptions.datasets[0].data[hour] + expense.amount) * 100
           ) / 100;
       }
 
@@ -245,8 +263,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
         const day = new Date(expense.date).getDate();
         this.chartOptions.datasets[0].data[day - 1] =
           Math.round(
-            (this.chartOptions.datasets[0].data[day - 1] + expense.amount) *
-            100
+            (this.chartOptions.datasets[0].data[day - 1] + expense.amount) * 100
           ) / 100;
       }
     });
@@ -262,8 +279,11 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.chartOptions.datasets[0].data[6] = null;
       }
     }
-    
-    this.chartOptions = { ...this.chartOptions, datasets: [...this.chartOptions.datasets] };
+
+    this.chartOptions = {
+      ...this.chartOptions,
+      datasets: [...this.chartOptions.datasets],
+    };
   }
 
   touchStartX: number = 0;
@@ -318,12 +338,12 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
     const green = Math.floor(Math.random() * 106) + 150;
     // Generate a random value for the blue component (200-255) to ensure it's a soft blue
     const blue = Math.floor(Math.random() * 56) + 200;
-    
+
     // Convert the components to hexadecimal and pad with leading zeros if necessary
     const redHex = red.toString(16).padStart(2, '0');
     const greenHex = green.toString(16).padStart(2, '0');
     const blueHex = blue.toString(16).padStart(2, '0');
-    
+
     // Combine the components into a single color string
     const hexColor = `#${redHex}${greenHex}${blueHex}`;
     return hexColor;
@@ -331,7 +351,8 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onRefresh(): void {
     this.categoryTotals = [];
-    this.totalAmount = 0;
+    this.irregularCategoriesCheckboxValue = true;
+    this.regularCategoriesCheckboxValue = true;
     this.excludedCategories = [];
     this.calculateCategoryTotals();
   }
@@ -339,16 +360,56 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   onRefreshDateFilter(): void {
     this.dateFilterService.refreshDateFrame();
     this.categoryTotals = [];
-    this.totalAmount = 0;
+    this.irregularCategoriesCheckboxValue = true;
+    this.regularCategoriesCheckboxValue = true;
     this.excludedCategories = [];
     this.calculateCategoryTotals();
   }
 
   onBarClose(category: string): void {
-    this.excludedCategories = [...this.excludedCategories, category];
-    this.totalAmount = this.categoryTotals
-      .filter((c) => !this.excludedCategories.includes(c.category))
-      .reduce((total, c) => Math.round((total + c.amount) * 100) / 100, 0);
+    this.updateByExcludedCategories([category]);
+  }
+
+  onRegularCategoriesCheckboxClick(value: boolean): void {
+    if (value) {
+      const regularCategories = this.currentCategories
+        .map(getCategoryById)
+        .filter((category) => !category.includeInBalance)
+        .map((category) => category.id);
+      this.excludedCategories = this.excludedCategories.filter(
+        (category) => !regularCategories.includes(category)
+      );
+      this.calculateCategoryTotals();
+    } else {
+      const regularCategories = this.currentCategories
+        .map(getCategoryById)
+        .filter((category) => !category.includeInBalance)
+        .map((category) => category.id);
+      this.updateByExcludedCategories(regularCategories);
+    }
+  }
+
+  onIrregularCategoriesCheckboxClick(value: boolean): void {
+    if (value) {
+      const irregularCategories = this.currentCategories
+        .map(getCategoryById)
+        .filter((category) => category.includeInBalance)
+        .map((category) => category.id);
+      this.excludedCategories = this.excludedCategories.filter(
+        (category) => !irregularCategories.includes(category)
+      );
+      this.calculateCategoryTotals();
+    } else {
+      const irregularCategories = this.currentCategories
+        .map(getCategoryById)
+        .filter((category) => category.includeInBalance)
+        .map((category) => category.id);
+      this.updateByExcludedCategories(irregularCategories);
+    }
+  }
+
+  private updateByExcludedCategories(categories: string[]): void {
+    this.excludedCategories = Array.from(new Set([...this.excludedCategories, ...categories]));
     this.calculateCategoryTotals();
   }
 
