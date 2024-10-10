@@ -1,20 +1,15 @@
 <div class="category-summary" *ngIf="isVisible">
   <div class="category-header">
-    <span class="app-link category-label" (click)="showCategoryDetails(category)">{{
-      getCategoryNameByIdFunc(category)
-    }}</span>
-    <span>{{ amount }}€</span>
+      <span class="app-link" (click)="showCategoryDetails(category)">{{ getCategoryNameByIdFunc(category)
+          }}</span>
+      <span>{{ amount }}€</span>
   </div>
   <div class="progress-bar-container">
-    <div class="progress-bar-delete" (click)="onHide()">X</div>
-    <div class="progress-bar">
-      <div
-        class="progress-bar"
-        [style.width.%]="percentage"
-        [style.backgroundColor]="color"
-      >
-        {{ percentage.toFixed(2) }}%
+      <div class="progress-bar">
+          <div class="progress-bar" [style.width.%]="percentage" [style.backgroundColor]="color">
+              {{ percentage.toFixed(2) }}%
+          </div>
       </div>
-    </div>
+      <div class="progress-bar-delete" (click)="onHide()">X</div>
   </div>
 </div>
