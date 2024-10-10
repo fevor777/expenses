@@ -2,10 +2,20 @@
   <app-date-filter (changeDateFrameEvent)="onFilterChange()"></app-date-filter>
   <div class="statistics-title" *ngIf="currentDateFrame | async as currentDate">
     Период:
-    <span style="font-weight: bold">{{ currentDate?.display }}</span>
+    <span class="statistic-date-frame">{{ currentDate?.display }}</span>
+    <span
+      style="color: grey"
+      *ngIf="
+        currentDate?.display === initialDayFrameLabel ||
+        currentDate?.display === initialWeekFrameLabel ||
+        currentDate?.display === initialMonthFrameLabel
+      "
+    >
+      ({{ currentDay }})</span
+    >
     <i
       (click)="onRefreshDateFilter()"
-      *ngIf="currentDate?.display !== initialDateFrameLabel"
+      *ngIf="currentDate?.display !== initialDayFrameLabel"
       class="fas fa-redo-alt statistic-refresh-button"
     ></i>
     <br />
@@ -23,8 +33,11 @@
         excludedCategories | categoryListName
       }}</span
       >)
-      <i (click)="onRefresh()" class="fas fa-redo-alt statistic-refresh-button"></i> </span
-    >
+      <i
+        (click)="onRefresh()"
+        class="fas fa-redo-alt statistic-refresh-button"
+      ></i>
+    </span>
   </span>
   <span class="statistics-checkbox">
     <input
@@ -36,7 +49,7 @@
       [(ngModel)]="irregularCategoriesCheckboxValue"
       (ngModelChange)="onRegularCategoriesCheckboxClick($event)"
     />
-    <label for="category-regular">Регулярное</label>
+    <label for="category-regular">Регулярное <span style="color: grey;">({{ regularAmount }}€)</span></label>
     <input
       type="checkbox"
       value="irregular"
@@ -46,7 +59,7 @@
       [(ngModel)]="regularCategoriesCheckboxValue"
       (ngModelChange)="onIrregularCategoriesCheckboxClick($event)"
     />
-    <label for="category-irregular">Нерегулярное</label>
+    <label for="category-irregular">Нерегулярное <span style="color: grey;">({{ irregularAmount }}€)</span></label>
   </span>
   <app-statistics-bar
     *ngFor="let categoryTotal of categoryTotals"
@@ -56,7 +69,7 @@
     (close)="onBarClose($event)"
   >
   </app-statistics-bar>
-  <hr class="statistics-separator"/>
+  <hr class="statistics-separator" />
   <div style="display: block">
     <canvas
       baseChart

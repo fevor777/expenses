@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import * as echarts from 'echarts';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -23,6 +29,8 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
     color: string;
   }[] = [];
   totalAmount: number = 0;
+  regularAmount: number = 0;
+  irregularAmount: number = 0;
   readonly getCategoryNameByIdFunc = getCategoryNameById;
   excludedCategories: string[] = [];
   currentCategories: string[] = [];
@@ -30,13 +38,23 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   currentDateFrame?: Observable<DateFrame>;
 
-  initialDateFrameLabel: string;
+  initialDayFrameLabel: string;
+  initialWeekFrameLabel: string;
+  initialMonthFrameLabel: string;
+
+  today: Date = new Date();
 
   chartDom: HTMLElement;
   myChart;
 
   regularCategoriesCheckboxValue: boolean = true;
   irregularCategoriesCheckboxValue: boolean = true;
+
+  currentDay: string = this.today.toLocaleDateString('ru-RU', {
+    weekday: 'short', // 'Thu'
+    month: 'short', // 'Aug'
+    day: 'numeric', // '12'
+  });
 
   // chartData = new BehaviorSubject<any[]>([]);
   // chartLabels = new BehaviorSubject<string[]>([]);
@@ -78,7 +96,9 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.currentDateFrame = this.dateFilterService.dateFrame$;
-    this.initialDateFrameLabel = this.dateFilterService.initialValue?.display;
+    this.initialDayFrameLabel = this.dateFilterService.initialDayFrameLabel;
+    this.initialWeekFrameLabel = this.dateFilterService.initialWeekFrameLabel;
+    this.initialMonthFrameLabel = this.dateFilterService.initialMonthFrameLabel;
   }
 
   initPieChart() {
@@ -163,6 +183,8 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
     const categoryMap: { [key: string]: number } = {};
     let expensesFilteredByDate = [];
     this.totalAmount = 0;
+    this.regularAmount = 0;
+    this.irregularAmount = 0;
 
     this.expenseService
       .getExpenses()
@@ -187,6 +209,13 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
           categoryMap[expense.category] =
             Math.round((categoryMap[expense.category] + expense.amount) * 100) /
             100;
+          if (!getCategoryById(expense.category)?.includeInBalance) {
+            this.regularAmount =
+              Math.round((this.regularAmount + expense.amount) * 100) / 100;
+          } else {
+            this.irregularAmount =
+              Math.round((this.irregularAmount + expense.amount) * 100) / 100;
+          }
           this.totalAmount =
             Math.round((this.totalAmount + expense.amount) * 100) / 100;
         });
@@ -408,7 +437,9 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private updateByExcludedCategories(categories: string[]): void {
-    this.excludedCategories = Array.from(new Set([...this.excludedCategories, ...categories]));
+    this.excludedCategories = Array.from(
+      new Set([...this.excludedCategories, ...categories])
+    );
     this.calculateCategoryTotals();
   }
 

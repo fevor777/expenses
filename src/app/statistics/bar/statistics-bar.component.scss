@@ -4,10 +4,10 @@
   .category-header {
     display: flex;
     justify-content: space-between;
-    font-weight: bold;
     margin-bottom: 5px;
 
     .category-label {
+      font-weight: 600;
       padding-left: 24px;
     }
   }

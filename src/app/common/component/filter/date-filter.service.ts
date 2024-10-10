@@ -5,10 +5,14 @@ import { DateTime } from "luxon";
 
 @Injectable()
 export class DateFilterService {
+  readonly initialDayFrameLabel: string = 'сегодня';
+  readonly initialWeekFrameLabel: string = 'эта неделя';
+  readonly initialMonthFrameLabel: string = 'этот месяц';
+
   initialValue: DateFrame = {
     start: DateTime.now().startOf('day'),
     finish: DateTime.now().endOf('day'),
-    display: 'сегодня',
+    display: this.initialDayFrameLabel,
     mode: Mode.DAY,
   };
   private dateFrameSubject: BehaviorSubject<DateFrame> = new BehaviorSubject<DateFrame>(this.initialValue);
