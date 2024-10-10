@@ -1,24 +1,26 @@
 <div class="statistics">
   <app-date-filter (changeDateFrameEvent)="onFilterChange()"></app-date-filter>
   <div class="statistics-title" *ngIf="currentDateFrame | async as currentDate">
-    Статистика по категориям за
+    Период:
     <span style="font-weight: bold">{{ currentDate?.display }}</span>
     <i
       (click)="onRefreshDateFilter()"
       *ngIf="currentDate?.display !== initialDateFrameLabel"
       class="fas fa-redo-alt statistic-refresh-button"
     ></i>
+    <br>
   </div>
   <div style="width: 100%; height: 200px">
     <div id="donut-chart" style="width: 100%; height: 100%"></div>
   </div>
-  Всего потрачено: {{ totalAmount }}€<br /><br />
-  <div *ngIf="excludedCategories?.length > 0">
-    <span>(За исключением: {{ excludedCategories.join(", ") }}) </span>
-    <i (click)="onRefresh()" class="fas fa-redo-alt"></i>
-    <br />
-    <br />
-  </div>
+  <span class="statistic-category-label"> Категории  
+    <span *ngIf="excludedCategories?.length > 0">
+      (За исключением: 
+      <span class="statistic-excluded-category">{{ excludedCategories | categoryListName }}</span>)
+      <i (click)="onRefresh()" class="fas fa-redo-alt"></i>
+    </span>:
+  </span>
+
   <app-statistics-bar
     *ngFor="let categoryTotal of categoryTotals"
     [amount]="categoryTotal.amount"

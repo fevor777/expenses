@@ -38,12 +38,20 @@
   &-title {
     text-align: center;
     font-size: 18px;
-    margin: 15px;
+    margin: 10px;
   }
 
   .statistic-refresh-button {
     font-size: 14px;
     padding-left: 10px;
+  }
+
+  .statistic-category-label {
+    margin: 10px 0px;
+  }
+
+  .statistic-excluded-category {
+    font-weight: bold;
   }
 }
 

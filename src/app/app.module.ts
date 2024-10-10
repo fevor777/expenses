@@ -30,6 +30,7 @@ import { take, tap } from 'rxjs';
 import { BalanceService } from './common/balance.service';
 import { DateFilterComponent } from "./common/component/filter/date-filter.component";
 import { DateFilterService } from './common/component/filter/date-filter.service';
+import { CategoryListNamePipe } from './common/pipe/category-list-name.pipe';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -59,7 +60,8 @@ export class HammerConfig extends HammerGestureConfig {
     BaseChartDirective,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
-    DateFilterComponent
+    DateFilterComponent,
+    CategoryListNamePipe,
 ],
   providers: [
     {
