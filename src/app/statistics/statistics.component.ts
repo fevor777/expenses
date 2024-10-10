@@ -116,8 +116,8 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
           },
           labelLine: {
             show: true,
-            length: 15,
-            length2: 20,
+            length: 5,
+            length2: 5,
           },
           data: this.categoryTotals.map((item) => ({
             value: item.amount,
