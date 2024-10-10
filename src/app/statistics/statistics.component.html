@@ -16,15 +16,15 @@
   </div>
   <hr class="statistics-separator" />
   <span class="statistic-category-label">
-    Категории
+    Категории:
     <span *ngIf="excludedCategories?.length > 0">
-      (За исключением:
+      (За исключением
       <span class="statistic-excluded-category">{{
         excludedCategories | categoryListName
       }}</span
       >)
-      <i (click)="onRefresh()" class="fas fa-redo-alt"></i> </span
-    >:
+      <i (click)="onRefresh()" class="fas fa-redo-alt statistic-refresh-button"></i> </span
+    >
   </span>
   <span class="statistics-checkbox">
     <input
