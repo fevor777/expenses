@@ -103,16 +103,15 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
             position: 'outside',
             formatter: [
               '{d|{b}}', // Bold category name
-              '{b|{c}€}', // Percentage
+              // '{b|{c}€}', // Percentage
             ].join('\n'),
             rich: {
-              b: {
-                fontWeight: 'bold',
-                fontSize: 16,
-              },
               d: {
-                color: '#616161',
+                fontSize: 14,
               },
+              // d: {
+              //   color: '#616161',
+              // },
             },
           },
           labelLine: {
