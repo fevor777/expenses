@@ -1,17 +1,21 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
-  OnDestroy,
+  Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { DateTime } from 'luxon';
-import { DateFrame, Mode } from './dateFrame.model';
-import { DateFilterService } from './date-filter.service';
-import { CommonModule } from '@angular/common';
-import { DateFilterDropDownComponent } from './dropdown/date-filter-drop-down.component';
+
 import { SelectOption } from '../../model/select-option';
-import { Subject, takeUntil } from 'rxjs';
+import { DateFrame, Mode } from './dateFrame.model';
+import {
+  DateFilterDropDownChange,
+  DateFilterDropDownComponent,
+} from './dropdown/date-filter-drop-down.component';
 
 @Component({
   selector: 'app-date-filter',
@@ -20,14 +24,23 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [CommonModule, DateFilterDropDownComponent],
 })
-export class DateFilterComponent implements OnInit, OnDestroy {
-  @Output()
-  changeDateFrameEvent: EventEmitter<null> = new EventEmitter();
+export class DateFilterComponent implements OnInit, OnChanges {
+  static readonly initialDayFrameLabel: string = 'сегодня';
+  static readonly initialWeekFrameLabel: string = 'эта неделя';
+  static readonly initialMonthFrameLabel: string = 'этот месяц';
+  static readonly initialYearFrameLabel: string = 'этот год';
+  static readonly initialValue: DateFrame = {
+    start: DateTime.now().startOf('day'),
+    finish: DateTime.now().endOf('day'),
+    display: DateFilterComponent.initialDayFrameLabel,
+    mode: Mode.DAY,
+  };
+
+  @Input() value: DateFrame = DateFilterComponent.initialValue;
+  @Output() changeFilter: EventEmitter<DateFrame> = new EventEmitter();
+
   readonly Mode = Mode;
 
-  private readonly destroySubject: Subject<void> = new Subject();
-
-  currentMode: Mode = Mode.DAY;
   clickedMode: Mode;
 
   optionsForDaysSelect: SelectOption<DateFrame>[] = [];
@@ -35,77 +48,50 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   optionsForMonthsSelect: SelectOption<DateFrame>[] = [];
   optionsForYearsSelect: SelectOption<DateFrame>[] = [];
 
-  defaultValue: SelectOption<DateFrame>;
+  currentFilter: SelectOption<DateFrame>;
+
+  defaultLabel: string = DateFilterComponent.initialDayFrameLabel;
 
   firstDayOption: SelectOption<DateFrame> = {
-    value: {
-      start: DateTime.now().startOf('day'),
-      finish: DateTime.now().endOf('day'),
-      mode: Mode.DAY,
-      display: 'сегодня',
-    },
-    display: 'сегодня',
+    value: DateFilterComponent.initialValue,
+    display: DateFilterComponent.initialDayFrameLabel,
   };
 
-  firstWeekOption: SelectOption<DateFrame> = {
-    value: {
-      start: DateTime.now().startOf('week'),
-      finish: DateTime.now().endOf('week'),
-      mode: Mode.WEEK,
-      display: 'эта неделя',
-    },
-    display: 'эта неделя',
-  };
-
-  firstMonthOption: SelectOption<DateFrame> = {
-    value: {
-      start: DateTime.now().startOf('month'),
-      finish: DateTime.now().endOf('month'),
-      mode: Mode.MONTH,
-      display: 'этот месяц',
-    },
-    display: 'этот месяц',
-  };
-
-  firstYearOption: SelectOption<DateFrame> = {
-    value: {
-      start: DateTime.now().startOf('year'),
-      finish: DateTime.now().endOf('year'),
-      mode: Mode.YEAR,
-      display: 'этот год',
-    },
-    display: 'этот год',
-  };
-
-  constructor(private dateFilterService: DateFilterService) {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['value']) {
+      this.setCurrentState(this.value);
+    }
+  }
 
   ngOnInit(): void {
-    this.dateFilterService.dateFrame$
-      .pipe(takeUntil(this.destroySubject))
-      .subscribe((currentFrame) => {
-        this.initOptions();
-        if (currentFrame) {
-          this.defaultValue = {
-            value: currentFrame,
-            display: currentFrame?.display,
-          };
-          this.currentMode = currentFrame.mode;
-        }
-      });
+    this.initOptions();
   }
 
-  onValueChange(frame: DateFrame): void {
-    this.dateFilterService.setDateFrame(frame);
-    this.changeDateFrameEvent.emit();
+  onRefresh(): void {
+    this.setCurrentState(DateFilterComponent.initialValue);
   }
 
-  onDropdownActive(mode: Mode): void {
-    this.currentMode = mode;
-    this.clickedMode = mode;
+  onDateSelect(selectedValue: DateFilterDropDownChange<DateFrame, Mode>): void {
+    this.clickedMode = selectedValue.name;
+    this.setCurrentState(selectedValue.value);
   }
 
   onDropdownToggleClick(mode: Mode): void {
     this.clickedMode = mode;
+  }
+
+  private setCurrentState(value: DateFrame): void {
+    if (value) {
+      if (value?.display !== this.currentFilter?.display) {
+        this.currentFilter = {
+          value,
+          display: value.display,
+        };
+      }
+    } else {
+      this.currentFilter = this.firstDayOption;
+    }
+    this.changeFilter.emit(this.currentFilter?.value);
   }
 
   private initOptions(): void {
@@ -139,7 +125,16 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   private initWeekOptions(): void {
     const now = DateTime.now();
     const thisWeekStart = now.startOf('week');
-    const weeksOptions: SelectOption<DateFrame>[] = [this.firstWeekOption];
+    const firstWeekOption: SelectOption<DateFrame> = {
+      value: {
+        start: thisWeekStart,
+        finish: DateTime.now().endOf('week'),
+        mode: Mode.WEEK,
+        display: DateFilterComponent.initialWeekFrameLabel,
+      },
+      display: DateFilterComponent.initialWeekFrameLabel,
+    };
+    const weeksOptions: SelectOption<DateFrame>[] = [firstWeekOption];
     for (let i = 1; i < 5; i++) {
       const displayWeekValue =
         thisWeekStart.minus({ weeks: i }).setLocale('ru').toFormat('d MMMM') +
@@ -165,7 +160,16 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   private initMonthOptions(): void {
     const now = DateTime.now();
     const thisMonthStart = now.startOf('month');
-    const monthsOptions: SelectOption<DateFrame>[] = [this.firstMonthOption];
+    const firstMonthOption: SelectOption<DateFrame> = {
+      value: {
+        start: thisMonthStart,
+        finish: DateTime.now().endOf('month'),
+        mode: Mode.MONTH,
+        display: DateFilterComponent.initialMonthFrameLabel,
+      },
+      display: DateFilterComponent.initialMonthFrameLabel,
+    };
+    const monthsOptions: SelectOption<DateFrame>[] = [firstMonthOption];
     for (let i = 1; i < 12; i++) {
       const displayMonthValue = thisMonthStart
         .minus({ months: i })
@@ -187,7 +191,16 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   private initYearOptions(): void {
     const now = DateTime.now();
     const thisYearStart = now.startOf('year');
-    const yearsOptions: SelectOption<DateFrame>[] = [this.firstYearOption];
+    const firstYearOption: SelectOption<DateFrame> = {
+      value: {
+        start: thisYearStart,
+        finish: DateTime.now().endOf('year'),
+        mode: Mode.YEAR,
+        display: DateFilterComponent.initialYearFrameLabel,
+      },
+      display: DateFilterComponent.initialYearFrameLabel,
+    };
+    const yearsOptions: SelectOption<DateFrame>[] = [firstYearOption];
     for (let i = 1; i < 5; i++) {
       const displayYearValue = thisYearStart
         .minus({ years: i })
@@ -204,10 +217,5 @@ export class DateFilterComponent implements OnInit, OnDestroy {
       });
     }
     this.optionsForYearsSelect = yearsOptions;
-  }
-
-  ngOnDestroy(): void {
-    this.destroySubject.next();
-    this.destroySubject.complete();
   }
 }

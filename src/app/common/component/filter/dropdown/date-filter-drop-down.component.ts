@@ -9,8 +9,10 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+
 import { SelectOption } from '../../../model/select-option';
-import { Mode } from '../dateFrame.model';
+
+export type DateFilterDropDownChange<T, D> = { value: T; name: D };
 
 @Component({
   selector: 'app-date-filter-drop-down',
@@ -19,20 +21,27 @@ import { Mode } from '../dateFrame.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
 })
-export class DateFilterDropDownComponent<T> implements OnChanges {
+export class DateFilterDropDownComponent<T, D> implements OnChanges {
   @Input() options: SelectOption<T>[] = [];
-  @Input() mode: Mode;
-  @Input() activatedMode: Mode;
-  @Input() defaultValue: SelectOption<T>;
+  @Input() name: D;
+  @Input() activatedName: D;
+  @Input() value: SelectOption<T>;
   @Input() hideOptions: boolean = false;
 
-  @Output() select: EventEmitter<T> = new EventEmitter();
-  @Output() active: EventEmitter<Mode> = new EventEmitter();
-  @Output() toggleClick: EventEmitter<Mode> = new EventEmitter();
+  @Output() select: EventEmitter<DateFilterDropDownChange<T, D>> =
+    new EventEmitter();
+  @Output() toggleClick: EventEmitter<D> = new EventEmitter();
 
   selectedOption: SelectOption<T>;
   dropdownOpen: boolean = false;
   isActivated: boolean = false;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isClickInsideComponent(event)) {
+      this.dropdownOpen = false;
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -42,8 +51,8 @@ export class DateFilterDropDownComponent<T> implements OnChanges {
     ) {
       this.selectedOption = this.options[0];
     }
-    if (changes?.['activatedMode'] && this.activatedMode) {
-      this.isActivated = this.activatedMode === this.mode;
+    if (changes?.['activatedName'] && this.activatedName) {
+      this.isActivated = this.activatedName === this.name;
       if (
         !this.isActivated &&
         Array.isArray(this.options) &&
@@ -56,44 +65,32 @@ export class DateFilterDropDownComponent<T> implements OnChanges {
       this.dropdownOpen = false;
     }
 
-    if (changes?.['defaultValue'] || changes?.['mode'] || changes?.['activatedMode']) {
+    if (changes?.['value'] || changes?.['name'] || changes?.['activatedName']) {
       this.updateSelectedOption();
     }
   }
 
   updateSelectedOption(): void {
     if (
-      this.defaultValue &&
-      this.mode &&
-      this.activatedMode &&
-      this.activatedMode === this.mode
+      this.value &&
+      this.name &&
+      this.activatedName &&
+      this.activatedName === this.name
     ) {
-      this.selectedOption = this.defaultValue;
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (!this.isClickInsideComponent(event)) {
-      this.dropdownOpen = false;
+      this.selectedOption = this.value;
     }
   }
 
   toggleDropdown(): void {
     this.dropdownOpen = !this.dropdownOpen;
-    this.toggleClick.emit(this.mode);
+    this.toggleClick.emit(this.name);
   }
 
   onSelectValue(selected: SelectOption<T>): void {
     this.selectedOption = selected;
-    this.select.emit(selected.value);
     this.isActivated = true;
-    this.active.emit(this.mode);
+    this.select.emit({ name: this.name, value: selected.value });
     this.dropdownOpen = false;
-  }
-
-  onClick(event: MouseEvent): void {
-    event.stopPropagation();
   }
 
   onDisplayValueClick(): void {
@@ -103,8 +100,11 @@ export class DateFilterDropDownComponent<T> implements OnChanges {
       this.dropdownOpen = false;
     }
     this.isActivated = true;
-    this.active.emit(this.mode);
-    this.select.emit(this.selectedOption?.value);
+    this.select.emit({ name: this.name, value: this.selectedOption?.value });
+  }
+
+  onClick(event: MouseEvent): void {
+    event.stopPropagation();
   }
 
   private isClickInsideComponent(event: MouseEvent): boolean {

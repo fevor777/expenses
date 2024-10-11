@@ -1,45 +1,46 @@
 <div class="statistics-period">
   <app-date-filter-drop-down
     [options]="optionsForDaysSelect"
-    [mode]="Mode.DAY"
-    [activatedMode]="currentMode"
-    [defaultValue]="defaultValue"
+    [name]="Mode.DAY"
+    [activatedName]="currentFilter?.value?.mode"
+    [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.DAY"
-    (select)="onValueChange($event)"
-    (active)="onDropdownActive($event)"
+    (select)="onDateSelect($event)"
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
   <app-date-filter-drop-down
     [options]="optionsForWeeksSelect"
-    [mode]="Mode.WEEK"
-    [activatedMode]="currentMode"
-    [defaultValue]="defaultValue"
+    [name]="Mode.WEEK"
+    [activatedName]="currentFilter?.value?.mode"
+    [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.WEEK"
-    (select)="onValueChange($event)"
-    (active)="onDropdownActive($event)"
+    (select)="onDateSelect($event)"
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
   <app-date-filter-drop-down
     [options]="optionsForMonthsSelect"
-    [mode]="Mode.MONTH"
-    [activatedMode]="currentMode"
-    [defaultValue]="defaultValue"
+    [name]="Mode.MONTH"
+    [activatedName]="currentFilter?.value?.mode"
+    [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.MONTH"
-    (select)="onValueChange($event)"
-    (active)="onDropdownActive($event)"
+    (select)="onDateSelect($event)"
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
   <app-date-filter-drop-down
     [options]="optionsForYearsSelect"
-    [mode]="Mode.YEAR"
-    [activatedMode]="currentMode"
-    [defaultValue]="defaultValue"
+    [name]="Mode.YEAR"
+    [activatedName]="currentFilter?.value?.mode"
+    [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.YEAR"
-    (select)="onValueChange($event)"
-    (active)="onDropdownActive($event)"
+    (select)="onDateSelect($event)"
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
+  <i
+    *ngIf="currentFilter?.display !== defaultLabel"
+    (click)="onRefresh()"
+    class="fas fa-redo-alt statistics-refresh-button"
+  ></i>
 </div>

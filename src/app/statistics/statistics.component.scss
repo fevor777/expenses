@@ -34,14 +34,8 @@
   display: flex;
   flex-direction: column;
 
-  &-title {
-    text-align: center;
-    font-size: 16px;
-    margin: 10px;
-
-    .statistic-date-frame {
-      color: #870024;
-    }
+  .statistics-filter {
+    padding-bottom: 15px;
   }
 
   .statistic-category-label {
@@ -68,11 +62,6 @@
       width: 1.5rem;
       height: 1.5rem;
     }
-  }
-
-  .statistic-refresh-button {
-    font-size: 14px;
-    padding: 10px;
   }
 }
 

@@ -1,27 +1,21 @@
-import {
-  AfterViewInit,
-  Component,
-  HostListener,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import * as echarts from 'echarts';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Subject, first, takeUntil } from 'rxjs';
 
 import { getCategoryById, getCategoryNameById } from '../common/categories';
-import { DateFilterService } from '../common/component/filter/date-filter.service';
 import { DateFrame, Mode } from '../common/component/filter/dateFrame.model';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { getExpensesFromTo } from './functions/expense-helpers';
+import { DateFilterComponent } from '../common/component/filter/date-filter.component';
 
 @Component({
   selector: 'app-statistics',
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss'],
 })
-export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class StatisticsComponent implements OnDestroy, AfterViewInit {
   categoryTotals: {
     category: string;
     amount: number;
@@ -36,11 +30,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   currentCategories: string[] = [];
   private readonly destroySubject: Subject<void> = new Subject();
 
-  currentDateFrame?: Observable<DateFrame>;
-
-  initialDayFrameLabel: string;
-  initialWeekFrameLabel: string;
-  initialMonthFrameLabel: string;
+  currentFilter?: DateFrame = DateFilterComponent.initialValue;
 
   today: Date = new Date();
 
@@ -55,12 +45,6 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
     month: 'short', // 'Aug'
     day: 'numeric', // '12'
   });
-
-  // chartData = new BehaviorSubject<any[]>([]);
-  // chartLabels = new BehaviorSubject<string[]>([]);
-
-  // chartData$ = this.chartData.asObservable();
-  // chartLabels$ = this.chartLabels.asObservable();
 
   chartOptions: any = {
     datasets: [
@@ -85,20 +69,13 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private router: Router,
     private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService
+    // private dateFilterService: DateFilterService
   ) {}
 
   ngAfterViewInit(): void {
     this.chartDom = document.getElementById('donut-chart')!;
     this.myChart = echarts.init(this.chartDom);
     this.calculateCategoryTotals();
-  }
-
-  ngOnInit(): void {
-    this.currentDateFrame = this.dateFilterService.dateFrame$;
-    this.initialDayFrameLabel = this.dateFilterService.initialDayFrameLabel;
-    this.initialWeekFrameLabel = this.dateFilterService.initialWeekFrameLabel;
-    this.initialMonthFrameLabel = this.dateFilterService.initialMonthFrameLabel;
   }
 
   initPieChart() {
@@ -171,15 +148,18 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  onFilterChange(): void {
-    this.excludedCategories = [];
-    this.irregularCategoriesCheckboxValue = true;
-    this.regularCategoriesCheckboxValue = true;
-    this.calculateCategoryTotals();
+  onFilterChange(frame: DateFrame): void {
+    if (frame?.display !== this.currentFilter?.display) {
+      this.currentFilter = frame;
+      this.excludedCategories = [];
+      this.irregularCategoriesCheckboxValue = true;
+      this.regularCategoriesCheckboxValue = true;
+      this.calculateCategoryTotals();
+    }
   }
 
   calculateCategoryTotals(): void {
-    const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
+    // const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
     const categoryMap: { [key: string]: number } = {};
     let expensesFilteredByDate = [];
     this.totalAmount = 0;
@@ -188,12 +168,12 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.expenseService
       .getExpenses()
-      .pipe(takeUntil(this.destroySubject))
+      .pipe(first(), takeUntil(this.destroySubject))
       .subscribe((expenses) => {
         expensesFilteredByDate = getExpensesFromTo(
           expenses,
-          currentDateFrame.start,
-          currentDateFrame.finish
+          this.currentFilter.start,
+          this.currentFilter.finish
         );
         this.currentCategories = Array.from(
           new Set(expensesFilteredByDate.map((expense) => expense.category))
@@ -234,8 +214,8 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   calculateChartData(expensesFiltered: Expense[]): void {
-    const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
-    if (!currentDateFrame.mode || currentDateFrame.mode === Mode.DAY) {
+    // const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
+    if (!this.currentFilter.mode || this.currentFilter.mode === Mode.DAY) {
       this.chartOptions.labels = new Array(24).fill(0).map((_, i) => {
         return i + ':00';
       });
@@ -247,7 +227,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    if (currentDateFrame.mode === Mode.WEEK) {
+    if (this.currentFilter.mode === Mode.WEEK) {
       this.chartOptions.labels = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
       this.chartOptions.datasets[0].data = new Array(7).fill(0);
 
@@ -257,7 +237,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    if (currentDateFrame.mode === Mode.MONTH) {
+    if (this.currentFilter.mode === Mode.MONTH) {
       this.chartOptions.labels = new Array(31).fill(0).map((_, i) => {
         return i + 1;
       });
@@ -269,7 +249,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    if (currentDateFrame.mode === Mode.YEAR) {
+    if (this.currentFilter.mode === Mode.YEAR) {
       this.chartOptions.labels = ['янв.', 'фев.', 'март', 'апр.', 'май', 'июнь', 'июль', 'авг.', 'сен.', 'окт.', 'нояб.', 'дек.'];
       this.chartOptions.datasets[0].data = new Array(12).fill(0);
       for (let i = new Date().getMonth(); i < 12; i++) {
@@ -279,7 +259,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     expensesFiltered.forEach((expense) => {
       //sum data for chart
-      if (!currentDateFrame.mode || currentDateFrame.mode === Mode.DAY) {
+      if (!this.currentFilter.mode || this.currentFilter.mode === Mode.DAY) {
         const hour = new Date(expense.date).getHours();
         this.chartOptions.datasets[0].data[hour] =
           Math.round(
@@ -287,7 +267,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
           ) / 100;
       }
 
-      if (currentDateFrame.mode === Mode.WEEK) {
+      if (this.currentFilter.mode === Mode.WEEK) {
         const day = new Date(expense.date).getDay();
         this.chartOptions.datasets[0].data[day] =
           Math.round(
@@ -295,7 +275,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
           ) / 100;
       }
 
-      if (currentDateFrame.mode === Mode.MONTH) {
+      if (this.currentFilter.mode === Mode.MONTH) {
         const day = new Date(expense.date).getDate();
         this.chartOptions.datasets[0].data[day - 1] =
           Math.round(
@@ -303,7 +283,7 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
           ) / 100;
       }
 
-      if (currentDateFrame.mode === Mode.YEAR) {
+      if (this.currentFilter.mode === Mode.YEAR) {
         const month = new Date(expense.date).getMonth();
         this.chartOptions.datasets[0].data[month] =
           Math.round(
@@ -312,16 +292,16 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
-    if (currentDateFrame.mode === Mode.WEEK) {
+    if (this.currentFilter.mode === Mode.WEEK) {
       this.chartOptions.labels.push(this.chartOptions.labels.shift());
       this.chartOptions.datasets[0].data.push(
         this.chartOptions.datasets[0].data.shift()
       );
 
       //make null for sunday if its not sunday
-      if (new Date().getDay() !== 0) {
-        this.chartOptions.datasets[0].data[6] = null;
-      }
+      // if (new Date().getDay() !== 0) {
+      //   this.chartOptions.datasets[0].data[6] = null;
+      // }
     }
 
     this.chartOptions = {
@@ -354,9 +334,9 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 100) {
+      if (deltaX > 150) {
         this.onSwipeRight();
-      } else if (deltaX < -100) {
+      } else if (deltaX < -150) {
         this.onSwipeLeft();
       }
     }
@@ -394,15 +374,6 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onRefresh(): void {
-    this.categoryTotals = [];
-    this.irregularCategoriesCheckboxValue = true;
-    this.regularCategoriesCheckboxValue = true;
-    this.excludedCategories = [];
-    this.calculateCategoryTotals();
-  }
-
-  onRefreshDateFilter(): void {
-    this.dateFilterService.refreshDateFrame();
     this.categoryTotals = [];
     this.irregularCategoriesCheckboxValue = true;
     this.regularCategoriesCheckboxValue = true;

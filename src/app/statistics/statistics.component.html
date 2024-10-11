@@ -1,26 +1,5 @@
 <div class="statistics">
-  <app-date-filter (changeDateFrameEvent)="onFilterChange()"></app-date-filter>
-  <div class="statistics-title" *ngIf="currentDateFrame | async as currentDate">
-    Период:
-    <span class="statistic-date-frame">{{ currentDate?.display }}</span>
-    <span
-      style="color: grey"
-      *ngIf="
-        currentDate?.display === initialDayFrameLabel ||
-        currentDate?.display === initialWeekFrameLabel ||
-        currentDate?.display === initialMonthFrameLabel
-      "
-    >
-      ({{ currentDay }})</span
-    >
-    <i
-      (click)="onRefreshDateFilter()"
-      *ngIf="currentDate?.display !== initialDayFrameLabel"
-      class="fas fa-redo-alt statistic-refresh-button"
-    ></i>
-    <br />
-  </div>
-  <hr class="statistics-separator" />
+  <app-date-filter class="statistics-filter" [value]="currentFilter" (changeFilter)="onFilterChange($event)"></app-date-filter>
   <div style="width: 100%; height: 200px">
     <div id="donut-chart" style="width: 100%; height: 100%"></div>
   </div>

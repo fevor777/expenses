@@ -17,7 +17,7 @@
     font-weight: 600;
   }
 
-  .date-filter-drop-down-dropdown {
+  .date-filter-drop-down-list {
     position: absolute;
     top: 100%;
     left: 0;
@@ -36,14 +36,9 @@
       cursor: pointer;
       border: 1px solid #e7e7e7;
     }
-
-    li:hover {
-      background-color: #007bff;
-      color: #fff;
-    }
   }
 
-  .date-filter-drop-down-dropdown-active {
+  .date-filter-drop-down-button-active {
     background-color: #f8d7da;
     border: #f8d7da 1px solid;
   }
