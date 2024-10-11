@@ -5,7 +5,7 @@ import { first, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { BalanceService } from '../common/balance.service';
 import { getCategoryById, getCategoryNameById } from '../common/categories';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
-import { DateFrame } from '../common/component/filter/date/dateFrame.model';
+import { MultiFilter } from '../common/component/filter/multi/multi-filter.component';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
@@ -27,14 +27,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   totalAmountPerDays: Map<number, number> = new Map();
   getCategoryByIdFunc = getCategoryById;
 
-  currentPeriod: string = 'за сегодня';
-
-  currentFilter?: DateFrame;
-
-  selectedCategories: string[] = [];
-  predefineCategories: string[] = [];
-
-  expandFilters: boolean = false;
+  filter: MultiFilter = { categories: [], date: undefined };
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
@@ -49,17 +42,16 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.dateFilterService.dateFilter) {
-      this.currentFilter = { ...this.dateFilterService.dateFilter };
+      this.filter = { ...this.filter, date: this.dateFilterService.dateFilter };
       this.dateFilterService.dateFilter = undefined;
     }
     const categoryFilters = this.dateFilterService.categories;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
-      this.predefineCategories = categoryFilters;
-      this.selectedCategories = categoryFilters;
+      this.filter = { ...this.filter, categories: categoryFilters };
       this.dateFilterService.categories = undefined;
     }
-    if (this.currentFilter || categoryFilters?.length > 0) {
-      this.applyFilters(this.currentFilter);
+    if (this.filter?.date || this.filter?.categories?.length > 0) {
+      this.applyFilters(this.filter);
     } else {
       this.initiateExpenses()
         .pipe(first(), takeUntil(this.destroySubject))
@@ -91,60 +83,34 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   getCategoryFilters(): string {
-    return this.selectedCategories.map(getCategoryNameById).join(', ');
+    return this.filter?.categories.map(getCategoryNameById).join(', ');
   }
 
-  applyFilters(frame?: DateFrame): void {
+  applyFilters(filter: MultiFilter): void {
     this.initiateExpenses()
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(() => {
-
-        if (this.selectedCategories.length > 0) {
+        if (filter?.categories.length > 0) {
           this.expenses = this.expenses.filter((expense) => {
-            return this.selectedCategories.includes(expense.category);
+            return filter?.categories.includes(expense.category);
           });
         }
 
-
         // Filter by date
-        this.currentFilter = frame;
-        if (frame) {
-          this.currentPeriod = frame.display;
+        if (filter?.date) {
           this.expenses = getExpensesFromTo(
             this.expenses,
-            frame.start,
-            frame.finish
+            filter?.date?.start,
+            filter?.date?.finish
           );
         }
         this.sumValues();
       });
   }
 
-  applyFiltersAndClose(): void {
-    this.applyFilters(this.currentFilter);
-    this.expandFilters = false;
-  }
-
   filterByCategory(category: string): void {
-    this.predefineCategories = [category];
-    this.applyCategoryFilters([category]);
-  }
-
-  applyCategoryFilters(categories: string[]): void {
-    this.selectedCategories = categories;
-    this.applyFilters(this.currentFilter);
-  }
-
-  clearFilters(): void {
-    this.currentFilter = undefined;
-    this.predefineCategories = [];
-    this.selectedCategories = [];
-    this.applyFilters(this.currentFilter);
-  }
-
-  toggleExpandFilters(): void {
-    this.expandFilters = !this.expandFilters;
-    this.predefineCategories = [...this.selectedCategories];
+    this.filter = { ...this.filter, categories: [category] };
+    this.applyFilters(this.filter);
   }
 
   getTotalAmountPerDay(date: number): number {
@@ -243,9 +209,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 50) {
+      if (deltaX > 100) {
         this.onSwipeRight();
-      } else if (deltaX < -50) {
+      } else if (deltaX < -100) {
         this.onSwipeLeft();
       }
     }

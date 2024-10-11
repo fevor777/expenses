@@ -2,61 +2,11 @@
   <span [style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'"
     >< Back</span
   ><br />
-  <div class="history-container-top">
-    <span *ngIf="(currentFilter?.display || getCategoryFilters()?.length) && !expandFilters">
-      <span [style.font-weight]="'bold'">Фильтры:</span>
-      <i
-        (click)="clearFilters()"
-        class="fas fa-redo-alt"
-        [style.padding-left]="'10px'"
-      ></i>
-      <br />
-      Период:
-      <span [style.color]="'#ff6f61'">{{
-        currentFilter?.display || "Весь"
-      }}</span
-      ><br />
-      Категории:
-      <span [style.color]="'#ff6f61'">{{ getCategoryFilters() || "Все" }}</span>
-    </span>
-    <span *ngIf="(!currentFilter?.display && !getCategoryFilters()?.length) || expandFilters">
-      <div [style.margin.px]="'10'">
-        <span>Общий расход: </span>
-        <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
-      </div>
-    </span>
-    <button
-      class="history-expand-filter-button"
-      [ngClass]="{ 'history-expand-filter-button-active': expandFilters }"
-      (click)="toggleExpandFilters()"
-    >
-      <i class="fas fa-filter"></i>
-    </button>
-  </div>
-  <div
-    [style.margin.px]="'10'"
-    *ngIf="(currentFilter?.display || getCategoryFilters()?.length) && !expandFilters"
-  >
-    <span>Общий расход: </span>
-    <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
-  </div>
-  <div class="history-expand-filter-container" *ngIf="expandFilters">
-    <div class="history-expand-filter">
-      <div class="history-expand-filter-date">
-        <app-date-filter
-          [value]="currentFilter"
-          (changeFilter)="applyFilters($event)"
-        ></app-date-filter>
-      </div>
-      <app-category-filter
-        [value]="predefineCategories"
-        (selectedCategories)="applyCategoryFilters($event)"
-      ></app-category-filter>
-    </div>
-    <div class="history-expand-filter-buttons">
-      <button (click)="applyFiltersAndClose()">Применить</button>
-    </div>
-  </div>
+  <app-multi-filter
+    [value]="filter"
+    [totalAmount]="totalAmount"
+    (selectedFilters)="applyFilters($event)"
+  ></app-multi-filter>
   <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   <div *ngIf="!expenses.length" class="history-empty">
     <span>Для этих категорий и периода трат нет</span>

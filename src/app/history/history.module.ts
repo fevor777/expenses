@@ -4,21 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
+import { MultiFilterComponent } from '../common/component/filter/multi/multi-filter.component';
 import { HistoryRoutingModule } from './history-routing.module';
 import { HistoryComponent } from './history.component';
-import { CategoryFilterModule } from '../common/component/filter/category/category-filter.module';
 
 @NgModule({
   declarations: [HistoryComponent],
   imports: [
     RouterModule,
-    CategoryFilterModule,
     HistoryRoutingModule,
     CommonModule,
     FormsModule,
     FontAwesomeModule,
-    DateFilterComponent,
+    MultiFilterComponent
   ],
 })
 export class HistoryModule {}

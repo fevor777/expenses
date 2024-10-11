@@ -1,0 +1,62 @@
+<div class="app-multi-filter">
+  <div class="app-multi-filter-container">
+    <span
+      *ngIf="
+        (dateFilter?.display || getCategoryFilters()?.length) && !expandFilters
+      "
+    >
+      <span [style.font-weight]="'bold'">Фильтры:</span>
+      <i
+        (click)="clearFilters()"
+        class="fas fa-redo-alt"
+        [style.padding-left]="'10px'"
+      ></i>
+      <br />
+      Период:
+      <span [style.color]="'#ff6f61'">{{ dateFilter?.display || "Весь" }}</span
+      ><br />
+      Категории:
+      <span [style.color]="'#ff6f61'">{{ getCategoryFilters() || "Все" }}</span>
+    </span>
+    <span
+      *ngIf="
+        (!dateFilter?.display && !getCategoryFilters()?.length) || expandFilters
+      "
+    >
+      <div [style.margin.px]="'10'">
+        <span>Общий расход: </span>
+        <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+      </div>
+    </span>
+    <button
+      class="app-multi-filter-button"
+      [ngClass]="{ 'app-multi-filter-button-active': expandFilters }"
+      (click)="toggleExpandFilters()"
+    >
+      <i class="fas fa-filter"></i>
+    </button>
+  </div>
+  <div
+    [style.margin.px]="'10'"
+    *ngIf="
+      (dateFilter?.display || getCategoryFilters()?.length) && !expandFilters
+    "
+  >
+    <span>Общий расход: </span>
+    <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+  </div>
+  <div class="app-multi-filter-expand" *ngIf="expandFilters">
+    <div class="app-multi-filter-expand-items">
+      <div class="app-multi-filter-expand-date">
+        <app-date-filter
+          [value]="dateFilter"
+          (changeFilter)="emitDateFilter($event)"
+        ></app-date-filter>
+      </div>
+      <app-category-filter
+        [value]="predefineCategories"
+        (selectedCategories)="emitCategoryFilters($event)"
+      ></app-category-filter>
+    </div>
+  </div>
+</div>
