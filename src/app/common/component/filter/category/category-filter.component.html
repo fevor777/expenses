@@ -1,0 +1,60 @@
+<div class="category-filter">
+  <span>Категория:</span>
+  <br />
+  <button (click)="clearCategoryFilters()" class="category-filter-clear">
+    Очистить все фильтры
+  </button>
+  <br />
+  <div class="category-filter-checkbox category-filter-checkbox-main">
+    <input
+      type="checkbox"
+      (change)="filterCategory(regularValue)"
+      value="regular"
+      id="category-regular"
+      [checked]="filterCategories.regular"
+      [(ngModel)]="filterCategories.regular"
+    />
+    <label for="category-regular">Регулярное</label>
+  </div>
+  <div class="category-filter-sub-items">
+    <ng-container *ngFor="let category of categories.regular">
+      <div class="category-filter-checkbox category-filter-checkbox-sub">
+        <input
+          type="checkbox"
+          (change)="emitChanges()"
+          [value]="category.id"
+          [id]="category.id"
+          [checked]="filterCategories[category.id]"
+          [(ngModel)]="filterCategories[category.id]"
+        />
+        <label [for]="category.id">{{ category.name }}</label>
+      </div>
+    </ng-container>
+  </div>
+  <div class="category-filter-checkbox category-filter-checkbox-main">
+    <input
+      type="checkbox"
+      (change)="filterCategory(irregularValue)"
+      value="irregular"
+      id="category-irregular"
+      [checked]="filterCategories.irregular"
+      [(ngModel)]="filterCategories.irregular"
+    />
+    <label for="category-irregular">Нерегулярное</label>
+  </div>
+  <div>
+    <ng-container *ngFor="let category of categories.irregular">
+      <div class="category-filter-checkbox category-filter-checkbox-sub">
+        <input
+          type="checkbox"
+          (change)="emitChanges()"
+          [value]="category.id"
+          [id]="category.id"
+          [checked]="filterCategories[category.id]"
+          [(ngModel)]="filterCategories[category.id]"
+        />
+        <label [for]="category.id">{{ category.name }}</label>
+      </div>
+    </ng-container>
+  </div>
+</div>

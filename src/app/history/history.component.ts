@@ -3,16 +3,12 @@ import { Router } from '@angular/router';
 import { first, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { BalanceService } from '../common/balance.service';
-import {
-  Categories,
-  getCategoryById,
-  getCategoryNameById,
-} from '../common/categories';
+import { getCategoryById, getCategoryNameById } from '../common/categories';
+import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
-import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 
 type HistoryExpense = Expense & {
   showDateTitle: boolean;
@@ -31,17 +27,12 @@ export class HistoryComponent implements OnInit, OnDestroy {
   totalAmountPerDays: Map<number, number> = new Map();
   getCategoryByIdFunc = getCategoryById;
 
-  categories = {
-    regular: Categories.filter((category) => !category.includeInBalance),
-    irregular: Categories.filter((category) => category.includeInBalance),
-  };
-  filterCategories: any = Categories.reduce((acc, category) => {
-    acc[category.id] = false;
-    return acc;
-  }, {});
   currentPeriod: string = 'за сегодня';
 
   currentFilter?: DateFrame;
+
+  selectedCategories: string[] = [];
+  predefineCategories: string[] = [];
 
   expandFilters: boolean = false;
 
@@ -63,10 +54,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
     const categoryFilters = this.dateFilterService.categories;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
-      this.filterCategories = Categories.reduce((acc, category) => {
-        acc[category.id] = categoryFilters.includes(category.id);
-        return acc;
-      }, {});
+      this.predefineCategories = categoryFilters;
+      this.selectedCategories = categoryFilters;
       this.dateFilterService.categories = undefined;
     }
     if (this.currentFilter || categoryFilters?.length > 0) {
@@ -76,8 +65,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
         .pipe(first(), takeUntil(this.destroySubject))
         .subscribe(() => {
           this.sumValues();
-          this.filterCategories.irregular = false;
-          this.filterCategories.regular = false;
         });
     }
   }
@@ -104,29 +91,20 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   getCategoryFilters(): string {
-    const availableCategories = Object.keys(this.filterCategories)
-      .filter((key) => this.filterCategories[key])
-      .map((value) => getCategoryNameById(value));
-    return Categories.length === availableCategories.length
-      ? ''
-      : availableCategories.join(', ');
+    return this.selectedCategories.map(getCategoryNameById).join(', ');
   }
 
   applyFilters(frame?: DateFrame): void {
     this.initiateExpenses()
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(() => {
-        this.checkMainCategory();
 
-        // Filter by category
-        this.expenses = this.expenses.filter((expense) => {
-          return (
-            Object.values(this.filterCategories).every((value) => !value) ||
-            Object.keys(this.filterCategories).some((key) => {
-              return this.filterCategories[key] && expense.category === key;
-            })
-          );
-        });
+        if (this.selectedCategories.length > 0) {
+          this.expenses = this.expenses.filter((expense) => {
+            return this.selectedCategories.includes(expense.category);
+          });
+        }
+
 
         // Filter by date
         this.currentFilter = frame;
@@ -147,65 +125,24 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.expandFilters = false;
   }
 
-  checkMainCategory(): { regularChecked: boolean; irregularChecked: boolean } {
-    const regularIds = this.categories.regular.map((category) => category.id);
-    const irregularIds = this.categories.irregular.map(
-      (category) => category.id
-    );
-    const regularChecked = regularIds.every((id) => this.filterCategories[id]);
-    const irregularChecked = irregularIds.every(
-      (id) => this.filterCategories[id]
-    );
-    this.filterCategories.regular = regularChecked;
-    this.filterCategories.irregular = irregularChecked;
-    return {
-      regularChecked,
-      irregularChecked,
-    };
+  filterByCategory(category: string): void {
+    this.predefineCategories = [category];
+    this.applyCategoryFilters([category]);
   }
 
-  filterMass(what: string): void {
-    let idList: any[] =
-      what === 'regular' ? this.categories.regular : this.categories.irregular;
-    idList = idList.map((category) => category.id);
-
-    if (this.filterCategories[what]) {
-      idList.forEach((id) => {
-        this.filterCategories[id] = false;
-      });
-    }
-
-    for (const key in this.filterCategories) {
-      if (idList.includes(key)) {
-        this.filterCategories[key] = !this.filterCategories[key];
-      }
-    }
-
-    this.applyFilters(this.currentFilter);
-  }
-
-  initiateFilterCategory(): void {
-    for (const key in this.filterCategories) {
-      this.filterCategories[key] = false;
-    }
-  }
-
-  applyCategoryFilters(): void {
+  applyCategoryFilters(categories: string[]): void {
+    this.selectedCategories = categories;
     this.applyFilters(this.currentFilter);
   }
 
   clearFilters(): void {
     this.currentFilter = undefined;
-    this.clearCategoryFilters();
-  }
-
-  clearCategoryFilters(): void {
-    this.initiateFilterCategory();
+    this.predefineCategories = [];
+    this.selectedCategories = [];
     this.applyFilters(this.currentFilter);
   }
 
   toggleExpandFilters(): void {
-    // this.applyFilters();
     this.expandFilters = !this.expandFilters;
   }
 

@@ -1,0 +1,36 @@
+.category-filter {
+  .category-filter-clear {
+    font-family: "Montserrat", sans-serif;
+    color: gray;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    margin: 0.5rem 0 0 0;
+    padding: 0;
+    text-decoration: underline;
+  }
+
+  .category-filter-checkbox {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+
+    label {
+      width: 100%;
+    }
+  }
+
+  .category-filter-checkbox-main {
+    display: flex;
+    font-family: "Montserrat", sans-serif;
+    color: #000;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .category-filter-checkbox-sub {
+    margin-left: 2rem;
+  }
+}

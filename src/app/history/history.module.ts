@@ -7,9 +7,18 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { HistoryRoutingModule } from './history-routing.module';
 import { HistoryComponent } from './history.component';
+import { CategoryFilterModule } from '../common/component/filter/category/category-filter.module';
 
 @NgModule({
   declarations: [HistoryComponent],
-  imports: [RouterModule, HistoryRoutingModule, CommonModule, FormsModule, FontAwesomeModule, DateFilterComponent],
+  imports: [
+    RouterModule,
+    CategoryFilterModule,
+    HistoryRoutingModule,
+    CommonModule,
+    FormsModule,
+    FontAwesomeModule,
+    DateFilterComponent,
+  ],
 })
 export class HistoryModule {}
