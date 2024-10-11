@@ -8,11 +8,11 @@ import {
   getCategoryById,
   getCategoryNameById,
 } from '../common/categories';
-import { DateFrame } from '../common/component/filter/dateFrame.model';
+import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
-import { DateFilterService } from '../common/component/filter/date-filter.service';
+import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 
 type HistoryExpense = Expense & {
   showDateTitle: boolean;

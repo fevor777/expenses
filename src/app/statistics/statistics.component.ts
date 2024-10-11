@@ -4,9 +4,9 @@ import * as echarts from 'echarts';
 import { first, Subject, takeUntil } from 'rxjs';
 
 import { getCategoryById, getCategoryNameById } from '../common/categories';
-import { DateFilterComponent } from '../common/component/filter/date-filter.component';
-import { DateFilterService } from '../common/component/filter/date-filter.service';
-import { DateFrame, Mode } from '../common/component/filter/dateFrame.model';
+import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
+import { DateFilterService } from '../common/component/filter/date/date-filter.service';
+import { DateFrame, Mode } from '../common/component/filter/date/dateFrame.model';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { getExpensesFromTo } from './functions/expense-helpers';

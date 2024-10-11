@@ -10,12 +10,12 @@ import {
 } from '@angular/core';
 import { DateTime } from 'luxon';
 
-import { SelectOption } from '../../model/select-option';
+import { SelectOption } from '../../../model/select-option';
 import { DateFrame, Mode } from './dateFrame.model';
 import {
   DateFilterDropDownChange,
   DateFilterDropDownComponent,
-} from './dropdown/date-filter-drop-down.component';
+} from '../dropdown/date-filter-drop-down.component';
 
 @Component({
   selector: 'app-date-filter',

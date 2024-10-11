@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-import { DateFilterComponent } from '../common/component/filter/date-filter.component';
+import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { HistoryRoutingModule } from './history-routing.module';
 import { HistoryComponent } from './history.component';
 

@@ -13,7 +13,7 @@ import { AppComponent } from './app.component';
 import { AuthService } from './common/auth.service';
 import { BalanceService } from './common/balance.service';
 import { CategoriesComponent } from './common/component/category/categories.component';
-import { DateFilterComponent } from './common/component/filter/date-filter.component';
+import { DateFilterComponent } from './common/component/filter/date/date-filter.component';
 import { NotificationComponent } from './common/component/notification/notification.component';
 import { CustomHammerConfig } from './common/custom-hammer.config';
 import { CategoryListNamePipe } from './common/pipe/category-list-name.pipe';
