@@ -144,6 +144,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   toggleExpandFilters(): void {
     this.expandFilters = !this.expandFilters;
+    this.predefineCategories = [...this.selectedCategories];
   }
 
   getTotalAmountPerDay(date: number): number {

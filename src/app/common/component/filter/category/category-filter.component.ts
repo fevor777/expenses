@@ -37,6 +37,7 @@ export class CategoryFilterComponent implements OnChanges {
           this.value.length > 0 ? this.value.includes(category.id) : false;
         return acc;
       }, {});
+      this.checkMainCategory();
     }
   }
 
