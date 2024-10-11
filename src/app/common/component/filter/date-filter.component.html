@@ -31,4 +31,15 @@
     (active)="onDropdownActive($event)"
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
+
+  <app-date-filter-drop-down
+    [options]="optionsForYearsSelect"
+    [mode]="Mode.YEAR"
+    [activatedMode]="currentMode"
+    [defaultValue]="defaultValue"
+    [hideOptions]="clickedMode !== Mode.YEAR"
+    (select)="onValueChange($event)"
+    (active)="onDropdownActive($event)"
+    (toggleClick)="onDropdownToggleClick($event)"
+  ></app-date-filter-drop-down>
 </div>

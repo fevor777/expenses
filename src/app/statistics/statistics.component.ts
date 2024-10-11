@@ -269,6 +269,14 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
+    if (currentDateFrame.mode === Mode.YEAR) {
+      this.chartOptions.labels = ['янв.', 'фев.', 'март', 'апр.', 'май', 'июнь', 'июль', 'авг.', 'сен.', 'окт.', 'нояб.', 'дек.'];
+      this.chartOptions.datasets[0].data = new Array(12).fill(0);
+      for (let i = new Date().getMonth(); i < 12; i++) {
+        this.chartOptions.datasets[0].data[i] = null;
+      }
+    }
+
     expensesFiltered.forEach((expense) => {
       //sum data for chart
       if (!currentDateFrame.mode || currentDateFrame.mode === Mode.DAY) {
@@ -292,6 +300,14 @@ export class StatisticsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.chartOptions.datasets[0].data[day - 1] =
           Math.round(
             (this.chartOptions.datasets[0].data[day - 1] + expense.amount) * 100
+          ) / 100;
+      }
+
+      if (currentDateFrame.mode === Mode.YEAR) {
+        const month = new Date(expense.date).getMonth();
+        this.chartOptions.datasets[0].data[month] =
+          Math.round(
+            (this.chartOptions.datasets[0].data[month] + expense.amount) * 100
           ) / 100;
       }
     });

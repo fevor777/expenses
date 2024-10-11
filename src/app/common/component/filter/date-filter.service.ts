@@ -8,6 +8,7 @@ export class DateFilterService {
   readonly initialDayFrameLabel: string = 'сегодня';
   readonly initialWeekFrameLabel: string = 'эта неделя';
   readonly initialMonthFrameLabel: string = 'этот месяц';
+  readonly initialYearFrameLabel: string = 'этот год';
 
   initialValue: DateFrame = {
     start: DateTime.now().startOf('day'),

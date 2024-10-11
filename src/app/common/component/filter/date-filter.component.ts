@@ -33,6 +33,7 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   optionsForDaysSelect: SelectOption<DateFrame>[] = [];
   optionsForWeeksSelect: SelectOption<DateFrame>[] = [];
   optionsForMonthsSelect: SelectOption<DateFrame>[] = [];
+  optionsForYearsSelect: SelectOption<DateFrame>[] = [];
 
   defaultValue: SelectOption<DateFrame>;
 
@@ -64,6 +65,16 @@ export class DateFilterComponent implements OnInit, OnDestroy {
       display: 'этот месяц',
     },
     display: 'этот месяц',
+  };
+
+  firstYearOption: SelectOption<DateFrame> = {
+    value: {
+      start: DateTime.now().startOf('year'),
+      finish: DateTime.now().endOf('year'),
+      mode: Mode.YEAR,
+      display: 'этот год',
+    },
+    display: 'этот год',
   };
 
   constructor(private dateFilterService: DateFilterService) {}
@@ -101,6 +112,7 @@ export class DateFilterComponent implements OnInit, OnDestroy {
     this.initDayOptions();
     this.initWeekOptions();
     this.initMonthOptions();
+    this.initYearOptions();
   }
 
   private initDayOptions(): void {
@@ -170,6 +182,28 @@ export class DateFilterComponent implements OnInit, OnDestroy {
       });
     }
     this.optionsForMonthsSelect = monthsOptions;
+  }
+
+  private initYearOptions(): void {
+    const now = DateTime.now();
+    const thisYearStart = now.startOf('year');
+    const yearsOptions: SelectOption<DateFrame>[] = [this.firstYearOption];
+    for (let i = 1; i < 5; i++) {
+      const displayYearValue = thisYearStart
+        .minus({ years: i })
+        .setLocale('ru')
+        .toFormat('yyyy');
+      yearsOptions.push({
+        value: {
+          start: thisYearStart.minus({ years: i }),
+          finish: thisYearStart.minus({ years: i }).endOf('year'),
+          mode: Mode.YEAR,
+          display: displayYearValue,
+        },
+        display: displayYearValue,
+      });
+    }
+    this.optionsForYearsSelect = yearsOptions;
   }
 
   ngOnDestroy(): void {
