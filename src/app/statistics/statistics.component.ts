@@ -1,14 +1,15 @@
 import { AfterViewInit, Component, HostListener, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import * as echarts from 'echarts';
-import { Subject, first, takeUntil } from 'rxjs';
+import { first, Subject, takeUntil } from 'rxjs';
 
 import { getCategoryById, getCategoryNameById } from '../common/categories';
+import { DateFilterComponent } from '../common/component/filter/date-filter.component';
+import { DateFilterService } from '../common/component/filter/date-filter.service';
 import { DateFrame, Mode } from '../common/component/filter/dateFrame.model';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { getExpensesFromTo } from './functions/expense-helpers';
-import { DateFilterComponent } from '../common/component/filter/date-filter.component';
 
 @Component({
   selector: 'app-statistics',
@@ -30,7 +31,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   currentCategories: string[] = [];
   private readonly destroySubject: Subject<void> = new Subject();
 
-  currentFilter?: DateFrame = DateFilterComponent.initialValue;
+  readonly initialFilterValue = DateFilterComponent.initialValue;
+
+  currentFilter?: DateFrame = this.initialFilterValue;
 
   today: Date = new Date();
 
@@ -69,7 +72,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   constructor(
     private router: Router,
     private expenseService: ExpenseService,
-    // private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService
   ) {}
 
   ngAfterViewInit(): void {
@@ -139,15 +142,6 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.myChart.setOption(option);
   }
 
-  showCategoryDetails(categoryId: string): void {
-    this.router.navigate(['/details'], {
-      queryParams: {
-        'category-id': categoryId,
-        'back-url': '/statistics',
-      },
-    });
-  }
-
   onFilterChange(frame: DateFrame): void {
     if (frame?.display !== this.currentFilter?.display) {
       this.currentFilter = frame;
@@ -158,8 +152,13 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     }
   }
 
+  onCategoryClick(categoryId: string): void {
+    this.dateFilterService.categories = [categoryId];
+    this.dateFilterService.dateFilter = this.currentFilter;
+    this.router.navigate(['/history']);
+  }
+
   calculateCategoryTotals(): void {
-    // const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
     const categoryMap: { [key: string]: number } = {};
     let expensesFilteredByDate = [];
     this.totalAmount = 0;
@@ -214,7 +213,6 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   calculateChartData(expensesFiltered: Expense[]): void {
-    // const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
     if (!this.currentFilter.mode || this.currentFilter.mode === Mode.DAY) {
       this.chartOptions.labels = new Array(24).fill(0).map((_, i) => {
         return i + ':00';

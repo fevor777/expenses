@@ -36,7 +36,9 @@ export class DateFilterComponent implements OnInit, OnChanges {
     mode: Mode.DAY,
   };
 
-  @Input() value: DateFrame = DateFilterComponent.initialValue;
+
+  @Input() value: DateFrame;
+  @Input() defaultValue: DateFrame;
   @Output() changeFilter: EventEmitter<DateFrame> = new EventEmitter();
 
   readonly Mode = Mode;
@@ -49,8 +51,8 @@ export class DateFilterComponent implements OnInit, OnChanges {
   optionsForYearsSelect: SelectOption<DateFrame>[] = [];
 
   currentFilter: SelectOption<DateFrame>;
+  defaultLabel: string;
 
-  defaultLabel: string = DateFilterComponent.initialDayFrameLabel;
 
   firstDayOption: SelectOption<DateFrame> = {
     value: DateFilterComponent.initialValue,
@@ -65,15 +67,18 @@ export class DateFilterComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.initOptions();
+    this.defaultLabel = this.defaultValue?.display;
   }
 
   onRefresh(): void {
-    this.setCurrentState(DateFilterComponent.initialValue);
+    this.setCurrentState(this.defaultValue);
+    this.changeFilter.emit(this.currentFilter?.value);
   }
 
   onDateSelect(selectedValue: DateFilterDropDownChange<DateFrame, Mode>): void {
     this.clickedMode = selectedValue.name;
     this.setCurrentState(selectedValue.value);
+    this.changeFilter.emit(this.currentFilter?.value);
   }
 
   onDropdownToggleClick(mode: Mode): void {
@@ -89,9 +94,8 @@ export class DateFilterComponent implements OnInit, OnChanges {
         };
       }
     } else {
-      this.currentFilter = this.firstDayOption;
+      this.currentFilter = undefined;
     }
-    this.changeFilter.emit(this.currentFilter?.value);
   }
 
   private initOptions(): void {

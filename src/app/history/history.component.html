@@ -3,10 +3,25 @@
     >< Back</span
   ><br />
   <div class="history-container-top">
-    <div [style.margin.px]="'10'">
-      <span>Общий расход: </span>
-      <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
-    </div>
+    <span *ngIf="currentFilter?.display || getCategoryFilters()?.length">
+      <span [style.font-weight]="'bold'">Фильтры:</span>
+      <i
+      (click)="clearFilters()"
+      class="fas fa-redo-alt"
+      [style.padding-left]="'10px'"
+      ></i>
+      <br />
+      Период:
+      <span [style.color]="'#ff6f61'">{{ currentFilter?.display || 'Весь' }}</span><br />
+      Категории:
+      <span [style.color]="'#ff6f61'">{{ getCategoryFilters() || 'Все' }}</span>
+    </span>
+    <span *ngIf="!currentFilter?.display && !getCategoryFilters()?.length">
+      <div [style.margin.px]="'10'">
+        <span>Общий расход: </span>
+        <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+      </div>
+    </span>
     <button
       class="history-expand-filter-button"
       [ngClass]="{ 'history-expand-filter-button-active': expandFilters }"
@@ -15,16 +30,19 @@
       <i class="fas fa-filter"></i>
     </button>
   </div>
+  <div [style.margin.px]="'10'" *ngIf="currentFilter?.display || getCategoryFilters()?.length">
+    <span>Общий расход: </span>
+    <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+  </div>
   <div class="history-expand-filter-container" *ngIf="expandFilters">
     <div class="history-expand-filter">
       <div class="history-expand-filter-date">
-        <span>Период: {{currentPeriod}}</span>
-        <app-date-filter (changeDayEvent)="applyFilters()"></app-date-filter>
+        <app-date-filter [value]="currentFilter" (changeFilter)="applyFilters($event)"></app-date-filter>
       </div>
       <div class="history-expand-filter-category">
         <span>Категория:</span>
         <br />
-        <button (click)="clearFilters()" class="history-button-clear-filters">Очистить все фильтры</button>
+        <button (click)="clearCategoryFilters()" class="history-button-clear-filters">Очистить все фильтры</button>
         <br />
         <div class="category-checkbox category-checkbox-main">
           <input
@@ -42,7 +60,7 @@
             <div class="category-checkbox category-checkbox-sub">
               <input
                 type="checkbox"
-                (change)="applyFilters()"
+                (change)="applyCategoryFilters()"
                 [value]="category.id"
                 [id]="category.id"
                 [checked]="filterCategories[category.id]"
@@ -68,7 +86,7 @@
             <div class="category-checkbox category-checkbox-sub">
               <input
                 type="checkbox"
-                (change)="applyFilters()"
+                (change)="applyCategoryFilters()"
                 [value]="category.id"
                 [id]="category.id"
                 [checked]="filterCategories[category.id]"
@@ -109,7 +127,7 @@
           getCategoryNameByIdFunc(item.category)
         }}</span>
       </div>
-      Date: {{ item.date | date : "HH:mm" }} <br /><br />
+      Date: {{ item.date | date : "HH:mm" }}   ({{ item.date | date : "dd-MM-YYYY" }})<br /><br />
       <span
         [style.color]="'grey'"
         [style.cursor]="'pointer'"

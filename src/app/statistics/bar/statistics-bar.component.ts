@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Router } from '@angular/router';
+
 import { getCategoryNameById } from '../../common/categories';
 
 @Component({
@@ -14,20 +14,14 @@ export class StatisticsBarComponent {
   @Input() color: string = '#28C600';
 
   @Output() close: EventEmitter<string> = new EventEmitter<string>();
+  @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
   isVisible: boolean = true;
 
-  constructor(private router: Router) {}
-
   showCategoryDetails(categoryId: string): void {
-    this.router.navigate(['/details'], {
-      queryParams: {
-        'category-id': categoryId,
-        'back-url': '/statistics',
-      },
-    });
+    this.categoryClick.emit(categoryId);
   }
 
   onHide(): void {

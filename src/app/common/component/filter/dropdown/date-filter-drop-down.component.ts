@@ -51,7 +51,7 @@ export class DateFilterDropDownComponent<T, D> implements OnChanges {
     ) {
       this.selectedOption = this.options[0];
     }
-    if (changes?.['activatedName'] && this.activatedName) {
+    if (changes?.['activatedName']) {
       this.isActivated = this.activatedName === this.name;
       if (
         !this.isActivated &&

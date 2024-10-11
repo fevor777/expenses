@@ -39,7 +39,7 @@
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
   <i
-    *ngIf="currentFilter?.display !== defaultLabel"
+    *ngIf="currentFilter?.display != defaultLabel"
     (click)="onRefresh()"
     class="fas fa-redo-alt statistics-refresh-button"
   ></i>

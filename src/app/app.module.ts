@@ -1,36 +1,28 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
-import {
-  BrowserModule,
-  HAMMER_GESTURE_CONFIG,
-  HammerGestureConfig,
-  HammerModule,
-} from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
-
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-import { firebaseConfig } from '../environments/environment';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule } from '@angular/platform-browser';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { take, tap } from 'rxjs';
 
+import { firebaseConfig } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ExpenseComponent } from './expense/expense.component';
-import { SwipeDirective } from './common/swipe.directive';
-import { CustomHammerConfig } from './common/custom-hammer.config';
-import { StatisticsComponent } from './statistics/statistics.component';
-import { DetailsComponent } from './details/details.component';
-import { CategoriesComponent } from './common/component/category/categories.component';
-import { NotificationComponent } from './common/component/notification/notification.component';
-import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
-import { BaseChartDirective } from 'ng2-charts';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { ExportComponent } from './export/export.component';
 import { AuthService } from './common/auth.service';
-import { take, tap } from 'rxjs';
 import { BalanceService } from './common/balance.service';
-import { DateFilterComponent } from "./common/component/filter/date-filter.component";
-import { DateFilterService } from './common/component/filter/date-filter.service';
+import { CategoriesComponent } from './common/component/category/categories.component';
+import { DateFilterComponent } from './common/component/filter/date-filter.component';
+import { NotificationComponent } from './common/component/notification/notification.component';
+import { CustomHammerConfig } from './common/custom-hammer.config';
 import { CategoryListNamePipe } from './common/pipe/category-list-name.pipe';
+import { SwipeDirective } from './common/swipe.directive';
+import { DetailsComponent } from './details/details.component';
+import { ExpenseComponent } from './expense/expense.component';
+import { ExportComponent } from './export/export.component';
+import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -92,8 +84,7 @@ export class HammerConfig extends HammerGestureConfig {
           );
       },
       deps: [BalanceService],
-    },
-    DateFilterService,
+    }
   ],
   bootstrap: [AppComponent],
 })

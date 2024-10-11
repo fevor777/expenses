@@ -1,15 +1,16 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subject, map, of, switchMap, takeUntil, tap } from 'rxjs';
+import { first, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
+import { BalanceService } from '../common/balance.service';
 import {
   Categories,
   getCategoryById,
   getCategoryNameById,
 } from '../common/categories';
+import { DateFrame } from '../common/component/filter/dateFrame.model';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
-import { BalanceService } from '../common/balance.service';
 import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
 import { DateFilterService } from '../common/component/filter/date-filter.service';
 
@@ -40,6 +41,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }, {});
   currentPeriod: string = 'за сегодня';
 
+  currentFilter?: DateFrame;
+
   expandFilters: boolean = false;
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
@@ -54,12 +57,29 @@ export class HistoryComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.initiateExpenses().pipe(takeUntil(this.destroySubject)).subscribe(() => {
-      this.sumValues();
-      this.filterCategories.irregular = false;
-      this.filterCategories.regular = false;
-    });
-    this.currentPeriod = this.dateFilterService.getCurrentDateFrame().display;
+    if (this.dateFilterService.dateFilter) {
+      this.currentFilter = { ...this.dateFilterService.dateFilter };
+      this.dateFilterService.dateFilter = undefined;
+    }
+    const categoryFilters = this.dateFilterService.categories;
+    if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
+      this.filterCategories = Categories.reduce((acc, category) => {
+        acc[category.id] = categoryFilters.includes(category.id);
+        return acc;
+      }, {});
+      this.dateFilterService.categories = undefined;
+    }
+    if (this.currentFilter || categoryFilters?.length > 0) {
+      this.applyFilters(this.currentFilter);
+    } else {
+      this.initiateExpenses()
+        .pipe(first(), takeUntil(this.destroySubject))
+        .subscribe(() => {
+          this.sumValues();
+          this.filterCategories.irregular = false;
+          this.filterCategories.regular = false;
+        });
+    }
   }
 
   initiateExpenses(): Observable<Expense[]> {
@@ -83,31 +103,47 @@ export class HistoryComponent implements OnInit, OnDestroy {
     );
   }
 
-  applyFilters(): void {
-    this.initiateExpenses().pipe(takeUntil(this.destroySubject)).subscribe(() => {
-      this.checkMainCategory();
+  getCategoryFilters(): string {
+    const availableCategories = Object.keys(this.filterCategories)
+      .filter((key) => this.filterCategories[key])
+      .map((value) => getCategoryNameById(value));
+    return Categories.length === availableCategories.length
+      ? ''
+      : availableCategories.join(', ');
+  }
 
-      // Filter by category
-      this.expenses = this.expenses.filter((expense) => {
-        return (
-          Object.values(this.filterCategories).every((value) => !value) ||
-          Object.keys(this.filterCategories).some((key) => {
-            return this.filterCategories[key] && expense.category === key;
-          })
-        );
+  applyFilters(frame?: DateFrame): void {
+    this.initiateExpenses()
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe(() => {
+        this.checkMainCategory();
+
+        // Filter by category
+        this.expenses = this.expenses.filter((expense) => {
+          return (
+            Object.values(this.filterCategories).every((value) => !value) ||
+            Object.keys(this.filterCategories).some((key) => {
+              return this.filterCategories[key] && expense.category === key;
+            })
+          );
+        });
+
+        // Filter by date
+        this.currentFilter = frame;
+        if (frame) {
+          this.currentPeriod = frame.display;
+          this.expenses = getExpensesFromTo(
+            this.expenses,
+            frame.start,
+            frame.finish
+          );
+        }
+        this.sumValues();
       });
-
-      // Filter by date
-      const currentDateFrame = this.dateFilterService.getCurrentDateFrame();
-      this.currentPeriod = currentDateFrame.display;
-      this.expenses = getExpensesFromTo(this.expenses, currentDateFrame.start, currentDateFrame.finish);
-     
-      this.sumValues();
-    });
   }
 
   applyFiltersAndClose(): void {
-    this.applyFilters();
+    this.applyFilters(this.currentFilter);
     this.expandFilters = false;
   }
 
@@ -145,7 +181,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.applyFilters();
+    this.applyFilters(this.currentFilter);
   }
 
   initiateFilterCategory(): void {
@@ -154,14 +190,22 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  applyCategoryFilters(): void {
+    this.applyFilters(this.currentFilter);
+  }
+
   clearFilters(): void {
+    this.currentFilter = undefined;
+    this.clearCategoryFilters();
+  }
+
+  clearCategoryFilters(): void {
     this.initiateFilterCategory();
-    this.dateFilterService.refreshDateFrame();
-    this.applyFilters();
+    this.applyFilters(this.currentFilter);
   }
 
   toggleExpandFilters(): void {
-    this.applyFilters();
+    // this.applyFilters();
     this.expandFilters = !this.expandFilters;
   }
 
@@ -177,7 +221,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
         .deleteExpense(id)
         .pipe(
           switchMap(() => this.initiateExpenses()),
-          takeUntil(this.destroySubject),
+          takeUntil(this.destroySubject)
         )
         .subscribe(() => this.sumValues());
     }
@@ -193,12 +237,17 @@ export class HistoryComponent implements OnInit, OnDestroy {
     ) {
       const newBalance =
         Math.round((balance + this.expenses[index].amount) * 100) / 100;
-      this.balanceService.addBalance(newBalance).pipe(takeUntil(this.destroySubject)).subscribe();
-      
+      this.balanceService
+        .addBalance(newBalance)
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe();
     }
     if (isDeleteFromBalance) {
       this.expenses[index].isDeletedFromBalance = isDeleteFromBalance;
-      this.expenseService.updateExpense(this.expenses[index]).pipe(takeUntil(this.destroySubject)).subscribe();
+      this.expenseService
+        .updateExpense(this.expenses[index])
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe();
     }
   }
 
