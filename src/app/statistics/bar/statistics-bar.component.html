@@ -1,8 +1,13 @@
 <div class="category-summary" *ngIf="isVisible">
   <div class="category-header">
-    <span class="app-link category-label" (click)="showCategoryDetails(category)">{{
-      getCategoryNameByIdFunc(category)
-    }}</span>
+    <span>
+      <span
+        class="app-link category-label"
+        (click)="onCategoryLabelClick(category)"
+        >{{ getCategoryNameByIdFunc(category) }}</span
+      >
+      <i class="fa-solid fa-list category-details-icon" (click)="onDetailsIconClick(category)"></i
+    ></span>
     <span>{{ amount }}€</span>
   </div>
   <div class="progress-bar-container">

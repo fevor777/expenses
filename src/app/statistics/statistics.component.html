@@ -55,7 +55,8 @@
     [amount]="categoryTotal.amount"
     [category]="categoryTotal.category"
     [percentage]="categoryTotal.percentage"
-    (categoryClick)="onCategoryClick($event)"
+    (categoryLabelClick)="filterByCategory($event)"
+    (detailsIconClick)="navigateToDetails($event)"
     (close)="onBarClose($event)"
   >
   </app-statistics-bar>

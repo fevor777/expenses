@@ -152,7 +152,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  onCategoryClick(categoryId: string): void {
+  navigateToDetails(categoryId: string): void {
     this.dateFilterService.categories = [categoryId];
     this.dateFilterService.dateFilter = this.currentFilter;
     this.router.navigate(['/history']);
@@ -419,6 +419,11 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
         .map((category) => category.id);
       this.updateByExcludedCategories(irregularCategories);
     }
+  }
+
+  filterByCategory(category: string): void {
+    const filteredCategories = this.currentCategories.filter((item) => item !== category);
+    this.updateByExcludedCategories(filteredCategories);
   }
 
   private updateByExcludedCategories(categories: string[]): void {

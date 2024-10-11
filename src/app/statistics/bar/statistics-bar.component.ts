@@ -14,14 +14,20 @@ export class StatisticsBarComponent {
   @Input() color: string = '#28C600';
 
   @Output() close: EventEmitter<string> = new EventEmitter<string>();
-  @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
+  @Output() categoryLabelClick: EventEmitter<string> =
+    new EventEmitter<string>();
+  @Output() detailsIconClick: EventEmitter<string> = new EventEmitter<string>();
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
   isVisible: boolean = true;
 
-  showCategoryDetails(categoryId: string): void {
-    this.categoryClick.emit(categoryId);
+  onCategoryLabelClick(categoryId: string): void {
+    this.categoryLabelClick.emit(categoryId);
+  }
+
+  onDetailsIconClick(categoryId: string): void {
+    this.detailsIconClick.emit(categoryId);
   }
 
   onHide(): void {
