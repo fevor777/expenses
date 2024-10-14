@@ -60,6 +60,6 @@
     (close)="onBarClose($event)"
   >
   </app-statistics-bar>
-  <hr class="statistics-separator" />
-  <app-bar-chart [filter]="currentFilter" [expenses]="filteredExpenses" ></app-bar-chart>
+  <hr class="statistics-separator" [style.margin-top.px]="'15'" [style.margin-bottom.px]="'15'"/>
+  <app-bar-chart [filter]="currentFilter" [expenses]="filteredExpenses"></app-bar-chart>
 </div>

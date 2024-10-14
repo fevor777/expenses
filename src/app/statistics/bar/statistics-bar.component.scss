@@ -1,5 +1,4 @@
 .category-summary {
-  margin-bottom: 20px;
 
   .category-header {
     display: flex;
@@ -12,6 +11,8 @@
     }
 
     .category-details-icon {
+      padding: 15px;
+      padding-bottom: 0px;
       padding-left: 25px;
       font-size: 15px;
       color: grey;

@@ -27,7 +27,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   totalAmountPerDays: Map<number, number> = new Map();
   getCategoryByIdFunc = getCategoryById;
 
-  filter: MultiFilter = { categories: [], date: undefined };
+  defaultFilter: MultiFilter = { categories: [], date: undefined };
+  currentFilter: MultiFilter = { categories: [], date: undefined };
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
@@ -42,16 +43,16 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.dateFilterService.dateFilter) {
-      this.filter = { ...this.filter, date: this.dateFilterService.dateFilter };
+      this.defaultFilter = { ...this.defaultFilter, date: this.dateFilterService.dateFilter };
       this.dateFilterService.dateFilter = undefined;
     }
     const categoryFilters = this.dateFilterService.categories;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
-      this.filter = { ...this.filter, categories: categoryFilters };
+      this.defaultFilter = { ...this.defaultFilter, categories: categoryFilters };
       this.dateFilterService.categories = undefined;
     }
-    if (this.filter?.date || this.filter?.categories?.length > 0) {
-      this.applyFilters(this.filter);
+    if (this.defaultFilter?.date || this.defaultFilter?.categories?.length > 0) {
+      this.applyFilters(this.defaultFilter);
     } else {
       this.initiateExpenses()
         .pipe(first(), takeUntil(this.destroySubject))
@@ -83,10 +84,11 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   getCategoryFilters(): string {
-    return this.filter?.categories.map(getCategoryNameById).join(', ');
+    return this.defaultFilter?.categories.map(getCategoryNameById).join(', ');
   }
 
   applyFilters(filter: MultiFilter): void {
+    this.currentFilter = { ...filter || { categories: [], date: undefined } };
     this.initiateExpenses()
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(() => {
@@ -109,8 +111,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   filterByCategory(category: string): void {
-    this.filter = { ...this.filter, categories: [category] };
-    this.applyFilters(this.filter);
+    this.defaultFilter = { ...this.currentFilter, categories: [category] };
+    this.applyFilters(this.defaultFilter);
   }
 
   getTotalAmountPerDay(date: number): number {
