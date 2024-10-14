@@ -12,7 +12,7 @@
       class="category"
       (click)="onCategoryClick(category.id)"
     >
-      <i [style.color]="category.color" [class]="category.icon"></i>
+      <i [style.color]="enteredAmount?.length > 0 ? category.color : '#f8d7da'" [class]="category.icon"></i>
       <span>{{ category.name }}</span>
     </div>
   </div>

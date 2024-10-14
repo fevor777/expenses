@@ -3,7 +3,7 @@
     <div class="menu-icon" [routerLink]="'/export'">
       <i [style.color]="'#BDA4A7'" class="fas fa-bars"></i>
     </div>
-    <div [style.color]="'#343434'" class="title">
+    <div [style.color]="'#343434'" [style.margin-bottom]="'70px'" class="title">
       <span *ngIf="!showSavings; else savingsTemplate" (click)="onShowSavings()"
         >{{ monthAmount }}€</span
       >
@@ -15,15 +15,16 @@
       </ng-template>
     </div>
 
-    <div class="title" [style.color]="'grey'">-</div>
+    <!-- <div class="title" [style.color]="'grey'">-</div> -->
     <div class="title">
-      <div [style.color]="'grey'" (click)="onCurrentAmountClick()">{{ currentDate }}</div>
+      <div [style.color]="'grey'" [style.margin-bottom]="'10px'" (click)="onCurrentAmountClick()">{{ currentDate }}</div>
       <span
-        class="title-total"
+        class="title-total title-total-current"
         (click)="onCurrentAmountClick()"
         *ngIf="!isShowCurrentBalanceAmount"
         >{{ currentAmount }}</span
       >
+      <div *ngIf="isShowCurrentBalanceAmount" (click)="onCurrentAmountClick()" [style.color]="'grey'" [style.font-size.px]="12">нерегул.</div>
       <span
         class="title-total"
         (click)="onCurrentAmountClick()"
@@ -31,10 +32,9 @@
         >{{ currentBalanceAmount }}</span
       >
       <span class="title-total">€</span>
-      <div *ngIf="isShowCurrentBalanceAmount" (click)="onCurrentAmountClick()" [style.color]="'grey'" [style.font-size.px]="12">нерегул.</div>
     </div>
-    <div class="title" [style.color]="'grey'">-</div>
-    <div class="title" [style.color]="'grey'">
+    <!-- <div class="title" [style.color]="'grey'">-</div> -->
+    <div class="title" [style.color]="'grey'" [style.margin-bottom]="'55px'">
       <div (click)="onBalanceDateChange()">до {{ balanceDate }}</div>
       <span (click)="onBalanceChange()" [style.color]="'#343434'"
         >{{ balance }}€</span
@@ -55,6 +55,7 @@
     (swipeUp)="onShowKeyBoard()"
     (swipeLeft)="onSwipeLeft()"
     (swipeRight)="onSwipeRight()"
+    [enteredAmount]="enteredAmount"
   >
   </app-categories>
   <ng-template #categoriesWithScroll>
@@ -65,6 +66,7 @@
       (categorySwipeUp)="onShowKeyBoard()"
       (categoryClick)="onCategoryClick($event)"
       [isContentDown]="true"
+      [enteredAmount]="enteredAmount"
     >
     </app-categories>
   </ng-template>

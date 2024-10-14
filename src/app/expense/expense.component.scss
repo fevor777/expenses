@@ -16,8 +16,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  height: 72px;
+  // padding: 10px;
+  height: 92px;
   background-color: #f8d7da;
   margin-bottom: 20px;
   box-shadow: 0px -22px 33px #870024;
@@ -39,10 +39,14 @@
   text-align: center;
   font-size: 18px;
   margin: 10px 0;
+  // letter-spacing: 3px;
 
   &-total {
-    font-size: 27px;
+    font-size: 35px;
     color: #870024;
+    font-weight: 600;
+    letter-spacing: 3px;
+
   }
 }
 

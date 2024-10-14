@@ -17,6 +17,7 @@ import { Categories, Category } from '../../categories';
 })
 export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Input() isContentDown: boolean;
+  @Input() enteredAmount: string;
 
   @Output() categoryClick: EventEmitter<string> = new EventEmitter<string>();
   @Output() categorySwipeRight: EventEmitter<void> = new EventEmitter<void>();
@@ -116,16 +117,16 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 50) {
+      if (deltaX > 100) {
         this.onSwipeRight();
-      } else if (deltaX < -50) {
+      } else if (deltaX < -100) {
         this.onSwipeLeft();
       }
     } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
-      if (deltaY < -50) {
+      if (deltaY < -100) {
         // Swiping up decreases Y coordinate
         this.onSwipeUp();
-      } else if (deltaY > 50) {
+      } else if (deltaY > 100) {
         // Swiping down increases Y coordinate
         this.onSwipeDown();
       }
