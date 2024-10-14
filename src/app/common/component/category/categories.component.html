@@ -13,7 +13,7 @@
       (click)="onCategoryClick(category.id)"
     >
       <i [style.color]="enteredAmount?.length > 0 ? category.color : '#f8d7da'" [class]="category.icon"></i>
-      <span>{{ category.name }}</span>
+      <span [style.color]="enteredAmount?.length > 0 ? 'black' : '#ff6f61'">{{ category.name }}</span>
     </div>
   </div>
 
@@ -21,7 +21,7 @@
       <i class="fas fa-plus"></i>
     </div> -->
 </div>
-<div class="categories-more" *ngIf="showMore" (click)="onClickMore()">
+<div class="categories-more"  [style.color]="enteredAmount?.length > 0 ? 'black' : '#f8d7da'" *ngIf="showMore" (click)="onClickMore()">
   <div>Еще</div>
   <i class="fa-solid fa-chevron-down"></i>
 </div>
