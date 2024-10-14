@@ -61,15 +61,5 @@
   >
   </app-statistics-bar>
   <hr class="statistics-separator" />
-  <div style="display: block">
-    <canvas
-      baseChart
-      [datasets]="chartOptions.datasets"
-      [labels]="chartOptions.labels"
-      [options]="chartOptions.options"
-      [legend]="chartOptions.legend"
-      type="bar"
-    >
-    </canvas>
-  </div>
+  <app-bar-chart [filter]="currentFilter" [expenses]="filteredExpenses" ></app-bar-chart>
 </div>

@@ -4,7 +4,7 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule } from '@angular/platform-browser';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { take, tap } from 'rxjs';
 
 import { firebaseConfig } from '../environments/environment';
@@ -23,6 +23,7 @@ import { ExpenseComponent } from './expense/expense.component';
 import { ExportComponent } from './export/export.component';
 import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
 import { StatisticsComponent } from './statistics/statistics.component';
+import { BarChartComponent } from './common/component/chart/bar/bar-chart.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -49,11 +50,11 @@ export class HammerConfig extends HammerGestureConfig {
     FontAwesomeModule,
     FormsModule,
     HammerModule,
-    BaseChartDirective,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
     DateFilterComponent,
     CategoryListNamePipe,
+    BarChartComponent,
 ],
   providers: [
     {

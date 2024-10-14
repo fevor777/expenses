@@ -49,25 +49,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     day: 'numeric', // '12'
   });
 
-  chartOptions: any = {
-    datasets: [
-      {
-        data: [1],
-        label: 'Expenses',
-      },
-    ],
-    labels: ['1'],
-    options: {
-      responsive: true,
-    },
-    colors: [
-      {
-        borderColor: 'black',
-        backgroundColor: 'rgba(255,0,0,0.3)',
-      },
-    ],
-    legend: false,
-  };
+  filteredExpenses: Expense[];
 
   constructor(
     private router: Router,
@@ -180,7 +162,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
         const expensesFiltered = expensesFilteredByDate.filter(
           (expense) => !this.excludedCategories.includes(expense.category)
         );
-        this.calculateChartData(expensesFiltered);
+        this.filteredExpenses = expensesFiltered;
         expensesFiltered.forEach((expense) => {
           if (!categoryMap[expense.category]) {
             categoryMap[expense.category] = 0;
@@ -212,101 +194,6 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       });
   }
 
-  calculateChartData(expensesFiltered: Expense[]): void {
-    if (!this.currentFilter.mode || this.currentFilter.mode === Mode.DAY) {
-      this.chartOptions.labels = new Array(24).fill(0).map((_, i) => {
-        return i + ':00';
-      });
-      this.chartOptions.datasets[0].data = new Array(24).fill(0);
-
-      //data on hours after current make null
-      for (let i = new Date().getHours(); i < 24; i++) {
-        this.chartOptions.datasets[0].data[i] = null;
-      }
-    }
-
-    if (this.currentFilter.mode === Mode.WEEK) {
-      this.chartOptions.labels = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-      this.chartOptions.datasets[0].data = new Array(7).fill(0);
-
-      //data on days after current make null
-      for (let i = new Date().getDay(); i < 7; i++) {
-        this.chartOptions.datasets[0].data[i] = null;
-      }
-    }
-
-    if (this.currentFilter.mode === Mode.MONTH) {
-      this.chartOptions.labels = new Array(31).fill(0).map((_, i) => {
-        return i + 1;
-      });
-      this.chartOptions.datasets[0].data = new Array(31).fill(0);
-
-      //data on days after current make null
-      for (let i = new Date().getDate(); i < 31; i++) {
-        this.chartOptions.datasets[0].data[i] = null;
-      }
-    }
-
-    if (this.currentFilter.mode === Mode.YEAR) {
-      this.chartOptions.labels = ['янв.', 'фев.', 'март', 'апр.', 'май', 'июнь', 'июль', 'авг.', 'сен.', 'окт.', 'нояб.', 'дек.'];
-      this.chartOptions.datasets[0].data = new Array(12).fill(0);
-      for (let i = new Date().getMonth(); i < 12; i++) {
-        this.chartOptions.datasets[0].data[i] = null;
-      }
-    }
-
-    expensesFiltered.forEach((expense) => {
-      //sum data for chart
-      if (!this.currentFilter.mode || this.currentFilter.mode === Mode.DAY) {
-        const hour = new Date(expense.date).getHours();
-        this.chartOptions.datasets[0].data[hour] =
-          Math.round(
-            (this.chartOptions.datasets[0].data[hour] + expense.amount) * 100
-          ) / 100;
-      }
-
-      if (this.currentFilter.mode === Mode.WEEK) {
-        const day = new Date(expense.date).getDay();
-        this.chartOptions.datasets[0].data[day] =
-          Math.round(
-            (this.chartOptions.datasets[0].data[day] + expense.amount) * 100
-          ) / 100;
-      }
-
-      if (this.currentFilter.mode === Mode.MONTH) {
-        const day = new Date(expense.date).getDate();
-        this.chartOptions.datasets[0].data[day - 1] =
-          Math.round(
-            (this.chartOptions.datasets[0].data[day - 1] + expense.amount) * 100
-          ) / 100;
-      }
-
-      if (this.currentFilter.mode === Mode.YEAR) {
-        const month = new Date(expense.date).getMonth();
-        this.chartOptions.datasets[0].data[month] =
-          Math.round(
-            (this.chartOptions.datasets[0].data[month] + expense.amount) * 100
-          ) / 100;
-      }
-    });
-
-    if (this.currentFilter.mode === Mode.WEEK) {
-      this.chartOptions.labels.push(this.chartOptions.labels.shift());
-      this.chartOptions.datasets[0].data.push(
-        this.chartOptions.datasets[0].data.shift()
-      );
-
-      //make null for sunday if its not sunday
-      // if (new Date().getDay() !== 0) {
-      //   this.chartOptions.datasets[0].data[6] = null;
-      // }
-    }
-
-    this.chartOptions = {
-      ...this.chartOptions,
-      datasets: [...this.chartOptions.datasets],
-    };
-  }
 
   touchStartX: number = 0;
   touchStartY: number = 0;
