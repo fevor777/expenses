@@ -13,17 +13,16 @@ import { AppComponent } from './app.component';
 import { AuthService } from './common/auth.service';
 import { BalanceService } from './common/balance.service';
 import { CategoriesComponent } from './common/component/category/categories.component';
+import { BarChartComponent } from './common/component/chart/bar/bar-chart.component';
 import { DateFilterComponent } from './common/component/filter/date/date-filter.component';
 import { NotificationComponent } from './common/component/notification/notification.component';
 import { CustomHammerConfig } from './common/custom-hammer.config';
 import { CategoryListNamePipe } from './common/pipe/category-list-name.pipe';
 import { SwipeDirective } from './common/swipe.directive';
-import { DetailsComponent } from './details/details.component';
 import { ExpenseComponent } from './expense/expense.component';
 import { ExportComponent } from './export/export.component';
 import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
 import { StatisticsComponent } from './statistics/statistics.component';
-import { BarChartComponent } from './common/component/chart/bar/bar-chart.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -38,7 +37,6 @@ export class HammerConfig extends HammerGestureConfig {
     ExpenseComponent,
     SwipeDirective,
     StatisticsComponent,
-    DetailsComponent,
     CategoriesComponent,
     NotificationComponent,
     StatisticsBarComponent,

@@ -1,3 +1,8 @@
+<app-multi-filter
+  [value]="filter"
+  [totalAmount]="totalAmount"
+  (selectedFilters)="applyFilters($event)"
+></app-multi-filter>
 <div class="details">
   <div>
     Категория: <span [style.color]="'#DB654D'">{{ selectedCategory }}</span>
