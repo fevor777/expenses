@@ -31,10 +31,20 @@
         (!dateFilter?.display && !getCategoryFilters()?.length) || expandFilters
       "
     >
-      <div class="app-multi-filter-header">
+      <div
+        class="app-multi-filter-header"
+        *ngIf="!showSavings; else savingsTemplate"
+        (click)="onShowSavings()"
+      >
         <span>Общий расход: </span>
         <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
       </div>
+      <ng-template #savingsTemplate>
+        <div class="app-multi-filter-header" (click)="onShowSavings()">
+          {{ savings }}€
+          <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
+        </div>
+      </ng-template>
     </span>
     <button
       class="app-multi-filter-button"
@@ -50,11 +60,22 @@
       (dateFilter?.display || getCategoryFilters()?.length) && !expandFilters
     "
   >
-    <div class="app-multi-filter-header" [style.margin-bottom.px]="30">
+    <div
+      *ngIf="!showSavings; else savingsTemplate"
+      (click)="onShowSavings()"
+      class="app-multi-filter-header"
+      [style.margin-bottom.px]="30"
+    >
       <span>Общий расход: </span>
       <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
     </div>
   </div>
+  <ng-template #savingsTemplate>
+    <div class="app-multi-filter-header" (click)="onShowSavings()">
+      {{ savings }}€
+      <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
+    </div>
+  </ng-template>
   <div class="app-multi-filter-expand" *ngIf="expandFilters">
     <div class="app-multi-filter-expand-items">
       <div class="app-multi-filter-expand-date">

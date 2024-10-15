@@ -35,7 +35,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   currentBalanceAmount: number = 0;
   isShowCurrentBalanceAmount: boolean = false;
   currentBalance: number = 0;
-  monthAmount: number = 0;
   balance: number = 0;
   balanceDate: string = '';
   showKeyBoard: boolean = true;
@@ -47,8 +46,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   categories: Category[] = Categories;
 
   currency: Currency;
-  showSavings: boolean;
-  savings: string = '0';
   description: string = '';
 
   private unsubscribe: Subject<void> = new Subject();
@@ -62,8 +59,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     private notificationService: NotificationService,
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
-    private balanceDateService: BalanceDateService,
-    private savingService: SavingService
+    private balanceDateService: BalanceDateService
   ) {}
 
   ngAfterViewChecked(): void {
@@ -76,7 +72,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((expenses) => {
         this.sumValues(expenses);
-        this.savings = localStorage.getItem('savings') || '0';
       });
 
     this.balanceDateService
@@ -84,13 +79,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((balanceDate) => {
         this.balanceDate = balanceDate;
-      });
-
-    this.savingService
-      .getSavings()
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((savings) => {
-        this.savings = savings?.toString() || '0';
       });
 
     this.balance = Number(localStorage.getItem('balance')) || 0;
@@ -230,22 +218,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.showKeyBoard = false;
   }
 
-  onShowSavings(): void {
-    this.showSavings = !this.showSavings;
-  }
-
-  changeSavings(): void {
-    const newSavings = prompt('Enter new savings', this.savings);
-    if (newSavings) {
-      this.savingService
-        .addSaving(Number(newSavings))
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(() => {
-          this.savings = newSavings;
-        });
-    }
-  }
-
   onCurrencyClick(): void {
     const newCurrency = prompt('Enter new currency', this.currency.code);
     if (newCurrency) {
@@ -272,7 +244,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   private sumValues(expenses: Expense[]): void {
     this.currentAmount = 0;
     this.currentBalanceAmount = 0;
-    this.monthAmount = 0;
     expenses.forEach((expense: Expense) => {
       if (new Date(expense.date).toDateString() === new Date().toDateString()) {
         const currentSum = this.currentAmount + expense.amount;
@@ -281,14 +252,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
           const currentBalanceSum = this.currentBalanceAmount + expense.amount;
           this.currentBalanceAmount = Math.round(currentBalanceSum * 100) / 100;
         }
-      }
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
-      const expenseMonth = new Date(expense.date).getMonth();
-      const expenseYear = new Date(expense.date).getFullYear();
-      if (currentMonth === expenseMonth && currentYear === expenseYear) {
-        const monthSum = this.monthAmount + expense.amount;
-        this.monthAmount = Math.round(monthSum * 100) / 100;
       }
     });
   }

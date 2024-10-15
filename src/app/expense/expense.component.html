@@ -1,50 +1,35 @@
 <div class="container">
-  <div class="header">
-    <div class="menu-icon" [routerLink]="'/export'">
-      <i [style.color]="'#BDA4A7'" class="fas fa-bars"></i>
-    </div>
-    <div [style.color]="'#343434'" [style.margin-bottom]="'70px'" class="title">
-      <span *ngIf="!showSavings; else savingsTemplate" (click)="onShowSavings()"
-        >{{ monthAmount }}€</span
-      >
-      <ng-template #savingsTemplate>
-        <span class="expense-savings" (click)="onShowSavings()"
-          >{{ savings }}€</span
-        >
-        <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
-      </ng-template>
-    </div>
+  <div class="header-container">
+    <div class="header">
+      <div class="menu-icon" [routerLink]="'/export'">
+        <i [style.color]="'#BDA4A7'" class="fas fa-bars"></i>
+      </div>
 
-    <!-- <div class="title" [style.color]="'grey'">-</div> -->
-    <div class="title">
-      <div [style.color]="'grey'" [style.margin-bottom]="'10px'" (click)="onCurrentAmountClick()">{{ currentDate }}</div>
-      <span
-        class="title-total title-total-current"
-        (click)="onCurrentAmountClick()"
-        *ngIf="!isShowCurrentBalanceAmount"
-        >{{ currentAmount }}</span
-      >
-      <div *ngIf="isShowCurrentBalanceAmount" (click)="onCurrentAmountClick()" [style.color]="'grey'" [style.font-size.px]="12">нерегул.</div>
-      <span
-        class="title-total"
-        (click)="onCurrentAmountClick()"
-        *ngIf="isShowCurrentBalanceAmount"
-        >{{ currentBalanceAmount }}</span
-      >
-      <span class="title-total" [style.margin-left]="'5px'">€</span>
+      <!-- <div class="title" [style.color]="'grey'">-</div> -->
+      <div class="title" (click)="onCurrentAmountClick()">
+        <div *ngIf="isShowCurrentBalanceAmount" class="bottom-header-irregular">
+          нерегул.
+        </div>
+        <span
+          class="title-total title-total-current"
+          *ngIf="!isShowCurrentBalanceAmount"
+          >{{ currentAmount }}</span
+        >
+        <span class="title-total" *ngIf="isShowCurrentBalanceAmount">{{
+          currentBalanceAmount
+        }}</span>
+        <span class="title-total" [style.margin-left]="'5px'">€</span>
+      </div>
+      <!-- <div class="title" [style.color]="'grey'">-</div> -->
+      <div class="clock-icon" [routerLink]="'/history'">
+        <i class="fas fa-clock" [style.color]="'#BDA4A7'"></i>
+      </div>
     </div>
-    <!-- <div class="title" [style.color]="'grey'">-</div> -->
-    <div class="title" [style.color]="'grey'" [style.margin-bottom]="'55px'">
-      <div (click)="onBalanceDateChange()">до {{ balanceDate }}</div>
-      <span (click)="onBalanceChange()" [style.color]="'#343434'"
-        >{{ balance }}€</span
-      >
-    </div>
-    <div class="clock-icon" [routerLink]="'/history'">
-      <i class="fas fa-clock" [style.color]="'#BDA4A7'"></i>
+    <div class="bottom-header">
+        <span class="bottom-header-balance" (click)="onBalanceChange()">{{ balance }}€</span>
+        <span (click)="onBalanceDateChange()">до {{ balanceDate }}</span>
     </div>
   </div>
-
   <app-categories
     *ngIf="showKeyBoard; else categoriesWithScroll"
     [style.overflow]="'hidden'"
@@ -77,7 +62,10 @@
       (swipeleft)="onDeleteClick()"
       (swiperight)="onDeleteClick()"
     >
-      <i class="description-icon fa-regular fa-pen-to-square" (click)="addDescription()"></i>
+      <i
+        class="description-icon fa-regular fa-pen-to-square"
+        (click)="addDescription()"
+      ></i>
       <input
         type="text"
         [(ngModel)]="enteredAmount"

@@ -1,11 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { getCategoryNameById } from '../../../categories';
 import { DateFrame } from '../date/dateFrame.model';
 import { DateFilterComponent } from '../date/date-filter.component';
 import { CategoryFilterComponent } from '../category/category-filter.component';
+import { SavingService } from '../../../saving.service';
+import { Subject, takeUntil } from 'rxjs';
 
 export type MultiFilter = {
   categories: string[];
@@ -24,8 +35,7 @@ export type MultiFilter = {
     CategoryFilterComponent,
   ],
 })
-export class MultiFilterComponent implements OnChanges {
-
+export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   @Input() value: MultiFilter;
   @Input() totalAmount: number;
   @Input() defaultDateValue: DateFrame;
@@ -36,17 +46,36 @@ export class MultiFilterComponent implements OnChanges {
   selectedCategories: string[] = [];
   predefineCategories: string[] = [];
   expandFilters: boolean = false;
+  showSavings: boolean;
+  savings: string = '0';
+
+  private unsubscribe: Subject<void> = new Subject();
+
+  constructor(private savingService: SavingService) {}
+
+  ngOnInit(): void {
+    this.savingService
+      .getSavings()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((savings) => {
+        this.savings = savings?.toString() || '0';
+      });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['value'] && this.value) {
       this.dateFilter = this.value.date;
       this.selectedCategories = this.value.categories;
-      this.predefineCategories = this.value.categories
+      this.predefineCategories = this.value.categories;
     }
   }
 
   getCategoryFilters(): string {
     return this.selectedCategories.map(getCategoryNameById).join(', ');
+  }
+
+  onShowSavings(): void {
+    this.showSavings = !this.showSavings;
   }
 
   clearFilters(): void {
@@ -75,5 +104,22 @@ export class MultiFilterComponent implements OnChanges {
   toggleExpandFilters(): void {
     this.expandFilters = !this.expandFilters;
     this.predefineCategories = [...this.selectedCategories];
+  }
+
+  changeSavings(): void {
+    const newSavings = prompt('Enter new savings', this.savings);
+    if (newSavings) {
+      this.savingService
+        .addSaving(Number(newSavings))
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(() => {
+          this.savings = newSavings;
+        });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 }
