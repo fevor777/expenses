@@ -146,7 +146,11 @@ export class HistoryComponent implements OnInit, OnDestroy {
   filterByCategory(category: string): void {
     this.defaultFilter = { ...this.currentFilter, categories: [category] };
     this.applyFilters(this.defaultFilter);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    let top = document.getElementById('back');
+    if (top !== null) {
+      top.scrollIntoView();
+      top = null;
+    }
   }
 
   getTotalAmountPerDay(date: number): number {
