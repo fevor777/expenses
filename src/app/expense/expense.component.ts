@@ -49,6 +49,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   currency: Currency;
   showSavings: boolean;
   savings: string = '0';
+  description: string = '';
 
   private unsubscribe: Subject<void> = new Subject();
 
@@ -107,6 +108,10 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.isShowCurrentBalanceAmount = JSON.parse(localStorageIsShowCurrentBalanceAmount);
   }
 
+  addDescription(): void {
+    this.description = prompt('Enter description', this.description);
+  }
+
   onCurrentAmountClick(): void {
     this.isShowCurrentBalanceAmount = !this.isShowCurrentBalanceAmount;
     localStorage.setItem('isShowCurrentBalanceAmount', this.isShowCurrentBalanceAmount.toString());
@@ -142,8 +147,13 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
         amount: amount,
         currency: this.currency?.code,
         date: Date.now(),
+        description: this.description || undefined,
       };
+      if (!this.description) {
+        delete newExpense.description;
+      }
       this.enteredAmount = '';
+      this.description = '';
       this.expenseService
         .addExpense(newExpense)
         .pipe(

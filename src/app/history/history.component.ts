@@ -92,6 +92,22 @@ export class HistoryComponent implements OnInit, OnDestroy {
     );
   }
 
+  changeDescription(expense: Expense): void {
+    let newDescription = prompt('Change description', expense?.description);
+    if (newDescription !== null) {
+      const oldDescription = expense.description ? expense.description : '';
+      newDescription = newDescription ? newDescription.replace(/\s/g, '') : '';
+      if (oldDescription !== newDescription) {
+        this.expenseService
+          .updateExpense({ ...expense, description: newDescription })
+          .pipe(first(), takeUntil(this.destroySubject))
+          .subscribe(() => {
+            this.applyFilters(this.currentFilter);
+          });
+      }
+    }
+  }
+
   navigateToChart(categoryId: string): void {
     this.dateFilterService.categories = [categoryId];
     this.dateFilterService.dateFilter = this.currentFilter?.date;
@@ -130,6 +146,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   filterByCategory(category: string): void {
     this.defaultFilter = { ...this.currentFilter, categories: [category] };
     this.applyFilters(this.defaultFilter);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   getTotalAmountPerDay(date: number): number {

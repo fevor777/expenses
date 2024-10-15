@@ -38,7 +38,18 @@
       </div>
       Date: {{ item.date | date : "HH:mm" }} ({{
         item.date | date : "dd-MM-YYYY"
-      }})<br /><br />
+      }})
+      <div>
+        <span class="history-item-description-label">Description:</span>
+        <span *ngIf="item.description">"</span>
+        <span>{{ item.description }}</span>
+        <span *ngIf="item.description">"</span>
+        <i
+          class="history-item-description-edit-icon fas fa-pencil-alt"
+          (click)="changeDescription(item)"
+        ></i>
+      </div>
+      <br /><br />
       <span
         [style.color]="'grey'"
         [style.cursor]="'pointer'"

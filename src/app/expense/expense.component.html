@@ -77,6 +77,7 @@
       (swipeleft)="onDeleteClick()"
       (swiperight)="onDeleteClick()"
     >
+      <i class="description-icon fa-regular fa-pen-to-square" (click)="addDescription()"></i>
       <input
         type="text"
         [(ngModel)]="enteredAmount"

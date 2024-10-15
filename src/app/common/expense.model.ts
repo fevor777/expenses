@@ -5,5 +5,6 @@ export class Expense {
   category: string;
   currency: string;
   date: number;
+  description?: string;
   isDeletedFromBalance?: boolean;
 }
