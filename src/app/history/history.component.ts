@@ -43,15 +43,24 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.dateFilterService.dateFilter) {
-      this.defaultFilter = { ...this.defaultFilter, date: this.dateFilterService.dateFilter };
+      this.defaultFilter = {
+        ...this.defaultFilter,
+        date: this.dateFilterService.dateFilter,
+      };
       this.dateFilterService.dateFilter = undefined;
     }
     const categoryFilters = this.dateFilterService.categories;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
-      this.defaultFilter = { ...this.defaultFilter, categories: categoryFilters };
+      this.defaultFilter = {
+        ...this.defaultFilter,
+        categories: categoryFilters,
+      };
       this.dateFilterService.categories = undefined;
     }
-    if (this.defaultFilter?.date || this.defaultFilter?.categories?.length > 0) {
+    if (
+      this.defaultFilter?.date ||
+      this.defaultFilter?.categories?.length > 0
+    ) {
       this.applyFilters(this.defaultFilter);
     } else {
       this.initiateExpenses()
@@ -83,12 +92,20 @@ export class HistoryComponent implements OnInit, OnDestroy {
     );
   }
 
+  navigateToChart(categoryId: string): void {
+    this.dateFilterService.categories = [categoryId];
+    this.dateFilterService.dateFilter = this.currentFilter?.date;
+    this.router.navigate(['/details'], {
+      queryParams: { 'back-url': '/history' },
+    });
+  }
+
   getCategoryFilters(): string {
     return this.defaultFilter?.categories.map(getCategoryNameById).join(', ');
   }
 
   applyFilters(filter: MultiFilter): void {
-    this.currentFilter = { ...filter || { categories: [], date: undefined } };
+    this.currentFilter = { ...(filter || { categories: [], date: undefined }) };
     this.initiateExpenses()
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(() => {
@@ -165,12 +182,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   onSwipeRight(): void {
     this.router.navigate(['/']);
-  }
-
-  showCategoryDetails(categoryId: string): void {
-    this.router.navigate(['/details'], {
-      queryParams: { 'category-id': categoryId, 'back-url': '/history' },
-    });
   }
 
   isDatePanelVisible(timestamp: number): boolean {

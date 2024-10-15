@@ -3,17 +3,24 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { first, Subject, takeUntil } from 'rxjs';
 
 import { getCategoryNameById } from '../common/categories';
-import { MultiFilter, MultiFilterComponent } from '../common/component/filter/multi/multi-filter.component';
+import {
+  MultiFilter,
+  MultiFilterComponent,
+} from '../common/component/filter/multi/multi-filter.component';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
+import { BarChartComponent } from '../common/component/chart/bar/bar-chart.component';
+import { DateFrame } from '../common/component/filter/date/dateFrame.model';
+import { DateFilterService } from '../common/component/filter/date/date-filter.service';
+import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 
 @Component({
   selector: 'app-details',
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
   standalone: true,
-  imports: [MultiFilterComponent],
+  imports: [MultiFilterComponent, BarChartComponent],
 })
 export class DetailsComponent implements OnInit, OnDestroy {
   amountForDay: number = 0;
@@ -21,7 +28,15 @@ export class DetailsComponent implements OnInit, OnDestroy {
   amountForYear: number = 0;
   backUrl: string = '';
   selectedCategory: string = '';
-  filter: MultiFilter = { categories: [], date: undefined };
+  initialFilter: MultiFilter = {
+    date: DateFilterComponent.initialMonthValue,
+    categories: [],
+  };
+  defaultDateValue: DateFrame = DateFilterComponent.initialMonthValue;
+  currentFilter: MultiFilter = {
+    categories: [],
+    date: DateFilterComponent.initialMonthValue,
+  };
   totalAmount: number = 0;
   expenses: Expense[] = [];
 
@@ -30,7 +45,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private expenseService: ExpenseService
+    private expenseService: ExpenseService,
+    private dateFilterService: DateFilterService
   ) {}
 
   ngOnInit(): void {
@@ -38,63 +54,55 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   initDetails(): void {
-    const categoryId =
-      this.activatedRoute.snapshot.queryParamMap.get('category-id');
-    this.selectedCategory = getCategoryNameById(categoryId);
     this.backUrl = this.activatedRoute.snapshot.queryParamMap.get('back-url');
-    this.expenseService
-      .getExpenses()
-      .pipe(takeUntil(this.destroySubject))
-      .subscribe((expenses) => {
-        const currentDate = new Date().getDate();
-        const currentMonth = new Date().getMonth();
-        const currentYear = new Date().getFullYear();
-        expenses.forEach((expense: Expense) => {
-          const date = new Date(expense.date);
-          const expenseDate = date.getDate();
-          const expenseMonth = date.getMonth();
-          const expenseYear = date.getFullYear();
-          if (categoryId === expense.category) {
-            if (
-              currentDate === expenseDate &&
-              currentMonth === expenseMonth &&
-              currentYear === expenseYear
-            ) {
-              this.amountForDay =
-                Math.round((this.amountForDay + expense.amount) * 100) / 100;
-            }
-            if (currentMonth === expenseMonth && currentYear === expenseYear) {
-              this.amountForMonth =
-                Math.round((this.amountForMonth + expense.amount) * 100) / 100;
-            }
-            if (currentYear === expenseYear) {
-              this.amountForYear =
-                Math.round((this.amountForYear + expense.amount) * 100) / 100;
-            }
-          }
-        });
-      });
+    const categoryFilters = this.dateFilterService.categories;
+    if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
+      this.initialFilter = {
+        ...this.initialFilter,
+        categories: categoryFilters,
+      };
+      this.dateFilterService.categories = undefined;
+      this.initialFilter = {
+        ...this.initialFilter,
+        date:
+          this.dateFilterService.dateFilter ||
+          DateFilterComponent.initialMonthValue,
+      };
+      this.dateFilterService.dateFilter = undefined;
+    }
+    this.applyFilters(this.initialFilter);
   }
 
   applyFilters(filter: MultiFilter): void {
+    const updatedFilter = {
+      date: filter?.date || DateFilterComponent.initialMonthValue,
+      categories: filter?.categories || [],
+    };
+    if (!filter?.date) {
+      this.initialFilter = {
+        categories: [],
+        date: DateFilterComponent.initialMonthValue,
+      };
+    }
     this.expenseService
       .getExpenses()
       .pipe(first(), takeUntil(this.destroySubject))
-      .subscribe(() => {
-        if (filter?.categories.length > 0) {
-          this.expenses = this.expenses.filter((expense) => {
-            return filter?.categories.includes(expense.category);
+      .subscribe((expenses) => {
+        let filteredExpenses = expenses;
+        if (updatedFilter?.categories.length > 0) {
+          filteredExpenses = filteredExpenses.filter((expense) => {
+            return updatedFilter?.categories.includes(expense.category);
           });
         }
 
         // Filter by date
-        if (filter?.date) {
-          this.expenses = getExpensesFromTo(
-            this.expenses,
-            filter?.date?.start,
-            filter?.date?.finish
-          );
-        }
+        filteredExpenses = getExpensesFromTo(
+          filteredExpenses,
+          updatedFilter?.date?.start,
+          updatedFilter?.date?.finish
+        );
+        this.currentFilter = updatedFilter;
+        this.expenses = filteredExpenses;
         this.sumValues();
       });
   }
@@ -132,7 +140,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   navigateBack() {
-    this.router.navigate([this.backUrl]);
+    this.router.navigate([this.backUrl || '/']);
     // Handle the left swipe action here
   }
 

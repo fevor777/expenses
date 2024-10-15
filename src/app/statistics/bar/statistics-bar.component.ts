@@ -17,6 +17,7 @@ export class StatisticsBarComponent {
   @Output() categoryLabelClick: EventEmitter<string> =
     new EventEmitter<string>();
   @Output() detailsIconClick: EventEmitter<string> = new EventEmitter<string>();
+  @Output() chartIconClick: EventEmitter<string> = new EventEmitter<string>();
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
@@ -29,6 +30,11 @@ export class StatisticsBarComponent {
   onDetailsIconClick(categoryId: string): void {
     this.detailsIconClick.emit(categoryId);
   }
+
+  onChartIconClick(categoryId: string): void {
+    this.chartIconClick.emit(categoryId);
+  }
+
 
   onHide(): void {
     this.isVisible = false;

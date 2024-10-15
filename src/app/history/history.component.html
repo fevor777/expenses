@@ -31,6 +31,10 @@
         <span class="app-link" (click)="filterByCategory(item.category)">{{
           getCategoryNameByIdFunc(item.category)
         }}</span>
+        <i
+          class="fas fa-chart-bar history-item-chart"
+          (click)="navigateToChart(item.category)"
+        ></i>
       </div>
       Date: {{ item.date | date : "HH:mm" }} ({{
         item.date | date : "dd-MM-YYYY"

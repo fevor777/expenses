@@ -28,6 +28,7 @@ export class MultiFilterComponent implements OnChanges {
 
   @Input() value: MultiFilter;
   @Input() totalAmount: number;
+  @Input() defaultDateValue: DateFrame;
 
   @Output() selectedFilters: EventEmitter<MultiFilter> = new EventEmitter();
 

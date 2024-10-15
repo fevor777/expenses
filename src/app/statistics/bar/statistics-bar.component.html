@@ -6,8 +6,16 @@
         (click)="onCategoryLabelClick(category)"
         >{{ getCategoryNameByIdFunc(category) }}</span
       >
-      <i class="fa-solid fa-list category-details-icon" (click)="onDetailsIconClick(category)"></i
-    ></span>
+      <i
+        class="fa-solid fa-list category-details-icon"
+        (click)="onDetailsIconClick(category)"
+      ></i>
+      <i
+        class="fas fa-chart-bar category-details-icon"
+        (click)="onChartIconClick(category)"
+      ></i>
+    </span>
+
     <span>{{ amount }}€</span>
   </div>
   <div class="progress-bar-container">

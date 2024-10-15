@@ -1,23 +1,12 @@
-<app-multi-filter
-  [value]="filter"
-  [totalAmount]="totalAmount"
-  (selectedFilters)="applyFilters($event)"
-></app-multi-filter>
 <div class="details">
-  <div>
-    Категория: <span [style.color]="'#DB654D'">{{ selectedCategory }}</span>
-  </div>
-  <hr />
-  <div class="details-item">
-    Потрачено сегодня: <span class="amount">{{ amountForDay }}€</span>
-  </div>
-  <hr />
-  <div class="details-item">
-    Потрачено за месяц: <span class="amount">{{ amountForMonth }}€</span>
-  </div>
-  <hr />
-  <div class="details-item">
-    Потрачено за год: <span class="amount">{{ amountForYear }}€</span>
-  </div>
-  <hr />
+  <app-multi-filter
+    [value]="initialFilter"
+    [totalAmount]="totalAmount"
+    [defaultDateValue]="defaultDateValue"
+    (selectedFilters)="applyFilters($event)"
+  ></app-multi-filter>
+  <app-bar-chart
+    [expenses]="expenses"
+    [filter]="currentFilter?.date"
+  ></app-bar-chart>
 </div>

@@ -140,6 +140,14 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.router.navigate(['/history']);
   }
 
+  navigateToChart(categoryId: string): void {
+    this.dateFilterService.categories = [categoryId];
+    this.dateFilterService.dateFilter = this.currentFilter;
+    this.router.navigate(['/details'], {
+      queryParams: { 'back-url': '/statistics' },
+    });
+  }
+
   calculateCategoryTotals(): void {
     const categoryMap: { [key: string]: number } = {};
     let expensesFilteredByDate = [];

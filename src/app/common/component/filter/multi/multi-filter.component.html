@@ -5,25 +5,33 @@
         (dateFilter?.display || getCategoryFilters()?.length) && !expandFilters
       "
     >
-      <span [style.font-weight]="'bold'">Фильтры:</span>
-      <i
-        (click)="clearFilters()"
-        class="fas fa-redo-alt"
-        [style.padding-left]="'10px'"
-      ></i>
-      <br />
-      Период:
-      <span [style.color]="'#ff6f61'">{{ dateFilter?.display || "Весь" }}</span
-      ><br />
-      Категории:
-      <span [style.color]="'#ff6f61'">{{ getCategoryFilters() || "Все" }}</span>
+      <div class="app-multi-filter-header">
+        <span [style.font-weight]="'bold'">Фильтры:</span>
+        <i
+          (click)="clearFilters()"
+          class="fas fa-redo-alt"
+          [style.padding-left]="'10px'"
+        ></i>
+      </div>
+      <div class="app-multi-filter-header">
+        <span [style.margin-right.px]="10">Период:</span>
+        <span [style.color]="'#ff6f61'">{{
+          dateFilter?.display || "Весь"
+        }}</span>
+      </div>
+      <div class="app-multi-filter-header">
+        <span [style.margin-right.px]="10">Категории:</span>
+        <span [style.color]="'#ff6f61'">{{
+          getCategoryFilters() || "Все"
+        }}</span>
+      </div>
     </span>
     <span
       *ngIf="
         (!dateFilter?.display && !getCategoryFilters()?.length) || expandFilters
       "
     >
-      <div [style.margin.px]="'10'">
+      <div class="app-multi-filter-header">
         <span>Общий расход: </span>
         <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
       </div>
@@ -42,13 +50,16 @@
       (dateFilter?.display || getCategoryFilters()?.length) && !expandFilters
     "
   >
-    <span>Общий расход: </span>
-    <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+    <div class="app-multi-filter-header" [style.margin-bottom.px]="30">
+      <span>Общий расход: </span>
+      <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+    </div>
   </div>
   <div class="app-multi-filter-expand" *ngIf="expandFilters">
     <div class="app-multi-filter-expand-items">
       <div class="app-multi-filter-expand-date">
         <app-date-filter
+          [defaultValue]="defaultDateValue"
           [value]="dateFilter"
           (changeFilter)="emitDateFilter($event)"
         ></app-date-filter>

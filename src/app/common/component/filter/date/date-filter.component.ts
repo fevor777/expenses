@@ -36,6 +36,12 @@ export class DateFilterComponent implements OnInit, OnChanges {
     mode: Mode.DAY,
   };
 
+  static readonly initialMonthValue: DateFrame = {
+    start: DateTime.now().startOf('month'),
+    finish: DateTime.now().endOf('month'),
+    mode: Mode.MONTH,
+    display: DateFilterComponent.initialMonthFrameLabel,
+  };
 
   @Input() value: DateFrame;
   @Input() defaultValue: DateFrame;
@@ -52,7 +58,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
 
   currentFilter: SelectOption<DateFrame>;
   defaultLabel: string;
-
+  
 
   firstDayOption: SelectOption<DateFrame> = {
     value: DateFilterComponent.initialValue,
