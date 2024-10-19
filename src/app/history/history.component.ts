@@ -96,7 +96,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     let newDescription = prompt('Change description', expense?.description);
     if (newDescription !== null) {
       const oldDescription = expense.description ? expense.description : '';
-      newDescription = newDescription ? newDescription.replace(/\s/g, '') : '';
+      newDescription = newDescription ? newDescription?.trim() : '';
       if (oldDescription !== newDescription) {
         this.expenseService
           .updateExpense({ ...expense, description: newDescription })
