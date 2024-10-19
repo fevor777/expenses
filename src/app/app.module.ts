@@ -1,6 +1,7 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule } from '@angular/platform-browser';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -50,6 +51,7 @@ export class HammerConfig extends HammerGestureConfig {
     HammerModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
+    AngularFireFunctionsModule,
     DateFilterComponent,
     CategoryListNamePipe,
     BarChartComponent,

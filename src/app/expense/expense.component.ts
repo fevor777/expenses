@@ -12,6 +12,7 @@ import { Currency } from '../common/currency';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Component({
   selector: 'app-expense',
@@ -48,7 +49,8 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     private notificationService: NotificationService,
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
-    private balanceDateService: BalanceDateService
+    private balanceDateService: BalanceDateService,
+    private functions: AngularFireFunctions
   ) {}
 
   ngAfterViewChecked(): void {
@@ -56,6 +58,12 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   ngOnInit(): void {
+    // const callable = this.functions.httpsCallable('getExpenses');
+    // const result$ = callable({});
+    // result$.subscribe((res) => {
+    //   console.log('result', res);
+    // });
+
     this.expenseService
       .getExpenses(DateFilterComponent.initialValue)
       .pipe(takeUntil(this.unsubscribe))

@@ -1,0 +1,41 @@
+[debug] [2024-10-19T15:45:13.036Z] ----------------------------------------------------------------------
+[debug] [2024-10-19T15:45:13.039Z] Command:       /home/viktar-hrynko/.nvm/versions/node/v18.19.1/bin/node /home/viktar-hrynko/.nvm/versions/node/v18.19.1/bin/firebase deploy --only functions
+[debug] [2024-10-19T15:45:13.040Z] CLI Version:   13.22.1
+[debug] [2024-10-19T15:45:13.041Z] Platform:      linux
+[debug] [2024-10-19T15:45:13.041Z] Node Version:  v18.19.1
+[debug] [2024-10-19T15:45:13.041Z] Time:          Sat Oct 19 2024 18:45:13 GMT+0300 (Eastern European Summer Time)
+[debug] [2024-10-19T15:45:13.042Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-10-19T15:45:13.197Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-10-19T15:45:13.198Z] > authorizing via signed-in user (fevor777@gmail.com)
+[debug] [2024-10-19T15:45:13.198Z] [iam] checking project expenses-6a190 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2024-10-19T15:45:13.201Z] Checked if tokens are valid: true, expires at: 1729354654738
+[debug] [2024-10-19T15:45:13.201Z] Checked if tokens are valid: true, expires at: 1729354654738
+[debug] [2024-10-19T15:45:13.205Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/expenses-6a190:testIamPermissions [none]
+[debug] [2024-10-19T15:45:13.205Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/expenses-6a190:testIamPermissions x-goog-quota-user=projects/expenses-6a190
+[debug] [2024-10-19T15:45:13.206Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/expenses-6a190:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2024-10-19T15:45:13.427Z] *** [apiv2] error from fetch(https://cloudresourcemanager.googleapis.com/v1/projects/expenses-6a190:testIamPermissions, {"headers":{},"method":"POST","body":"{\"permissions\":[\"cloudfunctions.functions.create\",\"cloudfunctions.functions.delete\",\"cloudfunctions.functions.get\",\"cloudfunctions.functions.list\",\"cloudfunctions.functions.update\",\"cloudfunctions.operations.get\",\"firebase.projects.get\"]}"}): FetchError: request to https://cloudresourcemanager.googleapis.com/v1/projects/expenses-6a190:testIamPermissions failed, reason: connect EHOSTUNREACH 2a00:1450:401b:805::200a:443
+[debug] [2024-10-19T15:45:13.428Z] [iam] error while checking permissions, command may fail: FirebaseError: Failed to make request to https://cloudresourcemanager.googleapis.com/v1/projects/expenses-6a190:testIamPermissions
+[debug] [2024-10-19T15:45:13.429Z] Checked if tokens are valid: true, expires at: 1729354654738
+[debug] [2024-10-19T15:45:13.429Z] Checked if tokens are valid: true, expires at: 1729354654738
+[debug] [2024-10-19T15:45:13.429Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/expenses-6a190/serviceAccounts/expenses-6a190@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2024-10-19T15:45:13.430Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/expenses-6a190/serviceAccounts/expenses-6a190@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2024-10-19T15:45:16.497Z] *** [apiv2] error from fetch(https://iam.googleapis.com/v1/projects/expenses-6a190/serviceAccounts/expenses-6a190@appspot.gserviceaccount.com:testIamPermissions, {"headers":{},"method":"POST","body":"{\"permissions\":[\"iam.serviceAccounts.actAs\"]}"}): FetchError: request to https://iam.googleapis.com/v1/projects/expenses-6a190/serviceAccounts/expenses-6a190@appspot.gserviceaccount.com:testIamPermissions failed, reason: connect EHOSTUNREACH 2a00:1450:401b:804::200a:443
+[debug] [2024-10-19T15:45:16.498Z] [functions] service account IAM check errored, deploy may fail: Failed to make request to https://iam.googleapis.com/v1/projects/expenses-6a190/serviceAccounts/expenses-6a190@appspot.gserviceaccount.com:testIamPermissions {"name":"FirebaseError","children":[],"exit":1,"message":"Failed to make request to https://iam.googleapis.com/v1/projects/expenses-6a190/serviceAccounts/expenses-6a190@appspot.gserviceaccount.com:testIamPermissions","original":{"message":"request to https://iam.googleapis.com/v1/projects/expenses-6a190/serviceAccounts/expenses-6a190@appspot.gserviceaccount.com:testIamPermissions failed, reason: connect EHOSTUNREACH 2a00:1450:401b:804::200a:443","type":"system","errno":"EHOSTUNREACH","code":"EHOSTUNREACH"},"status":500}
+[info] 
+[info] === Deploying to 'expenses-6a190'...
+[info] 
+[info] i  deploying functions 
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint
+[info] Running command: npm --prefix "$RESOURCE_DIR" run build
+[info] ✔  functions: Finished running predeploy script. 
+[debug] [2024-10-19T15:45:43.109Z] Checked if tokens are valid: true, expires at: 1729354654738
+[debug] [2024-10-19T15:45:43.110Z] Checked if tokens are valid: true, expires at: 1729354654738
+[debug] [2024-10-19T15:45:43.111Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/expenses-6a190 [none]
+[debug] [2024-10-19T15:45:43.474Z] *** [apiv2] error from fetch(https://firebase.googleapis.com/v1beta1/projects/expenses-6a190, {"headers":{},"method":"GET","signal":{}}): FetchError: request to https://firebase.googleapis.com/v1beta1/projects/expenses-6a190 failed, reason: connect EHOSTUNREACH 2a00:1450:401b:810::200a:443
+[debug] [2024-10-19T15:45:43.475Z] Failed to make request to https://firebase.googleapis.com/v1beta1/projects/expenses-6a190 (original: request to https://firebase.googleapis.com/v1beta1/projects/expenses-6a190 failed, reason: connect EHOSTUNREACH 2a00:1450:401b:810::200a:443)
+[debug] [2024-10-19T15:45:46.549Z] FirebaseError: Failed to make request to https://firebase.googleapis.com/v1beta1/projects/expenses-6a190
+    at RetryOperation._fn (/home/viktar-hrynko/.nvm/versions/node/v18.19.1/lib/node_modules/firebase-tools/lib/apiv2.js:261:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get Firebase project expenses-6a190. Please make sure the project exists and your account has permission to access it.

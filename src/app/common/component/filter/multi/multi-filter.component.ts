@@ -79,10 +79,10 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   clearFilters(): void {
-    this.dateFilter = undefined;
+    this.dateFilter = this.defaultDateValue;
     this.predefineCategories = [];
     this.selectedCategories = [];
-    this.selectedFilters.emit({ categories: [], date: undefined });
+    this.selectedFilters.emit({ categories: [], date: this.defaultDateValue });
   }
 
   emitDateFilter(dateFilter: DateFrame): void {
