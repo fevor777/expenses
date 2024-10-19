@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, from, map, of } from 'rxjs';
-import { Expense } from './expense.model';
+import { from, map, Observable, of } from 'rxjs';
+
+import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
 import { AuthService } from './auth.service';
+import { DateFrame } from './component/filter/date/dateFrame.model';
+import { Expense } from './expense.model';
 
 @Injectable({
   providedIn: 'root',
@@ -38,14 +41,32 @@ export class ExpenseService {
   }
 
   // Get all expenses
-  getExpenses(): Observable<Expense[]> {
+  getExpenses(
+    dateFilter?: DateFrame,
+    category?: string[]
+  ): Observable<Expense[]> {
     if (this.authService.user) {
       return this.fireStore
-        .collection<Expense>('expenses', (ref) =>
-          ref
-            .where('uid', '==', this.authService.user.uid)
-            .orderBy('date', 'desc')
-        )
+        .collection<Expense>('expenses', (ref) => {
+          let query = ref.where('uid', '==', this.authService.user.uid);
+
+          // If dateFilter is provided, add the date conditions to the query
+          if (dateFilter?.start && dateFilter?.finish) {
+            query = query
+              .where('date', '>=', dateFilter.start.valueOf())
+              .where('date', '<=', dateFilter.finish.valueOf());
+          }
+
+          if (
+            Array.isArray(category) &&
+            category.length > 0
+          ) {
+            query = query.where('category', 'in', category);
+          }
+
+          // Always order by date
+          return query.orderBy('date', 'desc');
+        })
         .snapshotChanges()
         .pipe(
           map((actions) =>
@@ -57,9 +78,25 @@ export class ExpenseService {
           )
         );
     } else {
-      const expensesFromLocStorage = JSON.parse(
+      let expensesFromLocStorage = JSON.parse(
         localStorage.getItem('expenses') || '[]'
       );
+      if (dateFilter) {
+        expensesFromLocStorage = getExpensesFromTo(
+          expensesFromLocStorage,
+          dateFilter.start,
+          dateFilter.finish
+        );
+      }
+
+      if (
+        Array.isArray(category) &&
+        category.length > 0
+      ) {
+        expensesFromLocStorage = expensesFromLocStorage.filter((expense) => {
+          return category.includes(expense.category);
+        });
+      }
       return of(expensesFromLocStorage);
     }
   }

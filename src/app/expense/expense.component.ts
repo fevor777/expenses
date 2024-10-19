@@ -1,28 +1,17 @@
 import { getCurrencySymbol } from '@angular/common';
 import { AfterViewChecked, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  Observable,
-  of,
-  Subject,
-  switchMap,
-  takeUntil,
-} from 'rxjs';
+import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 
+import { BalanceDateService } from '../common/balance-date.service';
 import { BalanceService } from '../common/balance.service';
-import {
-  Categories,
-  Category,
-  getCategoryById,
-  getCategoryNameById,
-} from '../common/categories';
+import { Categories, Category, getCategoryById, getCategoryNameById } from '../common/categories';
+import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { NotificationService } from '../common/component/notification/notification.service';
 import { Currency } from '../common/currency';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
-import { BalanceDateService } from '../common/balance-date.service';
-import { SavingService } from '../common/saving.service';
 
 @Component({
   selector: 'app-expense',
@@ -68,7 +57,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   ngOnInit(): void {
     this.expenseService
-      .getExpenses()
+      .getExpenses(DateFilterComponent.initialValue)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((expenses) => {
         this.sumValues(expenses);
@@ -92,8 +81,11 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
-    const localStorageIsShowCurrentBalanceAmount = localStorage.getItem('isShowCurrentBalanceAmount') || 'false';
-    this.isShowCurrentBalanceAmount = JSON.parse(localStorageIsShowCurrentBalanceAmount);
+    const localStorageIsShowCurrentBalanceAmount =
+      localStorage.getItem('isShowCurrentBalanceAmount') || 'false';
+    this.isShowCurrentBalanceAmount = JSON.parse(
+      localStorageIsShowCurrentBalanceAmount
+    );
   }
 
   addDescription(): void {
@@ -102,7 +94,10 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   onCurrentAmountClick(): void {
     this.isShowCurrentBalanceAmount = !this.isShowCurrentBalanceAmount;
-    localStorage.setItem('isShowCurrentBalanceAmount', this.isShowCurrentBalanceAmount.toString());
+    localStorage.setItem(
+      'isShowCurrentBalanceAmount',
+      this.isShowCurrentBalanceAmount.toString()
+    );
   }
 
   categoriesVisible = false;
@@ -156,7 +151,9 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
             return balanceObs;
           }),
           switchMap(() => {
-            return this.expenseService.getExpenses();
+            return this.expenseService.getExpenses(
+              DateFilterComponent.initialValue
+            );
           }),
           takeUntil(this.unsubscribe)
         )
@@ -248,7 +245,10 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
       if (new Date(expense.date).toDateString() === new Date().toDateString()) {
         const currentSum = this.currentAmount + expense.amount;
         this.currentAmount = Math.round(currentSum * 100) / 100;
-        if (getCategoryById(expense.category)?.includeInBalance && !expense.isDeletedFromBalance) {
+        if (
+          getCategoryById(expense.category)?.includeInBalance &&
+          !expense.isDeletedFromBalance
+        ) {
           const currentBalanceSum = this.currentBalanceAmount + expense.amount;
           this.currentBalanceAmount = Math.round(currentBalanceSum * 100) / 100;
         }

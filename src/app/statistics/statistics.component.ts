@@ -1,4 +1,9 @@
-import { AfterViewInit, Component, HostListener, OnDestroy } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  OnDestroy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import * as echarts from 'echarts';
 import { first, Subject, takeUntil } from 'rxjs';
@@ -6,10 +11,9 @@ import { first, Subject, takeUntil } from 'rxjs';
 import { getCategoryById, getCategoryNameById } from '../common/categories';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
-import { DateFrame, Mode } from '../common/component/filter/date/dateFrame.model';
+import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
-import { getExpensesFromTo } from './functions/expense-helpers';
 
 @Component({
   selector: 'app-statistics',
@@ -148,30 +152,29 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     });
   }
 
-  calculateCategoryTotals(): void {
+  calculateCategoryTotals(
+    category: string = '',
+    isCurrentCategoriesUpdate: boolean = true
+  ): void {
     const categoryMap: { [key: string]: number } = {};
     let expensesFilteredByDate = [];
     this.totalAmount = 0;
     this.regularAmount = 0;
     this.irregularAmount = 0;
 
+    const categories = category ? [category] : this.getRemainCategories();
     this.expenseService
-      .getExpenses()
+      .getExpenses(this.currentFilter, categories)
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe((expenses) => {
-        expensesFilteredByDate = getExpensesFromTo(
-          expenses,
-          this.currentFilter.start,
-          this.currentFilter.finish
-        );
-        this.currentCategories = Array.from(
-          new Set(expensesFilteredByDate.map((expense) => expense.category))
-        );
-        const expensesFiltered = expensesFilteredByDate.filter(
-          (expense) => !this.excludedCategories.includes(expense.category)
-        );
-        this.filteredExpenses = expensesFiltered;
-        expensesFiltered.forEach((expense) => {
+        expensesFilteredByDate = expenses;
+        if (isCurrentCategoriesUpdate) {
+          this.currentCategories = Array.from(
+            new Set(expensesFilteredByDate.map((expense) => expense.category))
+          );
+        }
+        this.filteredExpenses = expensesFilteredByDate;
+        expensesFilteredByDate.forEach((expense) => {
           if (!categoryMap[expense.category]) {
             categoryMap[expense.category] = 0;
           }
@@ -201,7 +204,6 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
         this.initPieChart();
       });
   }
-
 
   touchStartX: number = 0;
   touchStartY: number = 0;
@@ -271,7 +273,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.irregularCategoriesCheckboxValue = true;
     this.regularCategoriesCheckboxValue = true;
     this.excludedCategories = [];
-    this.calculateCategoryTotals();
+    this.calculateCategoryTotals(null, false);
   }
 
   onBarClose(category: string): void {
@@ -279,53 +281,82 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   onRegularCategoriesCheckboxClick(value: boolean): void {
-    if (value) {
-      const regularCategories = this.currentCategories
-        .map(getCategoryById)
-        .filter((category) => !category.includeInBalance)
-        .map((category) => category.id);
-      this.excludedCategories = this.excludedCategories.filter(
-        (category) => !regularCategories.includes(category)
-      );
-      this.calculateCategoryTotals();
+    if (!value) {
+      if (this.irregularCategoriesCheckboxValue) {
+        const regularCategories = this.currentCategories
+          .map(getCategoryById)
+          .filter((category) => !category.includeInBalance)
+          .map((category) => category.id);
+        this.excludedCategories = [...regularCategories];
+        this.calculateCategoryTotals(null, false);
+      } else {
+        this.excludedCategories = [];
+        this.calculateCategoryTotals(null, false);
+      }
     } else {
-      const regularCategories = this.currentCategories
-        .map(getCategoryById)
-        .filter((category) => !category.includeInBalance)
-        .map((category) => category.id);
-      this.updateByExcludedCategories(regularCategories);
+      if (this.irregularCategoriesCheckboxValue) {
+        this.excludedCategories = [];
+        this.calculateCategoryTotals(null, false);
+      } else {
+        this.onIrregularCategoriesCheckboxClick(false);
+      }
     }
   }
 
   onIrregularCategoriesCheckboxClick(value: boolean): void {
-    if (value) {
-      const irregularCategories = this.currentCategories
-        .map(getCategoryById)
-        .filter((category) => category.includeInBalance)
-        .map((category) => category.id);
-      this.excludedCategories = this.excludedCategories.filter(
-        (category) => !irregularCategories.includes(category)
-      );
-      this.calculateCategoryTotals();
+    if (!value) {
+      if (this.regularCategoriesCheckboxValue) {
+        const irregularCategories = this.currentCategories
+          .map(getCategoryById)
+          .filter((category) => category.includeInBalance)
+          .map((category) => category.id);
+        this.excludedCategories = [...irregularCategories];
+        this.calculateCategoryTotals(null, false);
+      } else {
+        this.excludedCategories = [];
+        this.calculateCategoryTotals(null, false);
+      }
     } else {
-      const irregularCategories = this.currentCategories
-        .map(getCategoryById)
-        .filter((category) => category.includeInBalance)
-        .map((category) => category.id);
-      this.updateByExcludedCategories(irregularCategories);
+      if (this.regularCategoriesCheckboxValue) {
+        this.excludedCategories = [];
+        this.calculateCategoryTotals(null, false);
+      } else {
+        this.onRegularCategoriesCheckboxClick(false);
+      }
     }
   }
 
   filterByCategory(category: string): void {
-    const filteredCategories = this.currentCategories.filter((item) => item !== category);
-    this.updateByExcludedCategories(filteredCategories);
+    const filteredCategories = this.currentCategories.filter(
+      (item) => item !== category
+    );
+    this.excludedCategories = Array.from(
+      new Set([...this.excludedCategories, ...filteredCategories])
+    );
+    this.calculateCategoryTotals(category, false);
   }
 
   private updateByExcludedCategories(categories: string[]): void {
-    this.excludedCategories = Array.from(
+    const updatedExcludedCategories = Array.from(
       new Set([...this.excludedCategories, ...categories])
     );
-    this.calculateCategoryTotals();
+    if (updatedExcludedCategories.length === this.currentCategories.length) {
+      this.excludedCategories = [];
+      this.irregularCategoriesCheckboxValue = true;
+      this.regularCategoriesCheckboxValue = true;
+    } else {
+      this.excludedCategories = updatedExcludedCategories;
+    }
+    this.calculateCategoryTotals(null, false);
+  }
+
+  private getRemainCategories(): string[] {
+    if (this.excludedCategories?.length === 0) {
+      return [];
+    }
+    return this.currentCategories.filter(
+      (category) => !this.excludedCategories.includes(category)
+    );
   }
 
   ngOnDestroy(): void {

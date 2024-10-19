@@ -4,11 +4,12 @@ import { first, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { BalanceService } from '../common/balance.service';
 import { getCategoryById, getCategoryNameById } from '../common/categories';
+import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { MultiFilter } from '../common/component/filter/multi/multi-filter.component';
 import { Expense } from '../common/expense.model';
 import { ExpenseService } from '../common/expense.service';
-import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
+import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 
 type HistoryExpense = Expense & {
   showDateTitle: boolean;
@@ -26,9 +27,16 @@ export class HistoryComponent implements OnInit, OnDestroy {
   temporaryDate: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
   getCategoryByIdFunc = getCategoryById;
+  defaultDateValue: DateFrame = DateFilterComponent.initialMonthValue;
 
-  defaultFilter: MultiFilter = { categories: [], date: undefined };
-  currentFilter: MultiFilter = { categories: [], date: undefined };
+  defaultFilter: MultiFilter = {
+    categories: [],
+    date: DateFilterComponent.initialMonthValue,
+  };
+  currentFilter: MultiFilter = {
+    categories: [],
+    date: DateFilterComponent.initialMonthValue,
+  };
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
@@ -72,24 +80,28 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   initiateExpenses(): Observable<Expense[]> {
-    return this.expenseService.getExpenses().pipe(
-      tap((expenses) => {
-        this.expenses = expenses.map((expense) => {
-          const showDateTitle = this.isDatePanelVisible(expense.date);
-          if (showDateTitle) {
-            this.totalAmountPerDays.set(expense.date, expense.amount);
-          } else {
-            const amount = this.totalAmountPerDays.get(this.temporaryDate) || 0;
-            const newAmount = Math.round((amount + expense.amount) * 100) / 100;
-            this.totalAmountPerDays.set(this.temporaryDate, newAmount);
-          }
-          return {
-            ...expense,
-            showDateTitle,
-          } as HistoryExpense;
-        });
-      })
-    );
+    return this.expenseService
+      .getExpenses(this.currentFilter?.date, this.currentFilter?.categories)
+      .pipe(
+        tap((expenses) => {
+          this.expenses = expenses.map((expense) => {
+            const showDateTitle = this.isDatePanelVisible(expense.date);
+            if (showDateTitle) {
+              this.totalAmountPerDays.set(expense.date, expense.amount);
+            } else {
+              const amount =
+                this.totalAmountPerDays.get(this.temporaryDate) || 0;
+              const newAmount =
+                Math.round((amount + expense.amount) * 100) / 100;
+              this.totalAmountPerDays.set(this.temporaryDate, newAmount);
+            }
+            return {
+              ...expense,
+              showDateTitle,
+            } as HistoryExpense;
+          });
+        })
+      );
   }
 
   changeDescription(expense: Expense): void {
@@ -121,24 +133,15 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(filter: MultiFilter): void {
-    this.currentFilter = { ...(filter || { categories: [], date: undefined }) };
+    this.currentFilter = {
+      ...(filter || {
+        categories: [],
+        date: DateFilterComponent.initialMonthValue,
+      }),
+    };
     this.initiateExpenses()
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(() => {
-        if (filter?.categories.length > 0) {
-          this.expenses = this.expenses.filter((expense) => {
-            return filter?.categories.includes(expense.category);
-          });
-        }
-
-        // Filter by date
-        if (filter?.date) {
-          this.expenses = getExpensesFromTo(
-            this.expenses,
-            filter?.date?.start,
-            filter?.date?.finish
-          );
-        }
         this.sumValues();
       });
   }

@@ -85,24 +85,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
       };
     }
     this.expenseService
-      .getExpenses()
+      .getExpenses(updatedFilter.date, updatedFilter.categories)
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe((expenses) => {
-        let filteredExpenses = expenses;
-        if (updatedFilter?.categories.length > 0) {
-          filteredExpenses = filteredExpenses.filter((expense) => {
-            return updatedFilter?.categories.includes(expense.category);
-          });
-        }
-
-        // Filter by date
-        filteredExpenses = getExpensesFromTo(
-          filteredExpenses,
-          updatedFilter?.date?.start,
-          updatedFilter?.date?.finish
-        );
         this.currentFilter = updatedFilter;
-        this.expenses = filteredExpenses;
+        this.expenses = expenses;
         this.sumValues();
       });
   }
