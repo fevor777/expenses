@@ -26,6 +26,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------------------
+Package: @angular/fire
+License: "MIT"
+
+
+--------------------------------------------------------------------------------
 Package: @kurkle/color
 License: "MIT"
 
@@ -408,6 +413,16 @@ The following files embed [d3.js](https://github.com/d3/d3) BSD 3-Clause:
     `/src/chart/graph/forceHelper.ts`,
     `/src/util/number.ts`
 See `/licenses/LICENSE-d3` for details of the license.
+
+--------------------------------------------------------------------------------
+Package: @firebase/functions
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
+Package: @firebase/functions-compat
+License: "Apache-2.0"
+
 
 --------------------------------------------------------------------------------
 Package: @angular/core
@@ -855,11 +870,6 @@ License: "Apache-2.0"
 
 
 --------------------------------------------------------------------------------
-Package: @angular/fire
-License: "MIT"
-
-
---------------------------------------------------------------------------------
 Package: @firebase/app-check
 License: "Apache-2.0"
 
@@ -876,6 +886,32 @@ License: "Apache-2.0"
 
 --------------------------------------------------------------------------------
 Package: @firebase/firestore-compat
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
+Package: tslib
+License: "0BSD"
+
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+--------------------------------------------------------------------------------
+Package: @firebase/auth
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
+Package: @firebase/auth-compat
 License: "Apache-2.0"
 
 
@@ -912,32 +948,6 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 --------------------------------------------------------------------------------
 Package: @firebase/app-compat
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
-Package: tslib
-License: "0BSD"
-
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
---------------------------------------------------------------------------------
-Package: @firebase/auth
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
-Package: @firebase/auth-compat
 License: "Apache-2.0"
 
 
