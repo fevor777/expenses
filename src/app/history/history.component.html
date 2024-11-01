@@ -26,6 +26,10 @@
     <div class="history-item">
       <br />Цена:
       <span [style.color]="'#ff6f61'">{{ item.amount }}€</span>
+      <i
+        class="history-item-description-edit-icon fas fa-pencil-alt"
+        (click)="changeAmount(item)"
+      ></i>
       <br /><br />
       <div>
         Category:

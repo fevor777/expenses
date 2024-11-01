@@ -110,13 +110,19 @@ export class HistoryComponent implements OnInit, OnDestroy {
       const oldDescription = expense.description ? expense.description : '';
       newDescription = newDescription ? newDescription?.trim() : '';
       if (oldDescription !== newDescription) {
-        this.expenseService
-          .updateExpense({ ...expense, description: newDescription })
-          .pipe(first(), takeUntil(this.destroySubject))
-          .subscribe(() => {
-            this.applyFilters(this.currentFilter);
-          });
+        this.updateExpense({ ...expense, description: newDescription });
       }
+    }
+  }
+
+  changeAmount(expense: Expense): void {
+    const newAmountAsString = prompt(
+      'Change amount',
+      expense?.amount?.toString()
+    );
+    const newAmount = Number(newAmountAsString);
+    if (newAmount && newAmount !== expense?.amount) {
+      this.updateExpense({ ...expense, amount: Number(newAmount) });
     }
   }
 
@@ -272,5 +278,14 @@ export class HistoryComponent implements OnInit, OnDestroy {
       },
       0
     );
+  }
+
+  private updateExpense(expense: Expense): void {
+    this.expenseService
+      .updateExpense(expense)
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe(() => {
+        this.applyFilters(this.currentFilter);
+      });
   }
 }
