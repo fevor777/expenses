@@ -1,14 +1,20 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
-import { ExpenseService } from '../common/service/expense.service';
-import { Observable, Subject, forkJoin, pipe, switchMap, takeUntil, tap } from 'rxjs';
-import { AuthService } from '../common/service/auth.service';
+import { RouterModule } from '@angular/router';
 import { User } from 'firebase/auth';
+import { first, forkJoin, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+
+import { Expense } from '../common/model/expense.model';
+import { AuthService } from '../common/service/auth.service';
 import { BalanceService } from '../common/service/balance.service';
+import { ExpenseService } from '../common/service/expense.service';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
 })
 export class ExportComponent implements OnDestroy {
   user$: Observable<User>; // Observable to track the logged-in user
@@ -46,20 +52,21 @@ export class ExportComponent implements OnDestroy {
 
   exportCSV(): void {
     const data = JSON.parse(localStorage.getItem('expenses') || '[]').map(
-      (expense) => ({
-        ...expense,
-        date: new Date(expense.date).toLocaleDateString(),
-      })
+      (expense) => this.formatData(expense)
     );
+    if (data?.length > 0) {
+      this.exportToFile(data);
+    }
 
-    const csvData = this.convertToCSV(data);
-    const blob = new Blob([csvData], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = 'exported_data.csv';
-    anchor.click();
-    window.URL.revokeObjectURL(url);
+    this.expenseService
+      .getExpenses()
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe((expenses) => {
+        if (Array.isArray(expenses) && expenses?.length) {
+          const data = expenses.map((exp) => this.formatData(exp));
+          this.exportToFile(data);
+        }
+      });
   }
 
   convertToCSV(data: any[]): string {
@@ -101,5 +108,28 @@ export class ExportComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.destroySubject.next();
     this.destroySubject.complete();
+  }
+
+  private formatData(data: Expense): Expense {
+    return {
+      id: data?.id || '',
+      uid: data?.uid || '',
+      category: data.category || '',
+      amount: data?.amount || 0,
+      currency: data?.currency || '',
+      date: data.date || 0,
+      description: data.description || '',
+    };
+  }
+
+  private exportToFile(data: any[]): void {
+    const csvData = this.convertToCSV(data);
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'exported_data.csv';
+    anchor.click();
+    window.URL.revokeObjectURL(url);
   }
 }

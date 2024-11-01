@@ -1,11 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
-import { NotificationService } from './notification.service';
 import { Subject, takeUntil } from 'rxjs';
+
+import { NotificationService } from './notification.service';
 
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
+  standalone: true,
+  imports: [CommonModule]
 })
 export class NotificationComponent implements OnDestroy {
   message = '';

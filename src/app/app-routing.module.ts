@@ -1,14 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { DetailsComponent } from './details/details.component';
-import { ExportComponent } from './export/export.component';
-
 const routes: Routes = [
   {
     path: 'history',
-    loadChildren: () =>
-      import('./history/history.module').then((m) => m.HistoryModule),
+    loadComponent: () =>
+      import('./history/history.component').then((m) => m.HistoryComponent),
   },
   {
     path: 'statistics',
@@ -19,11 +16,13 @@ const routes: Routes = [
   },
   {
     path: 'export',
-    component: ExportComponent,
+    loadComponent: () =>
+      import('./export/export.component').then((m) => m.ExportComponent),
   },
   {
     path: 'details',
-    component: DetailsComponent,
+    loadComponent: () =>
+      import('./details/details.component').then((m) => m.DetailsComponent),
   },
   {
     path: '',

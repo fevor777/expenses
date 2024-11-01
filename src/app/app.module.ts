@@ -2,25 +2,17 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
-import { FormsModule } from '@angular/forms';
 import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule } from '@angular/platform-browser';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { take, tap } from 'rxjs';
 
 import { firebaseConfig } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { AuthService } from './common/service/auth.service';
-import { BalanceService } from './common/service/balance.service';
-import { CategoriesComponent } from './common/component/category/categories.component';
-import { BarChartComponent } from './common/component/chart/bar/bar-chart.component';
-import { DateFilterComponent } from './common/component/filter/date/date-filter.component';
 import { NotificationComponent } from './common/component/notification/notification.component';
 import { CustomHammerConfig } from './common/custom-hammer.config';
-import { CategoryListNamePipe } from './common/pipe/category-list-name.pipe';
-import { SwipeDirective } from './common/swipe.directive';
-import { ExportComponent } from './export/export.component';
+import { AuthService } from './common/service/auth.service';
+import { BalanceService } from './common/service/balance.service';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -32,21 +24,15 @@ export class HammerConfig extends HammerGestureConfig {
 @NgModule({
   declarations: [
     AppComponent,
-    NotificationComponent,
-    ExportComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FontAwesomeModule,
-    FormsModule,
     HammerModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
     AngularFireFunctionsModule,
-    DateFilterComponent,
-    CategoryListNamePipe,
-    BarChartComponent,
+    NotificationComponent,
 ],
   providers: [
     {
