@@ -1,0 +1,42 @@
+<div class="expense-number-board">
+  <div
+    class="expense-number-board-header"
+    (swipeleft)="onDeleteClick()"
+    (swiperight)="onDeleteClick()"
+  >
+    <i
+      class="expense-description-icon fa-regular fa-pen-to-square"
+      (click)="addDescription()"
+    ></i>
+    <input
+      type="text"
+      [(ngModel)]="enteredAmount"
+      name="input"
+      class="expense-number-board-input"
+      placeholder="ВВЕДИТЕ РАСХОД"
+    />
+    <span (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
+  </div>
+  <div
+    class="expense-number-board-body"
+    (swipedown)="onSwipeDown($event)"
+    (swipeup)="onSwipeUp()"
+    (swipeleft)="onSwipeLeft()"
+    (swiperight)="onSwipeRight()"
+  >
+    <div (click)="onNumberClick('1')" class="expense-number-board-item">1</div>
+    <div (click)="onNumberClick('2')" class="expense-number-board-item">2</div>
+    <div (click)="onNumberClick('3')" class="expense-number-board-item">3</div>
+    <div (click)="onNumberClick('4')" class="expense-number-board-item">4</div>
+    <div (click)="onNumberClick('5')" class="expense-number-board-item">5</div>
+    <div (click)="onNumberClick('6')" class="expense-number-board-item">6</div>
+    <div (click)="onNumberClick('7')" class="expense-number-board-item">7</div>
+    <div (click)="onNumberClick('8')" class="expense-number-board-item">8</div>
+    <div (click)="onNumberClick('9')" class="expense-number-board-item">9</div>
+    <div (click)="onNumberClick('.')" class="expense-number-board-item">.</div>
+    <div (click)="onNumberClick('0')" class="expense-number-board-item">0</div>
+    <div (click)="onDeleteClick()" class="expense-number-board-item">
+      <i class="fas fa-backspace"></i>
+    </div>
+  </div>
+</div>

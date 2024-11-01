@@ -20,6 +20,7 @@ import { BalanceDateService } from '../common/service/balance-date.service';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
+import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
 
 @Component({
   selector: 'app-expense',
@@ -32,6 +33,7 @@ import { SwipeDirective } from '../common/swipe.directive';
     CategoriesComponent,
     FormsModule,
     SwipeDirective,
+    ExpenseNumberBoardComponent,
   ],
 })
 export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
@@ -54,10 +56,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   description: string = '';
 
   private unsubscribe: Subject<void> = new Subject();
-
-  getCurrencySymbol(): string {
-    return getCurrencySymbol(this.currency.code, 'narrow');
-  }
 
   constructor(
     private router: Router,
@@ -105,10 +103,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     );
   }
 
-  addDescription(): void {
-    this.description = prompt('Enter description', this.description);
-  }
-
   onCurrentAmountClick(): void {
     this.isShowCurrentBalanceAmount = !this.isShowCurrentBalanceAmount;
     localStorage.setItem(
@@ -118,24 +112,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   categoriesVisible = false;
-
-  onNumberClick(numberValue: string) {
-    if (numberValue === '.') {
-      if (this.enteredAmount.length === 0) {
-        this.enteredAmount = '0.';
-      } else if (!this.enteredAmount.includes('.')) {
-        this.enteredAmount += numberValue;
-      }
-    } else {
-      this.enteredAmount += numberValue;
-    }
-  }
-
-  onDeleteClick() {
-    if (this.enteredAmount.length > 0) {
-      this.enteredAmount = this.enteredAmount.slice(0, -1);
-    }
-  }
 
   onCategoryClick(categoryName: string) {
     const exchangeRate = this.currency?.exchangeRate || 1;
@@ -187,6 +163,18 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   ngAfterViewInit(): void {}
 
+  onNumberBoardSwipeDown(): void {
+    this.showKeyBoard = false;
+  }
+
+  onNumberBoardSwipeLeft(): void {
+    this.router.navigate(['/history']);
+  }
+
+  onNumberBoardSwipeRight(): void {
+    this.router.navigate(['/statistics']);
+  }
+
   onBalanceChange(): void {
     const newBalance = prompt('Enter new balance', this.balance.toString());
     if (newBalance) {
@@ -213,10 +201,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
   }
 
-  onDisableRefresh(event: Event): void {
-    event.stopPropagation();
-  }
-
   onSwipeLeft(): void {
     this.router.navigate(['/history']);
   }
@@ -232,24 +216,19 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.showKeyBoard = false;
   }
 
-  onCurrencyClick(): void {
-    const newCurrency = prompt('Enter new currency', this.currency.code);
-    if (newCurrency) {
-      let newExchangeRate = '1';
-      if (newCurrency !== 'EUR') {
-        newExchangeRate = prompt(
-          'Enter exchange rate',
-          this.currency?.exchangeRate?.toString() || '1'
-        );
-      }
-      this.currency = {
-        code: newCurrency,
-        exchangeRate: Number(newExchangeRate),
-      };
-      localStorage.setItem('currency', JSON.stringify(this.currency));
-    }
+  onAmountChange(amount: string): void {
+    this.enteredAmount = amount;
   }
 
+  onCurrencyChange(currency: Currency): void {
+    this.currency = currency;
+    localStorage.setItem('currency', JSON.stringify(this.currency));
+  }
+
+  onDescriptionChange(description: string): void {
+    this.description = description;
+  }
+  
   ngOnDestroy(): void {
     this.unsubscribe.next();
     this.unsubscribe.complete();

@@ -56,45 +56,16 @@
     </app-categories>
   </ng-template>
 
-  <div class="number-board" *ngIf="showKeyBoard">
-    <div
-      class="number-board-header"
-      (swipeleft)="onDeleteClick()"
-      (swiperight)="onDeleteClick()"
+  <app-expense-number-board 
+    *ngIf="showKeyBoard"
+    [currency]="currency"
+    (amountChange)="onAmountChange($event)"
+    (currencyChange)="onCurrencyChange($event)"
+    (descriptionChange)="onDescriptionChange($event)"
+    (numberBoardSwipeDown)="onNumberBoardSwipeDown()"
+    (numberBoardSwipeLeft)="onNumberBoardSwipeLeft()"
+    (numberBoardSwipeRight)="onNumberBoardSwipeRight()"
     >
-      <i
-        class="description-icon fa-regular fa-pen-to-square"
-        (click)="addDescription()"
-      ></i>
-      <input
-        type="text"
-        [(ngModel)]="enteredAmount"
-        name="input"
-        placeholder="ВВЕДИТЕ РАСХОД"
-      />
-      <!-- <i class="fas fa-edit"></i> -->
-      <span (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
-    </div>
-    <div
-      class="number-board-body"
-      (swipedown)="onDisableRefresh($event)"
-      (swipeleft)="onSwipeLeft()"
-      (swiperight)="onSwipeRight()"
-    >
-      <div (click)="onNumberClick('1')" class="number">1</div>
-      <div (click)="onNumberClick('2')" class="number">2</div>
-      <div (click)="onNumberClick('3')" class="number">3</div>
-      <div (click)="onNumberClick('4')" class="number">4</div>
-      <div (click)="onNumberClick('5')" class="number">5</div>
-      <div (click)="onNumberClick('6')" class="number">6</div>
-      <div (click)="onNumberClick('7')" class="number">7</div>
-      <div (click)="onNumberClick('8')" class="number">8</div>
-      <div (click)="onNumberClick('9')" class="number">9</div>
-      <div (click)="onNumberClick('.')" class="number">.</div>
-      <div (click)="onNumberClick('0')" class="number">0</div>
-      <div (click)="onDeleteClick()" class="number">
-        <i class="fas fa-backspace"></i>
-      </div>
-    </div>
-  </div>
+  </app-expense-number-board>
+
 </div>

@@ -1,0 +1,48 @@
+.expense-number-board {
+  background-color: #f8d7da;
+  height: 292px;
+  box-shadow: 0px 3px 7px #870024;
+
+  .expense-number-board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    padding: 12px;
+    position: relative;
+    border: #fff 1px solid;
+    border-top: none;
+
+    .expense-description-icon {
+      color: rgb(58, 58, 58);
+      cursor: pointer;
+    }
+
+    .expense-number-board-input {
+      flex: 1;
+      text-align: center;
+      border: none;
+      background: none;
+      font-size: 18px;
+      outline: none;
+    }
+  }
+
+  .expense-number-board-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow: hidden;
+
+    .expense-number-board-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f8d7da;
+      border: #fff 1px solid;
+      font-size: 24px;
+      padding: 15px;
+      overflow: hidden;
+      color: #870024;
+    }
+  }
+}
