@@ -2,13 +2,13 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first, Subject, takeUntil } from 'rxjs';
 
-import { getCategoryNameById } from '../common/categories';
+import { getCategoryNameById } from '../common/model/categories';
 import {
   MultiFilter,
   MultiFilterComponent,
 } from '../common/component/filter/multi/multi-filter.component';
-import { Expense } from '../common/expense.model';
-import { ExpenseService } from '../common/expense.service';
+import { Expense } from '../common/model/expense.model';
+import { ExpenseService } from '../common/service/expense.service';
 import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
 import { BarChartComponent } from '../common/component/chart/bar/bar-chart.component';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';

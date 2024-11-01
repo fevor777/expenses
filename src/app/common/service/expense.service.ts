@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { from, map, Observable, of } from 'rxjs';
 
-import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
+import { getExpensesFromTo } from '../../statistics/functions/expense-helpers';
 import { AuthService } from './auth.service';
-import { DateFrame } from './component/filter/date/dateFrame.model';
-import { Expense } from './expense.model';
+import { DateFrame } from '../component/filter/date/dateFrame.model';
+import { Expense } from '../model/expense.model';
 
 @Injectable({
   providedIn: 'root',

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { getCategoryNameById } from '../../common/categories';
+import { getCategoryNameById } from '../../common/model/categories';
 
 @Component({
   selector: 'app-statistics-bar',

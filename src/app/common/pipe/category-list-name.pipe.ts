@@ -1,5 +1,5 @@
 import { Pipe } from '@angular/core';
-import { getCategoryNameById } from '../categories';
+import { getCategoryNameById } from '../model/categories';
 
 @Pipe({
   name: 'categoryListName',

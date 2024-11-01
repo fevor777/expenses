@@ -11,11 +11,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { getCategoryNameById } from '../../../categories';
+import { getCategoryNameById } from '../../../model/categories';
 import { DateFrame } from '../date/dateFrame.model';
 import { DateFilterComponent } from '../date/date-filter.component';
 import { CategoryFilterComponent } from '../category/category-filter.component';
-import { SavingService } from '../../../saving.service';
+import { SavingService } from '../../../service/saving.service';
 import { Subject, takeUntil } from 'rxjs';
 
 export type MultiFilter = {

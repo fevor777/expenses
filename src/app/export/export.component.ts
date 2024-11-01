@@ -1,9 +1,9 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ExpenseService } from '../common/expense.service';
+import { ExpenseService } from '../common/service/expense.service';
 import { Observable, Subject, forkJoin, pipe, switchMap, takeUntil, tap } from 'rxjs';
-import { AuthService } from '../common/auth.service';
+import { AuthService } from '../common/service/auth.service';
 import { User } from 'firebase/auth';
-import { BalanceService } from '../common/balance.service';
+import { BalanceService } from '../common/service/balance.service';
 
 @Component({
   selector: 'app-export',

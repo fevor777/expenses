@@ -8,12 +8,12 @@ import { Router } from '@angular/router';
 import * as echarts from 'echarts';
 import { first, Subject, takeUntil } from 'rxjs';
 
-import { getCategoryById, getCategoryNameById } from '../common/categories';
+import { getCategoryById, getCategoryNameById } from '../common/model/categories';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
-import { Expense } from '../common/expense.model';
-import { ExpenseService } from '../common/expense.service';
+import { Expense } from '../common/model/expense.model';
+import { ExpenseService } from '../common/service/expense.service';
 
 @Component({
   selector: 'app-statistics',

@@ -3,14 +3,14 @@ import { AfterViewChecked, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 
-import { BalanceDateService } from '../common/balance-date.service';
-import { BalanceService } from '../common/balance.service';
-import { Categories, Category, getCategoryById, getCategoryNameById } from '../common/categories';
+import { BalanceDateService } from '../common/service/balance-date.service';
+import { BalanceService } from '../common/service/balance.service';
+import { Categories, Category, getCategoryById, getCategoryNameById } from '../common/model/categories';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { NotificationService } from '../common/component/notification/notification.service';
-import { Currency } from '../common/currency';
-import { Expense } from '../common/expense.model';
-import { ExpenseService } from '../common/expense.service';
+import { Currency } from '../common/model/currency';
+import { Expense } from '../common/model/expense.model';
+import { ExpenseService } from '../common/service/expense.service';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
 

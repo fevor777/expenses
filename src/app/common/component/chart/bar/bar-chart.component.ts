@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 
-import { Expense } from '../../../expense.model';
+import { Expense } from '../../../model/expense.model';
 import { DateFrame, Mode } from '../../filter/date/dateFrame.model';
 
 @Component({

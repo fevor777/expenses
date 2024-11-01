@@ -3,7 +3,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { from, map, Observable, of } from 'rxjs';
 
 import { AuthService } from './auth.service';
-import { BalanceDate } from './balance-date.model';
+import { BalanceDate } from '../model/balance-date.model';
 
 @Injectable({
   providedIn: 'root',

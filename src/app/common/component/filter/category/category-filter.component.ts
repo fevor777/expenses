@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Categories } from '../../../categories';
+import { Categories } from '../../../model/categories';
 
 @Component({
   selector: 'app-category-filter',

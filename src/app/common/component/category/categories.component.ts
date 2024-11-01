@@ -8,7 +8,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import { Categories, Category } from '../../categories';
+import { Categories, Category } from '../../model/categories';
 
 @Component({
   selector: 'app-categories',
