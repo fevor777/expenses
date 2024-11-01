@@ -3,7 +3,10 @@ import { Router } from '@angular/router';
 import { first, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { BalanceService } from '../common/service/balance.service';
-import { getCategoryById, getCategoryNameById } from '../common/model/categories';
+import {
+  getCategoryById,
+  getCategoryNameById,
+} from '../common/model/categories';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { MultiFilter } from '../common/component/filter/multi/multi-filter.component';
@@ -27,16 +30,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
   temporaryDate: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
   getCategoryByIdFunc = getCategoryById;
-  defaultDateValue: DateFrame = DateFilterComponent.initialMonthValue;
+  defaultDateValue: DateFrame;
 
-  defaultFilter: MultiFilter = {
-    categories: [],
-    date: DateFilterComponent.initialMonthValue,
-  };
-  currentFilter: MultiFilter = {
-    categories: [],
-    date: DateFilterComponent.initialMonthValue,
-  };
+  defaultFilter: MultiFilter;
+  currentFilter: MultiFilter;
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
 
@@ -47,7 +44,18 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private dateFilterService: DateFilterService
-  ) {}
+  ) {
+    this.defaultDateValue = this.dateFilterService.getInitialMonthValue();
+
+    this.defaultFilter = {
+      categories: [],
+      date: this.dateFilterService.getInitialMonthValue(),
+    };
+    this.currentFilter = {
+      categories: [],
+      date: this.dateFilterService.getInitialMonthValue(),
+    };
+  }
 
   ngOnInit(): void {
     if (this.dateFilterService.dateFilter) {
@@ -142,7 +150,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.currentFilter = {
       ...(filter || {
         categories: [],
-        date: DateFilterComponent.initialMonthValue,
+        date: this.dateFilterService.getInitialMonthValue(),
       }),
     };
     this.initiateExpenses()

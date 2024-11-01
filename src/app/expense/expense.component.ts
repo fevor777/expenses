@@ -1,23 +1,38 @@
-import { getCurrencySymbol } from '@angular/common';
+import { CommonModule, getCurrencySymbol } from '@angular/common';
 import { AfterViewChecked, Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 
-import { BalanceDateService } from '../common/service/balance-date.service';
-import { BalanceService } from '../common/service/balance.service';
-import { Categories, Category, getCategoryById, getCategoryNameById } from '../common/model/categories';
-import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
+import { CategoriesComponent } from '../common/component/category/categories.component';
+import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { NotificationService } from '../common/component/notification/notification.service';
+import { ExpressionEvaluator } from '../common/expression-evaluator';
+import {
+  Categories,
+  Category,
+  getCategoryById,
+  getCategoryNameById,
+} from '../common/model/categories';
 import { Currency } from '../common/model/currency';
 import { Expense } from '../common/model/expense.model';
+import { BalanceDateService } from '../common/service/balance-date.service';
+import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
-import { ExpressionEvaluator } from '../common/expression-evaluator';
-import { AngularFireFunctions } from '@angular/fire/compat/functions';
+import { SwipeDirective } from '../common/swipe.directive';
 
 @Component({
   selector: 'app-expense',
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    CategoriesComponent,
+    FormsModule,
+    SwipeDirective,
+  ],
 })
 export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   enteredAmount = '';
@@ -50,7 +65,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
-    private functions: AngularFireFunctions
+    private dateFilterService: DateFilterService
   ) {}
 
   ngAfterViewChecked(): void {
@@ -58,14 +73,8 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   ngOnInit(): void {
-    // const callable = this.functions.httpsCallable('getExpenses');
-    // const result$ = callable({});
-    // result$.subscribe((res) => {
-    //   console.log('result', res);
-    // });
-
     this.expenseService
-      .getExpenses(DateFilterComponent.initialValue)
+      .getExpenses(this.dateFilterService.getInitialDayValue())
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((expenses) => {
         this.sumValues(expenses);
@@ -160,7 +169,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
           }),
           switchMap(() => {
             return this.expenseService.getExpenses(
-              DateFilterComponent.initialValue
+              this.dateFilterService.getInitialDayValue()
             );
           }),
           takeUntil(this.unsubscribe)

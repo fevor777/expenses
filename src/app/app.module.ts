@@ -20,10 +20,7 @@ import { NotificationComponent } from './common/component/notification/notificat
 import { CustomHammerConfig } from './common/custom-hammer.config';
 import { CategoryListNamePipe } from './common/pipe/category-list-name.pipe';
 import { SwipeDirective } from './common/swipe.directive';
-import { ExpenseComponent } from './expense/expense.component';
 import { ExportComponent } from './export/export.component';
-import { StatisticsBarComponent } from './statistics/bar/statistics-bar.component';
-import { StatisticsComponent } from './statistics/statistics.component';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -35,12 +32,7 @@ export class HammerConfig extends HammerGestureConfig {
 @NgModule({
   declarations: [
     AppComponent,
-    ExpenseComponent,
-    SwipeDirective,
-    StatisticsComponent,
-    CategoriesComponent,
     NotificationComponent,
-    StatisticsBarComponent,
     ExportComponent,
   ],
   imports: [

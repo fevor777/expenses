@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ExpenseComponent } from './expense/expense.component';
-import { StatisticsComponent } from './statistics/statistics.component';
+
 import { DetailsComponent } from './details/details.component';
 import { ExportComponent } from './export/export.component';
 
@@ -13,7 +12,10 @@ const routes: Routes = [
   },
   {
     path: 'statistics',
-    component: StatisticsComponent,
+    loadComponent: () =>
+      import('./statistics/statistics.component').then(
+        (m) => m.StatisticsComponent
+      ),
   },
   {
     path: 'export',
@@ -26,7 +28,8 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: ExpenseComponent,
+    loadComponent: () =>
+      import('./expense/expense.component').then((m) => m.ExpenseComponent),
   },
 ];
 

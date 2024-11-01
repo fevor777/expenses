@@ -1,24 +1,33 @@
-import {
-  AfterViewInit,
-  Component,
-  HostListener,
-  OnDestroy,
-} from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as echarts from 'echarts';
 import { first, Subject, takeUntil } from 'rxjs';
 
-import { getCategoryById, getCategoryNameById } from '../common/model/categories';
+import { BarChartComponent } from '../common/component/chart/bar/bar-chart.component';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
+import { getCategoryById, getCategoryNameById } from '../common/model/categories';
 import { Expense } from '../common/model/expense.model';
+import { CategoryListNamePipe } from '../common/pipe/category-list-name.pipe';
 import { ExpenseService } from '../common/service/expense.service';
+import { StatisticsBarComponent } from './bar/statistics-bar.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-statistics',
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss'],
+  standalone: true,
+  imports: [
+    DateFilterComponent,
+    FormsModule,
+    CategoryListNamePipe,
+    StatisticsBarComponent,
+    BarChartComponent,
+    CommonModule,
+  ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
   categoryTotals: {
@@ -35,9 +44,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   currentCategories: string[] = [];
   private readonly destroySubject: Subject<void> = new Subject();
 
-  readonly initialFilterValue = DateFilterComponent.initialValue;
+  readonly initialFilterValue: DateFrame;
 
-  currentFilter?: DateFrame = this.initialFilterValue;
+  currentFilter?: DateFrame;
 
   today: Date = new Date();
 
@@ -59,7 +68,10 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     private router: Router,
     private expenseService: ExpenseService,
     private dateFilterService: DateFilterService
-  ) {}
+  ) {
+    this.initialFilterValue = this.dateFilterService.getInitialDayValue();
+    this.currentFilter = this.initialFilterValue;
+  }
 
   ngAfterViewInit(): void {
     this.chartDom = document.getElementById('donut-chart')!;

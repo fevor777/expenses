@@ -2,7 +2,8 @@ import {Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output} from '@a
 import * as Hammer from 'hammerjs';
 
 @Directive({
-  selector: '[appSwipe]'
+  selector: '[appSwipe]',
+  standalone: true,
 })
 export class SwipeDirective implements OnInit, OnDestroy {
   @Output() swipeLeft = new EventEmitter<void>();

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { getCategoryNameById } from '../../common/model/categories';
@@ -6,6 +7,8 @@ import { getCategoryNameById } from '../../common/model/categories';
   selector: 'app-statistics-bar',
   templateUrl: './statistics-bar.component.html',
   styleUrls: ['./statistics-bar.component.scss'],
+  standalone: true,
+  imports: [CommonModule]
 })
 export class StatisticsBarComponent {
   @Input() category: string;

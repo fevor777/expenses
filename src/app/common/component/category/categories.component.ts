@@ -9,11 +9,14 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Categories, Category } from '../../model/categories';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-categories',
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss'],
+  standalone: true,
+  imports: [CommonModule],
 })
 export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Input() isContentDown: boolean;

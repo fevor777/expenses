@@ -16,6 +16,7 @@ import {
   DateFilterDropDownChange,
   DateFilterDropDownComponent,
 } from '../dropdown/date-filter-drop-down.component';
+import { DateFilterService } from './date-filter.service';
 
 @Component({
   selector: 'app-date-filter',
@@ -25,24 +26,6 @@ import {
   imports: [CommonModule, DateFilterDropDownComponent],
 })
 export class DateFilterComponent implements OnInit, OnChanges {
-  static readonly initialDayFrameLabel: string = 'сегодня';
-  static readonly initialWeekFrameLabel: string = 'эта неделя';
-  static readonly initialMonthFrameLabel: string = 'этот месяц';
-  static readonly initialYearFrameLabel: string = 'этот год';
-  static readonly initialValue: DateFrame = {
-    start: DateTime.now().startOf('day'),
-    finish: DateTime.now().endOf('day'),
-    display: DateFilterComponent.initialDayFrameLabel,
-    mode: Mode.DAY,
-  };
-
-  static readonly initialMonthValue: DateFrame = {
-    start: DateTime.now().startOf('month'),
-    finish: DateTime.now().endOf('month'),
-    mode: Mode.MONTH,
-    display: DateFilterComponent.initialMonthFrameLabel,
-  };
-
   @Input() value: DateFrame;
   @Input() defaultValue: DateFrame;
   @Output() changeFilter: EventEmitter<DateFrame> = new EventEmitter();
@@ -58,12 +41,10 @@ export class DateFilterComponent implements OnInit, OnChanges {
 
   currentFilter: SelectOption<DateFrame>;
   defaultLabel: string;
-  
 
-  firstDayOption: SelectOption<DateFrame> = {
-    value: DateFilterComponent.initialValue,
-    display: DateFilterComponent.initialDayFrameLabel,
-  };
+  firstDayOption: SelectOption<DateFrame>;
+
+  constructor(private dateFilterService: DateFilterService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['value']) {
@@ -72,6 +53,10 @@ export class DateFilterComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.firstDayOption = {
+      value: this.dateFilterService.getInitialDayValue(),
+      display: DateFilterService.initialDayFrameLabel,
+    };
     this.initOptions();
     this.defaultLabel = this.defaultValue?.display;
   }
@@ -140,9 +125,9 @@ export class DateFilterComponent implements OnInit, OnChanges {
         start: thisWeekStart,
         finish: DateTime.now().endOf('week'),
         mode: Mode.WEEK,
-        display: DateFilterComponent.initialWeekFrameLabel,
+        display: DateFilterService.initialWeekFrameLabel,
       },
-      display: DateFilterComponent.initialWeekFrameLabel,
+      display: DateFilterService.initialWeekFrameLabel,
     };
     const weeksOptions: SelectOption<DateFrame>[] = [firstWeekOption];
     for (let i = 1; i < 5; i++) {
@@ -175,9 +160,9 @@ export class DateFilterComponent implements OnInit, OnChanges {
         start: thisMonthStart,
         finish: DateTime.now().endOf('month'),
         mode: Mode.MONTH,
-        display: DateFilterComponent.initialMonthFrameLabel,
+        display: DateFilterService.initialMonthFrameLabel,
       },
-      display: DateFilterComponent.initialMonthFrameLabel,
+      display: DateFilterService.initialMonthFrameLabel,
     };
     const monthsOptions: SelectOption<DateFrame>[] = [firstMonthOption];
     for (let i = 1; i < 12; i++) {
@@ -206,9 +191,9 @@ export class DateFilterComponent implements OnInit, OnChanges {
         start: thisYearStart,
         finish: DateTime.now().endOf('year'),
         mode: Mode.YEAR,
-        display: DateFilterComponent.initialYearFrameLabel,
+        display: DateFilterService.initialYearFrameLabel,
       },
-      display: DateFilterComponent.initialYearFrameLabel,
+      display: DateFilterService.initialYearFrameLabel,
     };
     const yearsOptions: SelectOption<DateFrame>[] = [firstYearOption];
     for (let i = 1; i < 5; i++) {

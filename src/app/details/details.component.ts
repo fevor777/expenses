@@ -28,15 +28,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
   amountForYear: number = 0;
   backUrl: string = '';
   selectedCategory: string = '';
-  initialFilter: MultiFilter = {
-    date: DateFilterComponent.initialMonthValue,
-    categories: [],
-  };
-  defaultDateValue: DateFrame = DateFilterComponent.initialMonthValue;
-  currentFilter: MultiFilter = {
-    categories: [],
-    date: DateFilterComponent.initialMonthValue,
-  };
+  initialFilter: MultiFilter;
+  defaultDateValue: DateFrame;
+  currentFilter: MultiFilter;
   totalAmount: number = 0;
   expenses: Expense[] = [];
 
@@ -50,6 +44,15 @@ export class DetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.initialFilter = {
+      date: this.dateFilterService.getInitialMonthValue(),
+      categories: [],
+    };
+    this.defaultDateValue = this.dateFilterService.getInitialMonthValue();
+    this.currentFilter = {
+      categories: [],
+      date: this.dateFilterService.getInitialMonthValue(),
+    };
     this.initDetails();
   }
 
@@ -66,7 +69,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         ...this.initialFilter,
         date:
           this.dateFilterService.dateFilter ||
-          DateFilterComponent.initialMonthValue,
+          this.dateFilterService.getInitialMonthValue(),
       };
       this.dateFilterService.dateFilter = undefined;
     }
@@ -75,13 +78,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   applyFilters(filter: MultiFilter): void {
     const updatedFilter = {
-      date: filter?.date || DateFilterComponent.initialMonthValue,
+      date: filter?.date || this.dateFilterService.getInitialMonthValue(),
       categories: filter?.categories || [],
     };
     if (!filter?.date) {
       this.initialFilter = {
         categories: [],
-        date: DateFilterComponent.initialMonthValue,
+        date: this.dateFilterService.getInitialMonthValue(),
       };
     }
     this.expenseService
