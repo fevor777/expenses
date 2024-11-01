@@ -1,76 +1,28 @@
 <div class="history-container">
-  <span id="back"[style.color]="'blue'" [style.cursor]="'pointer'" [routerLink]="'/'"
+  <span
+    id="back"
+    class="app-link"
+    [routerLink]="'/'"
     >< Back</span
   ><br />
   <app-multi-filter
     [value]="defaultFilter"
     [totalAmount]="totalAmount"
     [defaultDateValue]="defaultDateValue"
-    (selectedFilters)="applyFilters($event)"
+    (selectedFilters)="updateFilterAndLoadExpenses($event)"
   ></app-multi-filter>
-  <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
   <div *ngIf="!expenses.length" class="history-empty">
     <span>Для этих категорий и периода трат нет</span>
   </div>
-  <span *ngFor="let item of expenses; let i = index">
-    <span
-      [style.background]="'#f8d7da'"
-      [style.width]="'100%'"
-      [style.display]="'block'"
-      *ngIf="item.showDateTitle"
-      ><span>{{ item.date | date : "dd-MM-YYYY" }} - </span
-      ><span [style.font-weight]="'600'"
-        >{{ getTotalAmountPerDay(item.date) }}€</span
-      ></span
-    >
-    <div class="history-item">
-      <br />Цена:
-      <span [style.color]="'#ff6f61'">{{ item.amount }}€</span>
-      <i
-        class="history-item-description-edit-icon fas fa-pencil-alt"
-        (click)="changeAmount(item)"
-      ></i>
-      <div>
-        Category:
-        <span class="app-link" (click)="filterByCategory(item.category)">{{
-          getCategoryNameByIdFunc(item.category)
-        }}</span>
-        <i
-          class="fas fa-chart-bar history-item-chart"
-          (click)="navigateToChart(item.category)"
-        ></i>
-      </div>
-      Date: {{ item.date | date : "HH:mm" }} ({{
-        item.date | date : "dd-MM-YYYY"
-      }})
-      <div>
-        <span class="history-item-description-label">Description:</span>
-        <span *ngIf="item.description">"</span>
-        <span>{{ item.description }}</span>
-        <span *ngIf="item.description">"</span>
-        <i
-          class="history-item-description-edit-icon fas fa-pencil-alt"
-          (click)="changeDescription(item)"
-        ></i>
-      </div>
-      <span
-        [style.color]="'grey'"
-        [style.cursor]="'pointer'"
-        (click)="onDelete(i)"
-        >Delete</span
-      >
-      <span
-        *ngIf="
-          !item.isDeletedFromBalance &&
-          getCategoryByIdFunc(item.category).includeInBalance
-        "
-        [style.color]="'grey'"
-        [style.cursor]="'pointer'"
-        (click)="onDeleteFromBalance(i)"
-      >
-        | Delete from balance</span
-      >
-    </div>
-    <hr [style.background]="'#f8d7da'" [style.height]="'2px'" />
-  </span>
+  <app-history-item
+    *ngFor="let item of expenses"
+    [item]="item"
+    [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
+    (editAmountIconClick)="changeAmount($event)"
+    (filterByCategory)="filterByCategory($event)"
+    (chartIconClick)="navigateToChart($event)"
+    (editDescriptionIconClick)="changeDescription($event)"
+    (deleteLabelClick)="onDelete($event)"
+    (deleteFromBalanceLabelClick)="onDeleteFromBalance($event)"
+  ></app-history-item>
 </div>

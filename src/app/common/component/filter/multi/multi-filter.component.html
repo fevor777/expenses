@@ -34,10 +34,9 @@
       <div
         class="app-multi-filter-header"
         *ngIf="!showSavings; else savingsTemplate"
-        (click)="onShowSavings()"
       >
-        <span>Общий расход: </span>
-        <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+        <span (click)="onShowSavings()">Общий расход: </span>
+        <span class="app-multi-filter-total-amount">{{ totalAmount }}€</span>
       </div>
       <ng-template #savingsTemplate>
         <div class="app-multi-filter-header" (click)="onShowSavings()">
@@ -67,7 +66,7 @@
       [style.margin-bottom.px]="30"
     >
       <span>Общий расход: </span>
-      <span [style.color]="'#ff6f61'">{{ totalAmount }}€</span>
+      <span class="app-multi-filter-total-amount">{{ totalAmount }}€</span>
     </div>
   </div>
   <ng-template #savingsTemplate>

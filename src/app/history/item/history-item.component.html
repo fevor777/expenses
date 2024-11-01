@@ -1,0 +1,62 @@
+<div class="history-item-container">
+  <span
+    class="history-item-date-title"
+    *ngIf="item.showDateTitle; else elseBlock"
+    ><span>{{ item.date | date : "dd-MM-YYYY" }} - </span
+    ><span class="history-item-date-title-amount-value"
+      >{{ totalAmountPerDays }}€</span
+    ></span
+  >
+  <ng-template #elseBlock>
+    <hr class="history-item-separator" />
+  </ng-template>
+  <div class="history-item">
+    <div class="history-item-amount">
+      Цена:
+      <span class="history-item-amount-value">{{ item.amount }}€</span>
+      <i
+        class="history-item-edit-icon fas fa-pencil-alt"
+        (click)="onEditAmountIconClick(item)"
+      ></i>
+    </div>
+    <div>
+      Category:
+      <span class="app-link" (click)="onFilterByCategory(item.category)">{{
+        getCategoryNameByIdFunc(item.category)
+      }}</span>
+      <i
+        class="fas fa-chart-bar history-item-chart"
+        (click)="onChartIconClick(item.category)"
+      ></i>
+    </div>
+    Date: {{ item.date | date : "HH:mm" }} ({{
+      item.date | date : "dd-MM-YYYY"
+    }})
+    <div>
+      <span class="history-item-description-label">Description:</span>
+      <ng-container *ngIf="item.description">
+        <span>"</span>
+        <span>{{ item.description }}</span>
+        <span>"</span>
+      </ng-container>
+
+      <i
+        class="history-item-edit-icon fas fa-pencil-alt"
+        (click)="onEditDescriptionIconClick(item)"
+      ></i>
+    </div>
+    <span class="history-item-delete-label" (click)="onDeleteLabelClick(item)"
+      >Delete</span
+    >
+    <span
+      *ngIf="
+        !item.isDeletedFromBalance &&
+        getCategoryByIdFunc(item.category).includeInBalance
+      "
+      class="history-item-delete-label"
+      (click)="onDeleteFromBalanceLabelClick(item)"
+    >
+      | Delete from balance</span
+    >
+  </div>
+</div>

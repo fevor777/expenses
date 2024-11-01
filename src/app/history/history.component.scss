@@ -1,16 +1,6 @@
 .history-container {
   height: 100dvh;
   overflow-y: scroll;
-  .history-item {
-    padding-left: 10px;
-  }
-
-  .history-container-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem 0 0;
-  }
 
   .history-empty {
     display: flex;
@@ -18,23 +8,5 @@
     align-items: center;
     font-family: "Montserrat", sans-serif;
     color: #000;
-  }
-
-  .history-item-chart {
-    padding: 15px;
-    padding-bottom: 0px;
-    padding-left: 25px;
-    font-size: 15px;
-    color: grey;
-  }
-
-  .history-item-description-label {
-    margin-right: 5px;
-  }
-
-  .history-item-description-edit-icon {
-    padding: 15px;
-    color: grey;
-    cursor: pointer;
   }
 }
