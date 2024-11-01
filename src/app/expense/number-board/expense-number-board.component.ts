@@ -13,6 +13,8 @@ import { Currency } from '../../common/model/currency';
 })
 export class ExpenseNumberBoardComponent {
   @Input() currency: Currency;
+  @Input() amount: string;
+  @Input() description: string;
 
   @Output() amountChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() currencyChange: EventEmitter<Currency> =
@@ -21,23 +23,25 @@ export class ExpenseNumberBoardComponent {
     new EventEmitter<string>();
 
   @Output() numberBoardSwipeLeft: EventEmitter<void> = new EventEmitter<void>();
-  @Output() numberBoardSwipeRight: EventEmitter<void> = new EventEmitter<void>();
+  @Output() numberBoardSwipeRight: EventEmitter<void> =
+    new EventEmitter<void>();
   @Output() numberBoardSwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() numberBoardSwipeUp: EventEmitter<void> = new EventEmitter<void>();
 
-  enteredAmount: string = '';
-  description: string = '';
-
   onDeleteClick(): void {
-    if (this.enteredAmount.length > 0) {
-      this.enteredAmount = this.enteredAmount.slice(0, -1);
-      this.amountChange.emit(this.enteredAmount);
+    if (this.amount.length > 0) {
+      const newAmount = this.amount.slice(0, -1);
+      this.amountChange.emit(newAmount);
     }
   }
 
+  onAmountChange(value: string): void {
+    this.amountChange.emit(value);
+  }
+
   addDescription(): void {
-    this.description = prompt('Enter description', this.description);
-    this.descriptionChange.emit(this.description);
+    const description = prompt('Enter description', this.description);
+    this.descriptionChange.emit(description);
   }
 
   onCurrencyClick(): void {
@@ -50,11 +54,11 @@ export class ExpenseNumberBoardComponent {
           this.currency?.exchangeRate?.toString() || '1'
         );
       }
-      this.currency = {
+      const currency = {
         code: newCurrency,
         exchangeRate: Number(newExchangeRate),
       };
-      this.currencyChange.emit(this.currency);
+      this.currencyChange.emit(currency);
     }
   }
 
@@ -63,16 +67,17 @@ export class ExpenseNumberBoardComponent {
   }
 
   onNumberClick(numberValue: string) {
+    let newAmount = this.amount;
     if (numberValue === '.') {
-      if (this.enteredAmount.length === 0) {
-        this.enteredAmount = '0.';
-      } else if (!this.enteredAmount.includes('.')) {
-        this.enteredAmount += numberValue;
+      if (this.amount.length === 0) {
+        newAmount = '0.';
+      } else if (!this.amount.includes('.')) {
+        newAmount += numberValue;
       }
     } else {
-      this.enteredAmount += numberValue;
+      newAmount = this.amount + numberValue;
     }
-    this.amountChange.emit(this.enteredAmount);
+    this.amountChange.emit(newAmount);
   }
 
   onSwipeLeft(): void {

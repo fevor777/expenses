@@ -58,7 +58,9 @@
 
   <app-expense-number-board 
     *ngIf="showKeyBoard"
+    [amount]="enteredAmount"
     [currency]="currency"
+    [description]="description"
     (amountChange)="onAmountChange($event)"
     (currencyChange)="onCurrencyChange($event)"
     (descriptionChange)="onDescriptionChange($event)"

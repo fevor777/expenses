@@ -10,7 +10,8 @@
     ></i>
     <input
       type="text"
-      [(ngModel)]="enteredAmount"
+      [ngModel]="amount"
+      (ngModelChange)="onAmountChange($event)"
       name="input"
       class="expense-number-board-input"
       placeholder="ВВЕДИТЕ РАСХОД"
