@@ -33,6 +33,35 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   showMore: boolean = false;
 
+  private categoryWidth = 120;
+  private categoryHeight = 94;
+  private containerWidth = 0;
+  private containerHeight = 0;
+
+  private touchStartX: number = 0;
+  private touchStartY: number = 0;
+  private touchEndX: number = 0;
+  private touchEndY: number = 0;
+  private isDown: boolean = false;
+
+  @HostListener('window:resize', ['$event'])
+  onResize(_event: any): void {
+    this.updateVisibleCategories();
+  }
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent): void {
+    this.touchStartX = event.changedTouches[0].screenX;
+    this.touchStartY = event.changedTouches[0].screenY;
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(event: TouchEvent): void {
+    this.touchEndX = event.changedTouches[0].screenX;
+    this.touchEndY = event.changedTouches[0].screenY;
+    this.handleSwipeGesture();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
@@ -42,29 +71,20 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       }
     }
   }
-  onCategoryClick(category: string) {
-    this.categoryClick.emit(category);
-  }
-
-  private categoryWidth = 120; // 70px width + 15px margin
-  private categoryHeight = 94;
-  private containerWidth = 0;
-  private containerHeight = 0;
-
-  ngOnInit(): void {
-    // this.updateVisibleCategories();
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any): void {
-    this.updateVisibleCategories();
-  }
 
   ngAfterViewInit(): void {
     this.updateVisibleCategories();
   }
 
-  updateVisibleCategories(): void {
+  onCategoryClick(category: string): void {
+    this.categoryClick.emit(category);
+  }
+
+  onClickMore(): void {
+    this.clickMore.emit();
+  }
+
+  private updateVisibleCategories(): void {
     this.categories = [];
     const containerElement = document.querySelector('.categories');
     if (containerElement) {
@@ -95,26 +115,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     return maxColumns * maxRows;
   }
 
-  touchStartX: number = 0;
-  touchStartY: number = 0;
-  touchEndX: number = 0;
-  touchEndY: number = 0;
-  isDown: boolean = false;
-
-  @HostListener('touchstart', ['$event'])
-  onTouchStart(event: TouchEvent) {
-    this.touchStartX = event.changedTouches[0].screenX;
-    this.touchStartY = event.changedTouches[0].screenY;
-  }
-
-  @HostListener('touchend', ['$event'])
-  onTouchEnd(event: TouchEvent) {
-    this.touchEndX = event.changedTouches[0].screenX;
-    this.touchEndY = event.changedTouches[0].screenY;
-    this.handleSwipeGesture();
-  }
-
-  handleSwipeGesture() {
+  private handleSwipeGesture(): void {
     const deltaX = this.touchEndX - this.touchStartX;
     const deltaY = this.touchEndY - this.touchStartY;
 
@@ -136,14 +137,14 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  onSwipeRight(): void {
+  private onSwipeRight(): void {
     this.categorySwipeRight.emit();
   }
-  onSwipeLeft(): void {
+  private onSwipeLeft(): void {
     this.categorySwipeLeft.emit();
   }
 
-  onSwipeUp(): void {
+  private onSwipeUp(): void {
     if (this.isScrolledUp()) {
       if (this.isDown) {
         this.categorySwipeUp.emit();
@@ -155,9 +156,9 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  onSwipeDown(): void {}
+  private onSwipeDown(): void {}
 
-  isScrolledUp(): boolean {
+  private isScrolledUp(): boolean {
     const scrollTop =
       window.pageYOffset ||
       document.documentElement.scrollTop ||
@@ -173,50 +174,5 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
     // If the difference between scrollHeight and scrollTop is greater than the clientHeight, then it's scrolled up
     return scrollTop === scrollHeight - clientHeight;
-  }
-
-  onClickMore() {
-    this.clickMore.emit();
-  }
-
-  // ----------------
-  menuVisible = false;
-  menuPosition = { top: '0px', left: '0px' };
-  selectedIconIndex: number | null = null;
-
-  // onPress(event: any, index: number) {
-  //   const domEvent = event.srcEvent as MouseEvent;
-  //   domEvent.preventDefault(); // Prevent the default context menu
-  //   domEvent.stopPropagation();
-  //   this.selectedIconIndex = index;
-  //   this.menuVisible = true;
-
-  //   // Get the bounding rect of the pressed icon
-  //   const iconElement = (event.target as HTMLElement).getBoundingClientRect();
-
-  //   // Adjust the menu position based on the icon's position
-  //   this.menuPosition = {
-  //     top: `${iconElement.bottom + window.scrollY}px`,
-  //     left: `${iconElement.left + window.scrollX}px`,
-  //   };
-  // }
-
-  updateIcon() {
-    // console.log('Update icon:', this.icons[this.selectedIconIndex!]);
-    this.menuVisible = false;
-  }
-
-  deleteIcon() {
-    // console.log('Delete icon:', this.icons[this.selectedIconIndex!]);
-    // this.icons.splice(this.selectedIconIndex!, 1);
-    this.menuVisible = false;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    // Hide the menu if a click is detected outside of the menu
-    // if (this.menuVisible) {
-    //   this.menuVisible = false;
-    // }
   }
 }

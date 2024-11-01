@@ -21,6 +21,7 @@ import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
+import { ExpenseHeaderComponent } from './header/expense-header.component';
 
 @Component({
   selector: 'app-expense',
@@ -34,23 +35,17 @@ import { ExpenseNumberBoardComponent } from './number-board/expense-number-board
     FormsModule,
     SwipeDirective,
     ExpenseNumberBoardComponent,
+    ExpenseHeaderComponent,
   ],
 })
-export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class ExpenseComponent implements OnInit, OnDestroy {
   enteredAmount = '';
   currentAmount: number = 0;
   currentBalanceAmount: number = 0;
-  isShowCurrentBalanceAmount: boolean = false;
   currentBalance: number = 0;
   balance: number = 0;
   balanceDate: string = '';
-  showKeyBoard: boolean = true;
-  currentDate: string = new Date().toLocaleDateString('ru-RU', {
-    weekday: 'short', // 'Thu'
-    month: 'short', // 'Aug'
-    day: 'numeric', // '12'
-  });
-  categories: Category[] = Categories;
+  showNumberBoard: boolean = true;
 
   currency: Currency;
   description: string = '';
@@ -65,10 +60,6 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService
   ) {}
-
-  ngAfterViewChecked(): void {
-    this.categoriesVisible = true;
-  }
 
   ngOnInit(): void {
     this.expenseService
@@ -96,22 +87,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
-    const localStorageIsShowCurrentBalanceAmount =
-      localStorage.getItem('isShowCurrentBalanceAmount') || 'false';
-    this.isShowCurrentBalanceAmount = JSON.parse(
-      localStorageIsShowCurrentBalanceAmount
-    );
   }
-
-  onCurrentAmountClick(): void {
-    this.isShowCurrentBalanceAmount = !this.isShowCurrentBalanceAmount;
-    localStorage.setItem(
-      'isShowCurrentBalanceAmount',
-      this.isShowCurrentBalanceAmount.toString()
-    );
-  }
-
-  categoriesVisible = false;
 
   onCategoryClick(categoryName: string) {
     const exchangeRate = this.currency?.exchangeRate || 1;
@@ -151,7 +127,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
           takeUntil(this.unsubscribe)
         )
         .subscribe((expenseList) => {
-          this.showKeyBoard = true;
+          this.onShowNumberBoard();
           this.notificationService.showMessage(
             `Добавлено: ${getCategoryNameById(categoryName)}, ${amount} €
           (${this.currentAmount}€)`
@@ -161,59 +137,41 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
   }
 
-  ngAfterViewInit(): void {}
-
-  onNumberBoardSwipeDown(): void {
-    this.showKeyBoard = false;
+  onHideNumberBoard(): void {
+    this.showNumberBoard = false;
   }
 
-  onNumberBoardSwipeLeft(): void {
+  onShowNumberBoard(): void {
+    this.showNumberBoard = true;
+  }
+
+  navigateToHistory(): void {
     this.router.navigate(['/history']);
   }
 
-  onNumberBoardSwipeRight(): void {
+  navigateToStatistics(): void {
     this.router.navigate(['/statistics']);
   }
 
-  onBalanceChange(): void {
-    const newBalance = prompt('Enter new balance', this.balance.toString());
-    if (newBalance) {
-      this.balanceService
-        .addBalance(Number(newBalance))
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe();
-      this.balance = Number(newBalance);
-    }
+  navigateToExport(): void {
+    this.router.navigate(['/export']);
   }
 
-  onBalanceDateChange(): void {
-    const newBalanceDate = prompt(
-      'Enter new balance date',
-      this.balanceDate || ''
-    );
-    if (newBalanceDate) {
-      this.balanceDateService
-        .addBalanceDate(newBalanceDate)
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(() => {
-          this.balanceDate = newBalanceDate;
-        });
-    }
+  onBalanceChange(balance: number): void {
+    this.balanceService
+      .addBalance(balance)
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe();
+    this.balance = balance;
   }
 
-  onSwipeLeft(): void {
-    this.router.navigate(['/history']);
-  }
-
-  onSwipeRight(): void {
-    this.router.navigate(['/statistics']);
-  }
-
-  onShowKeyBoard(): void {
-    this.showKeyBoard = true;
-  }
-  onSwipeDown(): void {
-    this.showKeyBoard = false;
+  onBalanceDateChange(newBalanceDate: string): void {
+    this.balanceDateService
+      .addBalanceDate(newBalanceDate)
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(() => {
+        this.balanceDate = newBalanceDate;
+      });
   }
 
   onAmountChange(amount: string): void {
@@ -228,7 +186,7 @@ export class ExpenseComponent implements OnInit, AfterViewChecked, OnDestroy {
   onDescriptionChange(description: string): void {
     this.description = description;
   }
-  
+
   ngOnDestroy(): void {
     this.unsubscribe.next();
     this.unsubscribe.complete();

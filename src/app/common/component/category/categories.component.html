@@ -1,37 +1,44 @@
-<div
-  class="scrollable-content"
-  [style.overflow]="isContentDown ? 'scroll' : 'hidden'"
-  [style.height]="showMore ? 'calc(100% - 40px)' : '100%'"
->
+<span class="categories-general-container">
   <div
-    class="categories"
-    [ngClass]="{ 'scrollable-content-down': isContentDown && !showMore }"
+    class="categories-container"
+    [ngClass]="{
+      'categories-with-scroll': isContentDown,
+      'categories-with-show-more': showMore
+    }"
   >
     <div
-      *ngFor="let category of categories; let i = index"
-      class="category"
-      (click)="onCategoryClick(category.id)"
+      class="categories"
+      [ngClass]="{
+        'categories-scrollable-content-down': isContentDown && !showMore,
+        'categories-center-aligned': !isContentDown
+      }"
     >
-      <i [style.color]="enteredAmount?.length > 0 ? category.color : '#f8d7da'" [class]="category.icon"></i>
-      <span [style.color]="enteredAmount?.length > 0 ? 'black' : '#ffedef'">{{ category.name }}</span>
+      <div
+        *ngFor="let category of categories; let i = index"
+        class="category"
+        (click)="onCategoryClick(category.id)"
+      >
+        <i
+          class="category-icon"
+          [ngClass]="{ 'disabled-category-icon': !enteredAmount }"
+          [style.color]="enteredAmount?.length > 0 ? category.color : ''"
+          [class]="category.icon"
+        ></i>
+        <span
+          class="category-name"
+          [ngClass]="{ 'disabled-category-name': enteredAmount?.length > 0 }"
+          >{{ category.name }}</span
+        >
+      </div>
     </div>
   </div>
-
-  <!-- <div class="add-expense">
-      <i class="fas fa-plus"></i>
-    </div> -->
-</div>
-<div class="categories-more"  [style.color]="enteredAmount?.length > 0 ? 'black' : '#f8d7da'" *ngIf="showMore" (click)="onClickMore()">
-  <div>Еще</div>
-  <i class="fa-solid fa-chevron-down"></i>
-</div>
-
-<div
-  *ngIf="menuVisible"
-  class="menu"
-  [ngStyle]="menuPosition"
-  (click)="$event.stopPropagation()"
->
-  <button mat-menu-item (click)="updateIcon()">Update</button>
-  <button mat-menu-item (click)="deleteIcon()">Delete</button>
-</div>
+  <div
+    class="categories-more"
+    [ngClass]="{ 'disabled-categories-more': enteredAmount?.length > 0 }"
+    *ngIf="showMore"
+    (click)="onClickMore()"
+  >
+    <div>Еще</div>
+    <i class="fa-solid fa-chevron-down"></i>
+  </div>
+</span>
