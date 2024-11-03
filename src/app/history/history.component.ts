@@ -10,6 +10,7 @@ import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { MultiFilter, MultiFilterComponent } from '../common/component/filter/multi/multi-filter.component';
 import { getCategoryById } from '../common/model/categories';
 import { Expense } from '../common/model/expense.model';
+import { BalanceStoreService } from '../common/service/balance-store.service';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { HistoryExpense } from './history-expense';
@@ -51,7 +52,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private router: Router,
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
-    private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService,
+    private balanceStoreService: BalanceStoreService
   ) {}
 
   @HostListener('touchstart', ['$event'])
@@ -161,7 +163,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     item: HistoryExpense,
     isDeleteFromBalance?: boolean
   ): void {
-    const balance = Number(localStorage.getItem('balance')) || 0;
+    const balance = this.balanceStoreService.getBalance();
     const expense = this.expenses.find((e) => e.id === item.id);
     const category = getCategoryById(expense?.category);
     if (
@@ -173,7 +175,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
       const newBalance = Math.round((balance + expense.amount) * 100) / 100;
       this.balanceService
         .addBalance(newBalance)
-        .pipe(takeUntil(this.destroySubject))
+        .pipe(
+          takeUntil(this.destroySubject),
+          tap(() => this.balanceStoreService.updateBalance(newBalance))
+        )
         .subscribe();
     }
     if (isDeleteFromBalance) {

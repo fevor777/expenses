@@ -2,7 +2,7 @@
   <app-expense-header
     [currentAmount]="currentAmount"
     [currentBalanceAmount]="currentBalanceAmount"
-    [balance]="balance"
+    [balance]="balance$ | async"
     [balanceDate]="balanceDate"
     (menuIconClick)="navigateToExport()"
     (historyIconClick)="navigateToHistory()"

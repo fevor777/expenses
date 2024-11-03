@@ -1,5 +1,5 @@
-import { CommonModule, getCurrencySymbol } from '@angular/common';
-import { AfterViewChecked, Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
@@ -9,19 +9,18 @@ import { DateFilterService } from '../common/component/filter/date/date-filter.s
 import { NotificationService } from '../common/component/notification/notification.service';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
 import {
-  Categories,
-  Category,
   getCategoryById,
   getCategoryNameById,
 } from '../common/model/categories';
 import { Currency } from '../common/model/currency';
 import { Expense } from '../common/model/expense.model';
 import { BalanceDateService } from '../common/service/balance-date.service';
+import { BalanceStoreService } from '../common/service/balance-store.service';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
-import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
 import { ExpenseHeaderComponent } from './header/expense-header.component';
+import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
 
 @Component({
   selector: 'app-expense',
@@ -43,7 +42,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   currentAmount: number = 0;
   currentBalanceAmount: number = 0;
   currentBalance: number = 0;
-  balance: number = 0;
+  balance$: Observable<number>;
   balanceDate: string = '';
   showNumberBoard: boolean = true;
 
@@ -58,7 +57,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
-    private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService,
+    private balanceStoreService: BalanceStoreService
   ) {}
 
   ngOnInit(): void {
@@ -76,7 +76,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.balanceDate = balanceDate;
       });
 
-    this.balance = Number(localStorage.getItem('balance')) || 0;
+    this.balance$ = this.balanceStoreService.balance$;
 
     const currencyInLocalStorage = localStorage.getItem('currency');
     if (currencyInLocalStorage) {
@@ -110,11 +110,11 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         .addExpense(newExpense)
         .pipe(
           switchMap(() => {
-            let balanceObs: Observable<number> = of(this.balance);
-            let newBalance = this.balance;
+            let newBalance = this.balanceStoreService.getBalance();
+            let balanceObs: Observable<number> = of(newBalance);
             if (getCategoryById(categoryName)?.includeInBalance) {
-              newBalance = Math.round((this.balance - amount) * 100) / 100;
-              this.balance = newBalance;
+              newBalance = Math.round((newBalance - amount) * 100) / 100;
+              this.balanceStoreService.updateBalance(newBalance);
               balanceObs = this.balanceService.addBalance(newBalance);
             }
             return balanceObs;
@@ -161,8 +161,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.balanceService
       .addBalance(balance)
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe();
-    this.balance = balance;
+      .subscribe(() => {
+        this.balanceStoreService.updateBalance(balance);
+      });
   }
 
   onBalanceDateChange(newBalanceDate: string): void {

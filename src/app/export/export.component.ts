@@ -8,6 +8,7 @@ import { Expense } from '../common/model/expense.model';
 import { AuthService } from '../common/service/auth.service';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
+import { BalanceStoreService } from '../common/service/balance-store.service';
 
 @Component({
   selector: 'app-export',
@@ -24,7 +25,8 @@ export class ExportComponent implements OnDestroy {
   constructor(
     private expenseService: ExpenseService,
     private authService: AuthService,
-    private balanceService: BalanceService
+    private balanceService: BalanceService,
+    private balanceStoreService: BalanceStoreService
   ) {
     this.user$ = this.authService.user$;
   }
@@ -35,7 +37,7 @@ export class ExportComponent implements OnDestroy {
       .signInWithGoogle()
       .pipe(
         switchMap(() => this.balanceService.getBalance()),
-        tap((balance) => localStorage.setItem('balance', balance.toString())),
+        tap((balance) => this.balanceStoreService.updateBalance(balance)),
         takeUntil(this.destroySubject)
       )
       .subscribe((res) => {
