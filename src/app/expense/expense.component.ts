@@ -66,7 +66,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       .getExpenses(this.dateFilterService.getInitialDayValue())
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((expenses) => {
-        this.sumValues(expenses);
+        this.calculateAmounts(expenses);
       });
 
     this.balanceDateService
@@ -119,20 +119,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
             }
             return balanceObs;
           }),
-          switchMap(() => {
-            return this.expenseService.getExpenses(
-              this.dateFilterService.getInitialDayValue()
-            );
-          }),
           takeUntil(this.unsubscribe)
         )
-        .subscribe((expenseList) => {
+        .subscribe(() => {
           this.onShowNumberBoard();
           this.notificationService.showMessage(
             `Добавлено: ${getCategoryNameById(categoryName)}, ${amount} €
           (${this.currentAmount}€)`
           );
-          this.sumValues(expenseList);
         });
     }
   }
@@ -193,21 +187,23 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.unsubscribe.complete();
   }
 
-  private sumValues(expenses: Expense[]): void {
-    this.currentAmount = 0;
-    this.currentBalanceAmount = 0;
+  private calculateAmounts(expenses: Expense[]): void {
+    let newAmount = 0;
+    let newBalanceAmount = 0;
     expenses.forEach((expense: Expense) => {
-      if (new Date(expense.date).toDateString() === new Date().toDateString()) {
-        const currentSum = this.currentAmount + expense.amount;
-        this.currentAmount = Math.round(currentSum * 100) / 100;
-        if (
-          getCategoryById(expense.category)?.includeInBalance &&
-          !expense.isDeletedFromBalance
-        ) {
-          const currentBalanceSum = this.currentBalanceAmount + expense.amount;
-          this.currentBalanceAmount = Math.round(currentBalanceSum * 100) / 100;
-        }
+      newAmount = this.roundUp(newAmount + expense.amount);
+      if (
+        getCategoryById(expense.category)?.includeInBalance &&
+        !expense.isDeletedFromBalance
+      ) {
+        newBalanceAmount = this.roundUp(newBalanceAmount + expense.amount);
       }
     });
+    this.currentAmount = newAmount;
+    this.currentBalanceAmount = newBalanceAmount;
+  }
+
+  private roundUp(value: number): number {
+    return Math.round(value * 100) / 100;
   }
 }
