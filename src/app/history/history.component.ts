@@ -3,7 +3,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { first, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { first, map, Observable, Subject, takeUntil, tap } from 'rxjs';
 
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
@@ -31,7 +31,7 @@ import { HistoryItemComponent } from './item/history-item.component';
   ],
 })
 export class HistoryComponent implements OnInit, OnDestroy {
-  expenses: HistoryExpense[] = [];
+  expenses$: Observable<HistoryExpense[]>;
   totalAmount: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
 
@@ -113,11 +113,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
         }),
       };
     }
-    this.loadExpenses()
-      .pipe(first(), takeUntil(this.destroySubject))
-      .subscribe(() => {
-        this.sumValues();
-      });
+    this.expenses$ = this.loadExpenses().pipe(takeUntil(this.destroySubject));
   }
 
   filterByCategory(category: string): void {
@@ -140,11 +136,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
       const id = item.id;
       this.expenseService
         .deleteExpense(id)
-        .pipe(
-          switchMap(() => this.loadExpenses()),
-          takeUntil(this.destroySubject)
-        )
-        .subscribe(() => this.sumValues());
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe();
     }
   }
 
@@ -164,15 +157,14 @@ export class HistoryComponent implements OnInit, OnDestroy {
     isDeleteFromBalance?: boolean
   ): void {
     const balance = this.balanceStoreService.getBalance();
-    const expense = this.expenses.find((e) => e.id === item.id);
-    const category = getCategoryById(expense?.category);
+    const category = getCategoryById(item?.category);
     if (
-      expense &&
+      item &&
       balance &&
-      !expense?.isDeletedFromBalance &&
+      !item?.isDeletedFromBalance &&
       category?.includeInBalance
     ) {
-      const newBalance = Math.round((balance + expense.amount) * 100) / 100;
+      const newBalance = Math.round((balance + item.amount) * 100) / 100;
       this.balanceService
         .addBalance(newBalance)
         .pipe(
@@ -182,9 +174,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
         .subscribe();
     }
     if (isDeleteFromBalance) {
-      expense.isDeletedFromBalance = isDeleteFromBalance;
+      item.isDeletedFromBalance = isDeleteFromBalance;
       this.expenseService
-        .updateExpense(expense)
+        .updateExpense(item)
         .pipe(takeUntil(this.destroySubject))
         .subscribe();
     }
@@ -212,15 +204,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
-  private loadExpenses(): Observable<Expense[]> {
-    this.temporaryDate = 0;
+  private loadExpenses(): Observable<HistoryExpense[]> {
     return this.expenseService
       .getExpenses(this.currentFilter?.date, this.currentFilter?.categories)
-      .pipe(
-        tap((expenses) => {
-          this.updateExpenses(expenses);
-        })
-      );
+      .pipe(map((expenses) => this.calculateAmountsAndModifyExpenses(expenses)));
   }
 
   private isDatePanelVisible(timestamp: number): boolean {
@@ -238,8 +225,11 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateExpenses(expenses: Expense[]): void {
-    this.expenses = expenses.map((expense) => {
+  private calculateAmountsAndModifyExpenses(expenses: Expense[]): HistoryExpense[] {
+    this.temporaryDate = 0;
+    let newAmount = 0;
+    const result = expenses.map((expense) => {
+      newAmount = this.roundUp(newAmount + expense.amount);
       const showDateTitle = this.isDatePanelVisible(expense.date);
       if (showDateTitle) {
         this.totalAmountPerDays.set(expense.date, expense.amount);
@@ -253,6 +243,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
         showDateTitle,
       } as HistoryExpense;
     });
+    this.totalAmount = newAmount;
+    return result;
   }
 
   private initFilter(): void {
@@ -296,22 +288,14 @@ export class HistoryComponent implements OnInit, OnDestroy {
     };
   }
 
-  private sumValues(): void {
-    this.totalAmount = this.expenses.reduce(
-      (total: number, expense: { amount: number }) => {
-        const result = total + expense.amount;
-        return Math.round(result * 100) / 100;
-      },
-      0
-    );
-  }
-
   private updateExpense(expense: Expense): void {
     this.expenseService
       .updateExpense(expense)
       .pipe(first(), takeUntil(this.destroySubject))
-      .subscribe(() => {
-        this.updateFilterAndLoadExpenses(this.currentFilter);
-      });
+      .subscribe();
+  }
+
+  private roundUp(value: number): number {
+    return Math.round(value * 100) / 100;
   }
 }

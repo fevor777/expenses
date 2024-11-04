@@ -1,8 +1,5 @@
 <div class="history-container">
-  <span
-    id="back"
-    class="app-link history-back-link"
-    [routerLink]="'/'"
+  <span id="back" class="app-link history-back-link" [routerLink]="'/'"
     >< Back</span
   ><br />
   <app-multi-filter
@@ -11,18 +8,25 @@
     [defaultDateValue]="defaultDateValue"
     (selectedFilters)="updateFilterAndLoadExpenses($event)"
   ></app-multi-filter>
-  <div *ngIf="!expenses.length" class="history-empty">
-    <span>Для этих категорий и периода трат нет</span>
-  </div>
-  <app-history-item
-    *ngFor="let item of expenses"
-    [item]="item"
-    [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
-    (editAmountIconClick)="changeAmount($event)"
-    (filterByCategory)="filterByCategory($event)"
-    (chartIconClick)="navigateToChart($event)"
-    (editDescriptionIconClick)="changeDescription($event)"
-    (deleteLabelClick)="onDelete($event)"
-    (deleteFromBalanceLabelClick)="onDeleteFromBalance($event)"
-  ></app-history-item>
+  <ng-container
+    *ngIf="(expenses$ | async)?.length > 0 && (expenses$ | async); let expenses; else: elseBlock"
+  >
+    <app-history-item
+      *ngFor="let item of expenses"
+      [item]="item"
+      [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
+      (editAmountIconClick)="changeAmount($event)"
+      (filterByCategory)="filterByCategory($event)"
+      (chartIconClick)="navigateToChart($event)"
+      (editDescriptionIconClick)="changeDescription($event)"
+      (deleteLabelClick)="onDelete($event)"
+      (deleteFromBalanceLabelClick)="onDeleteFromBalance($event)"
+    ></app-history-item
+  ></ng-container>
+
+  <ng-template #elseBlock>
+    <div class="history-empty">
+      <span>Для этих категорий и периода трат нет</span>
+    </div>
+  </ng-template>
 </div>
