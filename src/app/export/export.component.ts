@@ -36,8 +36,6 @@ export class ExportComponent implements OnDestroy {
     this.authService
       .signInWithGoogle()
       .pipe(
-        switchMap(() => this.balanceService.getBalance()),
-        tap((balance) => this.balanceStoreService.updateBalance(balance)),
         takeUntil(this.destroySubject)
       )
       .subscribe((res) => {

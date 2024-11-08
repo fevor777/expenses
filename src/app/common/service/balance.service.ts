@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, from, map, of } from 'rxjs';
+import { Observable, catchError, from, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Balance } from '../model/balance.model';
+import { BalanceStoreService } from './balance-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,8 @@ export class BalanceService {
 
   constructor(
     private fireStore: AngularFirestore,
-    private authService: AuthService
+    private authService: AuthService,
+    private balanceStoreService: BalanceStoreService
   ) {
     this.balanceCollection = this.fireStore.collection<Balance>('balance');
   }
@@ -22,9 +24,12 @@ export class BalanceService {
     if (this.authService.user) {
       const uid = this.authService.user.uid;
       const balanceObj = { value: balance, uid: this.authService.user.uid };
-      return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(map(() => balance));
+      return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(
+        map(() => balance),
+        catchError(() => this.balanceStoreService.addBalanceObs(balance))
+      );
     } else {
-      return of(balance);
+      return this.balanceStoreService.addBalanceObs(balance);
     }
   }
 
@@ -34,9 +39,12 @@ export class BalanceService {
       return this.fireStore
         .doc<Balance>(`balance/${uid}`)
         .valueChanges()
-        .pipe(map((v) => v?.value || 0));
+        .pipe(
+          map((v) => v?.value || 0),
+          catchError(() => this.balanceStoreService.getBalanceObs())
+        );
     } else {
-      return of(Number(localStorage.getItem('balance')) || 0);
+      return this.balanceStoreService.getBalanceObs();
     }
   }
 }

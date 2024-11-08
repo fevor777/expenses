@@ -3,14 +3,13 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { first, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { MultiFilter, MultiFilterComponent } from '../common/component/filter/multi/multi-filter.component';
 import { getCategoryById } from '../common/model/categories';
 import { Expense } from '../common/model/expense.model';
-import { BalanceStoreService } from '../common/service/balance-store.service';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { HistoryExpense } from './history-expense';
@@ -52,8 +51,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private router: Router,
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
-    private dateFilterService: DateFilterService,
-    private balanceStoreService: BalanceStoreService
+    private dateFilterService: DateFilterService
   ) {}
 
   @HostListener('touchstart', ['$event'])
@@ -92,7 +90,20 @@ export class HistoryComponent implements OnInit, OnDestroy {
     );
     const newAmount = Number(newAmountAsString);
     if (newAmount && newAmount !== expense?.amount) {
-      this.updateExpense({ ...expense, amount: Number(newAmount) });
+      const oldAmount = expense.amount;
+      this.expenseService
+        .updateExpense({ ...expense, amount: Number(newAmount) })
+        .pipe(
+          switchMap(() => this.balanceService.getBalance()),
+          first(),
+          switchMap((balance) => {
+            const newBalance =
+              Math.round((balance + oldAmount - newAmount) * 100) / 100;
+            return this.balanceService.addBalance(newBalance);
+          }),
+          takeUntil(this.destroySubject)
+        )
+        .subscribe();
     }
   }
 
@@ -156,20 +167,17 @@ export class HistoryComponent implements OnInit, OnDestroy {
     item: HistoryExpense,
     isDeleteFromBalance?: boolean
   ): void {
-    const balance = this.balanceStoreService.getBalance();
     const category = getCategoryById(item?.category);
-    if (
-      item &&
-      balance &&
-      !item?.isDeletedFromBalance &&
-      category?.includeInBalance
-    ) {
-      const newBalance = Math.round((balance + item.amount) * 100) / 100;
+    if (item && !item?.isDeletedFromBalance && category?.includeInBalance) {
       this.balanceService
-        .addBalance(newBalance)
+        .getBalance()
         .pipe(
-          takeUntil(this.destroySubject),
-          tap(() => this.balanceStoreService.updateBalance(newBalance))
+          first(),
+          switchMap((balance) => {
+            const newBalance = Math.round((balance + item.amount) * 100) / 100;
+            return this.balanceService.addBalance(newBalance);
+          }),
+          takeUntil(this.destroySubject)
         )
         .subscribe();
     }
@@ -207,7 +215,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
   private loadExpenses(): Observable<HistoryExpense[]> {
     return this.expenseService
       .getExpenses(this.currentFilter?.date, this.currentFilter?.categories)
-      .pipe(map((expenses) => this.calculateAmountsAndModifyExpenses(expenses)));
+      .pipe(
+        map((expenses) => this.calculateAmountsAndModifyExpenses(expenses))
+      );
   }
 
   private isDatePanelVisible(timestamp: number): boolean {
@@ -225,7 +235,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private calculateAmountsAndModifyExpenses(expenses: Expense[]): HistoryExpense[] {
+  private calculateAmountsAndModifyExpenses(
+    expenses: Expense[]
+  ): HistoryExpense[] {
     this.temporaryDate = 0;
     let newAmount = 0;
     const result = expenses.map((expense) => {

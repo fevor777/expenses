@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable } from 'rxjs';
 
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { Expense } from '../model/expense.model';
