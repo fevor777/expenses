@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable } from 'rxjs';
 
-import { AuthService } from './auth.service';
 import { BalanceDate } from '../model/balance-date.model';
+import { AuthService } from './auth.service';
+import { BalanceDateStoreService } from './balance-date-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,19 +14,26 @@ export class BalanceDateService {
 
   constructor(
     private fireStore: AngularFirestore,
-    private authService: AuthService
+    private authService: AuthService,
+    private balanceDateStoreService: BalanceDateStoreService
   ) {
-    this.balanceCollection = this.fireStore.collection<BalanceDate>('balance-date');
+    this.balanceCollection =
+      this.fireStore.collection<BalanceDate>('balance-date');
   }
 
   addBalanceDate(balance: string): Observable<string> {
+    localStorage.setItem('balanceDate', balance.toString());
     if (this.authService.user) {
       const uid = this.authService.user.uid;
       const balanceObj = { value: balance, uid: this.authService.user.uid };
-      return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(map(() => balance));
+      return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(
+        map(() => balance),
+        catchError(() =>
+          this.balanceDateStoreService.addBalanceDateObs(balance)
+        )
+      );
     } else {
-      localStorage.setItem('balanceDate', balance);
-      return of(balance);
+      return this.balanceDateStoreService.addBalanceDateObs(balance);
     }
   }
 
@@ -35,9 +43,12 @@ export class BalanceDateService {
       return this.fireStore
         .doc<BalanceDate>(`balance-date/${uid}`)
         .valueChanges()
-        .pipe(map((v) => v?.value || ''));
+        .pipe(
+          map((v) => v?.value || ''),
+          catchError(() => this.balanceDateStoreService.getBalanceDateObs())
+        );
     } else {
-      return of(localStorage.getItem('balanceDate') || '');
+      return this.balanceDateStoreService.getBalanceDateObs();
     }
   }
 }

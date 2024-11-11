@@ -8,7 +8,10 @@ import { CategoriesComponent } from '../common/component/category/categories.com
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { NotificationService } from '../common/component/notification/notification.service';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
-import { getCategoryById, getCategoryNameById } from '../common/model/categories';
+import {
+  getCategoryById,
+  getCategoryNameById,
+} from '../common/model/categories';
 import { Currency } from '../common/model/currency';
 import { Expense } from '../common/model/expense.model';
 import { BalanceDateService } from '../common/service/balance-date.service';
@@ -39,7 +42,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   currentBalanceAmount: number = 0;
   currentBalance: number = 0;
   balance$: Observable<number>;
-  balanceDate: string = '';
+  balanceDate$: Observable<string>;
   showNumberBoard: boolean = true;
 
   currency: Currency;
@@ -64,12 +67,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.calculateAmounts(expenses);
       });
 
-    this.balanceDateService
-      .getBalanceDate()
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((balanceDate) => {
-        this.balanceDate = balanceDate;
-      });
+    this.balanceDate$ = this.balanceDateService.getBalanceDate();
 
     this.balance$ = this.balanceService
       .getBalance()
@@ -151,16 +149,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.balanceService
       .addBalance(balance)
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe(() => this.currentBalance = balance);
+      .subscribe(() => (this.currentBalance = balance));
   }
 
   onBalanceDateChange(newBalanceDate: string): void {
     this.balanceDateService
       .addBalanceDate(newBalanceDate)
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe(() => {
-        this.balanceDate = newBalanceDate;
-      });
+      .subscribe();
   }
 
   onAmountChange(amount: string): void {

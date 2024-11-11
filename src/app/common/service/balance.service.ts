@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, catchError, from, map, of } from 'rxjs';
-import { AuthService } from './auth.service';
+import { catchError, from, map, Observable } from 'rxjs';
+
 import { Balance } from '../model/balance.model';
+import { AuthService } from './auth.service';
 import { BalanceStoreService } from './balance-store.service';
 
 @Injectable({

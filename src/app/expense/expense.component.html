@@ -3,7 +3,7 @@
     [currentAmount]="currentAmount"
     [currentBalanceAmount]="currentBalanceAmount"
     [balance]="balance$ | async"
-    [balanceDate]="balanceDate"
+    [balanceDate]="balanceDate$ | async"
     (menuIconClick)="navigateToExport()"
     (historyIconClick)="navigateToHistory()"
     (balanceChange)="onBalanceChange($event)"
