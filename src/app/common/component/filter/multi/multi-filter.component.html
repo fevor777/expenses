@@ -40,7 +40,7 @@
       </div>
       <ng-template #savingsTemplate>
         <div class="app-multi-filter-header" (click)="onShowSavings()">
-          {{ savings }}€
+          {{ savings$ | async }}€
           <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
         </div>
       </ng-template>
@@ -71,7 +71,7 @@
   </div>
   <ng-template #savingsTemplate>
     <div class="app-multi-filter-header" (click)="onShowSavings()">
-      {{ savings }}€
+      {{ savings$ | async }}€
       <i class="fas fa-pencil-alt" (click)="changeSavings()"></i>
     </div>
   </ng-template>

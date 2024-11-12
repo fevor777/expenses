@@ -16,7 +16,7 @@ import { DateFrame } from '../date/dateFrame.model';
 import { DateFilterComponent } from '../date/date-filter.component';
 import { CategoryFilterComponent } from '../category/category-filter.component';
 import { SavingService } from '../../../service/saving.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, tap } from 'rxjs';
 
 export type MultiFilter = {
   categories: string[];
@@ -47,19 +47,16 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   predefineCategories: string[] = [];
   expandFilters: boolean = false;
   showSavings: boolean;
-  savings: string = '0';
+  savings$: Observable<number>;
+  savings: number;
 
   private unsubscribe: Subject<void> = new Subject();
 
   constructor(private savingService: SavingService) {}
 
   ngOnInit(): void {
-    this.savingService
-      .getSavings()
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((savings) => {
-        this.savings = savings?.toString() || '0';
-      });
+    this.savings$ = this.savingService
+      .getSavings().pipe(tap((savings) => this.savings = savings));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -107,14 +104,12 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   changeSavings(): void {
-    const newSavings = prompt('Enter new savings', this.savings);
+    const newSavings = prompt('Enter new savings', this.savings?.toString());
     if (newSavings) {
       this.savingService
         .addSaving(Number(newSavings))
         .pipe(takeUntil(this.unsubscribe))
-        .subscribe(() => {
-          this.savings = newSavings;
-        });
+        .subscribe();
     }
   }
 

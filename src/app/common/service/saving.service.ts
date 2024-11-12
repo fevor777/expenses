@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable } from 'rxjs';
 
-import { AuthService } from './auth.service';
 import { Savings } from '../model/saving.model';
+import { AuthService } from './auth.service';
+import { SavingStoreService } from './saving-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,19 +14,23 @@ export class SavingService {
 
   constructor(
     private fireStore: AngularFirestore,
-    private authService: AuthService
+    private authService: AuthService,
+    private savingStoreService: SavingStoreService
   ) {
     this.savingCollection = this.fireStore.collection<Savings>('savings');
   }
 
   addSaving(savings: number): Observable<number> {
+    localStorage.setItem('savings', savings.toString());
     if (this.authService.user) {
       const uid = this.authService.user.uid;
       const savingsObj = { value: savings, uid: this.authService.user.uid };
-      return from(this.savingCollection.doc(uid).set(savingsObj)).pipe(map(() => savings));
+      return from(this.savingCollection.doc(uid).set(savingsObj)).pipe(
+        map(() => savings),
+        catchError(() => this.savingStoreService.addSavingObs(savings))
+      );
     } else {
-      localStorage.setItem('savings', savings.toString());
-      return of(savings);
+      return this.savingStoreService.addSavingObs(savings);
     }
   }
 
@@ -35,9 +40,12 @@ export class SavingService {
       return this.fireStore
         .doc<Savings>(`savings/${uid}`)
         .valueChanges()
-        .pipe(map((v) => v?.value || 0));
+        .pipe(
+          map((v) => v?.value || 0),
+          catchError(() => this.savingStoreService.getSavingObs())
+        );
     } else {
-      return of(Number(localStorage.getItem('savings')) || 0);
+      return this.savingStoreService.getSavingObs();
     }
   }
 }
