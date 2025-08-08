@@ -51,12 +51,12 @@ export class ExportComponent implements OnDestroy {
   }
 
   exportCSV(): void {
-    const data = JSON.parse(localStorage.getItem('expenses') || '[]').map(
-      (expense) => this.formatData(expense)
-    );
-    if (data?.length > 0) {
-      this.exportToFile(data);
-    }
+    // const data = JSON.parse(localStorage.getItem('expenses') || '[]').map(
+    //   (expense) => this.formatData(expense)
+    // );
+    // if (data?.length > 0) {
+    //   this.exportToFile(data);
+    // }
 
     this.expenseService
       .getExpenses()
