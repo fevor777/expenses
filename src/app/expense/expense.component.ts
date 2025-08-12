@@ -44,6 +44,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   balance$: Observable<number>;
   balanceDate$: Observable<string>;
   showNumberBoard: boolean = true;
+  monthlyExpenses: Expense[] = [];
+  todaysExpenses: Expense[] = [];
 
   currency: Currency;
   description: string = '';
@@ -57,11 +59,11 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.expenseService
-      .getExpenses(this.dateFilterService.getInitialDayValue())
+      .getExpenses(this.dateFilterService.getInitialMonthValue())
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((expenses) => {
         this.calculateAmounts(expenses);
@@ -117,11 +119,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         )
         .subscribe(() => {
           this.onShowNumberBoard();
-          this.notificationService.showMessage(
-            `✅ <u>Добавлено:</u> ${amount} €` +
-            ` - ${getCategoryNameById(categoryName)}<br><br>` +
-            `<u>Сегодня по категории:</u> ${this.currentAmount} €`
-          );
+          this.showNotification(categoryName, amount);
         });
     }
   }
@@ -178,18 +176,57 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.unsubscribe.complete();
   }
 
+  showNotification(categoryName, amount): void {
+    const todaysAmountByCategory = this.getTodaysAmount(categoryName);
+    const monthlyAmountByCategory = this.getMonthlyAmountByCategory(
+      categoryName
+    );
+    const monthlyAmount = this.getMonthlyAmount();
+    this.notificationService.showMessage(
+      `<u>Добавлено:</u> ${amount} €` +
+      ` - ${getCategoryNameById(categoryName)}<br><br>` +
+      `<u>Сегодня по категории:</u> ${todaysAmountByCategory} €<br><br>` +
+      `<u>За месяц по категории:</u> ${monthlyAmountByCategory} €` +
+      `<br><br><u>Всего за месяц:</u> ${monthlyAmount} €`
+    );
+  }
+
+  private getTodaysAmount(categoryName: string): number {
+    return this.todaysExpenses
+      .filter((expense) => expense.category === categoryName)
+      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
+  }
+
+  private getMonthlyAmountByCategory(categoryName: string): number {
+    return this.monthlyExpenses
+      .filter((expense) => expense.category === categoryName)
+      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
+  }
+
+  private getMonthlyAmount(): number {
+    return this.monthlyExpenses
+      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
+  }
+
   private calculateAmounts(expenses: Expense[]): void {
+    this.monthlyExpenses = [...expenses];
     let newAmount = 0;
     let newBalanceAmount = 0;
-    expenses.forEach((expense: Expense) => {
-      newAmount = this.roundUp(newAmount + expense.amount);
-      if (
-        getCategoryById(expense.category)?.includeInBalance &&
-        !expense.isDeletedFromBalance
-      ) {
-        newBalanceAmount = this.roundUp(newBalanceAmount + expense.amount);
-      }
-    });
+    this.todaysExpenses = [];
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    expenses
+      .filter((expense: Expense) => expense.date >= startOfDay)
+      .forEach((expense: Expense) => {
+        this.todaysExpenses.push(expense);
+        newAmount = this.roundUp(newAmount + expense.amount);
+        if (
+          getCategoryById(expense.category)?.includeInBalance &&
+          !expense.isDeletedFromBalance
+        ) {
+          newBalanceAmount = this.roundUp(newBalanceAmount + expense.amount);
+        }
+      });
     this.currentAmount = newAmount;
     this.currentBalanceAmount = newBalanceAmount;
   }

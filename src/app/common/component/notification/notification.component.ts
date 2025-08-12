@@ -30,7 +30,7 @@ export class NotificationComponent implements OnDestroy {
     this.show = true;
     setTimeout(() => {
       this.show = false;
-    }, 7000);
+    }, 60000);
   }
 
   onCloseNotification() {
