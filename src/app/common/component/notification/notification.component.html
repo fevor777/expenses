@@ -1,4 +1,4 @@
 <div class="notification-container" *ngIf="show">
-  <span>{{ message }}</span>
+  <span [innerHTML]="message"></span>
   <span (click)="onCloseNotification()" class="notification-close">X</span>
 </div>

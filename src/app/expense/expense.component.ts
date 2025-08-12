@@ -118,8 +118,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         .subscribe(() => {
           this.onShowNumberBoard();
           this.notificationService.showMessage(
-            `Добавлено: ${getCategoryNameById(categoryName)}, ${amount} €
-          (${this.currentAmount}€)`
+            `✅ <u>Добавлено:</u> ${amount} €` +
+            ` - ${getCategoryNameById(categoryName)}<br><br>` +
+            `<u>Сегодня по категории:</u> ${this.currentAmount} €`
           );
         });
     }
