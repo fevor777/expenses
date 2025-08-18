@@ -1,0 +1,1 @@
+export const GLOBAL_LONG_PRESS_DURATION = 300;

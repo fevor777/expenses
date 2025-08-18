@@ -3,6 +3,7 @@ import { Component, EventEmitter, HostListener, Input, Output } from '@angular/c
 import { FormsModule } from '@angular/forms';
 
 import { Currency } from '../../common/model/currency';
+import { GLOBAL_LONG_PRESS_DURATION } from '../../constants';
 
 @Component({
   selector: 'app-expense-number-board',
@@ -31,7 +32,6 @@ export class ExpenseNumberBoardComponent {
 
   private longPressTimeout: any;
   private longPressTriggered = false;
-  private readonly LONG_PRESS_DURATION = 300;
   private readonly LONG_PRESS_MOVE_TOLERANCE = 10;
   private lpStartX = 0;
   private lpStartY = 0;
@@ -116,7 +116,7 @@ export class ExpenseNumberBoardComponent {
     this.longPressTimeout = setTimeout(() => {
       this.longPressTriggered = true;
       this.numberBoardLongPress.emit();
-    }, this.LONG_PRESS_DURATION);
+    }, GLOBAL_LONG_PRESS_DURATION);
   }
 
   @HostListener('touchmove', ['$event'])

@@ -25,6 +25,7 @@ import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
 import { ExpenseHeaderComponent } from './header/expense-header.component';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
+import { GLOBAL_LONG_PRESS_DURATION } from '../constants';
 
 @Component({
   selector: 'app-expense',
@@ -60,7 +61,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   // Long press while number board is shown (categories component not present)
   private globalLongPressTimeout: any;
   private globalLongPressTriggered = false;
-  private readonly GLOBAL_LONG_PRESS_DURATION = 500;
   private readonly GLOBAL_LONG_PRESS_MOVE_TOLERANCE = 10;
   private globalTouchStartX = 0;
   private globalTouchStartY = 0;
@@ -264,7 +264,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       this.globalLongPressTriggered = true;
       // Mimic left swipe on categories => navigate to statistics
       this.navigateToStatistics();
-    }, this.GLOBAL_LONG_PRESS_DURATION);
+    }, GLOBAL_LONG_PRESS_DURATION);
   }
 
   @HostListener('touchmove', ['$event'])
