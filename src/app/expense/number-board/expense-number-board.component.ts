@@ -31,7 +31,7 @@ export class ExpenseNumberBoardComponent {
 
   private longPressTimeout: any;
   private longPressTriggered = false;
-  private readonly LONG_PRESS_DURATION = 500;
+  private readonly LONG_PRESS_DURATION = 300;
   private readonly LONG_PRESS_MOVE_TOLERANCE = 10;
   private lpStartX = 0;
   private lpStartY = 0;
