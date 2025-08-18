@@ -1,5 +1,5 @@
 import { CommonModule, getCurrencySymbol } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Currency } from '../../common/model/currency';
@@ -27,6 +27,14 @@ export class ExpenseNumberBoardComponent {
     new EventEmitter<void>();
   @Output() numberBoardSwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() numberBoardSwipeUp: EventEmitter<void> = new EventEmitter<void>();
+  @Output() numberBoardLongPress: EventEmitter<void> = new EventEmitter<void>();
+
+  private longPressTimeout: any;
+  private longPressTriggered = false;
+  private readonly LONG_PRESS_DURATION = 500;
+  private readonly LONG_PRESS_MOVE_TOLERANCE = 10;
+  private lpStartX = 0;
+  private lpStartY = 0;
 
   onDeleteClick(): void {
     if (this.amount.length > 0) {
@@ -95,5 +103,37 @@ export class ExpenseNumberBoardComponent {
 
   onSwipeUp(): void {
     this.numberBoardSwipeUp.emit();
+  }
+
+  @HostListener('touchstart', ['$event'])
+  onNbTouchStart(e: TouchEvent) {
+    if (!e.changedTouches.length) return;
+    const t = e.changedTouches[0];
+    this.lpStartX = t.screenX;
+    this.lpStartY = t.screenY;
+    this.longPressTriggered = false;
+    clearTimeout(this.longPressTimeout);
+    this.longPressTimeout = setTimeout(() => {
+      this.longPressTriggered = true;
+      this.numberBoardLongPress.emit();
+    }, this.LONG_PRESS_DURATION);
+  }
+
+  @HostListener('touchmove', ['$event'])
+  onNbTouchMove(e: TouchEvent) {
+    if (this.longPressTriggered) return;
+    if (!e.changedTouches.length) return;
+    const t = e.changedTouches[0];
+    if (
+      Math.abs(t.screenX - this.lpStartX) > this.LONG_PRESS_MOVE_TOLERANCE ||
+      Math.abs(t.screenY - this.lpStartY) > this.LONG_PRESS_MOVE_TOLERANCE
+    ) {
+      clearTimeout(this.longPressTimeout);
+    }
+  }
+
+  @HostListener('touchend')
+  onNbTouchEnd() {
+    clearTimeout(this.longPressTimeout);
   }
 }

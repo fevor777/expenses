@@ -30,7 +30,6 @@
       (categorySwipeRight)="navigateToStatistics()"
       (categorySwipeLeft)="navigateToHistory()"
       (categorySwipeUp)="onShowNumberBoard()"
-      (categoryLongPress)="navigateToStatistics()"
       (categoryClick)="onCategoryClick($event)"
       [isContentDown]="true"
       [enteredAmount]="enteredAmount"
@@ -49,6 +48,7 @@
     (numberBoardSwipeDown)="onHideNumberBoard()"
     (numberBoardSwipeLeft)="navigateToHistory()"
     (numberBoardSwipeRight)="navigateToStatistics()"
+    (numberBoardLongPress)="navigateToHistory()"
   >
   </app-expense-number-board>
 </div>

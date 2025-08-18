@@ -28,7 +28,6 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categorySwipeUp: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
-  @Output() categoryLongPress: EventEmitter<void> = new EventEmitter<void>();
 
   categories: Category[] = [...Categories];
 
@@ -45,12 +44,6 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   private touchEndY: number = 0;
   private isDown: boolean = false;
 
-  // Long press support
-  private longPressTimeout: any;
-  private longPressTriggered: boolean = false;
-  private readonly LONG_PRESS_DURATION = 500; // ms
-  private readonly LONG_PRESS_MOVE_TOLERANCE = 10;
-
   @HostListener('window:resize', ['$event'])
   onResize(_event: any): void {
     this.updateVisibleCategories();
@@ -60,37 +53,13 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   onTouchStart(event: TouchEvent): void {
     this.touchStartX = event.changedTouches[0].screenX;
     this.touchStartY = event.changedTouches[0].screenY;
-
-    // Start long press timer
-    this.longPressTriggered = false;
-    clearTimeout(this.longPressTimeout);
-    this.longPressTimeout = setTimeout(() => {
-      this.longPressTriggered = true;
-      this.handleLongPress();
-    }, this.LONG_PRESS_DURATION);
-  }
-
-  @HostListener('touchmove', ['$event'])
-  onTouchMove(event: TouchEvent): void {
-    const moveX = event.changedTouches[0].screenX;
-    const moveY = event.changedTouches[0].screenY;
-    if (
-      Math.abs(moveX - this.touchStartX) > this.LONG_PRESS_MOVE_TOLERANCE ||
-      Math.abs(moveY - this.touchStartY) > this.LONG_PRESS_MOVE_TOLERANCE
-    ) {
-      // Cancel long press if user starts moving (likely a swipe)
-      clearTimeout(this.longPressTimeout);
-    }
   }
 
   @HostListener('touchend', ['$event'])
   onTouchEnd(event: TouchEvent): void {
-    clearTimeout(this.longPressTimeout);
     this.touchEndX = event.changedTouches[0].screenX;
     this.touchEndY = event.changedTouches[0].screenY;
-    if (!this.longPressTriggered) {
-      this.handleSwipeGesture();
-    }
+    this.handleSwipeGesture();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -205,10 +174,5 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
     // If the difference between scrollHeight and scrollTop is greater than the clientHeight, then it's scrolled up
     return scrollTop === scrollHeight - clientHeight;
-  }
-
-  private handleLongPress(): void {
-    // Emit both long press and swipe left equivalent
-    this.onSwipeLeft();
   }
 }

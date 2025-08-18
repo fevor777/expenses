@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  HostListener,   // added
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -51,6 +56,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   description: string = '';
 
   private unsubscribe: Subject<void> = new Subject();
+
+  // Long press while number board is shown (categories component not present)
+  private globalLongPressTimeout: any;
+  private globalLongPressTriggered = false;
+  private readonly GLOBAL_LONG_PRESS_DURATION = 500;
+  private readonly GLOBAL_LONG_PRESS_MOVE_TOLERANCE = 10;
+  private globalTouchStartX = 0;
+  private globalTouchStartY = 0;
 
   constructor(
     private router: Router,
@@ -233,5 +246,46 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   private roundUp(value: number): number {
     return Math.round(value * 100) / 100;
+  }
+
+  @HostListener('touchstart', ['$event'])
+  onGlobalTouchStart(e: TouchEvent) {
+    if (!this.showNumberBoard || this.enteredAmount) return; // categories handle it otherwise
+    if (!e.changedTouches.length) return;
+    const target = e.target as HTMLElement;
+    if (target.closest('.expense-number-board')) return; // ignore number board area
+
+    const t = e.changedTouches[0];
+    this.globalTouchStartX = t.screenX;
+    this.globalTouchStartY = t.screenY;
+    this.globalLongPressTriggered = false;
+    clearTimeout(this.globalLongPressTimeout);
+    this.globalLongPressTimeout = setTimeout(() => {
+      this.globalLongPressTriggered = true;
+      // Mimic left swipe on categories => navigate to statistics
+      this.navigateToStatistics();
+    }, this.GLOBAL_LONG_PRESS_DURATION);
+  }
+
+  @HostListener('touchmove', ['$event'])
+  onGlobalTouchMove(e: TouchEvent) {
+    if (!this.showNumberBoard || this.enteredAmount) return;
+    if (!e.changedTouches.length) return;
+    if (this.globalLongPressTriggered) return;
+    const t = e.changedTouches[0];
+    if (
+      Math.abs(t.screenX - this.globalTouchStartX) >
+      this.GLOBAL_LONG_PRESS_MOVE_TOLERANCE ||
+      Math.abs(t.screenY - this.globalTouchStartY) >
+      this.GLOBAL_LONG_PRESS_MOVE_TOLERANCE
+    ) {
+      clearTimeout(this.globalLongPressTimeout);
+    }
+  }
+
+  @HostListener('touchend')
+  onGlobalTouchEnd() {
+    if (!this.showNumberBoard || this.enteredAmount) return;
+    clearTimeout(this.globalLongPressTimeout);
   }
 }
