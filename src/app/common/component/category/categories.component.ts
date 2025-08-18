@@ -5,6 +5,7 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  NgZone,
   OnChanges,
   Output,
   SimpleChanges,
@@ -47,6 +48,11 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   private touchEndY: number = 0;
   private isDown: boolean = false;
 
+  private longPressTimer: any;
+  private readonly LONG_PRESS_DURATION = 500;
+
+  constructor(private ngZone: NgZone) { }
+
   @HostListener('window:resize', ['$event'])
   onResize(_event: any): void {
     this.updateVisibleCategories();
@@ -63,6 +69,27 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     this.touchEndX = event.changedTouches[0].screenX;
     this.touchEndY = event.changedTouches[0].screenY;
     this.handleSwipeGesture();
+  }
+
+  @HostListener('mousedown', ['$event'])
+  @HostListener('touchstart', ['$event'])
+  onPressStart(event: MouseEvent | TouchEvent): void {
+    clearTimeout(this.longPressTimer);
+    this.longPressTimer = setTimeout(() => {
+      this.ngZone.run(() => {
+        if (this.enteredAmount) {
+          this.categoryLongPress.emit();
+        }
+      });
+    }, this.LONG_PRESS_DURATION);
+  }
+
+  @HostListener('mouseup', ['$event'])
+  @HostListener('mouseleave', ['$event'])
+  @HostListener('touchend', ['$event'])
+  @HostListener('touchcancel', ['$event'])
+  onPressEnd(event: MouseEvent | TouchEvent): void {
+    clearTimeout(this.longPressTimer);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
