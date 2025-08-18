@@ -1,43 +1,23 @@
 <span class="categories-general-container">
-  <div
-    class="categories-container"
+  <div class="categories-container" appLongPress [disabled]="!enteredAmount" (longPress)="onLongPress()"
     [ngClass]="{
       'categories-with-scroll': isContentDown,
       'categories-with-show-more': showMore
-    }"
-  >
-    <div
-      class="categories"
-      [ngClass]="{
+    }">
+    <div class="categories" [ngClass]="{
         'categories-scrollable-content-down': isContentDown && !showMore,
         'categories-center-aligned': !isContentDown
-      }"
-    >
-      <div
-        *ngFor="let category of categories; let i = index"
-        class="category"
-        (click)="onCategoryClick(category.id)"
-      >
-        <i
-          class="category-icon"
-          [ngClass]="{ 'disabled-category-icon': !enteredAmount }"
-          [style.color]="enteredAmount?.length > 0 ? category.color : ''"
-          [class]="category.icon"
-        ></i>
-        <span
-          class="category-name"
-          [ngClass]="{ 'disabled-category-name': enteredAmount?.length > 0 }"
-          >{{ category.name }}</span
-        >
+      }">
+      <div *ngFor="let category of categories; let i = index" class="category" (click)="onCategoryClick(category.id)">
+        <i class="category-icon" [ngClass]="{ 'disabled-category-icon': !enteredAmount }"
+          [style.color]="enteredAmount?.length > 0 ? category.color : ''" [class]="category.icon"></i>
+        <span class="category-name" [ngClass]="{ 'disabled-category-name': enteredAmount?.length > 0 }">{{ category.name
+          }}</span>
       </div>
     </div>
   </div>
-  <div
-    class="categories-more"
-    [ngClass]="{ 'disabled-categories-more': enteredAmount?.length > 0 }"
-    *ngIf="showMore"
-    (click)="onClickMore()"
-  >
+  <div class="categories-more" [ngClass]="{ 'disabled-categories-more': enteredAmount?.length > 0 }" *ngIf="showMore"
+    (click)="onClickMore()">
     <div>Еще</div>
     <i class="fa-solid fa-chevron-down"></i>
   </div>

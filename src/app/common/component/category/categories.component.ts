@@ -11,13 +11,14 @@ import {
 } from '@angular/core';
 import { Categories, Category } from '../../model/categories';
 import { CommonModule } from '@angular/common';
+import { LongPressDirective } from '../../directive/long-press.directive';
 
 @Component({
   selector: 'app-categories',
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LongPressDirective],
 })
 export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Input() isContentDown: boolean;
@@ -64,8 +65,6 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     this.handleSwipeGesture();
   }
 
-  constructor(private elementRef: ElementRef) { }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
@@ -78,15 +77,6 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.updateVisibleCategories();
-
-    const hammer = new Hammer(this.elementRef.nativeElement);
-    hammer.add(new Hammer.Press({ time: 500 })); // 500ms for long press
-
-    hammer.on('press', () => {
-      if (this.enteredAmount) {
-        this.categoryLongPress.emit();
-      }
-    });
   }
 
   onCategoryClick(category: string): void {
@@ -95,6 +85,10 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   onClickMore(): void {
     this.clickMore.emit();
+  }
+
+  onLongPress(): void {
+    this.categoryLongPress.emit();
   }
 
   private updateVisibleCategories(): void {
