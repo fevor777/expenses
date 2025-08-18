@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
@@ -28,6 +29,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categorySwipeUp: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
+  @Output() categoryLongPress: EventEmitter<void> = new EventEmitter<void>();
 
   categories: Category[] = [...Categories];
 
@@ -62,6 +64,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     this.handleSwipeGesture();
   }
 
+  constructor(private elementRef: ElementRef) { }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
@@ -74,6 +78,15 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.updateVisibleCategories();
+
+    const hammer = new Hammer(this.elementRef.nativeElement);
+    hammer.add(new Hammer.Press({ time: 500 })); // 500ms for long press
+
+    hammer.on('press', () => {
+      if (this.enteredAmount) {
+        this.categoryLongPress.emit();
+      }
+    });
   }
 
   onCategoryClick(category: string): void {
@@ -156,7 +169,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  private onSwipeDown(): void {}
+  private onSwipeDown(): void { }
 
   private isScrolledUp(): boolean {
     const scrollTop =
