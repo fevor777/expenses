@@ -13,6 +13,7 @@ import {
 import { Categories, Category } from '../../model/categories';
 import { CommonModule } from '@angular/common';
 import { LongPressDirective } from '../../directive/long-press.directive';
+import { catchError, EMPTY, filter, fromEvent, merge, takeUntil, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-categories',
@@ -48,10 +49,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   private touchEndY: number = 0;
   private isDown: boolean = false;
 
-  private longPressTimer: any;
-  private readonly LONG_PRESS_DURATION = 500;
-
-  constructor(private ngZone: NgZone) { }
+  constructor(private elementRef: ElementRef, private ngZone: NgZone) { }
 
   @HostListener('window:resize', ['$event'])
   onResize(_event: any): void {
@@ -71,27 +69,6 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     this.handleSwipeGesture();
   }
 
-  @HostListener('mousedown', ['$event'])
-  @HostListener('touchstart', ['$event'])
-  onPressStart(event: MouseEvent | TouchEvent): void {
-    clearTimeout(this.longPressTimer);
-    this.longPressTimer = setTimeout(() => {
-      this.ngZone.run(() => {
-        if (this.enteredAmount) {
-          this.categoryLongPress.emit();
-        }
-      });
-    }, this.LONG_PRESS_DURATION);
-  }
-
-  @HostListener('mouseup', ['$event'])
-  @HostListener('mouseleave', ['$event'])
-  @HostListener('touchend', ['$event'])
-  @HostListener('touchcancel', ['$event'])
-  onPressEnd(event: MouseEvent | TouchEvent): void {
-    clearTimeout(this.longPressTimer);
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
@@ -104,6 +81,29 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.updateVisibleCategories();
+
+    const element = this.elementRef.nativeElement;
+    const mousedown$ = fromEvent<MouseEvent>(element, 'mousedown');
+    const touchstart$ = fromEvent<TouchEvent>(element, 'touchstart');
+    const mouseup$ = fromEvent<MouseEvent>(document, 'mouseup');
+    const touchend$ = fromEvent<TouchEvent>(document, 'touchend');
+
+    const start$ = merge(mousedown$, touchstart$);
+    const end$ = merge(mouseup$, touchend$);
+
+    this.ngZone.runOutsideAngular(() => {
+      start$.pipe(
+        filter(() => Boolean(this.enteredAmount)),
+        timeout(500),
+        takeUntil(end$),
+        catchError(() => {
+          this.ngZone.run(() => {
+            this.categoryLongPress.emit();
+          });
+          return EMPTY;
+        })
+      ).subscribe();
+    });
   }
 
   onCategoryClick(category: string): void {
