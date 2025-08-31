@@ -15,8 +15,7 @@ import { getCategoryNameById } from '../../../model/categories';
 import { DateFrame } from '../date/dateFrame.model';
 import { DateFilterComponent } from '../date/date-filter.component';
 import { CategoryFilterComponent } from '../category/category-filter.component';
-import { SavingService } from '../../../service/saving.service';
-import { Observable, Subject, takeUntil, tap } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { DateFilterService } from '../date/date-filter.service';
 
@@ -52,21 +51,15 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   predefineCategories: string[] = [];
   expandFilters: boolean = false;
   descriptionFilter: string = '';
-  showSavings: boolean;
-  savings$: Observable<number>;
-  savings: number;
 
   private unsubscribe: Subject<void> = new Subject();
 
   constructor(
-    private savingService: SavingService,
     private router: Router,
     private dateFilterService: DateFilterService
   ) { }
 
   ngOnInit(): void {
-    this.savings$ = this.savingService
-      .getSavings().pipe(tap((savings) => this.savings = savings));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -80,10 +73,6 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
 
   getCategoryFilters(): string {
     return this.selectedCategories.map(getCategoryNameById).join(', ');
-  }
-
-  onShowSavings(): void {
-    this.showSavings = !this.showSavings;
   }
 
   clearFilters(): void {
@@ -125,15 +114,6 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     this.predefineCategories = [...this.selectedCategories];
   }
 
-  changeSavings(): void {
-    const newSavings = prompt('Enter new savings', this.savings?.toString());
-    if (newSavings) {
-      this.savingService
-        .addSaving(Number(newSavings))
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe();
-    }
-  }
 
   navigateToDetails(): void {
     // Match history navigation pattern: store filter state in DateFilterService

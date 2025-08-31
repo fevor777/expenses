@@ -9,6 +9,8 @@ import { AuthService } from '../common/service/auth.service';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { BalanceStoreService } from '../common/service/balance-store.service';
+import { IrregularBudgetService } from '../common/service/irregular-budget.service';
+import { SavingService } from '../common/service/saving.service';
 import { TabsContainerComponent } from '../common/tabs-container.component';
 import { TabComponent } from '../common/tab.component';
 
@@ -22,6 +24,10 @@ import { TabComponent } from '../common/tab.component';
 export class ExportComponent implements OnDestroy {
   user$: Observable<User>; // Observable to track the logged-in user
   activeTab = 'general';
+  irregularBudget$!: Observable<number>;
+  irregularBudgetValue: number = 0;
+  savings$!: Observable<number>;
+  savingsValue: number = 0;
 
   private readonly destroySubject: Subject<void> = new Subject();
 
@@ -29,9 +35,15 @@ export class ExportComponent implements OnDestroy {
     private expenseService: ExpenseService,
     private authService: AuthService,
     private balanceService: BalanceService,
-    private balanceStoreService: BalanceStoreService
+    private balanceStoreService: BalanceStoreService,
+    private irregularBudgetService: IrregularBudgetService,
+    private savingService: SavingService
   ) {
     this.user$ = this.authService.user$;
+    this.irregularBudget$ = this.irregularBudgetService.getValue();
+    this.irregularBudget$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.irregularBudgetValue = v || 0);
+    this.savings$ = this.savingService.getSavings();
+    this.savings$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.savingsValue = v || 0);
   }
 
   // Method to trigger Google Sign-in
@@ -134,5 +146,25 @@ export class ExportComponent implements OnDestroy {
     anchor.download = 'exported_data.csv';
     anchor.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  onEditIrregularBudget(): void {
+    const newVal = prompt('Enter irregular budget', this.irregularBudgetValue.toString());
+    if (newVal !== null) {
+      const num = Number(newVal);
+      if (!isNaN(num) && num >= 0) {
+        this.irregularBudgetService.addValue(num).pipe(first(), takeUntil(this.destroySubject)).subscribe();
+      }
+    }
+  }
+
+  onEditSavings(): void {
+    const newVal = prompt('Enter savings', this.savingsValue.toString());
+    if (newVal !== null) {
+      const num = Number(newVal);
+      if (!isNaN(num) && num >= 0) {
+        this.savingService.addSaving(num).pipe(first(), takeUntil(this.destroySubject)).subscribe();
+      }
+    }
   }
 }

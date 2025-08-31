@@ -9,7 +9,7 @@ import { TabComponent } from './tab.component';
     styles: [`
     :host { display:block; font-family:"Montserrat", sans-serif; }
     /* Header bar mimics expense header palette */
-  .tabs-header { display:flex; gap:6px; margin:24px 0 16px; overflow-x:auto; padding:10px 16px 6px; background:#f8d7da; box-shadow:0 -6px 18px #87002466, 0 1px 3px rgba(0,0,0,0.08); border-radius:18px; scrollbar-width:none; }
+  .tabs-header { display:flex; gap:6px; margin:24px 0 16px; overflow-x:auto; padding:10px 16px 6px; background:#f8d7da; box-shadow:0 1px 1px #87002466, 0 1px 1px rgba(0,0,0,0.08); border-radius:18px; scrollbar-width:none; }
     .tabs-header::-webkit-scrollbar{display:none;}
     .tab-btn { position:relative; padding:6px 18px 8px; font-size:14px; letter-spacing:.3px; cursor:pointer; border-radius:10px; color:#346078; user-select:none; font-weight:500; transition:background .18s, color .18s, transform .18s; }
     .tab-btn:hover { background:rgba(255,255,255,0.55); }

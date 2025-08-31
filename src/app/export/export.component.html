@@ -1,7 +1,18 @@
 <span style="color:blue;cursor:pointer" routerLink="/">&lt; Back</span>
 <app-tabs-container [(active)]="activeTab">
   <app-tab key="general" label="General">
-    will be implemented later
+    <div style="margin-top:12px">
+      <div style="margin-bottom:10px">
+        <span>Irregular Budget: <strong>{{ (irregularBudget$ | async) || 0 }}</strong>
+          <span (click)="onEditIrregularBudget()" title="Edit irregular budget" style="cursor:pointer;display:inline-block;margin-left:8px;vertical-align:middle">✏️</span>
+        </span>
+      </div>
+      <div>
+        <span>Savings: <strong>{{ (savings$ | async) || 0 }}</strong>
+          <span (click)="onEditSavings()" title="Edit savings" style="cursor:pointer;display:inline-block;margin-left:8px;vertical-align:middle">✏️</span>
+        </span>
+      </div>
+    </div>
   </app-tab>
   <app-tab key="export" label="Export">
     <div style="margin-top:12px">
