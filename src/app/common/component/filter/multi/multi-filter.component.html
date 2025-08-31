@@ -41,7 +41,7 @@
     </button>
   </div>
   <div [style.margin.px]="'10'" *ngIf="(dateFilter?.display || getCategoryFilters()?.length) && !expandFilters">
-    <div class="app-multi-filter-header" [style.margin-bottom.px]="30">
+    <div class="app-multi-filter-header" [style.margin-bottom.px]="15">
       <span>Общий расход: </span>
       <span class="app-multi-filter-total-amount">{{ totalAmount }}€</span>
       <i *ngIf="showHistoryIcon" class="fa-solid fa-list category-details-icon" (click)="navigateToHistory()"

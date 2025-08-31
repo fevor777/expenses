@@ -20,20 +20,6 @@ interface CategoryStat {
   imports: [CommonModule],
   template: `
     <div class="micro-wrapper" *ngIf="stats.length; else noDataTpl">
-      <div class="micro-header">
-        <div class="micro-title">Микро визуализация</div>
-        <div class="micro-subtitle">Спарклайны и доля категорий (Top {{topN}} vs Other)</div>
-      </div>
-      <div class="topn-bar" *ngIf="topOtherTotal > 0">
-        <div class="topn-labels">
-          <span>Top {{topN}}: {{ topTotal | number:'1.2-2' }}€</span>
-          <span>Other: {{ otherTotal | number:'1.2-2' }}€</span>
-        </div>
-        <div class="topn-bar-track">
-          <div class="topn-seg top" [style.width.%]="(topTotal / topOtherTotal) * 100"></div>
-          <div class="topn-seg other" [style.width.%]="(otherTotal / topOtherTotal) * 100"></div>
-        </div>
-      </div>
       <table class="micro-table">
         <thead>
           <tr>
@@ -79,39 +65,34 @@ interface CategoryStat {
   styles: [`
     .micro-wrapper { margin-top:20px; }
     .micro-header { margin:0 2px 8px 2px; }
-    .micro-title { font-weight:600; font-size:14px; }
-    .micro-subtitle { font-size:11px; color:#666; }
-    .micro-empty { font-size:13px; color:#777; margin:8px; }
-    .micro-table { width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; }
-    .micro-table th { text-align:left; font-weight:600; font-size:11px; padding:4px 2px; border-bottom:1px solid #eee; }
-    .micro-table td { padding:3px 2px; vertical-align:middle; border-bottom:1px solid #f5f5f5; }
+  .micro-title { font-weight:600; font-size:15px; }
+  .micro-subtitle { font-size:12px; color:#666; }
+  .micro-empty { font-size:14px; color:#777; margin:8px; }
+  .micro-table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; }
+  .micro-table th { text-align:left; font-weight:600; font-size:12px; padding:8px 2px; border-bottom:1px solid #eee; }
+  .micro-table td { padding:7px 2px; vertical-align:middle; border-bottom:1px solid #f5f5f5; }
+  .micro-table tbody tr.cat-row:last-child td { border-bottom: none; }
     .micro-table tbody tr.cat-row{cursor:pointer;}
   .micro-table tbody tr.cat-row:hover{background:#f7faff;}
   .micro-table tbody tr.cat-row.active{background:#e6f3ff;}
   .cat-cell{display:flex;align-items:center;gap:4px;}
   .row-x{font-size:10px;color:#666;cursor:pointer;padding:2px 8px;border-radius:3px;}
   .row-x:hover{background:#ddd;color:#222;}
-  .cat-name{color:#1a73e8;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+  .cat-name{color:#1a73e8;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-size:12px;}
   .cat-name:hover{color:#0b5ec9;}
   .micro-table tbody tr.cat-row.active .cat-name{font-weight:600;color:#0b5ec9;}
-    .cat-cell { white-space:nowrap; }
-  .share-col { width:70px; }
+    .cat-cell { white-space:nowrap; min-width:200px; }
+  .share-col { width:40px; }
   .trend-col { width:120px; }
     .sum-col { width:60px; text-align:right; }
   .sortable{cursor:pointer; user-select:none;}
   .sortable:hover{text-decoration:underline;}
-  .sort-indicator{font-size:9px; margin-left:2px;}
+  .sort-indicator{font-size:10px; margin-left:2px;}
   .lollipop-track { position:relative; width:100%; height:8px; background:#f0f0f0; border-radius:4px; }
   .lollipop-fill { position:absolute; left:0; top:0; bottom:0; background:#8ab4f8; border-radius:4px 0 0 4px; }
   .lollipop-dot { position:absolute; top:50%; width:8px; height:8px; margin-top:-4px; margin-left:-4px; background:#1a73e8; border:1px solid #fff; border-radius:50%; box-shadow:0 0 2px rgba(0,0,0,0.4); }
     .spark { width:100%; height:20px; }
     .spark-placeholder { text-align:center; color:#aaa; }
-    .topn-bar { margin:4px 0 12px 0; }
-    .topn-labels { display:flex; justify-content:space-between; font-size:10px; margin-bottom:2px; }
-    .topn-bar-track { position:relative; width:100%; height:12px; background:#f0f0f0; border-radius:6px; overflow:hidden; }
-    .topn-seg { height:100%; float:left; }
-    .topn-seg.top { background:#4caf50; }
-    .topn-seg.other { background:#ff9800; }
   `]
 })
 export class MicroVisualsComponent implements OnChanges {
@@ -126,9 +107,7 @@ export class MicroVisualsComponent implements OnChanges {
   private readonly maxSparkSpan = 40; // adjust if you prefer denser or more compressed lines
 
   stats: CategoryStat[] = [];
-  topTotal = 0;
-  otherTotal = 0;
-  topOtherTotal = 0;
+  // removed top/other aggregate bar
   private dateKeys: string[] = [];
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses']) {
@@ -139,7 +118,6 @@ export class MicroVisualsComponent implements OnChanges {
   private recompute(): void {
     if (!this.expenses || this.expenses.length === 0) {
       this.stats = [];
-      this.topTotal = this.otherTotal = this.topOtherTotal = 0;
       return;
     }
     // Build ordered date keys. Prefer provided dateFrame to ensure consistent horizontal scale.
@@ -169,9 +147,9 @@ export class MicroVisualsComponent implements OnChanges {
       }
       this.dateKeys = dateKeys;
     }
-  const catMap = new Map<string, number[]>(); // category -> series aligned with dateKeys
-  const totals = new Map<string, number>();
-  // we'll derive active day counts from the filled series (days with >0 spend)
+    const catMap = new Map<string, number[]>(); // category -> series aligned with dateKeys
+    const totals = new Map<string, number>();
+    // we'll derive active day counts from the filled series (days with >0 spend)
     this.dateKeys.forEach(_ => { /* placeholder to guarantee index */ });
     const indexMap: Record<string, number> = {};
     this.dateKeys.forEach((k, i) => indexMap[k] = i);
@@ -197,11 +175,6 @@ export class MicroVisualsComponent implements OnChanges {
     });
     this.stats = stats;
     this.applySort();
-    // Top N vs other
-    const top = stats.slice(0, this.topN);
-    this.topTotal = top.reduce((s, v) => s + v.total, 0);
-    this.otherTotal = stats.slice(this.topN).reduce((s, v) => s + v.total, 0);
-    this.topOtherTotal = this.topTotal + this.otherTotal;
   }
 
   getSparkWidth(len: number): number {

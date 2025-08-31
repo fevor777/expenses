@@ -1,4 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first, Subject, takeUntil } from 'rxjs';
 
@@ -16,13 +17,16 @@ import { MicroVisualsComponent } from './micro/micro-visuals.component';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
+import { IrregularBudgetService } from '../common/service/irregular-budget.service';
+import { IrregularBudgetGaugeComponent } from './irregular/irregular-budget-gauge.component';
+import { IrregularCumulativeComponent } from './irregular/irregular-cumulative.component';
 
 @Component({
   selector: 'app-details',
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
   standalone: true,
-  imports: [MultiFilterComponent, BarChartComponent, CompositionChartsComponent, MicroVisualsComponent],
+  imports: [CommonModule, MultiFilterComponent, BarChartComponent, CompositionChartsComponent, MicroVisualsComponent, IrregularBudgetGaugeComponent, IrregularCumulativeComponent],
 })
 export class DetailsComponent implements OnInit, OnDestroy {
   amountForDay: number = 0;
@@ -35,6 +39,15 @@ export class DetailsComponent implements OnInit, OnDestroy {
   currentFilter: MultiFilter;
   totalAmount: number = 0;
   expenses: Expense[] = [];
+  irregularBudget = 0;
+  // collapse state for each chart section
+  collapsed: Record<'irregularGauge' | 'irregularCumulative' | 'bar' | 'composition' | 'micro', boolean> = {
+    irregularGauge: false,
+    irregularCumulative: false,
+    bar: false,
+    composition: false,
+    micro: false
+  };
 
   private readonly destroySubject: Subject<void> = new Subject();
 
@@ -42,7 +55,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService,
+    private irregularBudgetService: IrregularBudgetService
   ) { }
 
   ngOnInit(): void {
@@ -58,6 +72,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
       description: '',
     };
     this.initDetails();
+  }
+
+  toggle(section: 'irregularGauge' | 'irregularCumulative' | 'bar' | 'composition' | 'micro') {
+    this.collapsed[section] = !this.collapsed[section];
   }
 
   initDetails(): void {
@@ -86,6 +104,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this.dateFilterService.description = undefined;
     }
     this.applyFilters(this.initialFilter);
+    this.irregularBudgetService.getValue().pipe(takeUntil(this.destroySubject)).subscribe(v => this.irregularBudget = v || 0);
   }
 
   applyFilters(filter: MultiFilter): void {
@@ -171,7 +190,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.applyFilters(this.currentFilter);
   }
 
-  onCategoryRemoved(catId: string){
+  onCategoryRemoved(catId: string) {
     const date = this.currentFilter?.date || this.dateFilterService.getInitialMonthValue();
     const description = this.currentFilter?.description || '';
     // remove category if present
