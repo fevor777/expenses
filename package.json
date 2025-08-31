@@ -8,7 +8,11 @@
     "watch": "ng build --watch --configuration development",
     "pp": "ng build && mv docs/browser/* docs && git add . && git commit -m 'feat: build' && git push origin HEAD",
     "ppwin": "ng build && Move-Item docs/browser/* docs && git add . && git commit -m 'feat: build' && git push origin HEAD",
-    "test": "ng test"
+    "test": "ng test",
+    "android:build-web": "ng build --configuration android && if [ -d docs/browser ]; then mv docs/browser/* docs && rmdir docs/browser; fi",
+    "android:prepare": "bash android-webview/copy-web.sh",
+    "android:apk": "npm run android:build-web && npm run android:prepare && (cd android-webview && ./gradlew assembleDebug)",
+    "android:install": "(cd android-webview && ./gradlew installDebug)"
   },
   "private": true,
   "dependencies": {

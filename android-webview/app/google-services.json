@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1086094925498",
+    "project_id": "expenses-6a190",
+    "storage_bucket": "expenses-6a190.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086094925498:android:573326f2a580b3886fac83",
+        "android_client_info": {
+          "package_name": "com.example.expenseswrapper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086094925498-39u65asbloheupeukv7932ksq9qm0otv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsY0BtcK-A8tsTYO9wU-uKPk1HwMRf5CI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1086094925498-39u65asbloheupeukv7932ksq9qm0otv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,6 +3,22 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.0.
 
 ## Development server
+### Android WebView wrapper Google Sign-In
+
+Set your Firebase Web OAuth client ID in `android-webview/local.properties`:
+
+```
+WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID.apps.googleusercontent.com
+```
+
+Then build & install:
+
+```
+npm run android:apk
+```
+
+The web app running inside the WebView will call the native bridge via `window.NativeAuth.requestGoogleSignIn()`; on success the native layer forwards the ID token to the web app (`window.onNativeGoogleIdToken`).
+
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
