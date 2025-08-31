@@ -20,6 +20,7 @@ import { DateFilterComponent } from '../common/component/filter/date/date-filter
 import { IrregularBudgetService } from '../common/service/irregular-budget.service';
 import { IrregularBudgetGaugeComponent } from './irregular/irregular-budget-gauge.component';
 import { IrregularCumulativeComponent } from './irregular/irregular-cumulative.component';
+import { Mode } from '../common/component/filter/date/dateFrame.model';
 
 @Component({
   selector: 'app-details',
@@ -76,6 +77,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   toggle(section: 'irregularGauge' | 'irregularCumulative' | 'bar' | 'composition' | 'micro') {
     this.collapsed[section] = !this.collapsed[section];
+  }
+
+  get isMonth(): boolean {
+    return (this.currentFilter?.date?.mode || this.defaultDateValue?.mode) === Mode.MONTH;
   }
 
   initDetails(): void {

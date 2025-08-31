@@ -7,11 +7,16 @@
       <button type="button" class="collapse-btn">{{ collapsed.irregularGauge ? '▼' : '▲' }}</button>
     </div>
     <div class="section-body" *ngIf="!collapsed.irregularGauge">
-      <div class="irregular-block single">
-        <div class="ib-chart">
-          <app-irregular-budget-gauge [expenses]="expenses" [budget]="irregularBudget"></app-irregular-budget-gauge>
+      <ng-container *ngIf="isMonth; else gaugeMsg">
+        <div class="irregular-block single">
+          <div class="ib-chart">
+            <app-irregular-budget-gauge [expenses]="expenses" [budget]="irregularBudget"></app-irregular-budget-gauge>
+          </div>
         </div>
-      </div>
+      </ng-container>
+      <ng-template #gaugeMsg>
+        <div class="placeholder-msg">Доступно только для месячного периода</div>
+      </ng-template>
     </div>
   </div>
   <div class="section">
@@ -20,12 +25,17 @@
       <button type="button" class="collapse-btn">{{ collapsed.irregularCumulative ? '▼' : '▲' }}</button>
     </div>
     <div class="section-body" *ngIf="!collapsed.irregularCumulative">
-      <div class="irregular-block single">
-        <div class="ib-chart wide">
-          <app-irregular-cumulative [expenses]="expenses" [budget]="irregularBudget"
-            [date]="currentFilter?.date"></app-irregular-cumulative>
+      <ng-container *ngIf="isMonth; else cumulativeMsg">
+        <div class="irregular-block single">
+          <div class="ib-chart wide">
+            <app-irregular-cumulative [expenses]="expenses" [budget]="irregularBudget"
+              [date]="currentFilter?.date"></app-irregular-cumulative>
+          </div>
         </div>
-      </div>
+      </ng-container>
+      <ng-template #cumulativeMsg>
+        <div class="placeholder-msg">Доступно только для месячного периода</div>
+      </ng-template>
     </div>
   </div>
   <div class="section">

@@ -103,4 +103,13 @@
     color: rgb(209, 209, 209);
     cursor: pointer;
   }
+
+  .statistics-nav-icon {
+    color: rgb(209, 209, 209);
+    font-size: 15px;
+    cursor: pointer;
+    padding-left: 25px;
+    transition: color .15s;
+  }
+  .statistics-nav-icon:hover { color: #b7b7b7; }
 }

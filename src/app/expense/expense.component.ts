@@ -157,6 +157,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.router.navigate(['/export']);
   }
 
+  navigateToDetails(): void {
+    this.router.navigate(['/details']);
+  }
+
   onBalanceChange(balance: number): void {
     this.balanceService
       .addBalance(balance)
@@ -262,8 +266,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     clearTimeout(this.globalLongPressTimeout);
     this.globalLongPressTimeout = setTimeout(() => {
       this.globalLongPressTriggered = true;
-      // Mimic left swipe on categories => navigate to statistics
-      this.navigateToStatistics();
+      // Mimic left swipe on categories => navigate to details
+      this.navigateToDetails();
     }, GLOBAL_LONG_PRESS_DURATION);
   }
 

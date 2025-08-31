@@ -12,7 +12,8 @@ import {
 import { FormsModule } from '@angular/forms';
 
 import { getCategoryNameById } from '../../../model/categories';
-import { DateFrame } from '../date/dateFrame.model';
+import { DateFrame, Mode } from '../date/dateFrame.model';
+import { DateTime } from 'luxon';
 import { DateFilterComponent } from '../date/date-filter.component';
 import { CategoryFilterComponent } from '../category/category-filter.component';
 import { Observable, Subject } from 'rxjs';
@@ -114,6 +115,14 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     this.predefineCategories = [...this.selectedCategories];
   }
 
+  get isToday(): boolean {
+    if (!this.dateFilter?.start || !this.dateFilter?.finish) return false;
+    const today = DateTime.local();
+    return (this.dateFilter.mode === Mode.DAY || !this.dateFilter.mode) &&
+      this.dateFilter.start.hasSame(today, 'day') &&
+      this.dateFilter.finish.hasSame(today, 'day');
+  }
+
 
   navigateToDetails(): void {
     // Match history navigation pattern: store filter state in DateFilterService
@@ -141,6 +150,10 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
       this.dateFilterService.description = this.descriptionFilter.trim();
     }
     this.router.navigate(['/history']);
+  }
+
+  navigateToStatistics(): void {
+    this.router.navigate(['/statistics']);
   }
 
   ngOnDestroy(): void {

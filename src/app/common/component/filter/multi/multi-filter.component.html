@@ -12,6 +12,7 @@
         <span [style.color]="'#ff6f61'">{{
           dateFilter?.display || "Весь"
           }}</span>
+        <i *ngIf="isToday" class="fas fa-chart-line statistics-nav-icon" title="Перейти к статистике" (click)="navigateToStatistics()" style="margin-left:8px;cursor:pointer;"></i>
       </div>
       <div class="app-multi-filter-header" *ngIf="descriptionFilter">
         <span class="description-filter-label">Description:</span>
