@@ -27,8 +27,8 @@ import { CompositionChartsComponent } from './composition/composition-charts.com
     CategoryListNamePipe,
     StatisticsBarComponent,
     BarChartComponent,
-  CommonModule,
-  CompositionChartsComponent,
+    CommonModule,
+    CompositionChartsComponent,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
@@ -164,6 +164,13 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.router.navigate(['/details'], {
       queryParams: { 'back-url': '/statistics' },
     });
+  }
+
+  navigateToDetailsPage(): void {
+    // open details page with current date filter and no preselected categories
+    this.dateFilterService.categories = [];
+    this.dateFilterService.dateFilter = this.currentFilter;
+    this.router.navigate(['/details'], { queryParams: { 'back-url': '/statistics' } });
   }
 
   calculateCategoryTotals(

@@ -2,7 +2,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first, Subject, takeUntil } from 'rxjs';
 
-import { getCategoryNameById } from '../common/model/categories';
+import { Categories } from '../common/model/categories';
 import {
   MultiFilter,
   MultiFilterComponent,
@@ -160,6 +160,30 @@ export class DetailsComponent implements OnInit, OnDestroy {
       },
       0
     );
+  }
+
+  onCategorySelected(catId: string) {
+    if (!catId) return;
+    const date = this.currentFilter?.date || this.dateFilterService.getInitialMonthValue();
+    const description = this.currentFilter?.description || '';
+    this.currentFilter = { categories: [catId], date, description };
+    this.initialFilter = { categories: [catId], date, description }; // keep description
+    this.applyFilters(this.currentFilter);
+  }
+
+  onCategoryRemoved(catId: string){
+    const date = this.currentFilter?.date || this.dateFilterService.getInitialMonthValue();
+    const description = this.currentFilter?.description || '';
+    // remove category if present
+    const categories = this.currentFilter?.categories.length > 0 ? this.currentFilter?.categories : Categories.map(c => c.id);
+    let remaining = categories.filter(c => c !== catId);
+    // if we removed the last visible category, interpret as clearing category filter (empty array)
+    if (remaining.length === 0) {
+      remaining = [];
+    }
+    this.currentFilter = { categories: remaining, date, description };
+    this.initialFilter = { categories: remaining, date, description };
+    this.applyFilters(this.currentFilter);
   }
 
   ngOnDestroy(): void {

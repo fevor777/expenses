@@ -14,5 +14,5 @@
     <div style="font-weight:600;font-size:14px;margin:4px 0 6px 4px;">Категории (дерево)</div>
     <app-composition-charts [expenses]="expenses"></app-composition-charts>
   </div>
-  <app-micro-visuals [expenses]="expenses" [topN]="5"></app-micro-visuals>
+  <app-micro-visuals [expenses]="expenses" [topN]="5" [selectedCategories]="currentFilter?.categories" (categorySelected)="onCategorySelected($event)" (categoryRemoved)="onCategoryRemoved($event)"></app-micro-visuals>
 </div>

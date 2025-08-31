@@ -1,12 +1,12 @@
 <div class="statistics">
-  <app-date-filter
-    class="statistics-filter"
-    [value]="currentFilter"
-    [defaultValue]="initialFilterValue"
-    (changeFilter)="onFilterChange($event)"
-  ></app-date-filter>
+  <app-date-filter class="statistics-filter" [value]="currentFilter" [defaultValue]="initialFilterValue"
+    (changeFilter)="onFilterChange($event)"></app-date-filter>
   <div style="width: 100%; height: 200px">
-    <div style="font-weight:600; font-size:14px; margin:4px 0 2px 4px;">Категории (доля расходов)</div>
+    <div style="font-weight:600; font-size:14px; margin:4px 0 2px 4px; display:flex; align-items:center; gap:30px;">
+      <span>Категории (доля расходов)</span>
+      <i class="fa-solid fa-list category-details-icon" title="Перейти в детализацию"
+        style="font-size:12px; color: grey; cursor:pointer;" (click)="navigateToDetailsPage()"></i>
+    </div>
     <div id="donut-chart" style="width: 100%; height: calc(100% - 22px);"></div>
   </div>
   <hr class="statistics-separator" />
@@ -16,63 +16,28 @@
       (За исключением
       <span class="statistic-excluded-category">{{
         excludedCategories | categoryListName
-      }}</span
-      >)
-      <i
-        (click)="onRefresh()"
-        class="fas fa-redo-alt statistic-refresh-button"
-      ></i>
+        }}</span>)
+      <i (click)="onRefresh()" class="fas fa-redo-alt statistic-refresh-button"></i>
     </span>
   </span>
   <span class="statistics-checkbox">
-    <input
-      type="checkbox"
-      value="regular"
-      id="category-regular"
-      class="statistics-checkbox-input"
-      [checked]="true"
-      [(ngModel)]="regularCategoriesCheckboxValue"
-      (ngModelChange)="onRegularCategoriesCheckboxClick($event)"
-    />
-    <label for="category-regular"
-      >Регулярное <span style="color: grey">({{ regularAmount }}€)</span></label
-    >
-    <input
-      type="checkbox"
-      value="irregular"
-      id="category-irregular"
-      class="statistics-checkbox-input"
-      [checked]="true"
-      [(ngModel)]="irregularCategoriesCheckboxValue"
-      (ngModelChange)="onIrregularCategoriesCheckboxClick($event)"
-    />
-    <label for="category-irregular"
-      >Нерегулярное
-      <span style="color: grey">({{ irregularAmount }}€)</span></label
-    >
+    <input type="checkbox" value="regular" id="category-regular" class="statistics-checkbox-input" [checked]="true"
+      [(ngModel)]="regularCategoriesCheckboxValue" (ngModelChange)="onRegularCategoriesCheckboxClick($event)" />
+    <label for="category-regular">Регулярное <span style="color: grey">({{ regularAmount }}€)</span></label>
+    <input type="checkbox" value="irregular" id="category-irregular" class="statistics-checkbox-input" [checked]="true"
+      [(ngModel)]="irregularCategoriesCheckboxValue" (ngModelChange)="onIrregularCategoriesCheckboxClick($event)" />
+    <label for="category-irregular">Нерегулярное
+      <span style="color: grey">({{ irregularAmount }}€)</span></label>
   </span>
-  <app-statistics-bar
-    *ngFor="let categoryTotal of categoryTotals"
-    [amount]="categoryTotal.amount"
-    [category]="categoryTotal.category"
-    [percentage]="categoryTotal.percentage"
-    (categoryLabelClick)="filterByCategory($event)"
-    (detailsIconClick)="navigateToDetails($event)"
-    (chartIconClick)="navigateToChart($event)"
-    (close)="onBarClose($event)"
-  >
+  <app-statistics-bar *ngFor="let categoryTotal of categoryTotals" [amount]="categoryTotal.amount"
+    [category]="categoryTotal.category" [percentage]="categoryTotal.percentage"
+    (categoryLabelClick)="filterByCategory($event)" (detailsIconClick)="navigateToDetails($event)"
+    (chartIconClick)="navigateToChart($event)" (close)="onBarClose($event)">
   </app-statistics-bar>
-  <hr
-    class="statistics-separator"
-    [style.margin-top.px]="'15'"
-    [style.margin-bottom.px]="'15'"
-  />
+  <hr class="statistics-separator" [style.margin-top.px]="'15'" [style.margin-bottom.px]="'15'" />
   <div style="margin-top:8px;">
     <div style="font-weight:600; font-size:14px; margin:4px 0 6px 4px;">Расходы по периодам</div>
-    <app-bar-chart
-      [filter]="currentFilter"
-      [expenses]="filteredExpenses"
-    ></app-bar-chart>
+    <app-bar-chart [filter]="currentFilter" [expenses]="filteredExpenses"></app-bar-chart>
   </div>
   <hr class="statistics-separator" />
   <div style="margin-top:4px;">

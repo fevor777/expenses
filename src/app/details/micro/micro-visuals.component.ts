@@ -1,22 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Expense } from '../../common/model/expense.model';
 import { getCategoryNameById } from '../../common/model/categories';
 
 interface CategoryStat {
-    id: string;
-    name: string;
-    total: number;
-    percent: number;
-    series: number[]; // daily totals over ordered dateKeys
-    max: number; // max value in series
+  id: string;
+  name: string;
+  total: number;
+  percent: number;
+  series: number[]; // daily totals over ordered dateKeys
+  max: number; // max value in series
 }
 
 @Component({
-    selector: 'app-micro-visuals',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-micro-visuals',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     <div class="micro-wrapper" *ngIf="stats.length; else noDataTpl">
       <div class="micro-header">
         <div class="micro-title">Микро визуализация</div>
@@ -42,8 +42,11 @@ interface CategoryStat {
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let s of stats">
-            <td class="cat-cell">{{ s.name }}</td>
+      <tr *ngFor="let s of stats" (click)="selectCategory(s.id)" class="cat-row" [class.active]="selectedCategories?.length===1 && selectedCategories[0]===s.id">
+            <td class="cat-cell">
+        <span class="row-x" (click)="onRemoveCategory(s.id, $event)">X</span>
+              <span class="cat-name">{{ s.name }}</span>
+            </td>
             <td class="share-col">
               <div class="lollipop-track">
                 <div class="lollipop-fill" [style.width.%]="s.percent"></div>
@@ -65,7 +68,7 @@ interface CategoryStat {
       <div class="micro-empty">Нет данных</div>
     </ng-template>
   `,
-    styles: [`
+  styles: [`
     .micro-wrapper { margin-top:20px; }
     .micro-header { margin:0 2px 8px 2px; }
     .micro-title { font-weight:600; font-size:14px; }
@@ -74,6 +77,15 @@ interface CategoryStat {
     .micro-table { width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; }
     .micro-table th { text-align:left; font-weight:600; font-size:11px; padding:4px 2px; border-bottom:1px solid #eee; }
     .micro-table td { padding:3px 2px; vertical-align:middle; border-bottom:1px solid #f5f5f5; }
+    .micro-table tbody tr.cat-row{cursor:pointer;}
+  .micro-table tbody tr.cat-row:hover{background:#f7faff;}
+  .micro-table tbody tr.cat-row.active{background:#e6f3ff;}
+  .cat-cell{display:flex;align-items:center;gap:4px;}
+  .row-x{margin-left:1px;margin-right:4px;font-size:10px;color:#666;cursor:pointer;padding:2px 4px;border-radius:3px;}
+  .row-x:hover{background:#ddd;color:#222;}
+  .cat-name{color:#1a73e8;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+  .cat-name:hover{color:#0b5ec9;}
+  .micro-table tbody tr.cat-row.active .cat-name{font-weight:600;color:#0b5ec9;}
     .cat-cell { white-space:nowrap; }
   .share-col { width:70px; }
   .trend-col { width:120px; }
@@ -92,80 +104,92 @@ interface CategoryStat {
   `]
 })
 export class MicroVisualsComponent implements OnChanges {
-    @Input() expenses: Expense[] = [];
-    @Input() topN: number = 5;
-    // Maximum horizontal units (virtual width) used for sparkline; longer series are compressed proportionally
-    private readonly maxSparkSpan = 40; // adjust if you prefer denser or more compressed lines
+  @Input() expenses: Expense[] = [];
+  @Input() topN: number = 5;
+  @Input() selectedCategories: string[] = [];
+  @Output() categorySelected = new EventEmitter<string>();
+  @Output() categoryRemoved = new EventEmitter<string>();
+  // Maximum horizontal units (virtual width) used for sparkline; longer series are compressed proportionally
+  private readonly maxSparkSpan = 40; // adjust if you prefer denser or more compressed lines
 
-    stats: CategoryStat[] = [];
-    topTotal = 0;
-    otherTotal = 0;
-    topOtherTotal = 0;
-    private dateKeys: string[] = [];
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['expenses']) {
-            this.recompute();
-        }
+  stats: CategoryStat[] = [];
+  topTotal = 0;
+  otherTotal = 0;
+  topOtherTotal = 0;
+  private dateKeys: string[] = [];
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['expenses']) {
+      this.recompute();
     }
+  }
 
-    private recompute(): void {
-        if (!this.expenses || this.expenses.length === 0) {
-            this.stats = [];
-            this.topTotal = this.otherTotal = this.topOtherTotal = 0;
-            return;
-        }
-        // Build ordered date keys (YYYY-MM-DD) for the provided expenses
-        const dateSet = new Set<string>();
-        this.expenses.forEach(e => {
-            const d = new Date(e.date);
-            dateSet.add(`${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`);
-        });
-        this.dateKeys = Array.from(dateSet).sort();
-        const catMap = new Map<string, number[]>(); // category -> series aligned with dateKeys
-        const totals = new Map<string, number>();
-        this.dateKeys.forEach(_ => { /* placeholder to guarantee index */ });
-        this.expenses.forEach(e => {
-            const d = new Date(e.date);
-            const key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
-            const idx = this.dateKeys.indexOf(key); // small sets; acceptable; else build index map
-            if (idx === -1) return;
-            if (!catMap.has(e.category)) catMap.set(e.category, new Array(this.dateKeys.length).fill(0));
-            const series = catMap.get(e.category)!;
-            series[idx] = +(series[idx] + e.amount).toFixed(2);
-            totals.set(e.category, (totals.get(e.category) || 0) + e.amount);
-        });
-        const grandTotal = Array.from(totals.values()).reduce((s, v) => s + v, 0) || 1;
-        const stats: CategoryStat[] = Array.from(catMap.entries()).map(([id, series]) => {
-            const name = getCategoryNameById(id);
-            const total = +(series.reduce((s, v) => s + v, 0).toFixed(2));
-            const percent = +((total / grandTotal) * 100).toFixed(2);
-            const max = Math.max(...series, 0);
-            return { id, name, total, percent, series, max };
-        });
-        stats.sort((a, b) => b.total - a.total);
-        this.stats = stats;
-        // Top N vs other
-        const top = stats.slice(0, this.topN);
-        this.topTotal = top.reduce((s, v) => s + v.total, 0);
-        this.otherTotal = stats.slice(this.topN).reduce((s, v) => s + v.total, 0);
-        this.topOtherTotal = this.topTotal + this.otherTotal;
+  private recompute(): void {
+    if (!this.expenses || this.expenses.length === 0) {
+      this.stats = [];
+      this.topTotal = this.otherTotal = this.topOtherTotal = 0;
+      return;
     }
+    // Build ordered date keys (YYYY-MM-DD) for the provided expenses
+    const dateSet = new Set<string>();
+    this.expenses.forEach(e => {
+      const d = new Date(e.date);
+      dateSet.add(`${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`);
+    });
+    this.dateKeys = Array.from(dateSet).sort();
+    const catMap = new Map<string, number[]>(); // category -> series aligned with dateKeys
+    const totals = new Map<string, number>();
+    this.dateKeys.forEach(_ => { /* placeholder to guarantee index */ });
+    this.expenses.forEach(e => {
+      const d = new Date(e.date);
+      const key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+      const idx = this.dateKeys.indexOf(key); // small sets; acceptable; else build index map
+      if (idx === -1) return;
+      if (!catMap.has(e.category)) catMap.set(e.category, new Array(this.dateKeys.length).fill(0));
+      const series = catMap.get(e.category)!;
+      series[idx] = +(series[idx] + e.amount).toFixed(2);
+      totals.set(e.category, (totals.get(e.category) || 0) + e.amount);
+    });
+    const grandTotal = Array.from(totals.values()).reduce((s, v) => s + v, 0) || 1;
+    const stats: CategoryStat[] = Array.from(catMap.entries()).map(([id, series]) => {
+      const name = getCategoryNameById(id);
+      const total = +(series.reduce((s, v) => s + v, 0).toFixed(2));
+      const percent = +((total / grandTotal) * 100).toFixed(2);
+      const max = Math.max(...series, 0);
+      return { id, name, total, percent, series, max };
+    });
+    stats.sort((a, b) => b.total - a.total);
+    this.stats = stats;
+    // Top N vs other
+    const top = stats.slice(0, this.topN);
+    this.topTotal = top.reduce((s, v) => s + v.total, 0);
+    this.otherTotal = stats.slice(this.topN).reduce((s, v) => s + v.total, 0);
+    this.topOtherTotal = this.topTotal + this.otherTotal;
+  }
 
-    getSparkWidth(len: number): number {
-        if (len <= 1) return 0;
-        return Math.min(len - 1, this.maxSparkSpan);
-    }
+  getSparkWidth(len: number): number {
+    if (len <= 1) return 0;
+    return Math.min(len - 1, this.maxSparkSpan);
+  }
 
-    buildSparkPoints(s: CategoryStat): string {
-        const len = s.series.length;
-        if (len <= 1) return '';
-        const max = s.max || 1;
-        const width = this.getSparkWidth(len);
-        const denom = (len - 1) || 1;
-        return s.series.map((v, i) => {
-            const x = (i / denom) * width;
-            const y = 18 - (v / max) * 16; // padding top 2px bottom 2px (height 20)
-            return `${x.toFixed(2)},${y.toFixed(2)}`;
-        }).join(' ');
-    }
+  buildSparkPoints(s: CategoryStat): string {
+    const len = s.series.length;
+    if (len <= 1) return '';
+    const max = s.max || 1;
+    const width = this.getSparkWidth(len);
+    const denom = (len - 1) || 1;
+    return s.series.map((v, i) => {
+      const x = (i / denom) * width;
+      const y = 18 - (v / max) * 16; // padding top 2px bottom 2px (height 20)
+      return `${x.toFixed(2)},${y.toFixed(2)}`;
+    }).join(' ');
+  }
+
+  selectCategory(id: string) {
+    this.categorySelected.emit(id);
+  }
+
+  onRemoveCategory(id: string, event: MouseEvent) {
+    event.stopPropagation();
+    this.categoryRemoved.emit(id);
+  }
 }
