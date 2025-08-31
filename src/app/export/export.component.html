@@ -23,7 +23,7 @@
   <app-tab key="auth" label="Auth">
     <div style="margin-top:12px">
       <div *ngIf="user$ | async as user; else loginBlock">
-        <h3>Welcome, {{ user?.displayName }}!</h3>
+        <h3>Welcome, {{ user?.displayName }}!!!</h3>
         <button (click)="logout()">Sign Out</button>
       </div>
       <ng-template #loginBlock>
