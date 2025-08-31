@@ -1,42 +1,38 @@
 <div class="app-multi-filter">
   <div class="app-multi-filter-container">
-    <span
-      *ngIf="
+    <span *ngIf="
         (dateFilter?.display || getCategoryFilters()?.length) && !expandFilters
-      "
-    >
+      ">
       <div class="app-multi-filter-header">
         <span [style.font-weight]="'bold'">Фильтры:</span>
-        <i
-          (click)="clearFilters()"
-          class="fas fa-redo-alt"
-          [style.padding-left]="'10px'"
-        ></i>
+        <i (click)="clearFilters()" class="fas fa-redo-alt" [style.padding-left]="'10px'"></i>
       </div>
       <div class="app-multi-filter-header">
         <span [style.margin-right.px]="10">Период:</span>
         <span [style.color]="'#ff6f61'">{{
           dateFilter?.display || "Весь"
-        }}</span>
+          }}</span>
+      </div>
+      <div class="app-multi-filter-header" *ngIf="descriptionFilter">
+        <span class="description-filter-label">Description:</span>
+        <span class="description-filter-value">"{{ descriptionFilter }}"</span>
       </div>
       <div class="app-multi-filter-header">
         <span [style.margin-right.px]="10">Категории:</span>
         <span [style.color]="'#ff6f61'">{{
           getCategoryFilters() || "Все"
-        }}</span>
+          }}</span>
       </div>
     </span>
-    <span
-      *ngIf="
+    <span *ngIf="
         (!dateFilter?.display && !getCategoryFilters()?.length) || expandFilters
-      "
-    >
-      <div
-        class="app-multi-filter-header"
-        *ngIf="!showSavings; else savingsTemplate"
-      >
+      ">
+      <div class="app-multi-filter-header" *ngIf="!showSavings; else savingsTemplate">
         <span (click)="onShowSavings()">Общий расход: </span>
         <span class="app-multi-filter-total-amount">{{ totalAmount }}€</span>
+        <i *ngIf="showHistoryIcon" class="fa-solid fa-list category-details-icon" (click)="navigateToHistory()"
+          title="Перейти к истории"></i>
+        <i *ngIf="showDetailsIcon" class="fas fa-chart-bar history-item-chart" (click)="navigateToDetails()"></i>
       </div>
       <ng-template #savingsTemplate>
         <div class="app-multi-filter-header" (click)="onShowSavings()">
@@ -45,28 +41,22 @@
         </div>
       </ng-template>
     </span>
-    <button
-      class="app-multi-filter-button"
-      [ngClass]="{ 'app-multi-filter-button-active': expandFilters }"
-      (click)="toggleExpandFilters()"
-    >
+    <button class="app-multi-filter-button" [ngClass]="{ 'app-multi-filter-button-active': expandFilters }"
+      (click)="toggleExpandFilters()">
       <i class="fas fa-filter"></i>
     </button>
   </div>
-  <div
-    [style.margin.px]="'10'"
-    *ngIf="
+  <div [style.margin.px]="'10'" *ngIf="
       (dateFilter?.display || getCategoryFilters()?.length) && !expandFilters
-    "
-  >
-    <div
-      *ngIf="!showSavings; else savingsTemplate"
-      (click)="onShowSavings()"
-      class="app-multi-filter-header"
-      [style.margin-bottom.px]="30"
-    >
+    ">
+    <div *ngIf="!showSavings; else savingsTemplate" (click)="onShowSavings()" class="app-multi-filter-header"
+      [style.margin-bottom.px]="30">
       <span>Общий расход: </span>
       <span class="app-multi-filter-total-amount">{{ totalAmount }}€</span>
+      <i *ngIf="showHistoryIcon" class="fa-solid fa-list category-details-icon" (click)="navigateToHistory()"
+        title="Перейти к истории"></i>
+      <i *ngIf="showDetailsIcon" class="fas fa-chart-bar history-item-chart" (click)="navigateToDetails()"
+        title="Перейти к истории"></i>
     </div>
   </div>
   <ng-template #savingsTemplate>
@@ -78,16 +68,15 @@
   <div class="app-multi-filter-expand" *ngIf="expandFilters">
     <div class="app-multi-filter-expand-items">
       <div class="app-multi-filter-expand-date">
-        <app-date-filter
-          [defaultValue]="defaultDateValue"
-          [value]="dateFilter"
-          (changeFilter)="emitDateFilter($event)"
-        ></app-date-filter>
+        <app-date-filter [defaultValue]="defaultDateValue" [value]="dateFilter"
+          (changeFilter)="emitDateFilter($event)"></app-date-filter>
       </div>
-      <app-category-filter
-        [value]="predefineCategories"
-        (selectedCategories)="emitCategoryFilters($event)"
-      ></app-category-filter>
+      <div class="description-filter-wrapper">
+        <input type="text" class="description-filter-input" placeholder="Description..." [(ngModel)]="descriptionFilter"
+          (ngModelChange)="emitDescriptionFilter()" />
+      </div>
+      <app-category-filter [value]="predefineCategories"
+        (selectedCategories)="emitCategoryFilters($event)"></app-category-filter>
     </div>
   </div>
 </div>

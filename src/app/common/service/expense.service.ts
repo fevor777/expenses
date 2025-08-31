@@ -41,12 +41,24 @@ export class ExpenseService {
 
   getExpenses(
     dateFilter?: DateFrame,
-    category?: string[]
+    category?: string[],
+    descriptionFilter?: string
   ): Observable<Expense[]> {
+    const desc = (descriptionFilter || '').trim().toLowerCase();
+    const applyDescriptionFilter = (expenses: Expense[]) => {
+      if (!desc) return expenses;
+      return expenses.filter((e) =>
+        (e.description || '').toLowerCase().includes(desc)
+      );
+    };
     if (this.authService.user) {
-      return this.getExpensesFromFirebase(dateFilter, category);
+      return this.getExpensesFromFirebase(dateFilter, category).pipe(
+        map(applyDescriptionFilter)
+      );
     } else {
-      return this.expenseStoreService.getExpensesObs(dateFilter, category);
+      return this.expenseStoreService
+        .getExpensesObs(dateFilter, category, descriptionFilter)
+        .pipe(map(applyDescriptionFilter));
     }
   }
 

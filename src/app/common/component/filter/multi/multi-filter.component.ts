@@ -17,10 +17,13 @@ import { DateFilterComponent } from '../date/date-filter.component';
 import { CategoryFilterComponent } from '../category/category-filter.component';
 import { SavingService } from '../../../service/saving.service';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { DateFilterService } from '../date/date-filter.service';
 
 export type MultiFilter = {
   categories: string[];
   date: DateFrame;
+  description?: string; // substring filter for expense description
 };
 
 @Component({
@@ -39,6 +42,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   @Input() value: MultiFilter;
   @Input() totalAmount: number;
   @Input() defaultDateValue: DateFrame;
+  @Input() showHistoryIcon: boolean = false; // show chart icon on history page
+  @Input() showDetailsIcon: boolean = false; // show list/chart icon on details/statistics page
 
   @Output() selectedFilters: EventEmitter<MultiFilter> = new EventEmitter();
 
@@ -46,13 +51,18 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   selectedCategories: string[] = [];
   predefineCategories: string[] = [];
   expandFilters: boolean = false;
+  descriptionFilter: string = '';
   showSavings: boolean;
   savings$: Observable<number>;
   savings: number;
 
   private unsubscribe: Subject<void> = new Subject();
 
-  constructor(private savingService: SavingService) {}
+  constructor(
+    private savingService: SavingService,
+    private router: Router,
+    private dateFilterService: DateFilterService
+  ) { }
 
   ngOnInit(): void {
     this.savings$ = this.savingService
@@ -64,6 +74,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
       this.dateFilter = this.value.date;
       this.selectedCategories = this.value.categories;
       this.predefineCategories = this.value.categories;
+      this.descriptionFilter = this.value.description || '';
     }
   }
 
@@ -79,7 +90,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     this.dateFilter = this.defaultDateValue;
     this.predefineCategories = [];
     this.selectedCategories = [];
-    this.selectedFilters.emit({ categories: [], date: this.defaultDateValue });
+    this.descriptionFilter = '';
+    this.selectedFilters.emit({ categories: [], date: this.defaultDateValue, description: '' });
   }
 
   emitDateFilter(dateFilter: DateFrame): void {
@@ -87,6 +99,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     this.selectedFilters.emit({
       categories: this.selectedCategories,
       date: dateFilter,
+      description: this.descriptionFilter?.trim(),
     });
   }
 
@@ -95,6 +108,15 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     this.selectedFilters.emit({
       categories: selectedCategories,
       date: this.dateFilter,
+      description: this.descriptionFilter?.trim(),
+    });
+  }
+
+  emitDescriptionFilter(): void {
+    this.selectedFilters.emit({
+      categories: this.selectedCategories,
+      date: this.dateFilter,
+      description: this.descriptionFilter?.trim(),
     });
   }
 
@@ -111,6 +133,34 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
         .pipe(takeUntil(this.unsubscribe))
         .subscribe();
     }
+  }
+
+  navigateToDetails(): void {
+    // Match history navigation pattern: store filter state in DateFilterService
+    if (this.dateFilter) {
+      this.dateFilterService.dateFilter = this.dateFilter;
+    }
+    if (this.selectedCategories?.length) {
+      this.dateFilterService.categories = [...this.selectedCategories];
+    }
+    if (this.descriptionFilter?.trim()) {
+      this.dateFilterService.description = this.descriptionFilter.trim();
+    }
+    this.router.navigate(['/details'], { queryParams: { 'back-url': '/history' } });
+  }
+
+  navigateToHistory(): void {
+    // Store filters so history page picks them up
+    if (this.dateFilter) {
+      this.dateFilterService.dateFilter = this.dateFilter;
+    }
+    if (this.selectedCategories?.length) {
+      this.dateFilterService.categories = [...this.selectedCategories];
+    }
+    if (this.descriptionFilter?.trim()) {
+      this.dateFilterService.description = this.descriptionFilter.trim();
+    }
+    this.router.navigate(['/history']);
   }
 
   ngOnDestroy(): void {

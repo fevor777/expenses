@@ -22,7 +22,8 @@ export class ExpenseStoreService {
 
   getExpensesObs(
     dateFilter?: DateFrame,
-    category?: string[]
+    category?: string[],
+    descriptionFilter?: string
   ): Observable<Expense[]> {
     let expensesFromLocStorage = JSON.parse(
       localStorage.getItem('expenses') || '[]'
@@ -30,9 +31,10 @@ export class ExpenseStoreService {
     expensesFromLocStorage = this.filterExpenses(
       expensesFromLocStorage,
       dateFilter,
-      category
+      category,
+      descriptionFilter
     );
-    this.filter = { date: dateFilter, categories: category };
+    this.filter = { date: dateFilter, categories: category, description: descriptionFilter } as MultiFilter;
     this.updateExpenses(expensesFromLocStorage);
     return this.expenses$;
   }
@@ -49,7 +51,8 @@ export class ExpenseStoreService {
     expenseList = this.filterExpenses(
       expenseList,
       this.filter?.date,
-      this.filter?.categories
+      this.filter?.categories,
+      this.filter?.description
     );
     this.updateExpenses(expenseList);
     return of(expense);
@@ -69,7 +72,8 @@ export class ExpenseStoreService {
     updatedExpenses = this.filterExpenses(
       updatedExpenses,
       this.filter?.date,
-      this.filter?.categories
+      this.filter?.categories,
+      this.filter?.description
     );
     this.updateExpenses(updatedExpenses);
     return of(expense);
@@ -86,7 +90,8 @@ export class ExpenseStoreService {
     updatedExpenses = this.filterExpenses(
       updatedExpenses,
       this.filter?.date,
-      this.filter?.categories
+      this.filter?.categories,
+      this.filter?.description
     );
     this.updateExpenses(updatedExpenses);
     return of(id);
@@ -95,9 +100,10 @@ export class ExpenseStoreService {
   private filterExpenses(
     expenses: Expense[],
     dateFilter?: DateFrame,
-    category?: string[]
+    category?: string[],
+    descriptionFilter?: string
   ): Expense[] {
-    let filteredExpenses = [];
+    let filteredExpenses: Expense[] = [];
     if (Array.isArray(expenses) && expenses.length > 0) {
       if (dateFilter) {
         filteredExpenses = getExpensesFromTo(
@@ -105,12 +111,21 @@ export class ExpenseStoreService {
           dateFilter.start,
           dateFilter.finish
         );
+      } else {
+        filteredExpenses = expenses;
       }
 
       if (Array.isArray(category) && category.length > 0) {
         filteredExpenses = filteredExpenses.filter((expense) => {
           return category.includes(expense.category);
         });
+      }
+
+      if (descriptionFilter && descriptionFilter.trim()) {
+        const desc = descriptionFilter.trim().toLowerCase();
+        filteredExpenses = filteredExpenses.filter((expense) =>
+          (expense.description || '').toLowerCase().includes(desc)
+        );
       }
     }
     return filteredExpenses;

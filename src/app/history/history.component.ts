@@ -52,7 +52,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private dateFilterService: DateFilterService
-  ) {}
+  ) { }
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -121,6 +121,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
         ...(filter || {
           categories: [],
           date: this.dateFilterService.getInitialMonthValue(),
+          description: '',
         }),
       };
     }
@@ -214,7 +215,11 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   private loadExpenses(): Observable<HistoryExpense[]> {
     return this.expenseService
-      .getExpenses(this.currentFilter?.date, this.currentFilter?.categories)
+      .getExpenses(
+        this.currentFilter?.date,
+        this.currentFilter?.categories,
+        this.currentFilter?.description
+      )
       .pipe(
         map((expenses) => this.calculateAmountsAndModifyExpenses(expenses))
       );
@@ -267,6 +272,11 @@ export class HistoryComponent implements OnInit, OnDestroy {
         date: this.dateFilterService.dateFilter,
       };
       this.dateFilterService.dateFilter = undefined;
+    } else {
+      this.defaultFilter = {
+        ...this.defaultFilter,
+        date: this.dateFilterService.getInitialMonthValue(),
+      };
     }
     const categoryFilters = this.dateFilterService.categories;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
@@ -275,28 +285,24 @@ export class HistoryComponent implements OnInit, OnDestroy {
         categories: categoryFilters,
       };
       this.dateFilterService.categories = undefined;
-    }
-
-    if (
-      this.dateFilterService.dateFilter ||
-      (Array.isArray(categoryFilters) && categoryFilters.length > 0)
-    ) {
-      this.currentFilter = {
-        ...this.defaultFilter,
-      };
     } else {
-      this.setDefaultFilter();
+      this.defaultFilter = {
+        ...this.defaultFilter,
+        categories: [],
+      };
     }
-  }
 
-  private setDefaultFilter(): void {
-    this.defaultFilter = {
-      categories: [],
-      date: this.dateFilterService.getInitialMonthValue(),
-    };
+    const descriptionFilter = this.dateFilterService.description;
+    if (descriptionFilter) {
+      this.defaultFilter = {
+        ...this.defaultFilter,
+        description: descriptionFilter,
+      };
+      this.dateFilterService.description = undefined;
+    }
+
     this.currentFilter = {
-      categories: [],
-      date: this.dateFilterService.getInitialMonthValue(),
+      ...this.defaultFilter,
     };
   }
 

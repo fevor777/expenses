@@ -41,17 +41,19 @@ export class DetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private expenseService: ExpenseService,
     private dateFilterService: DateFilterService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initialFilter = {
       date: this.dateFilterService.getInitialMonthValue(),
       categories: [],
+      description: '',
     };
     this.defaultDateValue = this.dateFilterService.getInitialMonthValue();
     this.currentFilter = {
       categories: [],
       date: this.dateFilterService.getInitialMonthValue(),
+      description: '',
     };
     this.initDetails();
   }
@@ -59,19 +61,27 @@ export class DetailsComponent implements OnInit, OnDestroy {
   initDetails(): void {
     this.backUrl = this.activatedRoute.snapshot.queryParamMap.get('back-url');
     const categoryFilters = this.dateFilterService.categories;
+    const descriptionFilter = this.dateFilterService.description;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
       this.initialFilter = {
         ...this.initialFilter,
         categories: categoryFilters,
       };
       this.dateFilterService.categories = undefined;
+    }
+    this.initialFilter = {
+      ...this.initialFilter,
+      date:
+        this.dateFilterService.dateFilter ||
+        this.dateFilterService.getInitialMonthValue(),
+    };
+    this.dateFilterService.dateFilter = undefined;
+    if (descriptionFilter) {
       this.initialFilter = {
         ...this.initialFilter,
-        date:
-          this.dateFilterService.dateFilter ||
-          this.dateFilterService.getInitialMonthValue(),
+        description: descriptionFilter,
       };
-      this.dateFilterService.dateFilter = undefined;
+      this.dateFilterService.description = undefined;
     }
     this.applyFilters(this.initialFilter);
   }
@@ -80,15 +90,21 @@ export class DetailsComponent implements OnInit, OnDestroy {
     const updatedFilter = {
       date: filter?.date || this.dateFilterService.getInitialMonthValue(),
       categories: filter?.categories || [],
+      description: filter?.description || '',
     };
     if (!filter?.date) {
       this.initialFilter = {
         categories: [],
         date: this.dateFilterService.getInitialMonthValue(),
+        description: '',
       };
     }
     this.expenseService
-      .getExpenses(updatedFilter.date, updatedFilter.categories)
+      .getExpenses(
+        updatedFilter.date,
+        updatedFilter.categories,
+        updatedFilter.description
+      )
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe((expenses) => {
         this.currentFilter = updatedFilter;

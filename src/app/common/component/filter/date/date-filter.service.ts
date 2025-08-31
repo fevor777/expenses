@@ -14,6 +14,7 @@ export class DateFilterService {
 
   categories: string[];
   dateFilter: DateFrame;
+  description?: string; // persisted description filter when navigating between pages
 
   getInitialDayValue(): DateFrame {
     return {
