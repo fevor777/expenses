@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Expense } from '../../common/model/expense.model';
+import { DateFrame } from '../../common/component/filter/date/dateFrame.model';
 import { getCategoryNameById } from '../../common/model/categories';
 
 interface CategoryStat {
@@ -107,6 +108,8 @@ export class MicroVisualsComponent implements OnChanges {
   @Input() expenses: Expense[] = [];
   @Input() topN: number = 5;
   @Input() selectedCategories: string[] = [];
+  // Full selected date frame (optional) to render continuous trend over entire range, even if category sparse
+  @Input() dateFrame?: DateFrame;
   @Output() categorySelected = new EventEmitter<string>();
   @Output() categoryRemoved = new EventEmitter<string>();
   // Maximum horizontal units (virtual width) used for sparkline; longer series are compressed proportionally
@@ -129,21 +132,43 @@ export class MicroVisualsComponent implements OnChanges {
       this.topTotal = this.otherTotal = this.topOtherTotal = 0;
       return;
     }
-    // Build ordered date keys (YYYY-MM-DD) for the provided expenses
-    const dateSet = new Set<string>();
-    this.expenses.forEach(e => {
-      const d = new Date(e.date);
-      dateSet.add(`${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`);
-    });
-    this.dateKeys = Array.from(dateSet).sort();
+    // Build ordered date keys. Prefer provided dateFrame to ensure consistent horizontal scale.
+    if (this.dateFrame) {
+      const start = this.dateFrame.start.startOf('day');
+      const finish = this.dateFrame.finish.startOf('day');
+      const keys: string[] = [];
+      for (let d = start; d <= finish; d = d.plus({ days: 1 })) {
+        keys.push(`${d.year}-${(d.month).toString().padStart(2, '0')}-${d.day.toString().padStart(2, '0')}`);
+      }
+      this.dateKeys = keys;
+    } else {
+      // Fallback: contiguous span from min to max expense date
+      let minDate = new Date(this.expenses[0].date);
+      let maxDate = new Date(this.expenses[0].date);
+      for (const e of this.expenses) {
+        const d = new Date(e.date);
+        if (d < minDate) minDate = d;
+        if (d > maxDate) maxDate = d;
+      }
+      minDate = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
+      maxDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
+      const dateKeys: string[] = [];
+      for (let dt = new Date(minDate); dt <= maxDate; dt.setDate(dt.getDate() + 1)) {
+        const key = `${dt.getFullYear()}-${(dt.getMonth() + 1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
+        dateKeys.push(key);
+      }
+      this.dateKeys = dateKeys;
+    }
     const catMap = new Map<string, number[]>(); // category -> series aligned with dateKeys
     const totals = new Map<string, number>();
     this.dateKeys.forEach(_ => { /* placeholder to guarantee index */ });
+    const indexMap: Record<string, number> = {};
+    this.dateKeys.forEach((k, i) => indexMap[k] = i);
     this.expenses.forEach(e => {
       const d = new Date(e.date);
       const key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
-      const idx = this.dateKeys.indexOf(key); // small sets; acceptable; else build index map
-      if (idx === -1) return;
+      const idx = indexMap[key];
+      if (idx === undefined) return;
       if (!catMap.has(e.category)) catMap.set(e.category, new Array(this.dateKeys.length).fill(0));
       const series = catMap.get(e.category)!;
       series[idx] = +(series[idx] + e.amount).toFixed(2);
