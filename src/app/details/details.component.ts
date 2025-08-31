@@ -11,6 +11,8 @@ import { Expense } from '../common/model/expense.model';
 import { ExpenseService } from '../common/service/expense.service';
 import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
 import { BarChartComponent } from '../common/component/chart/bar/bar-chart.component';
+import { CompositionChartsComponent } from '../statistics/composition/composition-charts.component';
+import { MicroVisualsComponent } from './micro/micro-visuals.component';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
@@ -20,7 +22,7 @@ import { DateFilterComponent } from '../common/component/filter/date/date-filter
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
   standalone: true,
-  imports: [MultiFilterComponent, BarChartComponent],
+  imports: [MultiFilterComponent, BarChartComponent, CompositionChartsComponent, MicroVisualsComponent],
 })
 export class DetailsComponent implements OnInit, OnDestroy {
   amountForDay: number = 0;

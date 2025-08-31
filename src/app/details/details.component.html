@@ -10,4 +10,9 @@
     [expenses]="expenses"
     [filter]="currentFilter?.date"
   ></app-bar-chart>
+  <div style="margin-top:20px">
+    <div style="font-weight:600;font-size:14px;margin:4px 0 6px 4px;">Категории (дерево)</div>
+    <app-composition-charts [expenses]="expenses"></app-composition-charts>
+  </div>
+  <app-micro-visuals [expenses]="expenses" [topN]="5"></app-micro-visuals>
 </div>

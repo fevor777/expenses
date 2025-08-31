@@ -14,6 +14,7 @@ import { CategoryListNamePipe } from '../common/pipe/category-list-name.pipe';
 import { ExpenseService } from '../common/service/expense.service';
 import { StatisticsBarComponent } from './bar/statistics-bar.component';
 import { CommonModule } from '@angular/common';
+import { CompositionChartsComponent } from './composition/composition-charts.component';
 
 @Component({
   selector: 'app-statistics',
@@ -26,7 +27,8 @@ import { CommonModule } from '@angular/common';
     CategoryListNamePipe,
     StatisticsBarComponent,
     BarChartComponent,
-    CommonModule,
+  CommonModule,
+  CompositionChartsComponent,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
