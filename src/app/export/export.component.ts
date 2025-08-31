@@ -9,16 +9,19 @@ import { AuthService } from '../common/service/auth.service';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { BalanceStoreService } from '../common/service/balance-store.service';
+import { TabsContainerComponent } from '../common/tabs-container.component';
+import { TabComponent } from '../common/tab.component';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TabsContainerComponent, TabComponent],
 })
 export class ExportComponent implements OnDestroy {
   user$: Observable<User>; // Observable to track the logged-in user
+  activeTab = 'general';
 
   private readonly destroySubject: Subject<void> = new Subject();
 
