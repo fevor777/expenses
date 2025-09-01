@@ -1,7 +1,6 @@
 plugins {
 	id("com.android.application")
 	kotlin("android")
-	id("com.google.gms.google-services")
 }
 
 import java.util.Properties
