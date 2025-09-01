@@ -1,54 +1,27 @@
 <div class="expense-container">
-  <app-expense-header
-    [currentAmount]="currentAmount"
-    [currentBalanceAmount]="currentBalanceAmount"
-    [balance]="balance$ | async"
-    [balanceDate]="balanceDate$ | async"
-    (menuIconClick)="navigateToExport()"
-    (historyIconClick)="navigateToHistory()"
-    (balanceChange)="onBalanceChange($event)"
-    (balanceDateChange)="onBalanceDateChange($event)"
-  >
+  <app-expense-header [currentAmount]="currentAmount" [currentBalanceAmount]="currentBalanceAmount"
+    [balance]="balance$ | async" [balanceDate]="balanceDate$ | async" (menuIconClick)="navigateToExport()"
+    (historyIconClick)="navigateToHistory()" (balanceChange)="onBalanceChange($event)"
+    (balanceDateChange)="onBalanceDateChange($event)">
   </app-expense-header>
 
-  <app-categories
-    *ngIf="showNumberBoard; else categoriesWithScroll"
-    [style.overflow]="'hidden'"
-    (categoryClick)="onCategoryClick($event)"
-    (clickMore)="onHideNumberBoard()"
-    appSwipe
-    (swipeDown)="onHideNumberBoard()"
-    (swipeUp)="onShowNumberBoard()"
-    (swipeLeft)="navigateToHistory()"
-    (swipeRight)="navigateToStatistics()"
-    [enteredAmount]="enteredAmount"
-  >
+  <app-categories *ngIf="showNumberBoard; else categoriesWithScroll" [style.overflow]="'hidden'"
+    (categoryClick)="onCategoryClick($event)" (clickMore)="!$event ? onShowNumberBoard() : onHideNumberBoard()" appSwipe
+    (swipeDown)="onHideNumberBoard()" (swipeUp)="onShowNumberBoard()" (swipeLeft)="navigateToHistory()"
+    (swipeRight)="navigateToStatistics()" [enteredAmount]="enteredAmount">
   </app-categories>
   <ng-template #categoriesWithScroll>
-    <app-categories
-      *ngIf="!showNumberBoard"
-      (categorySwipeRight)="navigateToStatistics()"
-      (categorySwipeLeft)="navigateToHistory()"
-      (categorySwipeUp)="onShowNumberBoard()"
-      (categoryClick)="onCategoryClick($event)"
-      [isContentDown]="true"
-      [enteredAmount]="enteredAmount"
-    >
+    <app-categories *ngIf="!showNumberBoard" (categorySwipeRight)="navigateToStatistics()"
+      (categorySwipeLeft)="navigateToHistory()" (clickMore)="!$event ? onShowNumberBoard() : onHideNumberBoard()"
+      (categorySwipeUp)="onShowNumberBoard()" (categoryClick)="onCategoryClick($event)" [isContentDown]="true"
+      [enteredAmount]="enteredAmount">
     </app-categories>
   </ng-template>
 
-  <app-expense-number-board
-    *ngIf="showNumberBoard"
-    [amount]="enteredAmount"
-    [currency]="currency"
-    [description]="description"
-    (amountChange)="onAmountChange($event)"
-    (currencyChange)="onCurrencyChange($event)"
-    (descriptionChange)="onDescriptionChange($event)"
-    (numberBoardSwipeDown)="onHideNumberBoard()"
-    (numberBoardSwipeLeft)="navigateToHistory()"
-    (numberBoardSwipeRight)="navigateToStatistics()"
-    (numberBoardLongPress)="navigateToHistory()"
-  >
+  <app-expense-number-board *ngIf="showNumberBoard" [amount]="enteredAmount" [currency]="currency"
+    [description]="description" (amountChange)="onAmountChange($event)" (currencyChange)="onCurrencyChange($event)"
+    (descriptionChange)="onDescriptionChange($event)" (numberBoardSwipeDown)="onHideNumberBoard()"
+    (numberBoardSwipeLeft)="navigateToHistory()" (numberBoardSwipeRight)="navigateToStatistics()"
+    (numberBoardLongPress)="navigateToHistory()">
   </app-expense-number-board>
 </div>

@@ -27,7 +27,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   @Output() categorySwipeLeft: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeUp: EventEmitter<void> = new EventEmitter<void>();
   @Output() categorySwipeDown: EventEmitter<void> = new EventEmitter<void>();
-  @Output() clickMore: EventEmitter<void> = new EventEmitter<void>();
+  // Emits desired expanded state (true => expand to full list, false => collapse back)
+  @Output() clickMore: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   categories: Category[] = [...Categories];
 
@@ -66,6 +67,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
         this.categories = [...Categories];
+        // Ensure the toggle bar shows immediately when expanded
+        this.showMore = true;
       } else {
         this.updateVisibleCategories();
       }
@@ -81,7 +84,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   onClickMore(): void {
-    this.clickMore.emit();
+    // When currently expanded (isContentDown true), clicking means collapse (false), else expand (true)
+    this.clickMore.emit(!this.isContentDown);
   }
 
   private updateVisibleCategories(): void {
