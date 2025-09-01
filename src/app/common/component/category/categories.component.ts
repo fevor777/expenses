@@ -34,8 +34,9 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   showMore: boolean = false;
 
-  private categoryWidth = 120;
-  private categoryHeight = 94;
+  // Adjusted to match real rendered dimensions (90px width + padding) to keep slice stable
+  private categoryWidth = 114;
+  private categoryHeight = 88; // 64px height + 24px vertical padding
   private containerWidth = 0;
   private containerHeight = 0;
 
