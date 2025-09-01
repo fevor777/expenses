@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-20:12
-INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-20:12
-INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-20:12
-INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-20:12
+ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-21:12
+INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-21:12
+INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-21:12
+INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:2:1-21:12
 MERGED from [com.google.android.material:material:1.12.0] /Users/home/.gradle/caches/transforms-4/84316cafd37c1b7b64f42d5faa8275d0/transformed/material-1.12.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /Users/home/.gradle/caches/transforms-4/ce072adbbf591810cb06ea2e978b7de0/transformed/appcompat-resources-1.7.0/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] /Users/home/.gradle/caches/transforms-4/fa0210d56f4091a3b35f9c9d987635b6/transformed/constraintlayout-2.0.1/AndroidManifest.xml:2:1-11:12
@@ -64,8 +64,8 @@ ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidMa
 	android:name
 		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:3:22-64
 application
-ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:4:5-19:19
-INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:4:5-19:19
+ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:4:5-20:19
+INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:4:5-20:19
 MERGED from [com.google.android.material:material:1.12.0] /Users/home/.gradle/caches/transforms-4/84316cafd37c1b7b64f42d5faa8275d0/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.12.0] /Users/home/.gradle/caches/transforms-4/84316cafd37c1b7b64f42d5faa8275d0/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] /Users/home/.gradle/caches/transforms-4/fa0210d56f4091a3b35f9c9d987635b6/transformed/constraintlayout-2.0.1/AndroidManifest.xml:9:5-20
@@ -98,32 +98,34 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/home/.gradle/caches/
 		ADDED from [androidx.core:core:1.13.1] /Users/home/.gradle/caches/transforms-4/86d139a0de0560a1a2e026d7936fd794/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
 	android:label
 		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:6:9-33
+	android:icon
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:7:9-43
 	android:allowBackup
 		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:5:9-36
 	android:theme
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:8:9-65
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:9:9-65
 	android:usesCleartextTraffic
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:7:9-45
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:8:9-45
 activity#com.example.expenseswrapper.MainActivity
-ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:9:9-18:20
+ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:10:9-19:20
 	android:screenOrientation
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:13:13-49
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:14:13-49
 	android:exported
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:11:13-36
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:12:13-36
 	android:configChanges
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:12:13-74
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:13:13-74
 	android:name
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:10:13-41
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:11:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:14:13-17:29
+ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:15:13-18:29
 action#android.intent.action.MAIN
-ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:15:17-69
+ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:16:17-69
 	android:name
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:15:25-66
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:16:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:16:17-77
+ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:17:17-77
 	android:name
-		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:16:27-74
+		ADDED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml:17:27-74
 uses-sdk
 INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/home/workspace/expenses/android-webview/app/src/main/AndroidManifest.xml

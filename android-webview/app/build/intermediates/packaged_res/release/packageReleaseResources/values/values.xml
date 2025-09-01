@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="ic_launcher_background">#13864E</color>
     <string name="default_web_client_id" translatable="false">1086094925498-39u65asbloheupeukv7932ksq9qm0otv.apps.googleusercontent.com</string>
     <string name="gcm_defaultSenderId" translatable="false">1086094925498</string>
     <string name="google_api_key" translatable="false">AIzaSyBsY0BtcK-A8tsTYO9wU-uKPk1HwMRf5CI</string>

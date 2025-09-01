@@ -244,6 +244,10 @@
         "source": "com.example.expenseswrapper.app-appcompat-1.7.0-1:/color/abc_secondary_text_material_light.xml"
     },
     {
+        "merged": "com.example.expenseswrapper.app-release-35:/mipmap-xxxhdpi_ic_launcher_foreground.xml.flat",
+        "source": "com.example.expenseswrapper.app-main-36:/mipmap-xxxhdpi/ic_launcher_foreground.xml"
+    },
+    {
         "merged": "com.example.expenseswrapper.app-release-35:/layout_mtrl_calendar_days_of_week.xml.flat",
         "source": "com.example.expenseswrapper.app-material-1.12.0-15:/layout/mtrl_calendar_days_of_week.xml"
     },
@@ -722,6 +726,10 @@
     {
         "merged": "com.example.expenseswrapper.app-release-35:/drawable-xhdpi-v4_abc_ic_commit_search_api_mtrl_alpha.png.flat",
         "source": "com.example.expenseswrapper.app-appcompat-1.7.0-1:/drawable-xhdpi-v4/abc_ic_commit_search_api_mtrl_alpha.png"
+    },
+    {
+        "merged": "com.example.expenseswrapper.app-release-35:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.example.expenseswrapper.app-main-36:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
         "merged": "com.example.expenseswrapper.app-release-35:/color_material_on_background_emphasis_medium.xml.flat",
