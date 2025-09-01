@@ -13,24 +13,73 @@ android {
 		applicationId = "com.example.expenseswrapper"
 		minSdk = 24
 		targetSdk = 34
-		versionCode = 1
-		versionName = "1.0"
+		versionCode = 2
+		versionName = "1.1"
 	}
 	signingConfigs {
 		create("release") {
-			val keystorePath: String? = System.getenv("APP_KEYSTORE")
-			val keystorePassword: String? = System.getenv("APP_KEYSTORE_PASSWORD")
-			val keyAlias: String? = System.getenv("APP_KEY_ALIAS")
-			val keyPassword: String? = System.getenv("APP_KEY_PASSWORD")
-			if (!keystorePath.isNullOrBlank() && file(keystorePath).exists() &&
-				!keystorePassword.isNullOrBlank() && !keyAlias.isNullOrBlank() && !keyPassword.isNullOrBlank()
+			println("[signing] Evaluating release signing config...")
+			// Allow configuration via environment variables OR signing.properties file (not committed)
+			val envKeystorePath: String? = System.getenv("APP_KEYSTORE")?.trim()
+			val envKeystorePassword: String? = System.getenv("APP_KEYSTORE_PASSWORD")?.trim()
+			val envKeyAlias: String? = System.getenv("APP_KEY_ALIAS")?.trim()
+			val envKeyPassword: String? = System.getenv("APP_KEY_PASSWORD")?.trim()
+
+			var resolvedKeystorePath = envKeystorePath
+			var resolvedStorePassword = envKeystorePassword
+			var resolvedKeyAlias = envKeyAlias
+			var resolvedKeyPassword = envKeyPassword
+
+			// Fallback: signing.properties (keys: storeFile, storePassword, keyAlias, keyPassword)
+			if (resolvedKeystorePath.isNullOrBlank() || resolvedStorePassword.isNullOrBlank() ||
+				resolvedKeyAlias.isNullOrBlank() || resolvedKeyPassword.isNullOrBlank()) {
+				val propsFile = rootProject.file("signing.properties").let { f -> if (f.exists()) f else rootProject.file("android-webview/signing.properties") }
+				println("[signing] Looking for signing.properties at: ${'$'}{propsFile.path}")
+				if (propsFile.exists()) {
+					val sp = Properties()
+					propsFile.inputStream().use { sp.load(it) }
+					resolvedKeystorePath = (resolvedKeystorePath ?: sp.getProperty("storeFile"))?.trim()
+					resolvedStorePassword = (resolvedStorePassword ?: sp.getProperty("storePassword"))?.trim()
+					resolvedKeyAlias = (resolvedKeyAlias ?: sp.getProperty("keyAlias"))?.trim()
+					resolvedKeyPassword = (resolvedKeyPassword ?: sp.getProperty("keyPassword"))?.trim()
+				}
+			}
+
+			var ksFile: java.io.File? = null
+			if (!resolvedKeystorePath.isNullOrBlank()) {
+				val candidates = mutableListOf<String>()
+				candidates += resolvedKeystorePath
+				// If path starts with project directory name (android-webview/), add stripped version
+				if (resolvedKeystorePath.startsWith("android-webview/")) {
+					candidates += resolvedKeystorePath.removePrefix("android-webview/")
+				}
+				println("[signing] Keystore path candidates: ${'$'}candidates")
+				candidates.forEach { rel ->
+					if (ksFile == null) {
+						val moduleRel = file(rel)
+						val rootRel = rootProject.file(rel)
+						ksFile = when {
+							moduleRel.exists() -> moduleRel
+							rootRel.exists() -> rootRel
+							else -> null
+						}
+					}
+				}
+			}
+
+			val finalKs = ksFile
+			if (finalKs != null &&
+				!resolvedStorePassword.isNullOrBlank() &&
+				!resolvedKeyAlias.isNullOrBlank() &&
+				!resolvedKeyPassword.isNullOrBlank()
 			) {
-				storeFile = file(keystorePath)
-				storePassword = keystorePassword
-				this.keyAlias = keyAlias
-				this.keyPassword = keyPassword
+				storeFile = finalKs
+				storePassword = resolvedStorePassword
+				this.keyAlias = resolvedKeyAlias
+				this.keyPassword = resolvedKeyPassword
+				println("[signing] Release build will be signed with keystore at ${finalKs.path} (alias=$resolvedKeyAlias)")
 			} else {
-				// Leave unsigned; Gradle will warn but not fail for release if not used
+				println("[signing] No valid signing credentials found; release APK will be unsigned. (Tried path='${resolvedKeystorePath}')")
 			}
 		}
 	}

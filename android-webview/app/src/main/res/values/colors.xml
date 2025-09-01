@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Basic brand / theme colors (adjust if needed) -->
+	<color name="colorPrimary">#2962FF</color>
+	<color name="colorPrimaryDark">#0039CB</color>
+	<color name="colorAccent">#FFAB00</color>
+	<color name="colorBackground">#FFFFFFFF</color>
+	<color name="colorSurface">#FFFFFFFF</color>
+	<color name="colorOnPrimary">#FFFFFFFF</color>
+	<color name="colorOnBackground">#FF000000</color>
+	<!-- Launcher icon background (green) -->
+	<color name="colorLauncherBackground">#0D7F4A</color>
+</resources>

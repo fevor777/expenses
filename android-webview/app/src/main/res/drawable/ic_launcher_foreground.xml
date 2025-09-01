@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Euro symbol -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M66,18c-9.6,0 -17.6,5 -22,13H60l-2.4,7H41.2c-0.1,1 -0.2,2 -0.2,3s0.1,2 0.2,3H55.6L53,51H44c4.4,8 12.5,13 22,13 6.4,0 12.4,-2.1 17.1,-6.2v13.1C78.6,73.6 72.2,75 66,75 50.4,75 38,63.6 36,51h-6.3L31.9,44H36c-0.1,-1 -0.2,-2 -0.2,-3 0,-1 .1,-2 .2,-3h-8.2L25,31h6.1C33.2,18.4 46.3,9 63,9c6.7,0 13.6,1.5 20.1,4.7v13.1C78.9,20.1 72.7,18 66,18z"/>
+    <!-- Wallet body -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M47,52h46c5.5,0 10,4.5 10,10v10H87c-7.7,0 -14,6.3 -14,14s6.3,14 14,14h16v12c0,8 -4,14 -14,14H55c-10,0 -16,-6 -16,-16V64c0,-7.2 5,-12 8,-12z"/>
+    <!-- Wallet flap -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M60,40l40,-11c5.5,-1.5 10,2 10,7v9H60v-5c0,-0.4 0.3,-0.9 0,-0.9z" />
+    <!-- Coin circle -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M103,86a14,14 0 1 1 -28,0 14,14 0 0 1 28,0z" />
+    <!-- Coin inner -->
+    <path android:fillColor="#0D7F4A" android:pathData="M95,86a6,6 0 1 1 -12,0 6,6 0 0 1 12,0z" />
+</vector>

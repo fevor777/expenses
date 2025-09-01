@@ -10056,12 +10056,12 @@ com.example.expenseswrapper.BuildConfig
 com.example.expenseswrapper.MainActivity:
     private static final int RC_SIGN_IN
 com.example.expenseswrapper.R$color
+com.example.expenseswrapper.R$drawable
 com.example.expenseswrapper.R$id:
     private void <init>()
 com.example.expenseswrapper.R$layout:
     private void <init>()
 com.example.expenseswrapper.R$mipmap
-com.example.expenseswrapper.R$string
 com.example.expenseswrapper.R
 com.google.android.gms.actions.ItemListIntents
 com.google.android.gms.actions.NoteIntents

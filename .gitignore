@@ -40,3 +40,13 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Android signing / local config
+android-webview/keystore/**
+*.keystore
+*.jks
+*.keystore.properties
+android-webview/local.properties
+local.properties
+app-release-signed*.apk
+app-release-aligned*.apk

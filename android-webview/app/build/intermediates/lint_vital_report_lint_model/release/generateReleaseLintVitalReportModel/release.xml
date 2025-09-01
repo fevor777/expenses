@@ -26,7 +26,7 @@
       type="MAIN"
       applicationId="com.example.expenseswrapper"
       generatedSourceFolders="build/generated/ap_generated_sources/release/out:build/generated/source/buildConfig/release"
-      generatedResourceFolders="build/generated/res/processReleaseGoogleServices:build/generated/res/resValues/release"
-      desugaredMethodsFiles="/Users/home/.gradle/caches/transforms-4/6af7d81be3d8df65bc4dacd68440db76/transformed/D8BackportedDesugaredMethods.txt">
+      generatedResourceFolders="build/generated/res/resValues/release"
+      desugaredMethodsFiles="/Users/home/.gradle/caches/transforms-4/464b18d790de16efd1bac404100a4564/transformed/D8BackportedDesugaredMethods.txt">
   </artifact>
 </variant>

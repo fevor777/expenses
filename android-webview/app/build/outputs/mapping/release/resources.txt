@@ -50,11 +50,11 @@ Marking attr:motionDurationShort2:2130903813 reachable: referenced from /Users/h
 Marking dimen:m3_back_progress_side_container_max_scale_x_distance_shrink:2131099825 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:m3_back_progress_side_container_max_scale_x_distance_grow:2131099824 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:m3_back_progress_side_container_max_scale_y_distance:2131099826 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:side_sheet_accessibility_pane_title:2131689660 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:side_sheet_accessibility_pane_title:2131689653 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:tag_unhandled_key_listeners:2131231124 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:special_effects_controller_view_tag:2131231092 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_picker_toggle_to_year_selection:2131689639 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_picker_toggle_to_day_selection:2131689637 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_picker_toggle_to_year_selection:2131689633 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_picker_toggle_to_day_selection:2131689631 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:transition_pause_alpha:2131231156 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:toolbarStyle:2130904146 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking style:Widget_MaterialComponents_Toolbar:2131756128 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -74,18 +74,18 @@ Marking id:action_bar:2131230768 reachable: referenced from /Users/home/workspac
 Marking attr:motionDurationLong2:2130903805 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:motionDurationMedium4:2130903811 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:motionEasingEmphasizedInterpolator:2130903821 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_chip_close_icon_content_description:2131689600 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_chip_close_icon_content_description:2131689594 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:ratingBarStyle:2130903903 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:tag_accessibility_actions:2131231113 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:accessibility_action_clickable_span:2131230735 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:tag_accessibility_clickable_spans:2131231114 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:text_input_error_icon:2131231134 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:text_input_end_icon:2131231133 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:error_icon_content_description:2131689538 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:error_icon_content_description:2131689537 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:textinput_suffix_text:2131231141 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:design_text_input_end_icon:2131427371 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_picker_navigate_to_current_year_description:2131689619 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_picker_navigate_to_year_description:2131689620 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_picker_navigate_to_current_year_description:2131689613 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_picker_navigate_to_year_description:2131689614 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:mtrl_calendar_year:2131427410 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:spinnerStyle:2130903970 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:support_simple_spinner_dropdown_item:2131427435 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -151,15 +151,15 @@ Marking string:common_google_play_services_notification_channel_name:2131689524 
 Marking attr:alpha:2130903084 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:lStar:2130903624 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking drawable:design_password_eye:2131165335 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:password_toggle_content_description:2131689650 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:password_toggle_content_description:2131689644 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking drawable:common_full_open_on_phone:2131165313 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:mtrl_calendar_day:2131427401 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:seekBarStyle:2130903925 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:alertDialogStyle:2130903081 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:view_tree_on_back_pressed_dispatcher_owner:2131231168 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:motionEasingLinearInterpolator:2130903823 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:exposed_dropdown_menu_content_description:2131689539 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:mtrl_dropdown_arrow:2131165391 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:exposed_dropdown_menu_content_description:2131689538 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:mtrl_dropdown_arrow:2131165394 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:design_textinput_caption_translate_y:2131099789 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:motionDurationShort4:2130903815 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:motionEasingEmphasizedDecelerateInterpolator:2130903820 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -271,7 +271,7 @@ Marking layout:design_navigation_menu_item:2131427370 reachable: referenced from
 Marking dimen:design_navigation_icon_size:2131099767 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:design_menu_item_text:2131230851 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:design_menu_item_action_area_stub:2131230850 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:navigation_empty_icon:2131165416 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:navigation_empty_icon:2131165419 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:split_action_bar:2131231094 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:action_context_bar:2131230776 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:month_grid:2131230966 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -302,16 +302,16 @@ Marking bool:abc_action_bar_embed_tabs:2130968576 reachable: referenced from /Us
 Marking attr:state_indeterminate:2130903987 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:state_error:2130903986 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking style:Widget_MaterialComponents_CompoundButton_CheckBox:2131756052 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:mtrl_checkbox_button_checked_unchecked:2131165381 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:mtrl_checkbox_button_checked_unchecked:2131165384 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:isMaterial3Theme:2130903589 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:mtrl_checkbox_button:2131165380 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:mtrl_checkbox_button_icon:2131165382 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:mtrl_checkbox_button:2131165383 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:mtrl_checkbox_button_icon:2131165385 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:checked:2131230820 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:unchecked:2131231161 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:indeterminate:2131230919 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_checkbox_state_description_checked:2131689597 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_checkbox_state_description_unchecked:2131689599 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_checkbox_state_description_indeterminate:2131689598 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_checkbox_state_description_checked:2131689591 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_checkbox_state_description_unchecked:2131689593 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_checkbox_state_description_indeterminate:2131689592 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:colorError:2130903269 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:report_drawn:2131231049 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking style:Widget_MaterialComponents_CompoundButton_RadioButton:2131756053 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -336,7 +336,7 @@ Marking animator:fragment_close_exit:2130837508 reachable: referenced from /User
 Marking animator:fragment_open_enter:2130837511 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking animator:fragment_open_exit:2130837512 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:mtrl_calendar_day_of_week:2131427402 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_picker_day_of_week_column_header:2131689613 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_picker_day_of_week_column_header:2131689607 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:tag_screen_reader_focusable:2131231120 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:tag_accessibility_heading:2131231115 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:tag_state_description:2131231121 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -360,7 +360,7 @@ Marking layout:abc_list_menu_item_radio:2131427345 reachable: referenced from /U
 Marking layout:abc_list_menu_item_checkbox:2131427342 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:abc_list_menu_item_icon:2131427343 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking string:clear_text_end_icon_content_description:2131689517 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:mtrl_ic_cancel:2131165394 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:mtrl_ic_cancel:2131165397 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:actionOverflowButtonStyle:2130903071 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:abc_list_menu_item_layout:2131427344 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking attr:materialButtonStyle:2130903734 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -381,10 +381,10 @@ Marking style:Widget_Design_TextInputLayout:2131755835 reachable: referenced fro
 Marking dimen:mtrl_textinput_box_label_cutout_padding:2131100414 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:mtrl_textinput_box_stroke_width_default:2131100415 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:mtrl_textinput_box_stroke_width_focused:2131100416 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking color:mtrl_filled_background_color:2131034841 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking color:mtrl_textinput_default_box_stroke_color:2131034868 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking color:mtrl_textinput_disabled_color:2131034869 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking color:mtrl_textinput_hovered_box_stroke_color:2131034872 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking color:mtrl_filled_background_color:2131034848 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking color:mtrl_textinput_default_box_stroke_color:2131034875 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking color:mtrl_textinput_disabled_color:2131034876 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking color:mtrl_textinput_hovered_box_stroke_color:2131034879 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:mtrl_shape_corner_size_small_component:2131100388 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:m3_comp_outlined_autocomplete_menu_container_elevation:2131099981 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:mtrl_exposed_dropdown_menu_popup_vertical_padding:2131100325 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -395,7 +395,7 @@ Marking dimen:material_filled_edittext_font_2_0_padding_bottom:2131100217 reacha
 Marking dimen:material_filled_edittext_font_1_3_padding_top:2131100216 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:material_filled_edittext_font_1_3_padding_bottom:2131100215 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking style:TextAppearance_AppCompat_Caption:2131755415 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking color:design_error:2131034198 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking color:design_error:2131034206 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking string:character_counter_overflowed_content_description:2131689515 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking string:character_counter_content_description:2131689514 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking string:character_counter_pattern:2131689516 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -425,17 +425,17 @@ Marking id:mtrl_calendar_main_pane:2131230977 reachable: referenced from /Users/
 Marking id:mtrl_picker_header_selection_text:2131230988 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:mtrl_picker_header_toggle:2131230990 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:mtrl_picker_title_text:2131230994 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:material_ic_calendar_black_24dp:2131165370 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking drawable:material_ic_edit_black_24dp:2131165372 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_picker_toggle_to_calendar_input_mode:2131689636 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking string:mtrl_picker_toggle_to_text_input_mode:2131689638 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:material_ic_calendar_black_24dp:2131165373 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking drawable:material_ic_edit_black_24dp:2131165375 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_picker_toggle_to_calendar_input_mode:2131689630 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking string:mtrl_picker_toggle_to_text_input_mode:2131689632 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:fullscreen_header:2131230898 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:mtrl_calendar_dialog_background_inset:2131100285 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking style:Theme_AppCompat_Empty:2131755544 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:view_tree_lifecycle_owner:2131231167 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:material_clockface_view:2131427386 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:material_clock_hand_padding:2131100200 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-Marking color:material_timepicker_clockface:2131034816 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+Marking color:material_timepicker_clockface:2131034823 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking layout:material_clockface_textview:2131427385 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking id:material_clock_level:2131230946 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 Marking dimen:material_time_picker_minimum_screen_height:2131100228 reachable: referenced from /Users/home/workspace/expenses/android-webview/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
@@ -1514,7 +1514,7 @@ Marking id:message:2131230963 used because it matches string pool constant messa
 Marking id:indeterminate:2131230919 used because it matches string pool constant indeterminate
 Marking attr:indeterminateAnimationType:2130903577 used because it matches string pool constant indeterminate
 Marking attr:indeterminateProgressStyle:2130903578 used because it matches string pool constant indeterminate
-Marking drawable:indeterminate_static:2131165357 used because it matches string pool constant indeterminate
+Marking drawable:indeterminate_static:2131165360 used because it matches string pool constant indeterminate
 Marking id:indeterminate:2131230919 used because it matches string pool constant indeterminate
 Marking attr:drawableEndCompat:2130903410 used because it matches string pool constant drawableEnd
 Marking id:linear:2131230935 used because it matches string pool constant linear
@@ -1718,12 +1718,12 @@ Marking dimen:item_touch_helper_max_drag_scroll_per_frame:2131099802 used becaus
 Marking dimen:item_touch_helper_swipe_escape_max_velocity:2131099803 used because it matches string pool constant item
 Marking dimen:item_touch_helper_swipe_escape_velocity:2131099804 used because it matches string pool constant item
 Marking id:item_touch_helper_previous_elevation:2131230924 used because it matches string pool constant item
-Marking string:item_view_role_description:2131689549 used because it matches string pool constant item
+Marking string:item_view_role_description:2131689543 used because it matches string pool constant item
 Marking string:character_counter_content_description:2131689514 used because it matches string pool constant char
 Marking string:character_counter_overflowed_content_description:2131689515 used because it matches string pool constant char
 Marking string:character_counter_pattern:2131689516 used because it matches string pool constant char
-Marking color:notification_action_color_filter:2131034873 used because it matches string pool constant notification
-Marking color:notification_icon_bg_color:2131034874 used because it matches string pool constant notification
+Marking color:notification_action_color_filter:2131034880 used because it matches string pool constant notification
+Marking color:notification_icon_bg_color:2131034881 used because it matches string pool constant notification
 Marking dimen:notification_action_icon_size:2131100428 used because it matches string pool constant notification
 Marking dimen:notification_action_text_size:2131100429 used because it matches string pool constant notification
 Marking dimen:notification_big_circle_margin:2131100430 used because it matches string pool constant notification
@@ -1739,18 +1739,18 @@ Marking dimen:notification_small_icon_size_as_large:2131100439 used because it m
 Marking dimen:notification_subtext_size:2131100440 used because it matches string pool constant notification
 Marking dimen:notification_top_pad:2131100441 used because it matches string pool constant notification
 Marking dimen:notification_top_pad_large_text:2131100442 used because it matches string pool constant notification
-Marking drawable:notification_action_background:2131165417 used because it matches string pool constant notification
-Marking drawable:notification_bg:2131165418 used because it matches string pool constant notification
-Marking drawable:notification_bg_low:2131165419 used because it matches string pool constant notification
-Marking drawable:notification_bg_low_normal:2131165420 used because it matches string pool constant notification
-Marking drawable:notification_bg_low_pressed:2131165421 used because it matches string pool constant notification
-Marking drawable:notification_bg_normal:2131165422 used because it matches string pool constant notification
-Marking drawable:notification_bg_normal_pressed:2131165423 used because it matches string pool constant notification
-Marking drawable:notification_icon_background:2131165424 used because it matches string pool constant notification
-Marking drawable:notification_oversize_large_icon_bg:2131165425 used because it matches string pool constant notification
-Marking drawable:notification_template_icon_bg:2131165426 used because it matches string pool constant notification
-Marking drawable:notification_template_icon_low_bg:2131165427 used because it matches string pool constant notification
-Marking drawable:notification_tile_bg:2131165428 used because it matches string pool constant notification
+Marking drawable:notification_action_background:2131165420 used because it matches string pool constant notification
+Marking drawable:notification_bg:2131165421 used because it matches string pool constant notification
+Marking drawable:notification_bg_low:2131165422 used because it matches string pool constant notification
+Marking drawable:notification_bg_low_normal:2131165423 used because it matches string pool constant notification
+Marking drawable:notification_bg_low_pressed:2131165424 used because it matches string pool constant notification
+Marking drawable:notification_bg_normal:2131165425 used because it matches string pool constant notification
+Marking drawable:notification_bg_normal_pressed:2131165426 used because it matches string pool constant notification
+Marking drawable:notification_icon_background:2131165427 used because it matches string pool constant notification
+Marking drawable:notification_oversize_large_icon_bg:2131165428 used because it matches string pool constant notification
+Marking drawable:notification_template_icon_bg:2131165429 used because it matches string pool constant notification
+Marking drawable:notification_template_icon_low_bg:2131165430 used because it matches string pool constant notification
+Marking drawable:notification_tile_bg:2131165431 used because it matches string pool constant notification
 Marking id:notification_background:2131231008 used because it matches string pool constant notification
 Marking id:notification_main_column:2131231009 used because it matches string pool constant notification
 Marking id:notification_main_column_container:2131231010 used because it matches string pool constant notification
@@ -1782,10 +1782,10 @@ Marking attr:pathMotionArc:2130903875 used because it matches string pool consta
 Marking attr:path_percent:2130903876 used because it matches string pool constant path
 Marking id:path:2131231036 used because it matches string pool constant path
 Marking id:pathRelative:2131231037 used because it matches string pool constant path
-Marking string:path_password_eye:2131689651 used because it matches string pool constant path
-Marking string:path_password_eye_mask_strike_through:2131689652 used because it matches string pool constant path
-Marking string:path_password_eye_mask_visible:2131689653 used because it matches string pool constant path
-Marking string:path_password_strike_through:2131689654 used because it matches string pool constant path
+Marking string:path_password_eye:2131689645 used because it matches string pool constant path
+Marking string:path_password_eye_mask_strike_through:2131689646 used because it matches string pool constant path
+Marking string:path_password_eye_mask_visible:2131689647 used because it matches string pool constant path
+Marking string:path_password_strike_through:2131689648 used because it matches string pool constant path
 Marking attr:arcMode:2130903093 used because it matches string pool constant ar
 Marking attr:arrowHeadLength:2130903094 used because it matches string pool constant ar
 Marking attr:arrowShaftLength:2130903095 used because it matches string pool constant ar
@@ -1804,7 +1804,7 @@ Marking attr:iconifiedByDefault:2130903573 used because it matches string pool c
 Marking id:icon:2131230912 used because it matches string pool constant icon
 Marking id:icon_group:2131230913 used because it matches string pool constant icon
 Marking id:icon_only:2131230914 used because it matches string pool constant icon
-Marking string:icon_content_description:2131689548 used because it matches string pool constant icon
+Marking string:icon_content_description:2131689542 used because it matches string pool constant icon
 Marking integer:config_tooltipAnimTime:2131296261 used because it matches string pool constant config
 Marking attr:font:2130903524 used because it matches string pool constant font
 Marking attr:font:2130903524 used because it matches string pool constant font
@@ -2144,8 +2144,6 @@ Marking attr:floatingActionButtonStyle:2130903502 used because it matches string
 Marking attr:floatingActionButtonSurfaceStyle:2130903503 used because it matches string pool constant float
 Marking attr:floatingActionButtonTertiaryStyle:2130903504 used because it matches string pool constant float
 Marking id:floating:2131230895 used because it matches string pool constant float
-Marking string:google_app_id:2131689544 used because it matches string pool constant google_app_id
-Marking string:google_app_id:2131689544 used because it matches string pool constant google_app_id
 Marking attr:values:2130904182 used because it matches string pool constant value
 Marking anim:fragment_fast_out_extra_slow_in:2130771996 used because it matches string pool constant fragment
 Marking animator:fragment_close_enter:2130837507 used because it matches string pool constant fragment
@@ -3632,6 +3630,14 @@ Marking id:fragment_container_view_tag:2131230897 used because it matches string
 @color/cardview_light_background : reachable=false
 @color/cardview_shadow_end_color : reachable=false
 @color/cardview_shadow_start_color : reachable=false
+@color/colorAccent : reachable=false
+@color/colorBackground : reachable=false
+@color/colorLauncherBackground : reachable=false
+@color/colorOnBackground : reachable=false
+@color/colorOnPrimary : reachable=false
+@color/colorPrimary : reachable=false
+@color/colorPrimaryDark : reachable=false
+@color/colorSurface : reachable=false
 @color/common_google_signin_btn_text_dark : reachable=false
     @color/common_google_signin_btn_text_dark_disabled
     @color/common_google_signin_btn_text_dark_pressed
@@ -3704,7 +3710,6 @@ Marking id:fragment_container_view_tag:2131230897 used because it matches string
 @color/foreground_material_light : reachable=false
 @color/highlighted_text_material_dark : reachable=false
 @color/highlighted_text_material_light : reachable=false
-@color/ic_launcher_background : reachable=false
 @color/m3_appbar_overlay_color : reachable=false
     @attr/elevationOverlayColor
 @color/m3_assist_chip_icon_tint_color : reachable=false
@@ -6447,6 +6452,10 @@ Marking id:fragment_container_view_tag:2131230897 used because it matches string
     @attr/colorControlNormal
 @drawable/ic_clock_black_24dp : reachable=false
 @drawable/ic_keyboard_black_24dp : reachable=false
+@drawable/ic_launcher_background : reachable=false
+    @color/colorLauncherBackground
+@drawable/ic_launcher_foreground : reachable=false
+@drawable/ic_launcher_monochrome : reachable=false
 @drawable/ic_m3_chip_check : reachable=false
     @color/m3_chip_text_color
 @drawable/ic_m3_chip_checked_circle : reachable=false
@@ -7768,8 +7777,9 @@ Marking id:fragment_container_view_tag:2131230897 used because it matches string
     @attr/dropdownListPreferredItemHeight
     @attr/spinnerDropDownItemStyle
 @mipmap/ic_launcher : reachable=true
-    @color/ic_launcher_background
-    @mipmap/ic_launcher_foreground
+    @drawable/ic_launcher_background
+    @drawable/ic_launcher_foreground
+    @drawable/ic_launcher_monochrome
 @mipmap/ic_launcher_foreground : reachable=false
 @plurals/mtrl_badge_content_description : reachable=false
 @string/abc_action_bar_home_description : reachable=false
@@ -7836,17 +7846,11 @@ Marking id:fragment_container_view_tag:2131230897 used because it matches string
 @string/common_open_on_phone : reachable=true
 @string/common_signin_button_text : reachable=false
 @string/common_signin_button_text_long : reachable=false
-@string/default_web_client_id : reachable=false
 @string/error_a11y_label : reachable=false
 @string/error_icon_content_description : reachable=true
 @string/exposed_dropdown_menu_content_description : reachable=true
 @string/fab_transformation_scrim_behavior : reachable=false
 @string/fab_transformation_sheet_behavior : reachable=false
-@string/gcm_defaultSenderId : reachable=false
-@string/google_api_key : reachable=false
-@string/google_app_id : reachable=true
-@string/google_crash_reporting_api_key : reachable=false
-@string/google_storage_bucket : reachable=false
 @string/hide_bottom_view_on_scroll_behavior : reachable=false
 @string/icon_content_description : reachable=true
 @string/item_view_role_description : reachable=true
@@ -7955,7 +7959,6 @@ Marking id:fragment_container_view_tag:2131230897 used because it matches string
 @string/path_password_eye_mask_strike_through : reachable=true
 @string/path_password_eye_mask_visible : reachable=true
 @string/path_password_strike_through : reachable=true
-@string/project_id : reachable=false
 @string/search_menu_title : reachable=false
 @string/searchbar_scrolling_view_behavior : reachable=false
 @string/searchview_clear_text_content_description : reachable=false
@@ -17127,14 +17130,14 @@ The root reachable resources are:
  color:background_floating_material_light:2131034142
  color:background_material_dark:2131034143
  color:background_material_light:2131034144
- color:design_error:2131034198
- color:material_timepicker_clockface:2131034816
- color:mtrl_filled_background_color:2131034841
- color:mtrl_textinput_default_box_stroke_color:2131034868
- color:mtrl_textinput_disabled_color:2131034869
- color:mtrl_textinput_hovered_box_stroke_color:2131034872
- color:notification_action_color_filter:2131034873
- color:notification_icon_bg_color:2131034874
+ color:design_error:2131034206
+ color:material_timepicker_clockface:2131034823
+ color:mtrl_filled_background_color:2131034848
+ color:mtrl_textinput_default_box_stroke_color:2131034875
+ color:mtrl_textinput_disabled_color:2131034876
+ color:mtrl_textinput_hovered_box_stroke_color:2131034879
+ color:notification_action_color_filter:2131034880
+ color:notification_icon_bg_color:2131034881
  dimen:abc_cascading_menus_min_smallest_width:2131099670
  dimen:abc_config_prefDialogWidth:2131099671
  dimen:abc_star_big:2131099707
@@ -17262,27 +17265,27 @@ The root reachable resources are:
  drawable:abc_vector_test:2131165302
  drawable:common_full_open_on_phone:2131165313
  drawable:design_password_eye:2131165335
- drawable:indeterminate_static:2131165357
- drawable:material_ic_calendar_black_24dp:2131165370
- drawable:material_ic_edit_black_24dp:2131165372
- drawable:mtrl_checkbox_button:2131165380
- drawable:mtrl_checkbox_button_checked_unchecked:2131165381
- drawable:mtrl_checkbox_button_icon:2131165382
- drawable:mtrl_dropdown_arrow:2131165391
- drawable:mtrl_ic_cancel:2131165394
- drawable:navigation_empty_icon:2131165416
- drawable:notification_action_background:2131165417
- drawable:notification_bg:2131165418
- drawable:notification_bg_low:2131165419
- drawable:notification_bg_low_normal:2131165420
- drawable:notification_bg_low_pressed:2131165421
- drawable:notification_bg_normal:2131165422
- drawable:notification_bg_normal_pressed:2131165423
- drawable:notification_icon_background:2131165424
- drawable:notification_oversize_large_icon_bg:2131165425
- drawable:notification_template_icon_bg:2131165426
- drawable:notification_template_icon_low_bg:2131165427
- drawable:notification_tile_bg:2131165428
+ drawable:indeterminate_static:2131165360
+ drawable:material_ic_calendar_black_24dp:2131165373
+ drawable:material_ic_edit_black_24dp:2131165375
+ drawable:mtrl_checkbox_button:2131165383
+ drawable:mtrl_checkbox_button_checked_unchecked:2131165384
+ drawable:mtrl_checkbox_button_icon:2131165385
+ drawable:mtrl_dropdown_arrow:2131165394
+ drawable:mtrl_ic_cancel:2131165397
+ drawable:navigation_empty_icon:2131165419
+ drawable:notification_action_background:2131165420
+ drawable:notification_bg:2131165421
+ drawable:notification_bg_low:2131165422
+ drawable:notification_bg_low_normal:2131165423
+ drawable:notification_bg_low_pressed:2131165424
+ drawable:notification_bg_normal:2131165425
+ drawable:notification_bg_normal_pressed:2131165426
+ drawable:notification_icon_background:2131165427
+ drawable:notification_oversize_large_icon_bg:2131165428
+ drawable:notification_template_icon_bg:2131165429
+ drawable:notification_template_icon_low_bg:2131165430
+ drawable:notification_tile_bg:2131165431
  id:BOTTOM_END:2131230721
  id:BOTTOM_START:2131230722
  id:SHOW_ALL:2131230728
@@ -17532,28 +17535,27 @@ The root reachable resources are:
  string:common_google_play_services_updating_text:2131689531
  string:common_google_play_services_wear_update_text:2131689532
  string:common_open_on_phone:2131689533
- string:error_icon_content_description:2131689538
- string:exposed_dropdown_menu_content_description:2131689539
- string:google_app_id:2131689544
- string:icon_content_description:2131689548
- string:item_view_role_description:2131689549
- string:mtrl_checkbox_state_description_checked:2131689597
- string:mtrl_checkbox_state_description_indeterminate:2131689598
- string:mtrl_checkbox_state_description_unchecked:2131689599
- string:mtrl_chip_close_icon_content_description:2131689600
- string:mtrl_picker_day_of_week_column_header:2131689613
- string:mtrl_picker_navigate_to_current_year_description:2131689619
- string:mtrl_picker_navigate_to_year_description:2131689620
- string:mtrl_picker_toggle_to_calendar_input_mode:2131689636
- string:mtrl_picker_toggle_to_day_selection:2131689637
- string:mtrl_picker_toggle_to_text_input_mode:2131689638
- string:mtrl_picker_toggle_to_year_selection:2131689639
- string:password_toggle_content_description:2131689650
- string:path_password_eye:2131689651
- string:path_password_eye_mask_strike_through:2131689652
- string:path_password_eye_mask_visible:2131689653
- string:path_password_strike_through:2131689654
- string:side_sheet_accessibility_pane_title:2131689660
+ string:error_icon_content_description:2131689537
+ string:exposed_dropdown_menu_content_description:2131689538
+ string:icon_content_description:2131689542
+ string:item_view_role_description:2131689543
+ string:mtrl_checkbox_state_description_checked:2131689591
+ string:mtrl_checkbox_state_description_indeterminate:2131689592
+ string:mtrl_checkbox_state_description_unchecked:2131689593
+ string:mtrl_chip_close_icon_content_description:2131689594
+ string:mtrl_picker_day_of_week_column_header:2131689607
+ string:mtrl_picker_navigate_to_current_year_description:2131689613
+ string:mtrl_picker_navigate_to_year_description:2131689614
+ string:mtrl_picker_toggle_to_calendar_input_mode:2131689630
+ string:mtrl_picker_toggle_to_day_selection:2131689631
+ string:mtrl_picker_toggle_to_text_input_mode:2131689632
+ string:mtrl_picker_toggle_to_year_selection:2131689633
+ string:password_toggle_content_description:2131689644
+ string:path_password_eye:2131689645
+ string:path_password_eye_mask_strike_through:2131689646
+ string:path_password_eye_mask_visible:2131689647
+ string:path_password_strike_through:2131689648
+ string:side_sheet_accessibility_pane_title:2131689653
  style:Animation_AppCompat_Tooltip:2131755012
  style:TextAppearance_AppCompat:2131755411
  style:TextAppearance_AppCompat_Body1:2131755412
@@ -17806,617 +17808,624 @@ Unused resources are:
  color:cardview_light_background:2131034156
  color:cardview_shadow_end_color:2131034157
  color:cardview_shadow_start_color:2131034158
- color:common_google_signin_btn_text_dark:2131034159
- color:common_google_signin_btn_text_dark_default:2131034160
- color:common_google_signin_btn_text_dark_disabled:2131034161
- color:common_google_signin_btn_text_dark_focused:2131034162
- color:common_google_signin_btn_text_dark_pressed:2131034163
- color:common_google_signin_btn_text_light:2131034164
- color:common_google_signin_btn_text_light_default:2131034165
- color:common_google_signin_btn_text_light_disabled:2131034166
- color:common_google_signin_btn_text_light_focused:2131034167
- color:common_google_signin_btn_text_light_pressed:2131034168
- color:common_google_signin_btn_tint:2131034169
- color:design_bottom_navigation_shadow_color:2131034170
- color:design_fab_shadow_end_color:2131034199
- color:design_fab_shadow_mid_color:2131034200
- color:design_fab_shadow_start_color:2131034201
- color:design_fab_stroke_end_inner_color:2131034202
- color:design_fab_stroke_end_outer_color:2131034203
- color:design_fab_stroke_top_inner_color:2131034204
- color:design_fab_stroke_top_outer_color:2131034205
- color:dim_foreground_disabled_material_dark:2131034208
- color:dim_foreground_disabled_material_light:2131034209
- color:dim_foreground_material_dark:2131034210
- color:dim_foreground_material_light:2131034211
- color:m3_appbar_overlay_color:2131034219
- color:m3_assist_chip_icon_tint_color:2131034220
- color:m3_assist_chip_stroke_color:2131034221
- color:m3_bottom_sheet_drag_handle_color:2131034222
- color:m3_button_background_color_selector:2131034223
- color:m3_button_foreground_color_selector:2131034224
- color:m3_button_outline_color_selector:2131034225
- color:m3_button_ripple_color:2131034226
- color:m3_button_ripple_color_selector:2131034227
- color:m3_calendar_item_disabled_text:2131034228
- color:m3_calendar_item_stroke_color:2131034229
- color:m3_card_foreground_color:2131034230
- color:m3_card_ripple_color:2131034231
- color:m3_card_stroke_color:2131034232
- color:m3_checkbox_button_icon_tint:2131034233
- color:m3_checkbox_button_tint:2131034234
- color:m3_chip_assist_text_color:2131034235
- color:m3_chip_background_color:2131034236
- color:m3_chip_ripple_color:2131034237
- color:m3_chip_stroke_color:2131034238
- color:m3_chip_text_color:2131034239
- color:m3_dark_default_color_primary_text:2131034240
- color:m3_dark_default_color_secondary_text:2131034241
- color:m3_dark_highlighted_text:2131034242
- color:m3_dark_hint_foreground:2131034243
- color:m3_dark_primary_text_disable_only:2131034244
- color:m3_default_color_primary_text:2131034245
- color:m3_default_color_secondary_text:2131034246
- color:m3_dynamic_dark_default_color_primary_text:2131034247
- color:m3_dynamic_dark_default_color_secondary_text:2131034248
- color:m3_dynamic_dark_highlighted_text:2131034249
- color:m3_dynamic_dark_hint_foreground:2131034250
- color:m3_dynamic_dark_primary_text_disable_only:2131034251
- color:m3_dynamic_default_color_primary_text:2131034252
- color:m3_dynamic_default_color_secondary_text:2131034253
- color:m3_dynamic_highlighted_text:2131034254
- color:m3_dynamic_hint_foreground:2131034255
- color:m3_dynamic_primary_text_disable_only:2131034256
- color:m3_efab_ripple_color_selector:2131034257
- color:m3_elevated_chip_background_color:2131034258
- color:m3_fab_efab_background_color_selector:2131034259
- color:m3_fab_efab_foreground_color_selector:2131034260
- color:m3_fab_ripple_color_selector:2131034261
- color:m3_filled_icon_button_container_color_selector:2131034262
- color:m3_highlighted_text:2131034263
- color:m3_hint_foreground:2131034264
- color:m3_icon_button_icon_color_selector:2131034265
- color:m3_navigation_bar_item_with_indicator_icon_tint:2131034266
- color:m3_navigation_bar_item_with_indicator_label_tint:2131034267
- color:m3_navigation_bar_ripple_color_selector:2131034268
- color:m3_navigation_item_background_color:2131034269
- color:m3_navigation_item_icon_tint:2131034270
- color:m3_navigation_item_ripple_color:2131034271
- color:m3_navigation_item_text_color:2131034272
- color:m3_navigation_rail_item_with_indicator_icon_tint:2131034273
- color:m3_navigation_rail_item_with_indicator_label_tint:2131034274
- color:m3_navigation_rail_ripple_color_selector:2131034275
- color:m3_popupmenu_overlay_color:2131034276
- color:m3_primary_text_disable_only:2131034277
- color:m3_radiobutton_button_tint:2131034278
- color:m3_radiobutton_ripple_tint:2131034279
- color:m3_ref_palette_black:2131034280
- color:m3_ref_palette_dynamic_neutral0:2131034281
- color:m3_ref_palette_dynamic_neutral10:2131034282
- color:m3_ref_palette_dynamic_neutral100:2131034283
- color:m3_ref_palette_dynamic_neutral12:2131034284
- color:m3_ref_palette_dynamic_neutral17:2131034285
- color:m3_ref_palette_dynamic_neutral20:2131034286
- color:m3_ref_palette_dynamic_neutral22:2131034287
- color:m3_ref_palette_dynamic_neutral24:2131034288
- color:m3_ref_palette_dynamic_neutral30:2131034289
- color:m3_ref_palette_dynamic_neutral4:2131034290
- color:m3_ref_palette_dynamic_neutral40:2131034291
- color:m3_ref_palette_dynamic_neutral50:2131034292
- color:m3_ref_palette_dynamic_neutral6:2131034293
- color:m3_ref_palette_dynamic_neutral60:2131034294
- color:m3_ref_palette_dynamic_neutral70:2131034295
- color:m3_ref_palette_dynamic_neutral80:2131034296
- color:m3_ref_palette_dynamic_neutral87:2131034297
- color:m3_ref_palette_dynamic_neutral90:2131034298
- color:m3_ref_palette_dynamic_neutral92:2131034299
- color:m3_ref_palette_dynamic_neutral94:2131034300
- color:m3_ref_palette_dynamic_neutral95:2131034301
- color:m3_ref_palette_dynamic_neutral96:2131034302
- color:m3_ref_palette_dynamic_neutral98:2131034303
- color:m3_ref_palette_dynamic_neutral99:2131034304
- color:m3_ref_palette_dynamic_neutral_variant0:2131034305
- color:m3_ref_palette_dynamic_neutral_variant10:2131034306
- color:m3_ref_palette_dynamic_neutral_variant100:2131034307
- color:m3_ref_palette_dynamic_neutral_variant12:2131034308
- color:m3_ref_palette_dynamic_neutral_variant17:2131034309
- color:m3_ref_palette_dynamic_neutral_variant20:2131034310
- color:m3_ref_palette_dynamic_neutral_variant22:2131034311
- color:m3_ref_palette_dynamic_neutral_variant24:2131034312
- color:m3_ref_palette_dynamic_neutral_variant30:2131034313
- color:m3_ref_palette_dynamic_neutral_variant4:2131034314
- color:m3_ref_palette_dynamic_neutral_variant40:2131034315
- color:m3_ref_palette_dynamic_neutral_variant50:2131034316
- color:m3_ref_palette_dynamic_neutral_variant6:2131034317
- color:m3_ref_palette_dynamic_neutral_variant60:2131034318
- color:m3_ref_palette_dynamic_neutral_variant70:2131034319
- color:m3_ref_palette_dynamic_neutral_variant80:2131034320
- color:m3_ref_palette_dynamic_neutral_variant87:2131034321
- color:m3_ref_palette_dynamic_neutral_variant90:2131034322
- color:m3_ref_palette_dynamic_neutral_variant92:2131034323
- color:m3_ref_palette_dynamic_neutral_variant94:2131034324
- color:m3_ref_palette_dynamic_neutral_variant95:2131034325
- color:m3_ref_palette_dynamic_neutral_variant96:2131034326
- color:m3_ref_palette_dynamic_neutral_variant98:2131034327
- color:m3_ref_palette_dynamic_neutral_variant99:2131034328
- color:m3_ref_palette_dynamic_primary0:2131034329
- color:m3_ref_palette_dynamic_primary10:2131034330
- color:m3_ref_palette_dynamic_primary100:2131034331
- color:m3_ref_palette_dynamic_primary20:2131034332
- color:m3_ref_palette_dynamic_primary30:2131034333
- color:m3_ref_palette_dynamic_primary40:2131034334
- color:m3_ref_palette_dynamic_primary50:2131034335
- color:m3_ref_palette_dynamic_primary60:2131034336
- color:m3_ref_palette_dynamic_primary70:2131034337
- color:m3_ref_palette_dynamic_primary80:2131034338
- color:m3_ref_palette_dynamic_primary90:2131034339
- color:m3_ref_palette_dynamic_primary95:2131034340
- color:m3_ref_palette_dynamic_primary99:2131034341
- color:m3_ref_palette_dynamic_secondary0:2131034342
- color:m3_ref_palette_dynamic_secondary10:2131034343
- color:m3_ref_palette_dynamic_secondary100:2131034344
- color:m3_ref_palette_dynamic_secondary20:2131034345
- color:m3_ref_palette_dynamic_secondary30:2131034346
- color:m3_ref_palette_dynamic_secondary40:2131034347
- color:m3_ref_palette_dynamic_secondary50:2131034348
- color:m3_ref_palette_dynamic_secondary60:2131034349
- color:m3_ref_palette_dynamic_secondary70:2131034350
- color:m3_ref_palette_dynamic_secondary80:2131034351
- color:m3_ref_palette_dynamic_secondary90:2131034352
- color:m3_ref_palette_dynamic_secondary95:2131034353
- color:m3_ref_palette_dynamic_secondary99:2131034354
- color:m3_ref_palette_dynamic_tertiary0:2131034355
- color:m3_ref_palette_dynamic_tertiary10:2131034356
- color:m3_ref_palette_dynamic_tertiary100:2131034357
- color:m3_ref_palette_dynamic_tertiary20:2131034358
- color:m3_ref_palette_dynamic_tertiary30:2131034359
- color:m3_ref_palette_dynamic_tertiary40:2131034360
- color:m3_ref_palette_dynamic_tertiary50:2131034361
- color:m3_ref_palette_dynamic_tertiary60:2131034362
- color:m3_ref_palette_dynamic_tertiary70:2131034363
- color:m3_ref_palette_dynamic_tertiary80:2131034364
- color:m3_ref_palette_dynamic_tertiary90:2131034365
- color:m3_ref_palette_dynamic_tertiary95:2131034366
- color:m3_ref_palette_dynamic_tertiary99:2131034367
- color:m3_ref_palette_error0:2131034368
- color:m3_ref_palette_error10:2131034369
- color:m3_ref_palette_error100:2131034370
- color:m3_ref_palette_error20:2131034371
- color:m3_ref_palette_error30:2131034372
- color:m3_ref_palette_error40:2131034373
- color:m3_ref_palette_error50:2131034374
- color:m3_ref_palette_error60:2131034375
- color:m3_ref_palette_error70:2131034376
- color:m3_ref_palette_error80:2131034377
- color:m3_ref_palette_error90:2131034378
- color:m3_ref_palette_error95:2131034379
- color:m3_ref_palette_error99:2131034380
- color:m3_ref_palette_neutral0:2131034381
- color:m3_ref_palette_neutral10:2131034382
- color:m3_ref_palette_neutral100:2131034383
- color:m3_ref_palette_neutral12:2131034384
- color:m3_ref_palette_neutral17:2131034385
- color:m3_ref_palette_neutral20:2131034386
- color:m3_ref_palette_neutral22:2131034387
- color:m3_ref_palette_neutral24:2131034388
- color:m3_ref_palette_neutral30:2131034389
- color:m3_ref_palette_neutral4:2131034390
- color:m3_ref_palette_neutral40:2131034391
- color:m3_ref_palette_neutral50:2131034392
- color:m3_ref_palette_neutral6:2131034393
- color:m3_ref_palette_neutral60:2131034394
- color:m3_ref_palette_neutral70:2131034395
- color:m3_ref_palette_neutral80:2131034396
- color:m3_ref_palette_neutral87:2131034397
- color:m3_ref_palette_neutral90:2131034398
- color:m3_ref_palette_neutral92:2131034399
- color:m3_ref_palette_neutral94:2131034400
- color:m3_ref_palette_neutral95:2131034401
- color:m3_ref_palette_neutral96:2131034402
- color:m3_ref_palette_neutral98:2131034403
- color:m3_ref_palette_neutral99:2131034404
- color:m3_ref_palette_neutral_variant0:2131034405
- color:m3_ref_palette_neutral_variant10:2131034406
- color:m3_ref_palette_neutral_variant100:2131034407
- color:m3_ref_palette_neutral_variant20:2131034408
- color:m3_ref_palette_neutral_variant30:2131034409
- color:m3_ref_palette_neutral_variant40:2131034410
- color:m3_ref_palette_neutral_variant50:2131034411
- color:m3_ref_palette_neutral_variant60:2131034412
- color:m3_ref_palette_neutral_variant70:2131034413
- color:m3_ref_palette_neutral_variant80:2131034414
- color:m3_ref_palette_neutral_variant90:2131034415
- color:m3_ref_palette_neutral_variant95:2131034416
- color:m3_ref_palette_neutral_variant99:2131034417
- color:m3_ref_palette_primary0:2131034418
- color:m3_ref_palette_primary10:2131034419
- color:m3_ref_palette_primary100:2131034420
- color:m3_ref_palette_primary20:2131034421
- color:m3_ref_palette_primary30:2131034422
- color:m3_ref_palette_primary40:2131034423
- color:m3_ref_palette_primary50:2131034424
- color:m3_ref_palette_primary60:2131034425
- color:m3_ref_palette_primary70:2131034426
- color:m3_ref_palette_primary80:2131034427
- color:m3_ref_palette_primary90:2131034428
- color:m3_ref_palette_primary95:2131034429
- color:m3_ref_palette_primary99:2131034430
- color:m3_ref_palette_secondary0:2131034431
- color:m3_ref_palette_secondary10:2131034432
- color:m3_ref_palette_secondary100:2131034433
- color:m3_ref_palette_secondary20:2131034434
- color:m3_ref_palette_secondary30:2131034435
- color:m3_ref_palette_secondary40:2131034436
- color:m3_ref_palette_secondary50:2131034437
- color:m3_ref_palette_secondary60:2131034438
- color:m3_ref_palette_secondary70:2131034439
- color:m3_ref_palette_secondary80:2131034440
- color:m3_ref_palette_secondary90:2131034441
- color:m3_ref_palette_secondary95:2131034442
- color:m3_ref_palette_secondary99:2131034443
- color:m3_ref_palette_tertiary0:2131034444
- color:m3_ref_palette_tertiary10:2131034445
- color:m3_ref_palette_tertiary100:2131034446
- color:m3_ref_palette_tertiary20:2131034447
- color:m3_ref_palette_tertiary30:2131034448
- color:m3_ref_palette_tertiary40:2131034449
- color:m3_ref_palette_tertiary50:2131034450
- color:m3_ref_palette_tertiary60:2131034451
- color:m3_ref_palette_tertiary70:2131034452
- color:m3_ref_palette_tertiary80:2131034453
- color:m3_ref_palette_tertiary90:2131034454
- color:m3_ref_palette_tertiary95:2131034455
- color:m3_ref_palette_tertiary99:2131034456
- color:m3_ref_palette_white:2131034457
- color:m3_selection_control_ripple_color_selector:2131034458
- color:m3_simple_item_ripple_color:2131034459
- color:m3_slider_active_track_color:2131034460
- color:m3_slider_active_track_color_legacy:2131034461
- color:m3_slider_halo_color_legacy:2131034462
- color:m3_slider_inactive_track_color:2131034463
- color:m3_slider_inactive_track_color_legacy:2131034464
- color:m3_slider_thumb_color:2131034465
- color:m3_slider_thumb_color_legacy:2131034466
- color:m3_switch_thumb_tint:2131034467
- color:m3_switch_track_tint:2131034468
- color:m3_sys_color_dark_background:2131034469
- color:m3_sys_color_dark_error:2131034470
- color:m3_sys_color_dark_error_container:2131034471
- color:m3_sys_color_dark_inverse_on_surface:2131034472
- color:m3_sys_color_dark_inverse_primary:2131034473
- color:m3_sys_color_dark_inverse_surface:2131034474
- color:m3_sys_color_dark_on_background:2131034475
- color:m3_sys_color_dark_on_error:2131034476
- color:m3_sys_color_dark_on_error_container:2131034477
- color:m3_sys_color_dark_on_primary:2131034478
- color:m3_sys_color_dark_on_primary_container:2131034479
- color:m3_sys_color_dark_on_secondary:2131034480
- color:m3_sys_color_dark_on_secondary_container:2131034481
- color:m3_sys_color_dark_on_surface:2131034482
- color:m3_sys_color_dark_on_surface_variant:2131034483
- color:m3_sys_color_dark_on_tertiary:2131034484
- color:m3_sys_color_dark_on_tertiary_container:2131034485
- color:m3_sys_color_dark_outline:2131034486
- color:m3_sys_color_dark_outline_variant:2131034487
- color:m3_sys_color_dark_primary:2131034488
- color:m3_sys_color_dark_primary_container:2131034489
- color:m3_sys_color_dark_secondary:2131034490
- color:m3_sys_color_dark_secondary_container:2131034491
- color:m3_sys_color_dark_surface:2131034492
- color:m3_sys_color_dark_surface_bright:2131034493
- color:m3_sys_color_dark_surface_container:2131034494
- color:m3_sys_color_dark_surface_container_high:2131034495
- color:m3_sys_color_dark_surface_container_highest:2131034496
- color:m3_sys_color_dark_surface_container_low:2131034497
- color:m3_sys_color_dark_surface_container_lowest:2131034498
- color:m3_sys_color_dark_surface_dim:2131034499
- color:m3_sys_color_dark_surface_variant:2131034500
- color:m3_sys_color_dark_tertiary:2131034501
- color:m3_sys_color_dark_tertiary_container:2131034502
- color:m3_sys_color_dynamic_dark_background:2131034503
- color:m3_sys_color_dynamic_dark_error:2131034504
- color:m3_sys_color_dynamic_dark_error_container:2131034505
- color:m3_sys_color_dynamic_dark_inverse_on_surface:2131034506
- color:m3_sys_color_dynamic_dark_inverse_primary:2131034507
- color:m3_sys_color_dynamic_dark_inverse_surface:2131034508
- color:m3_sys_color_dynamic_dark_on_background:2131034509
- color:m3_sys_color_dynamic_dark_on_error:2131034510
- color:m3_sys_color_dynamic_dark_on_error_container:2131034511
- color:m3_sys_color_dynamic_dark_on_primary:2131034512
- color:m3_sys_color_dynamic_dark_on_primary_container:2131034513
- color:m3_sys_color_dynamic_dark_on_secondary:2131034514
- color:m3_sys_color_dynamic_dark_on_secondary_container:2131034515
- color:m3_sys_color_dynamic_dark_on_surface:2131034516
- color:m3_sys_color_dynamic_dark_on_surface_variant:2131034517
- color:m3_sys_color_dynamic_dark_on_tertiary:2131034518
- color:m3_sys_color_dynamic_dark_on_tertiary_container:2131034519
- color:m3_sys_color_dynamic_dark_outline:2131034520
- color:m3_sys_color_dynamic_dark_outline_variant:2131034521
- color:m3_sys_color_dynamic_dark_primary:2131034522
- color:m3_sys_color_dynamic_dark_primary_container:2131034523
- color:m3_sys_color_dynamic_dark_secondary:2131034524
- color:m3_sys_color_dynamic_dark_secondary_container:2131034525
- color:m3_sys_color_dynamic_dark_surface:2131034526
- color:m3_sys_color_dynamic_dark_surface_bright:2131034527
- color:m3_sys_color_dynamic_dark_surface_container:2131034528
- color:m3_sys_color_dynamic_dark_surface_container_high:2131034529
- color:m3_sys_color_dynamic_dark_surface_container_highest:2131034530
- color:m3_sys_color_dynamic_dark_surface_container_low:2131034531
- color:m3_sys_color_dynamic_dark_surface_container_lowest:2131034532
- color:m3_sys_color_dynamic_dark_surface_dim:2131034533
- color:m3_sys_color_dynamic_dark_surface_variant:2131034534
- color:m3_sys_color_dynamic_dark_tertiary:2131034535
- color:m3_sys_color_dynamic_dark_tertiary_container:2131034536
- color:m3_sys_color_dynamic_light_background:2131034537
- color:m3_sys_color_dynamic_light_error:2131034538
- color:m3_sys_color_dynamic_light_error_container:2131034539
- color:m3_sys_color_dynamic_light_inverse_on_surface:2131034540
- color:m3_sys_color_dynamic_light_inverse_primary:2131034541
- color:m3_sys_color_dynamic_light_inverse_surface:2131034542
- color:m3_sys_color_dynamic_light_on_background:2131034543
- color:m3_sys_color_dynamic_light_on_error:2131034544
- color:m3_sys_color_dynamic_light_on_error_container:2131034545
- color:m3_sys_color_dynamic_light_on_primary:2131034546
- color:m3_sys_color_dynamic_light_on_primary_container:2131034547
- color:m3_sys_color_dynamic_light_on_secondary:2131034548
- color:m3_sys_color_dynamic_light_on_secondary_container:2131034549
- color:m3_sys_color_dynamic_light_on_surface:2131034550
- color:m3_sys_color_dynamic_light_on_surface_variant:2131034551
- color:m3_sys_color_dynamic_light_on_tertiary:2131034552
- color:m3_sys_color_dynamic_light_on_tertiary_container:2131034553
- color:m3_sys_color_dynamic_light_outline:2131034554
- color:m3_sys_color_dynamic_light_outline_variant:2131034555
- color:m3_sys_color_dynamic_light_primary:2131034556
- color:m3_sys_color_dynamic_light_primary_container:2131034557
- color:m3_sys_color_dynamic_light_secondary:2131034558
- color:m3_sys_color_dynamic_light_secondary_container:2131034559
- color:m3_sys_color_dynamic_light_surface:2131034560
- color:m3_sys_color_dynamic_light_surface_bright:2131034561
- color:m3_sys_color_dynamic_light_surface_container:2131034562
- color:m3_sys_color_dynamic_light_surface_container_high:2131034563
- color:m3_sys_color_dynamic_light_surface_container_highest:2131034564
- color:m3_sys_color_dynamic_light_surface_container_low:2131034565
- color:m3_sys_color_dynamic_light_surface_container_lowest:2131034566
- color:m3_sys_color_dynamic_light_surface_dim:2131034567
- color:m3_sys_color_dynamic_light_surface_variant:2131034568
- color:m3_sys_color_dynamic_light_tertiary:2131034569
- color:m3_sys_color_dynamic_light_tertiary_container:2131034570
- color:m3_sys_color_dynamic_on_primary_fixed:2131034571
- color:m3_sys_color_dynamic_on_primary_fixed_variant:2131034572
- color:m3_sys_color_dynamic_on_secondary_fixed:2131034573
- color:m3_sys_color_dynamic_on_secondary_fixed_variant:2131034574
- color:m3_sys_color_dynamic_on_tertiary_fixed:2131034575
- color:m3_sys_color_dynamic_on_tertiary_fixed_variant:2131034576
- color:m3_sys_color_dynamic_primary_fixed:2131034577
- color:m3_sys_color_dynamic_primary_fixed_dim:2131034578
- color:m3_sys_color_dynamic_secondary_fixed:2131034579
- color:m3_sys_color_dynamic_secondary_fixed_dim:2131034580
- color:m3_sys_color_dynamic_tertiary_fixed:2131034581
- color:m3_sys_color_dynamic_tertiary_fixed_dim:2131034582
- color:m3_sys_color_light_background:2131034583
- color:m3_sys_color_light_error:2131034584
- color:m3_sys_color_light_error_container:2131034585
- color:m3_sys_color_light_inverse_on_surface:2131034586
- color:m3_sys_color_light_inverse_primary:2131034587
- color:m3_sys_color_light_inverse_surface:2131034588
- color:m3_sys_color_light_on_background:2131034589
- color:m3_sys_color_light_on_error:2131034590
- color:m3_sys_color_light_on_error_container:2131034591
- color:m3_sys_color_light_on_primary:2131034592
- color:m3_sys_color_light_on_primary_container:2131034593
- color:m3_sys_color_light_on_secondary:2131034594
- color:m3_sys_color_light_on_secondary_container:2131034595
- color:m3_sys_color_light_on_surface:2131034596
- color:m3_sys_color_light_on_surface_variant:2131034597
- color:m3_sys_color_light_on_tertiary:2131034598
- color:m3_sys_color_light_on_tertiary_container:2131034599
- color:m3_sys_color_light_outline:2131034600
- color:m3_sys_color_light_outline_variant:2131034601
- color:m3_sys_color_light_primary:2131034602
- color:m3_sys_color_light_primary_container:2131034603
- color:m3_sys_color_light_secondary:2131034604
- color:m3_sys_color_light_secondary_container:2131034605
- color:m3_sys_color_light_surface:2131034606
- color:m3_sys_color_light_surface_bright:2131034607
- color:m3_sys_color_light_surface_container:2131034608
- color:m3_sys_color_light_surface_container_high:2131034609
- color:m3_sys_color_light_surface_container_highest:2131034610
- color:m3_sys_color_light_surface_container_low:2131034611
- color:m3_sys_color_light_surface_container_lowest:2131034612
- color:m3_sys_color_light_surface_dim:2131034613
- color:m3_sys_color_light_surface_variant:2131034614
- color:m3_sys_color_light_tertiary:2131034615
- color:m3_sys_color_light_tertiary_container:2131034616
- color:m3_sys_color_on_primary_fixed:2131034617
- color:m3_sys_color_on_primary_fixed_variant:2131034618
- color:m3_sys_color_on_secondary_fixed:2131034619
- color:m3_sys_color_on_secondary_fixed_variant:2131034620
- color:m3_sys_color_on_tertiary_fixed:2131034621
- color:m3_sys_color_on_tertiary_fixed_variant:2131034622
- color:m3_sys_color_primary_fixed:2131034623
- color:m3_sys_color_primary_fixed_dim:2131034624
- color:m3_sys_color_secondary_fixed:2131034625
- color:m3_sys_color_secondary_fixed_dim:2131034626
- color:m3_sys_color_tertiary_fixed:2131034627
- color:m3_sys_color_tertiary_fixed_dim:2131034628
- color:m3_tabs_icon_color:2131034629
- color:m3_tabs_icon_color_secondary:2131034630
- color:m3_tabs_ripple_color:2131034631
- color:m3_tabs_ripple_color_secondary:2131034632
- color:m3_tabs_text_color:2131034633
- color:m3_tabs_text_color_secondary:2131034634
- color:m3_text_button_background_color_selector:2131034635
- color:m3_text_button_foreground_color_selector:2131034636
- color:m3_text_button_ripple_color_selector:2131034637
- color:m3_textfield_filled_background_color:2131034638
- color:m3_textfield_indicator_text_color:2131034639
- color:m3_textfield_input_text_color:2131034640
- color:m3_textfield_label_color:2131034641
- color:m3_textfield_stroke_color:2131034642
- color:m3_timepicker_button_background_color:2131034643
- color:m3_timepicker_button_ripple_color:2131034644
- color:m3_timepicker_button_text_color:2131034645
- color:m3_timepicker_clock_text_color:2131034646
- color:m3_timepicker_display_background_color:2131034647
- color:m3_timepicker_display_ripple_color:2131034648
- color:m3_timepicker_display_text_color:2131034649
- color:m3_timepicker_secondary_text_button_ripple_color:2131034650
- color:m3_timepicker_secondary_text_button_text_color:2131034651
- color:m3_timepicker_time_input_stroke_color:2131034652
- color:m3_tonal_button_ripple_color_selector:2131034653
- color:material_blue_grey_800:2131034654
- color:material_blue_grey_900:2131034655
- color:material_blue_grey_950:2131034656
- color:material_cursor_color:2131034657
- color:material_divider_color:2131034660
- color:material_dynamic_color_dark_error:2131034661
- color:material_dynamic_color_dark_error_container:2131034662
- color:material_dynamic_color_dark_on_error:2131034663
- color:material_dynamic_color_dark_on_error_container:2131034664
- color:material_dynamic_color_light_error:2131034665
- color:material_dynamic_color_light_error_container:2131034666
- color:material_dynamic_color_light_on_error:2131034667
- color:material_dynamic_color_light_on_error_container:2131034668
- color:material_dynamic_neutral0:2131034669
- color:material_dynamic_neutral10:2131034670
- color:material_dynamic_neutral100:2131034671
- color:material_dynamic_neutral20:2131034672
- color:material_dynamic_neutral30:2131034673
- color:material_dynamic_neutral40:2131034674
- color:material_dynamic_neutral50:2131034675
- color:material_dynamic_neutral60:2131034676
- color:material_dynamic_neutral70:2131034677
- color:material_dynamic_neutral80:2131034678
- color:material_dynamic_neutral90:2131034679
- color:material_dynamic_neutral95:2131034680
- color:material_dynamic_neutral99:2131034681
- color:material_dynamic_neutral_variant0:2131034682
- color:material_dynamic_neutral_variant10:2131034683
- color:material_dynamic_neutral_variant100:2131034684
- color:material_dynamic_neutral_variant20:2131034685
- color:material_dynamic_neutral_variant30:2131034686
- color:material_dynamic_neutral_variant40:2131034687
- color:material_dynamic_neutral_variant50:2131034688
- color:material_dynamic_neutral_variant60:2131034689
- color:material_dynamic_neutral_variant70:2131034690
- color:material_dynamic_neutral_variant80:2131034691
- color:material_dynamic_neutral_variant90:2131034692
- color:material_dynamic_neutral_variant95:2131034693
- color:material_dynamic_neutral_variant99:2131034694
- color:material_dynamic_primary0:2131034695
- color:material_dynamic_primary10:2131034696
- color:material_dynamic_primary100:2131034697
- color:material_dynamic_primary20:2131034698
- color:material_dynamic_primary30:2131034699
- color:material_dynamic_primary40:2131034700
- color:material_dynamic_primary50:2131034701
- color:material_dynamic_primary60:2131034702
- color:material_dynamic_primary70:2131034703
- color:material_dynamic_primary80:2131034704
- color:material_dynamic_primary90:2131034705
- color:material_dynamic_primary95:2131034706
- color:material_dynamic_primary99:2131034707
- color:material_dynamic_secondary0:2131034708
- color:material_dynamic_secondary10:2131034709
- color:material_dynamic_secondary100:2131034710
- color:material_dynamic_secondary20:2131034711
- color:material_dynamic_secondary30:2131034712
- color:material_dynamic_secondary40:2131034713
- color:material_dynamic_secondary50:2131034714
- color:material_dynamic_secondary60:2131034715
- color:material_dynamic_secondary70:2131034716
- color:material_dynamic_secondary80:2131034717
- color:material_dynamic_secondary90:2131034718
- color:material_dynamic_secondary95:2131034719
- color:material_dynamic_secondary99:2131034720
- color:material_dynamic_tertiary0:2131034721
- color:material_dynamic_tertiary10:2131034722
- color:material_dynamic_tertiary100:2131034723
- color:material_dynamic_tertiary20:2131034724
- color:material_dynamic_tertiary30:2131034725
- color:material_dynamic_tertiary40:2131034726
- color:material_dynamic_tertiary50:2131034727
- color:material_dynamic_tertiary60:2131034728
- color:material_dynamic_tertiary70:2131034729
- color:material_dynamic_tertiary80:2131034730
- color:material_dynamic_tertiary90:2131034731
- color:material_dynamic_tertiary95:2131034732
- color:material_dynamic_tertiary99:2131034733
- color:material_grey_300:2131034735
- color:material_harmonized_color_error:2131034741
- color:material_harmonized_color_error_container:2131034742
- color:material_harmonized_color_on_error:2131034743
- color:material_harmonized_color_on_error_container:2131034744
- color:material_on_background_disabled:2131034745
- color:material_on_background_emphasis_high_type:2131034746
- color:material_on_background_emphasis_medium:2131034747
- color:material_on_primary_disabled:2131034748
- color:material_on_primary_emphasis_high_type:2131034749
- color:material_on_primary_emphasis_medium:2131034750
- color:material_on_surface_stroke:2131034754
- color:material_personalized__highlighted_text:2131034755
- color:material_personalized__highlighted_text_inverse:2131034756
- color:material_personalized_color_background:2131034757
- color:material_personalized_color_control_activated:2131034758
- color:material_personalized_color_control_highlight:2131034759
- color:material_personalized_color_control_normal:2131034760
- color:material_personalized_color_error:2131034761
- color:material_personalized_color_error_container:2131034762
- color:material_personalized_color_on_background:2131034763
- color:material_personalized_color_on_error:2131034764
- color:material_personalized_color_on_error_container:2131034765
- color:material_personalized_color_on_primary:2131034766
- color:material_personalized_color_on_primary_container:2131034767
- color:material_personalized_color_on_secondary:2131034768
- color:material_personalized_color_on_secondary_container:2131034769
- color:material_personalized_color_on_surface:2131034770
- color:material_personalized_color_on_surface_inverse:2131034771
- color:material_personalized_color_on_surface_variant:2131034772
- color:material_personalized_color_on_tertiary:2131034773
- color:material_personalized_color_on_tertiary_container:2131034774
- color:material_personalized_color_outline:2131034775
- color:material_personalized_color_outline_variant:2131034776
- color:material_personalized_color_primary:2131034777
- color:material_personalized_color_primary_container:2131034778
- color:material_personalized_color_primary_inverse:2131034779
- color:material_personalized_color_primary_text:2131034780
- color:material_personalized_color_primary_text_inverse:2131034781
- color:material_personalized_color_secondary:2131034782
- color:material_personalized_color_secondary_container:2131034783
- color:material_personalized_color_secondary_text:2131034784
- color:material_personalized_color_secondary_text_inverse:2131034785
- color:material_personalized_color_surface:2131034786
- color:material_personalized_color_surface_bright:2131034787
- color:material_personalized_color_surface_container:2131034788
- color:material_personalized_color_surface_container_high:2131034789
- color:material_personalized_color_surface_container_highest:2131034790
- color:material_personalized_color_surface_container_low:2131034791
- color:material_personalized_color_surface_container_lowest:2131034792
- color:material_personalized_color_surface_dim:2131034793
- color:material_personalized_color_surface_inverse:2131034794
- color:material_personalized_color_surface_variant:2131034795
- color:material_personalized_color_tertiary:2131034796
- color:material_personalized_color_tertiary_container:2131034797
- color:material_personalized_color_text_hint_foreground_inverse:2131034798
- color:material_personalized_color_text_primary_inverse:2131034799
- color:material_personalized_color_text_primary_inverse_disable_only:2131034800
- color:material_personalized_color_text_secondary_and_tertiary_inverse:2131034801
- color:material_personalized_color_text_secondary_and_tertiary_inverse_disabled:2131034802
- color:material_personalized_hint_foreground:2131034803
- color:material_personalized_hint_foreground_inverse:2131034804
- color:material_personalized_primary_inverse_text_disable_only:2131034805
- color:material_personalized_primary_text_disable_only:2131034806
- color:mtrl_btn_text_color_disabled:2131034823
- color:mtrl_btn_transparent_bg_color:2131034825
- color:mtrl_navigation_bar_colored_item_tint:2131034845
- color:mtrl_navigation_bar_colored_ripple_color:2131034846
- color:mtrl_switch_thumb_icon_tint:2131034858
- color:mtrl_switch_thumb_tint:2131034859
- color:mtrl_switch_track_decoration_tint:2131034860
- color:mtrl_switch_track_tint:2131034861
- color:mtrl_tabs_colored_ripple_color:2131034862
- color:mtrl_tabs_icon_color_selector_colored:2131034864
- color:mtrl_textinput_filled_box_default_background_color:2131034870
+ color:colorAccent:2131034159
+ color:colorBackground:2131034160
+ color:colorOnBackground:2131034162
+ color:colorOnPrimary:2131034163
+ color:colorPrimary:2131034164
+ color:colorPrimaryDark:2131034165
+ color:colorSurface:2131034166
+ color:common_google_signin_btn_text_dark:2131034167
+ color:common_google_signin_btn_text_dark_default:2131034168
+ color:common_google_signin_btn_text_dark_disabled:2131034169
+ color:common_google_signin_btn_text_dark_focused:2131034170
+ color:common_google_signin_btn_text_dark_pressed:2131034171
+ color:common_google_signin_btn_text_light:2131034172
+ color:common_google_signin_btn_text_light_default:2131034173
+ color:common_google_signin_btn_text_light_disabled:2131034174
+ color:common_google_signin_btn_text_light_focused:2131034175
+ color:common_google_signin_btn_text_light_pressed:2131034176
+ color:common_google_signin_btn_tint:2131034177
+ color:design_bottom_navigation_shadow_color:2131034178
+ color:design_fab_shadow_end_color:2131034207
+ color:design_fab_shadow_mid_color:2131034208
+ color:design_fab_shadow_start_color:2131034209
+ color:design_fab_stroke_end_inner_color:2131034210
+ color:design_fab_stroke_end_outer_color:2131034211
+ color:design_fab_stroke_top_inner_color:2131034212
+ color:design_fab_stroke_top_outer_color:2131034213
+ color:dim_foreground_disabled_material_dark:2131034216
+ color:dim_foreground_disabled_material_light:2131034217
+ color:dim_foreground_material_dark:2131034218
+ color:dim_foreground_material_light:2131034219
+ color:m3_appbar_overlay_color:2131034226
+ color:m3_assist_chip_icon_tint_color:2131034227
+ color:m3_assist_chip_stroke_color:2131034228
+ color:m3_bottom_sheet_drag_handle_color:2131034229
+ color:m3_button_background_color_selector:2131034230
+ color:m3_button_foreground_color_selector:2131034231
+ color:m3_button_outline_color_selector:2131034232
+ color:m3_button_ripple_color:2131034233
+ color:m3_button_ripple_color_selector:2131034234
+ color:m3_calendar_item_disabled_text:2131034235
+ color:m3_calendar_item_stroke_color:2131034236
+ color:m3_card_foreground_color:2131034237
+ color:m3_card_ripple_color:2131034238
+ color:m3_card_stroke_color:2131034239
+ color:m3_checkbox_button_icon_tint:2131034240
+ color:m3_checkbox_button_tint:2131034241
+ color:m3_chip_assist_text_color:2131034242
+ color:m3_chip_background_color:2131034243
+ color:m3_chip_ripple_color:2131034244
+ color:m3_chip_stroke_color:2131034245
+ color:m3_chip_text_color:2131034246
+ color:m3_dark_default_color_primary_text:2131034247
+ color:m3_dark_default_color_secondary_text:2131034248
+ color:m3_dark_highlighted_text:2131034249
+ color:m3_dark_hint_foreground:2131034250
+ color:m3_dark_primary_text_disable_only:2131034251
+ color:m3_default_color_primary_text:2131034252
+ color:m3_default_color_secondary_text:2131034253
+ color:m3_dynamic_dark_default_color_primary_text:2131034254
+ color:m3_dynamic_dark_default_color_secondary_text:2131034255
+ color:m3_dynamic_dark_highlighted_text:2131034256
+ color:m3_dynamic_dark_hint_foreground:2131034257
+ color:m3_dynamic_dark_primary_text_disable_only:2131034258
+ color:m3_dynamic_default_color_primary_text:2131034259
+ color:m3_dynamic_default_color_secondary_text:2131034260
+ color:m3_dynamic_highlighted_text:2131034261
+ color:m3_dynamic_hint_foreground:2131034262
+ color:m3_dynamic_primary_text_disable_only:2131034263
+ color:m3_efab_ripple_color_selector:2131034264
+ color:m3_elevated_chip_background_color:2131034265
+ color:m3_fab_efab_background_color_selector:2131034266
+ color:m3_fab_efab_foreground_color_selector:2131034267
+ color:m3_fab_ripple_color_selector:2131034268
+ color:m3_filled_icon_button_container_color_selector:2131034269
+ color:m3_highlighted_text:2131034270
+ color:m3_hint_foreground:2131034271
+ color:m3_icon_button_icon_color_selector:2131034272
+ color:m3_navigation_bar_item_with_indicator_icon_tint:2131034273
+ color:m3_navigation_bar_item_with_indicator_label_tint:2131034274
+ color:m3_navigation_bar_ripple_color_selector:2131034275
+ color:m3_navigation_item_background_color:2131034276
+ color:m3_navigation_item_icon_tint:2131034277
+ color:m3_navigation_item_ripple_color:2131034278
+ color:m3_navigation_item_text_color:2131034279
+ color:m3_navigation_rail_item_with_indicator_icon_tint:2131034280
+ color:m3_navigation_rail_item_with_indicator_label_tint:2131034281
+ color:m3_navigation_rail_ripple_color_selector:2131034282
+ color:m3_popupmenu_overlay_color:2131034283
+ color:m3_primary_text_disable_only:2131034284
+ color:m3_radiobutton_button_tint:2131034285
+ color:m3_radiobutton_ripple_tint:2131034286
+ color:m3_ref_palette_black:2131034287
+ color:m3_ref_palette_dynamic_neutral0:2131034288
+ color:m3_ref_palette_dynamic_neutral10:2131034289
+ color:m3_ref_palette_dynamic_neutral100:2131034290
+ color:m3_ref_palette_dynamic_neutral12:2131034291
+ color:m3_ref_palette_dynamic_neutral17:2131034292
+ color:m3_ref_palette_dynamic_neutral20:2131034293
+ color:m3_ref_palette_dynamic_neutral22:2131034294
+ color:m3_ref_palette_dynamic_neutral24:2131034295
+ color:m3_ref_palette_dynamic_neutral30:2131034296
+ color:m3_ref_palette_dynamic_neutral4:2131034297
+ color:m3_ref_palette_dynamic_neutral40:2131034298
+ color:m3_ref_palette_dynamic_neutral50:2131034299
+ color:m3_ref_palette_dynamic_neutral6:2131034300
+ color:m3_ref_palette_dynamic_neutral60:2131034301
+ color:m3_ref_palette_dynamic_neutral70:2131034302
+ color:m3_ref_palette_dynamic_neutral80:2131034303
+ color:m3_ref_palette_dynamic_neutral87:2131034304
+ color:m3_ref_palette_dynamic_neutral90:2131034305
+ color:m3_ref_palette_dynamic_neutral92:2131034306
+ color:m3_ref_palette_dynamic_neutral94:2131034307
+ color:m3_ref_palette_dynamic_neutral95:2131034308
+ color:m3_ref_palette_dynamic_neutral96:2131034309
+ color:m3_ref_palette_dynamic_neutral98:2131034310
+ color:m3_ref_palette_dynamic_neutral99:2131034311
+ color:m3_ref_palette_dynamic_neutral_variant0:2131034312
+ color:m3_ref_palette_dynamic_neutral_variant10:2131034313
+ color:m3_ref_palette_dynamic_neutral_variant100:2131034314
+ color:m3_ref_palette_dynamic_neutral_variant12:2131034315
+ color:m3_ref_palette_dynamic_neutral_variant17:2131034316
+ color:m3_ref_palette_dynamic_neutral_variant20:2131034317
+ color:m3_ref_palette_dynamic_neutral_variant22:2131034318
+ color:m3_ref_palette_dynamic_neutral_variant24:2131034319
+ color:m3_ref_palette_dynamic_neutral_variant30:2131034320
+ color:m3_ref_palette_dynamic_neutral_variant4:2131034321
+ color:m3_ref_palette_dynamic_neutral_variant40:2131034322
+ color:m3_ref_palette_dynamic_neutral_variant50:2131034323
+ color:m3_ref_palette_dynamic_neutral_variant6:2131034324
+ color:m3_ref_palette_dynamic_neutral_variant60:2131034325
+ color:m3_ref_palette_dynamic_neutral_variant70:2131034326
+ color:m3_ref_palette_dynamic_neutral_variant80:2131034327
+ color:m3_ref_palette_dynamic_neutral_variant87:2131034328
+ color:m3_ref_palette_dynamic_neutral_variant90:2131034329
+ color:m3_ref_palette_dynamic_neutral_variant92:2131034330
+ color:m3_ref_palette_dynamic_neutral_variant94:2131034331
+ color:m3_ref_palette_dynamic_neutral_variant95:2131034332
+ color:m3_ref_palette_dynamic_neutral_variant96:2131034333
+ color:m3_ref_palette_dynamic_neutral_variant98:2131034334
+ color:m3_ref_palette_dynamic_neutral_variant99:2131034335
+ color:m3_ref_palette_dynamic_primary0:2131034336
+ color:m3_ref_palette_dynamic_primary10:2131034337
+ color:m3_ref_palette_dynamic_primary100:2131034338
+ color:m3_ref_palette_dynamic_primary20:2131034339
+ color:m3_ref_palette_dynamic_primary30:2131034340
+ color:m3_ref_palette_dynamic_primary40:2131034341
+ color:m3_ref_palette_dynamic_primary50:2131034342
+ color:m3_ref_palette_dynamic_primary60:2131034343
+ color:m3_ref_palette_dynamic_primary70:2131034344
+ color:m3_ref_palette_dynamic_primary80:2131034345
+ color:m3_ref_palette_dynamic_primary90:2131034346
+ color:m3_ref_palette_dynamic_primary95:2131034347
+ color:m3_ref_palette_dynamic_primary99:2131034348
+ color:m3_ref_palette_dynamic_secondary0:2131034349
+ color:m3_ref_palette_dynamic_secondary10:2131034350
+ color:m3_ref_palette_dynamic_secondary100:2131034351
+ color:m3_ref_palette_dynamic_secondary20:2131034352
+ color:m3_ref_palette_dynamic_secondary30:2131034353
+ color:m3_ref_palette_dynamic_secondary40:2131034354
+ color:m3_ref_palette_dynamic_secondary50:2131034355
+ color:m3_ref_palette_dynamic_secondary60:2131034356
+ color:m3_ref_palette_dynamic_secondary70:2131034357
+ color:m3_ref_palette_dynamic_secondary80:2131034358
+ color:m3_ref_palette_dynamic_secondary90:2131034359
+ color:m3_ref_palette_dynamic_secondary95:2131034360
+ color:m3_ref_palette_dynamic_secondary99:2131034361
+ color:m3_ref_palette_dynamic_tertiary0:2131034362
+ color:m3_ref_palette_dynamic_tertiary10:2131034363
+ color:m3_ref_palette_dynamic_tertiary100:2131034364
+ color:m3_ref_palette_dynamic_tertiary20:2131034365
+ color:m3_ref_palette_dynamic_tertiary30:2131034366
+ color:m3_ref_palette_dynamic_tertiary40:2131034367
+ color:m3_ref_palette_dynamic_tertiary50:2131034368
+ color:m3_ref_palette_dynamic_tertiary60:2131034369
+ color:m3_ref_palette_dynamic_tertiary70:2131034370
+ color:m3_ref_palette_dynamic_tertiary80:2131034371
+ color:m3_ref_palette_dynamic_tertiary90:2131034372
+ color:m3_ref_palette_dynamic_tertiary95:2131034373
+ color:m3_ref_palette_dynamic_tertiary99:2131034374
+ color:m3_ref_palette_error0:2131034375
+ color:m3_ref_palette_error10:2131034376
+ color:m3_ref_palette_error100:2131034377
+ color:m3_ref_palette_error20:2131034378
+ color:m3_ref_palette_error30:2131034379
+ color:m3_ref_palette_error40:2131034380
+ color:m3_ref_palette_error50:2131034381
+ color:m3_ref_palette_error60:2131034382
+ color:m3_ref_palette_error70:2131034383
+ color:m3_ref_palette_error80:2131034384
+ color:m3_ref_palette_error90:2131034385
+ color:m3_ref_palette_error95:2131034386
+ color:m3_ref_palette_error99:2131034387
+ color:m3_ref_palette_neutral0:2131034388
+ color:m3_ref_palette_neutral10:2131034389
+ color:m3_ref_palette_neutral100:2131034390
+ color:m3_ref_palette_neutral12:2131034391
+ color:m3_ref_palette_neutral17:2131034392
+ color:m3_ref_palette_neutral20:2131034393
+ color:m3_ref_palette_neutral22:2131034394
+ color:m3_ref_palette_neutral24:2131034395
+ color:m3_ref_palette_neutral30:2131034396
+ color:m3_ref_palette_neutral4:2131034397
+ color:m3_ref_palette_neutral40:2131034398
+ color:m3_ref_palette_neutral50:2131034399
+ color:m3_ref_palette_neutral6:2131034400
+ color:m3_ref_palette_neutral60:2131034401
+ color:m3_ref_palette_neutral70:2131034402
+ color:m3_ref_palette_neutral80:2131034403
+ color:m3_ref_palette_neutral87:2131034404
+ color:m3_ref_palette_neutral90:2131034405
+ color:m3_ref_palette_neutral92:2131034406
+ color:m3_ref_palette_neutral94:2131034407
+ color:m3_ref_palette_neutral95:2131034408
+ color:m3_ref_palette_neutral96:2131034409
+ color:m3_ref_palette_neutral98:2131034410
+ color:m3_ref_palette_neutral99:2131034411
+ color:m3_ref_palette_neutral_variant0:2131034412
+ color:m3_ref_palette_neutral_variant10:2131034413
+ color:m3_ref_palette_neutral_variant100:2131034414
+ color:m3_ref_palette_neutral_variant20:2131034415
+ color:m3_ref_palette_neutral_variant30:2131034416
+ color:m3_ref_palette_neutral_variant40:2131034417
+ color:m3_ref_palette_neutral_variant50:2131034418
+ color:m3_ref_palette_neutral_variant60:2131034419
+ color:m3_ref_palette_neutral_variant70:2131034420
+ color:m3_ref_palette_neutral_variant80:2131034421
+ color:m3_ref_palette_neutral_variant90:2131034422
+ color:m3_ref_palette_neutral_variant95:2131034423
+ color:m3_ref_palette_neutral_variant99:2131034424
+ color:m3_ref_palette_primary0:2131034425
+ color:m3_ref_palette_primary10:2131034426
+ color:m3_ref_palette_primary100:2131034427
+ color:m3_ref_palette_primary20:2131034428
+ color:m3_ref_palette_primary30:2131034429
+ color:m3_ref_palette_primary40:2131034430
+ color:m3_ref_palette_primary50:2131034431
+ color:m3_ref_palette_primary60:2131034432
+ color:m3_ref_palette_primary70:2131034433
+ color:m3_ref_palette_primary80:2131034434
+ color:m3_ref_palette_primary90:2131034435
+ color:m3_ref_palette_primary95:2131034436
+ color:m3_ref_palette_primary99:2131034437
+ color:m3_ref_palette_secondary0:2131034438
+ color:m3_ref_palette_secondary10:2131034439
+ color:m3_ref_palette_secondary100:2131034440
+ color:m3_ref_palette_secondary20:2131034441
+ color:m3_ref_palette_secondary30:2131034442
+ color:m3_ref_palette_secondary40:2131034443
+ color:m3_ref_palette_secondary50:2131034444
+ color:m3_ref_palette_secondary60:2131034445
+ color:m3_ref_palette_secondary70:2131034446
+ color:m3_ref_palette_secondary80:2131034447
+ color:m3_ref_palette_secondary90:2131034448
+ color:m3_ref_palette_secondary95:2131034449
+ color:m3_ref_palette_secondary99:2131034450
+ color:m3_ref_palette_tertiary0:2131034451
+ color:m3_ref_palette_tertiary10:2131034452
+ color:m3_ref_palette_tertiary100:2131034453
+ color:m3_ref_palette_tertiary20:2131034454
+ color:m3_ref_palette_tertiary30:2131034455
+ color:m3_ref_palette_tertiary40:2131034456
+ color:m3_ref_palette_tertiary50:2131034457
+ color:m3_ref_palette_tertiary60:2131034458
+ color:m3_ref_palette_tertiary70:2131034459
+ color:m3_ref_palette_tertiary80:2131034460
+ color:m3_ref_palette_tertiary90:2131034461
+ color:m3_ref_palette_tertiary95:2131034462
+ color:m3_ref_palette_tertiary99:2131034463
+ color:m3_ref_palette_white:2131034464
+ color:m3_selection_control_ripple_color_selector:2131034465
+ color:m3_simple_item_ripple_color:2131034466
+ color:m3_slider_active_track_color:2131034467
+ color:m3_slider_active_track_color_legacy:2131034468
+ color:m3_slider_halo_color_legacy:2131034469
+ color:m3_slider_inactive_track_color:2131034470
+ color:m3_slider_inactive_track_color_legacy:2131034471
+ color:m3_slider_thumb_color:2131034472
+ color:m3_slider_thumb_color_legacy:2131034473
+ color:m3_switch_thumb_tint:2131034474
+ color:m3_switch_track_tint:2131034475
+ color:m3_sys_color_dark_background:2131034476
+ color:m3_sys_color_dark_error:2131034477
+ color:m3_sys_color_dark_error_container:2131034478
+ color:m3_sys_color_dark_inverse_on_surface:2131034479
+ color:m3_sys_color_dark_inverse_primary:2131034480
+ color:m3_sys_color_dark_inverse_surface:2131034481
+ color:m3_sys_color_dark_on_background:2131034482
+ color:m3_sys_color_dark_on_error:2131034483
+ color:m3_sys_color_dark_on_error_container:2131034484
+ color:m3_sys_color_dark_on_primary:2131034485
+ color:m3_sys_color_dark_on_primary_container:2131034486
+ color:m3_sys_color_dark_on_secondary:2131034487
+ color:m3_sys_color_dark_on_secondary_container:2131034488
+ color:m3_sys_color_dark_on_surface:2131034489
+ color:m3_sys_color_dark_on_surface_variant:2131034490
+ color:m3_sys_color_dark_on_tertiary:2131034491
+ color:m3_sys_color_dark_on_tertiary_container:2131034492
+ color:m3_sys_color_dark_outline:2131034493
+ color:m3_sys_color_dark_outline_variant:2131034494
+ color:m3_sys_color_dark_primary:2131034495
+ color:m3_sys_color_dark_primary_container:2131034496
+ color:m3_sys_color_dark_secondary:2131034497
+ color:m3_sys_color_dark_secondary_container:2131034498
+ color:m3_sys_color_dark_surface:2131034499
+ color:m3_sys_color_dark_surface_bright:2131034500
+ color:m3_sys_color_dark_surface_container:2131034501
+ color:m3_sys_color_dark_surface_container_high:2131034502
+ color:m3_sys_color_dark_surface_container_highest:2131034503
+ color:m3_sys_color_dark_surface_container_low:2131034504
+ color:m3_sys_color_dark_surface_container_lowest:2131034505
+ color:m3_sys_color_dark_surface_dim:2131034506
+ color:m3_sys_color_dark_surface_variant:2131034507
+ color:m3_sys_color_dark_tertiary:2131034508
+ color:m3_sys_color_dark_tertiary_container:2131034509
+ color:m3_sys_color_dynamic_dark_background:2131034510
+ color:m3_sys_color_dynamic_dark_error:2131034511
+ color:m3_sys_color_dynamic_dark_error_container:2131034512
+ color:m3_sys_color_dynamic_dark_inverse_on_surface:2131034513
+ color:m3_sys_color_dynamic_dark_inverse_primary:2131034514
+ color:m3_sys_color_dynamic_dark_inverse_surface:2131034515
+ color:m3_sys_color_dynamic_dark_on_background:2131034516
+ color:m3_sys_color_dynamic_dark_on_error:2131034517
+ color:m3_sys_color_dynamic_dark_on_error_container:2131034518
+ color:m3_sys_color_dynamic_dark_on_primary:2131034519
+ color:m3_sys_color_dynamic_dark_on_primary_container:2131034520
+ color:m3_sys_color_dynamic_dark_on_secondary:2131034521
+ color:m3_sys_color_dynamic_dark_on_secondary_container:2131034522
+ color:m3_sys_color_dynamic_dark_on_surface:2131034523
+ color:m3_sys_color_dynamic_dark_on_surface_variant:2131034524
+ color:m3_sys_color_dynamic_dark_on_tertiary:2131034525
+ color:m3_sys_color_dynamic_dark_on_tertiary_container:2131034526
+ color:m3_sys_color_dynamic_dark_outline:2131034527
+ color:m3_sys_color_dynamic_dark_outline_variant:2131034528
+ color:m3_sys_color_dynamic_dark_primary:2131034529
+ color:m3_sys_color_dynamic_dark_primary_container:2131034530
+ color:m3_sys_color_dynamic_dark_secondary:2131034531
+ color:m3_sys_color_dynamic_dark_secondary_container:2131034532
+ color:m3_sys_color_dynamic_dark_surface:2131034533
+ color:m3_sys_color_dynamic_dark_surface_bright:2131034534
+ color:m3_sys_color_dynamic_dark_surface_container:2131034535
+ color:m3_sys_color_dynamic_dark_surface_container_high:2131034536
+ color:m3_sys_color_dynamic_dark_surface_container_highest:2131034537
+ color:m3_sys_color_dynamic_dark_surface_container_low:2131034538
+ color:m3_sys_color_dynamic_dark_surface_container_lowest:2131034539
+ color:m3_sys_color_dynamic_dark_surface_dim:2131034540
+ color:m3_sys_color_dynamic_dark_surface_variant:2131034541
+ color:m3_sys_color_dynamic_dark_tertiary:2131034542
+ color:m3_sys_color_dynamic_dark_tertiary_container:2131034543
+ color:m3_sys_color_dynamic_light_background:2131034544
+ color:m3_sys_color_dynamic_light_error:2131034545
+ color:m3_sys_color_dynamic_light_error_container:2131034546
+ color:m3_sys_color_dynamic_light_inverse_on_surface:2131034547
+ color:m3_sys_color_dynamic_light_inverse_primary:2131034548
+ color:m3_sys_color_dynamic_light_inverse_surface:2131034549
+ color:m3_sys_color_dynamic_light_on_background:2131034550
+ color:m3_sys_color_dynamic_light_on_error:2131034551
+ color:m3_sys_color_dynamic_light_on_error_container:2131034552
+ color:m3_sys_color_dynamic_light_on_primary:2131034553
+ color:m3_sys_color_dynamic_light_on_primary_container:2131034554
+ color:m3_sys_color_dynamic_light_on_secondary:2131034555
+ color:m3_sys_color_dynamic_light_on_secondary_container:2131034556
+ color:m3_sys_color_dynamic_light_on_surface:2131034557
+ color:m3_sys_color_dynamic_light_on_surface_variant:2131034558
+ color:m3_sys_color_dynamic_light_on_tertiary:2131034559
+ color:m3_sys_color_dynamic_light_on_tertiary_container:2131034560
+ color:m3_sys_color_dynamic_light_outline:2131034561
+ color:m3_sys_color_dynamic_light_outline_variant:2131034562
+ color:m3_sys_color_dynamic_light_primary:2131034563
+ color:m3_sys_color_dynamic_light_primary_container:2131034564
+ color:m3_sys_color_dynamic_light_secondary:2131034565
+ color:m3_sys_color_dynamic_light_secondary_container:2131034566
+ color:m3_sys_color_dynamic_light_surface:2131034567
+ color:m3_sys_color_dynamic_light_surface_bright:2131034568
+ color:m3_sys_color_dynamic_light_surface_container:2131034569
+ color:m3_sys_color_dynamic_light_surface_container_high:2131034570
+ color:m3_sys_color_dynamic_light_surface_container_highest:2131034571
+ color:m3_sys_color_dynamic_light_surface_container_low:2131034572
+ color:m3_sys_color_dynamic_light_surface_container_lowest:2131034573
+ color:m3_sys_color_dynamic_light_surface_dim:2131034574
+ color:m3_sys_color_dynamic_light_surface_variant:2131034575
+ color:m3_sys_color_dynamic_light_tertiary:2131034576
+ color:m3_sys_color_dynamic_light_tertiary_container:2131034577
+ color:m3_sys_color_dynamic_on_primary_fixed:2131034578
+ color:m3_sys_color_dynamic_on_primary_fixed_variant:2131034579
+ color:m3_sys_color_dynamic_on_secondary_fixed:2131034580
+ color:m3_sys_color_dynamic_on_secondary_fixed_variant:2131034581
+ color:m3_sys_color_dynamic_on_tertiary_fixed:2131034582
+ color:m3_sys_color_dynamic_on_tertiary_fixed_variant:2131034583
+ color:m3_sys_color_dynamic_primary_fixed:2131034584
+ color:m3_sys_color_dynamic_primary_fixed_dim:2131034585
+ color:m3_sys_color_dynamic_secondary_fixed:2131034586
+ color:m3_sys_color_dynamic_secondary_fixed_dim:2131034587
+ color:m3_sys_color_dynamic_tertiary_fixed:2131034588
+ color:m3_sys_color_dynamic_tertiary_fixed_dim:2131034589
+ color:m3_sys_color_light_background:2131034590
+ color:m3_sys_color_light_error:2131034591
+ color:m3_sys_color_light_error_container:2131034592
+ color:m3_sys_color_light_inverse_on_surface:2131034593
+ color:m3_sys_color_light_inverse_primary:2131034594
+ color:m3_sys_color_light_inverse_surface:2131034595
+ color:m3_sys_color_light_on_background:2131034596
+ color:m3_sys_color_light_on_error:2131034597
+ color:m3_sys_color_light_on_error_container:2131034598
+ color:m3_sys_color_light_on_primary:2131034599
+ color:m3_sys_color_light_on_primary_container:2131034600
+ color:m3_sys_color_light_on_secondary:2131034601
+ color:m3_sys_color_light_on_secondary_container:2131034602
+ color:m3_sys_color_light_on_surface:2131034603
+ color:m3_sys_color_light_on_surface_variant:2131034604
+ color:m3_sys_color_light_on_tertiary:2131034605
+ color:m3_sys_color_light_on_tertiary_container:2131034606
+ color:m3_sys_color_light_outline:2131034607
+ color:m3_sys_color_light_outline_variant:2131034608
+ color:m3_sys_color_light_primary:2131034609
+ color:m3_sys_color_light_primary_container:2131034610
+ color:m3_sys_color_light_secondary:2131034611
+ color:m3_sys_color_light_secondary_container:2131034612
+ color:m3_sys_color_light_surface:2131034613
+ color:m3_sys_color_light_surface_bright:2131034614
+ color:m3_sys_color_light_surface_container:2131034615
+ color:m3_sys_color_light_surface_container_high:2131034616
+ color:m3_sys_color_light_surface_container_highest:2131034617
+ color:m3_sys_color_light_surface_container_low:2131034618
+ color:m3_sys_color_light_surface_container_lowest:2131034619
+ color:m3_sys_color_light_surface_dim:2131034620
+ color:m3_sys_color_light_surface_variant:2131034621
+ color:m3_sys_color_light_tertiary:2131034622
+ color:m3_sys_color_light_tertiary_container:2131034623
+ color:m3_sys_color_on_primary_fixed:2131034624
+ color:m3_sys_color_on_primary_fixed_variant:2131034625
+ color:m3_sys_color_on_secondary_fixed:2131034626
+ color:m3_sys_color_on_secondary_fixed_variant:2131034627
+ color:m3_sys_color_on_tertiary_fixed:2131034628
+ color:m3_sys_color_on_tertiary_fixed_variant:2131034629
+ color:m3_sys_color_primary_fixed:2131034630
+ color:m3_sys_color_primary_fixed_dim:2131034631
+ color:m3_sys_color_secondary_fixed:2131034632
+ color:m3_sys_color_secondary_fixed_dim:2131034633
+ color:m3_sys_color_tertiary_fixed:2131034634
+ color:m3_sys_color_tertiary_fixed_dim:2131034635
+ color:m3_tabs_icon_color:2131034636
+ color:m3_tabs_icon_color_secondary:2131034637
+ color:m3_tabs_ripple_color:2131034638
+ color:m3_tabs_ripple_color_secondary:2131034639
+ color:m3_tabs_text_color:2131034640
+ color:m3_tabs_text_color_secondary:2131034641
+ color:m3_text_button_background_color_selector:2131034642
+ color:m3_text_button_foreground_color_selector:2131034643
+ color:m3_text_button_ripple_color_selector:2131034644
+ color:m3_textfield_filled_background_color:2131034645
+ color:m3_textfield_indicator_text_color:2131034646
+ color:m3_textfield_input_text_color:2131034647
+ color:m3_textfield_label_color:2131034648
+ color:m3_textfield_stroke_color:2131034649
+ color:m3_timepicker_button_background_color:2131034650
+ color:m3_timepicker_button_ripple_color:2131034651
+ color:m3_timepicker_button_text_color:2131034652
+ color:m3_timepicker_clock_text_color:2131034653
+ color:m3_timepicker_display_background_color:2131034654
+ color:m3_timepicker_display_ripple_color:2131034655
+ color:m3_timepicker_display_text_color:2131034656
+ color:m3_timepicker_secondary_text_button_ripple_color:2131034657
+ color:m3_timepicker_secondary_text_button_text_color:2131034658
+ color:m3_timepicker_time_input_stroke_color:2131034659
+ color:m3_tonal_button_ripple_color_selector:2131034660
+ color:material_blue_grey_800:2131034661
+ color:material_blue_grey_900:2131034662
+ color:material_blue_grey_950:2131034663
+ color:material_cursor_color:2131034664
+ color:material_divider_color:2131034667
+ color:material_dynamic_color_dark_error:2131034668
+ color:material_dynamic_color_dark_error_container:2131034669
+ color:material_dynamic_color_dark_on_error:2131034670
+ color:material_dynamic_color_dark_on_error_container:2131034671
+ color:material_dynamic_color_light_error:2131034672
+ color:material_dynamic_color_light_error_container:2131034673
+ color:material_dynamic_color_light_on_error:2131034674
+ color:material_dynamic_color_light_on_error_container:2131034675
+ color:material_dynamic_neutral0:2131034676
+ color:material_dynamic_neutral10:2131034677
+ color:material_dynamic_neutral100:2131034678
+ color:material_dynamic_neutral20:2131034679
+ color:material_dynamic_neutral30:2131034680
+ color:material_dynamic_neutral40:2131034681
+ color:material_dynamic_neutral50:2131034682
+ color:material_dynamic_neutral60:2131034683
+ color:material_dynamic_neutral70:2131034684
+ color:material_dynamic_neutral80:2131034685
+ color:material_dynamic_neutral90:2131034686
+ color:material_dynamic_neutral95:2131034687
+ color:material_dynamic_neutral99:2131034688
+ color:material_dynamic_neutral_variant0:2131034689
+ color:material_dynamic_neutral_variant10:2131034690
+ color:material_dynamic_neutral_variant100:2131034691
+ color:material_dynamic_neutral_variant20:2131034692
+ color:material_dynamic_neutral_variant30:2131034693
+ color:material_dynamic_neutral_variant40:2131034694
+ color:material_dynamic_neutral_variant50:2131034695
+ color:material_dynamic_neutral_variant60:2131034696
+ color:material_dynamic_neutral_variant70:2131034697
+ color:material_dynamic_neutral_variant80:2131034698
+ color:material_dynamic_neutral_variant90:2131034699
+ color:material_dynamic_neutral_variant95:2131034700
+ color:material_dynamic_neutral_variant99:2131034701
+ color:material_dynamic_primary0:2131034702
+ color:material_dynamic_primary10:2131034703
+ color:material_dynamic_primary100:2131034704
+ color:material_dynamic_primary20:2131034705
+ color:material_dynamic_primary30:2131034706
+ color:material_dynamic_primary40:2131034707
+ color:material_dynamic_primary50:2131034708
+ color:material_dynamic_primary60:2131034709
+ color:material_dynamic_primary70:2131034710
+ color:material_dynamic_primary80:2131034711
+ color:material_dynamic_primary90:2131034712
+ color:material_dynamic_primary95:2131034713
+ color:material_dynamic_primary99:2131034714
+ color:material_dynamic_secondary0:2131034715
+ color:material_dynamic_secondary10:2131034716
+ color:material_dynamic_secondary100:2131034717
+ color:material_dynamic_secondary20:2131034718
+ color:material_dynamic_secondary30:2131034719
+ color:material_dynamic_secondary40:2131034720
+ color:material_dynamic_secondary50:2131034721
+ color:material_dynamic_secondary60:2131034722
+ color:material_dynamic_secondary70:2131034723
+ color:material_dynamic_secondary80:2131034724
+ color:material_dynamic_secondary90:2131034725
+ color:material_dynamic_secondary95:2131034726
+ color:material_dynamic_secondary99:2131034727
+ color:material_dynamic_tertiary0:2131034728
+ color:material_dynamic_tertiary10:2131034729
+ color:material_dynamic_tertiary100:2131034730
+ color:material_dynamic_tertiary20:2131034731
+ color:material_dynamic_tertiary30:2131034732
+ color:material_dynamic_tertiary40:2131034733
+ color:material_dynamic_tertiary50:2131034734
+ color:material_dynamic_tertiary60:2131034735
+ color:material_dynamic_tertiary70:2131034736
+ color:material_dynamic_tertiary80:2131034737
+ color:material_dynamic_tertiary90:2131034738
+ color:material_dynamic_tertiary95:2131034739
+ color:material_dynamic_tertiary99:2131034740
+ color:material_grey_300:2131034742
+ color:material_harmonized_color_error:2131034748
+ color:material_harmonized_color_error_container:2131034749
+ color:material_harmonized_color_on_error:2131034750
+ color:material_harmonized_color_on_error_container:2131034751
+ color:material_on_background_disabled:2131034752
+ color:material_on_background_emphasis_high_type:2131034753
+ color:material_on_background_emphasis_medium:2131034754
+ color:material_on_primary_disabled:2131034755
+ color:material_on_primary_emphasis_high_type:2131034756
+ color:material_on_primary_emphasis_medium:2131034757
+ color:material_on_surface_stroke:2131034761
+ color:material_personalized__highlighted_text:2131034762
+ color:material_personalized__highlighted_text_inverse:2131034763
+ color:material_personalized_color_background:2131034764
+ color:material_personalized_color_control_activated:2131034765
+ color:material_personalized_color_control_highlight:2131034766
+ color:material_personalized_color_control_normal:2131034767
+ color:material_personalized_color_error:2131034768
+ color:material_personalized_color_error_container:2131034769
+ color:material_personalized_color_on_background:2131034770
+ color:material_personalized_color_on_error:2131034771
+ color:material_personalized_color_on_error_container:2131034772
+ color:material_personalized_color_on_primary:2131034773
+ color:material_personalized_color_on_primary_container:2131034774
+ color:material_personalized_color_on_secondary:2131034775
+ color:material_personalized_color_on_secondary_container:2131034776
+ color:material_personalized_color_on_surface:2131034777
+ color:material_personalized_color_on_surface_inverse:2131034778
+ color:material_personalized_color_on_surface_variant:2131034779
+ color:material_personalized_color_on_tertiary:2131034780
+ color:material_personalized_color_on_tertiary_container:2131034781
+ color:material_personalized_color_outline:2131034782
+ color:material_personalized_color_outline_variant:2131034783
+ color:material_personalized_color_primary:2131034784
+ color:material_personalized_color_primary_container:2131034785
+ color:material_personalized_color_primary_inverse:2131034786
+ color:material_personalized_color_primary_text:2131034787
+ color:material_personalized_color_primary_text_inverse:2131034788
+ color:material_personalized_color_secondary:2131034789
+ color:material_personalized_color_secondary_container:2131034790
+ color:material_personalized_color_secondary_text:2131034791
+ color:material_personalized_color_secondary_text_inverse:2131034792
+ color:material_personalized_color_surface:2131034793
+ color:material_personalized_color_surface_bright:2131034794
+ color:material_personalized_color_surface_container:2131034795
+ color:material_personalized_color_surface_container_high:2131034796
+ color:material_personalized_color_surface_container_highest:2131034797
+ color:material_personalized_color_surface_container_low:2131034798
+ color:material_personalized_color_surface_container_lowest:2131034799
+ color:material_personalized_color_surface_dim:2131034800
+ color:material_personalized_color_surface_inverse:2131034801
+ color:material_personalized_color_surface_variant:2131034802
+ color:material_personalized_color_tertiary:2131034803
+ color:material_personalized_color_tertiary_container:2131034804
+ color:material_personalized_color_text_hint_foreground_inverse:2131034805
+ color:material_personalized_color_text_primary_inverse:2131034806
+ color:material_personalized_color_text_primary_inverse_disable_only:2131034807
+ color:material_personalized_color_text_secondary_and_tertiary_inverse:2131034808
+ color:material_personalized_color_text_secondary_and_tertiary_inverse_disabled:2131034809
+ color:material_personalized_hint_foreground:2131034810
+ color:material_personalized_hint_foreground_inverse:2131034811
+ color:material_personalized_primary_inverse_text_disable_only:2131034812
+ color:material_personalized_primary_text_disable_only:2131034813
+ color:mtrl_btn_text_color_disabled:2131034830
+ color:mtrl_btn_transparent_bg_color:2131034832
+ color:mtrl_navigation_bar_colored_item_tint:2131034852
+ color:mtrl_navigation_bar_colored_ripple_color:2131034853
+ color:mtrl_switch_thumb_icon_tint:2131034865
+ color:mtrl_switch_thumb_tint:2131034866
+ color:mtrl_switch_track_decoration_tint:2131034867
+ color:mtrl_switch_track_tint:2131034868
+ color:mtrl_tabs_colored_ripple_color:2131034869
+ color:mtrl_tabs_icon_color_selector_colored:2131034871
+ color:mtrl_textinput_filled_box_default_background_color:2131034877
  dimen:abc_action_bar_icon_vertical_padding_material:2131099654
  dimen:abc_action_bar_overflow_padding_end_material:2131099655
  dimen:abc_action_bar_overflow_padding_start_material:2131099656
@@ -18945,37 +18954,37 @@ Unused resources are:
  drawable:ic_clear_black_24:2131165346
  drawable:ic_clock_black_24dp:2131165347
  drawable:ic_keyboard_black_24dp:2131165348
- drawable:ic_m3_chip_check:2131165349
- drawable:ic_m3_chip_checked_circle:2131165350
- drawable:ic_m3_chip_close:2131165351
- drawable:ic_search_black_24:2131165356
- drawable:m3_avd_hide_password:2131165358
- drawable:m3_avd_show_password:2131165359
- drawable:m3_bottom_sheet_drag_handle:2131165360
- drawable:m3_password_eye:2131165361
- drawable:m3_popupmenu_background_overlay:2131165362
- drawable:m3_radiobutton_ripple:2131165363
- drawable:m3_selection_control_ripple:2131165364
- drawable:m3_tabs_background:2131165365
- drawable:m3_tabs_line_indicator:2131165366
- drawable:m3_tabs_rounded_line_indicator:2131165367
- drawable:m3_tabs_transparent_background:2131165368
- drawable:material_ic_menu_arrow_up_black_24dp:2131165378
- drawable:mtrl_bottomsheet_drag_handle:2131165379
- drawable:mtrl_navigation_bar_item_background:2131165400
- drawable:mtrl_switch_thumb:2131165403
- drawable:mtrl_switch_thumb_checked:2131165404
- drawable:mtrl_switch_thumb_checked_pressed:2131165405
- drawable:mtrl_switch_thumb_checked_unchecked:2131165406
- drawable:mtrl_switch_thumb_pressed:2131165407
- drawable:mtrl_switch_thumb_pressed_checked:2131165408
- drawable:mtrl_switch_thumb_pressed_unchecked:2131165409
- drawable:mtrl_switch_thumb_unchecked:2131165410
- drawable:mtrl_switch_thumb_unchecked_checked:2131165411
- drawable:mtrl_switch_thumb_unchecked_pressed:2131165412
- drawable:mtrl_switch_track:2131165413
- drawable:mtrl_switch_track_decoration:2131165414
- drawable:test_level_drawable:2131165430
+ drawable:ic_m3_chip_check:2131165352
+ drawable:ic_m3_chip_checked_circle:2131165353
+ drawable:ic_m3_chip_close:2131165354
+ drawable:ic_search_black_24:2131165359
+ drawable:m3_avd_hide_password:2131165361
+ drawable:m3_avd_show_password:2131165362
+ drawable:m3_bottom_sheet_drag_handle:2131165363
+ drawable:m3_password_eye:2131165364
+ drawable:m3_popupmenu_background_overlay:2131165365
+ drawable:m3_radiobutton_ripple:2131165366
+ drawable:m3_selection_control_ripple:2131165367
+ drawable:m3_tabs_background:2131165368
+ drawable:m3_tabs_line_indicator:2131165369
+ drawable:m3_tabs_rounded_line_indicator:2131165370
+ drawable:m3_tabs_transparent_background:2131165371
+ drawable:material_ic_menu_arrow_up_black_24dp:2131165381
+ drawable:mtrl_bottomsheet_drag_handle:2131165382
+ drawable:mtrl_navigation_bar_item_background:2131165403
+ drawable:mtrl_switch_thumb:2131165406
+ drawable:mtrl_switch_thumb_checked:2131165407
+ drawable:mtrl_switch_thumb_checked_pressed:2131165408
+ drawable:mtrl_switch_thumb_checked_unchecked:2131165409
+ drawable:mtrl_switch_thumb_pressed:2131165410
+ drawable:mtrl_switch_thumb_pressed_checked:2131165411
+ drawable:mtrl_switch_thumb_pressed_unchecked:2131165412
+ drawable:mtrl_switch_thumb_unchecked:2131165413
+ drawable:mtrl_switch_thumb_unchecked_checked:2131165414
+ drawable:mtrl_switch_thumb_unchecked_pressed:2131165415
+ drawable:mtrl_switch_track:2131165416
+ drawable:mtrl_switch_track_decoration:2131165417
+ drawable:test_level_drawable:2131165433
  id:ALT:2131230720
  id:CTRL:2131230723
  id:FUNCTION:2131230724
@@ -19346,6 +19355,7 @@ Unused resources are:
  layout:mtrl_picker_text_input_date_range:2131427423
  layout:mtrl_search_bar:2131427424
  layout:mtrl_search_view:2131427425
+ mipmap:ic_launcher_foreground:2131558401
  plurals:mtrl_badge_content_description:2131623936
  string:abc_action_bar_home_description:2131689472
  string:abc_action_menu_overflow_description:2131689474
@@ -19369,81 +19379,80 @@ Unused resources are:
  string:call_notification_screening_text:2131689513
  string:common_signin_button_text:2131689534
  string:common_signin_button_text_long:2131689535
- string:error_a11y_label:2131689537
- string:fab_transformation_scrim_behavior:2131689540
- string:fab_transformation_sheet_behavior:2131689541
- string:hide_bottom_view_on_scroll_behavior:2131689547
- string:m3_exceed_max_badge_text_suffix:2131689550
- string:m3_ref_typeface_brand_medium:2131689551
- string:m3_sys_motion_easing_emphasized:2131689555
- string:m3_sys_motion_easing_emphasized_accelerate:2131689556
- string:m3_sys_motion_easing_emphasized_decelerate:2131689557
- string:m3_sys_motion_easing_emphasized_path_data:2131689558
- string:m3_sys_motion_easing_legacy:2131689559
- string:m3_sys_motion_easing_legacy_accelerate:2131689560
- string:m3_sys_motion_easing_legacy_decelerate:2131689561
- string:m3_sys_motion_easing_linear:2131689562
- string:m3_sys_motion_easing_standard:2131689563
- string:m3_sys_motion_easing_standard_accelerate:2131689564
- string:m3_sys_motion_easing_standard_decelerate:2131689565
- string:material_hour_24h_suffix:2131689568
- string:material_hour_selection:2131689569
- string:material_hour_suffix:2131689570
- string:material_minute_selection:2131689571
- string:material_minute_suffix:2131689572
- string:material_slider_range_end:2131689578
- string:material_slider_range_start:2131689579
- string:material_slider_value:2131689580
- string:material_timepicker_clock_mode_description:2131689582
- string:material_timepicker_hour:2131689583
- string:material_timepicker_minute:2131689584
- string:material_timepicker_select_time:2131689586
- string:material_timepicker_text_input_mode_description:2131689587
- string:mtrl_badge_numberless_content_description:2131689588
- string:mtrl_exceed_max_badge_number_content_description:2131689601
- string:mtrl_exceed_max_badge_number_suffix:2131689602
- string:mtrl_picker_announce_current_range_selection:2131689605
- string:mtrl_picker_announce_current_selection:2131689606
- string:mtrl_picker_announce_current_selection_none:2131689607
- string:mtrl_picker_date_header_selected:2131689610
- string:mtrl_picker_date_header_title:2131689611
- string:mtrl_picker_date_header_unselected:2131689612
- string:mtrl_picker_end_date_description:2131689614
- string:mtrl_picker_invalid_format:2131689615
- string:mtrl_picker_invalid_format_example:2131689616
- string:mtrl_picker_invalid_format_use:2131689617
- string:mtrl_picker_invalid_range:2131689618
- string:mtrl_picker_out_of_range:2131689621
- string:mtrl_picker_range_header_only_end_selected:2131689622
- string:mtrl_picker_range_header_only_start_selected:2131689623
- string:mtrl_picker_range_header_selected:2131689624
- string:mtrl_picker_range_header_title:2131689625
- string:mtrl_picker_range_header_unselected:2131689626
- string:mtrl_picker_start_date_description:2131689628
- string:mtrl_picker_text_input_date_hint:2131689629
- string:mtrl_picker_text_input_date_range_end_hint:2131689630
- string:mtrl_picker_text_input_date_range_start_hint:2131689631
- string:mtrl_picker_text_input_day_abbr:2131689632
- string:mtrl_picker_text_input_month_abbr:2131689633
- string:mtrl_picker_text_input_year_abbr:2131689634
- string:mtrl_picker_today_description:2131689635
- string:mtrl_switch_thumb_group_name:2131689640
- string:mtrl_switch_thumb_path_checked:2131689641
- string:mtrl_switch_thumb_path_morphing:2131689642
- string:mtrl_switch_thumb_path_name:2131689643
- string:mtrl_switch_thumb_path_pressed:2131689644
- string:mtrl_switch_thumb_path_unchecked:2131689645
- string:mtrl_switch_track_decoration_path:2131689646
- string:mtrl_switch_track_path:2131689647
- string:mtrl_timepicker_cancel:2131689648
- string:mtrl_timepicker_confirm:2131689649
- string:project_id:2131689655
- string:search_menu_title:2131689656
- string:searchbar_scrolling_view_behavior:2131689657
- string:searchview_clear_text_content_description:2131689658
- string:searchview_navigation_content_description:2131689659
- string:side_sheet_behavior:2131689661
- string:status_bar_notification_info_overflow:2131689662
+ string:error_a11y_label:2131689536
+ string:fab_transformation_scrim_behavior:2131689539
+ string:fab_transformation_sheet_behavior:2131689540
+ string:hide_bottom_view_on_scroll_behavior:2131689541
+ string:m3_exceed_max_badge_text_suffix:2131689544
+ string:m3_ref_typeface_brand_medium:2131689545
+ string:m3_sys_motion_easing_emphasized:2131689549
+ string:m3_sys_motion_easing_emphasized_accelerate:2131689550
+ string:m3_sys_motion_easing_emphasized_decelerate:2131689551
+ string:m3_sys_motion_easing_emphasized_path_data:2131689552
+ string:m3_sys_motion_easing_legacy:2131689553
+ string:m3_sys_motion_easing_legacy_accelerate:2131689554
+ string:m3_sys_motion_easing_legacy_decelerate:2131689555
+ string:m3_sys_motion_easing_linear:2131689556
+ string:m3_sys_motion_easing_standard:2131689557
+ string:m3_sys_motion_easing_standard_accelerate:2131689558
+ string:m3_sys_motion_easing_standard_decelerate:2131689559
+ string:material_hour_24h_suffix:2131689562
+ string:material_hour_selection:2131689563
+ string:material_hour_suffix:2131689564
+ string:material_minute_selection:2131689565
+ string:material_minute_suffix:2131689566
+ string:material_slider_range_end:2131689572
+ string:material_slider_range_start:2131689573
+ string:material_slider_value:2131689574
+ string:material_timepicker_clock_mode_description:2131689576
+ string:material_timepicker_hour:2131689577
+ string:material_timepicker_minute:2131689578
+ string:material_timepicker_select_time:2131689580
+ string:material_timepicker_text_input_mode_description:2131689581
+ string:mtrl_badge_numberless_content_description:2131689582
+ string:mtrl_exceed_max_badge_number_content_description:2131689595
+ string:mtrl_exceed_max_badge_number_suffix:2131689596
+ string:mtrl_picker_announce_current_range_selection:2131689599
+ string:mtrl_picker_announce_current_selection:2131689600
+ string:mtrl_picker_announce_current_selection_none:2131689601
+ string:mtrl_picker_date_header_selected:2131689604
+ string:mtrl_picker_date_header_title:2131689605
+ string:mtrl_picker_date_header_unselected:2131689606
+ string:mtrl_picker_end_date_description:2131689608
+ string:mtrl_picker_invalid_format:2131689609
+ string:mtrl_picker_invalid_format_example:2131689610
+ string:mtrl_picker_invalid_format_use:2131689611
+ string:mtrl_picker_invalid_range:2131689612
+ string:mtrl_picker_out_of_range:2131689615
+ string:mtrl_picker_range_header_only_end_selected:2131689616
+ string:mtrl_picker_range_header_only_start_selected:2131689617
+ string:mtrl_picker_range_header_selected:2131689618
+ string:mtrl_picker_range_header_title:2131689619
+ string:mtrl_picker_range_header_unselected:2131689620
+ string:mtrl_picker_start_date_description:2131689622
+ string:mtrl_picker_text_input_date_hint:2131689623
+ string:mtrl_picker_text_input_date_range_end_hint:2131689624
+ string:mtrl_picker_text_input_date_range_start_hint:2131689625
+ string:mtrl_picker_text_input_day_abbr:2131689626
+ string:mtrl_picker_text_input_month_abbr:2131689627
+ string:mtrl_picker_text_input_year_abbr:2131689628
+ string:mtrl_picker_today_description:2131689629
+ string:mtrl_switch_thumb_group_name:2131689634
+ string:mtrl_switch_thumb_path_checked:2131689635
+ string:mtrl_switch_thumb_path_morphing:2131689636
+ string:mtrl_switch_thumb_path_name:2131689637
+ string:mtrl_switch_thumb_path_pressed:2131689638
+ string:mtrl_switch_thumb_path_unchecked:2131689639
+ string:mtrl_switch_track_decoration_path:2131689640
+ string:mtrl_switch_track_path:2131689641
+ string:mtrl_timepicker_cancel:2131689642
+ string:mtrl_timepicker_confirm:2131689643
+ string:search_menu_title:2131689649
+ string:searchbar_scrolling_view_behavior:2131689650
+ string:searchview_clear_text_content_description:2131689651
+ string:searchview_navigation_content_description:2131689652
+ string:side_sheet_behavior:2131689654
+ string:status_bar_notification_info_overflow:2131689655
  style:Animation_Design_BottomSheetDialog:2131755013
  style:Animation_Material3_BottomSheetDialog:2131755014
  style:Animation_Material3_SideSheetDialog:2131755015
