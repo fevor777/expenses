@@ -7,28 +7,21 @@
     <div class="expense-header-title" (click)="onCurrentAmountClick()">
       <ng-container *ngIf="isShowCurrentBalanceAmount; else elseBlock">
         <div class="expense-header-irregular-title">нерегул.</div>
-        <span class="expense-header-total-title">{{
-          currentBalanceAmount
-        }}</span>
+        <span class="expense-header-total-title">{{ currentBalanceAmount }}<span class="expense-header-total-title-currency">€</span></span>
       </ng-container>
 
       <ng-template #elseBlock>
-        <span class="expense-header-total-title">{{ currentAmount }}</span>
+        <span class="expense-header-total-title">{{ currentAmount }}<span class="expense-header-total-title-currency">€</span></span>
       </ng-template>
-
-      <span
-        class="expense-header-total-title expense-header-total-title-currency"
-        >€</span
-      >
     </div>
     <div class="expense-header-clock-icon" (click)="onHistoryIconClick()">
       <i class="fas fa-clock"></i>
     </div>
   </div>
   <div class="expense-header-bottom">
-    <span class="expense-header-bottom-balance" (click)="onBalanceChange()"
-      >{{ balance }}€</span
-    >
+    <span class="expense-header-bottom-balance" (click)="onBalanceChange()">
+      {{ balance }}<span class="expense-header-bottom-balance-currency">€</span>
+    </span>
     <span (click)="onBalanceDateChange()">до {{ balanceDate }}</span>
   </div>
 </div>

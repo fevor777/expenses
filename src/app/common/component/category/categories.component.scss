@@ -1,73 +1,26 @@
 .categories-general-container {
-  .categories-container {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-
-    .categories {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      width: 100%;
-      opacity: 0.7;
-      touch-action: manipulation;
-
-      .category {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 90px;
-        height: 64px;
-        padding: 15px;
-        text-align: center;
-        font-size: 15px;
-        touch-action: manipulation;
-
-        .category-icon {
-          font-size: 35px;
-          margin-bottom: 5px;
-        }
-
-        .disabled-category-icon {
-          color: #f8d7da;
-        }
-
-        .category-name {
-          color: #ffedef;
-        }
-
-        .disabled-category-name {
-          color: black;
-        }
-      }
-    }
-
-    .categories-scrollable-content-down {
-      align-self: flex-end;
-    }
-  }
-
-  .categories-with-show-more {
-    height: calc(100% - 40px);
-  }
-
-  .categories-with-scroll {
-    overflow: scroll;
-  }
-
-  .categories-center-aligned {
-    align-items: center;
-    justify-content: center;
-  }
-
-  .categories-more {
-    text-align: center;
-    color: #f8d7da;
-    background-color: rgba(0, 0, 0, 0);
-  }
-
-  .disabled-categories-more {
-    color: black;
-  }
+  .categories-container { display:flex; height:100%; width:100%; overflow:hidden; }
+  .categories { display:flex; flex-wrap:wrap; justify-content:space-around; width:100%; opacity:.92; touch-action:manipulation; padding:4px 0; }
+  .category { display:flex; flex-direction:column; align-items:center; width:90px; height:64px; padding:12px; text-align:center; font-size:14px; touch-action:manipulation; border-radius:14px; position:relative; color:var(--color-text-secondary); transition:background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
+  .category:hover { background:var(--color-bg-alt); color:var(--color-text); }
+  .category:active { transform:scale(.94); }
+  .category-icon { font-size:30px; margin-bottom:4px; line-height:1; color:var(--color-primary); transition:color var(--transition-fast), filter var(--transition-fast); }
+  .disabled-category-icon { color:var(--color-border-strong, var(--color-border)); opacity:.28; position:relative; filter:grayscale(1) brightness(.9) sepia(.35) hue-rotate(-8deg) saturate(1.4); }
+  .disabled-category-icon::after { content:""; position:absolute; inset:2px 4px 8px 4px; top:45%; left:50%; width:55%; height:55%; transform:translate(-50%,-50%); pointer-events:none; background:radial-gradient(circle at 50% 50%, rgba(255,180,40,0.35) 0%, rgba(255,180,40,0.05) 62%, rgba(255,180,40,0) 75%); filter:blur(2px); opacity:.55; }
+  .category-name { color:var(--color-text-secondary); font-size:12px; letter-spacing:.5px; }
+  .category-name:not(.disabled-category-name) { color:var(--color-text); letter-spacing:.4px; }
+  .disabled-category-name { color:var(--color-border-strong, var(--color-border)); opacity:.33; letter-spacing:.4px; text-shadow:0 0 4px rgba(255,170,30,0.25); }
+  .categories-scrollable-content-down { align-self:flex-end; }
+  .categories-with-show-more { height:calc(100% - 40px); }
+  .categories-with-scroll { overflow:scroll; }
+  .categories-center-aligned { align-items:center; justify-content:center; }
+  .categories-more { text-align:center; color:var(--color-text-secondary); background:transparent; font-size:12px; letter-spacing:.5px; padding:8px 0; transition:color var(--transition-fast), background var(--transition-fast); border-radius:10px; }
+  .categories-more:hover { color:var(--color-primary); }
+  .categories-more:not(.disabled-categories-more) { color:var(--color-text); }
+  .categories-more:not(.disabled-categories-more):hover { background:var(--color-bg-alt); }
+  .disabled-categories-more { color:var(--color-border-strong, var(--color-border)); opacity:.30; }
+  /* Prevent hover pop for disabled state (icon gets disabled class externally) */
+  .disabled-category-icon:hover, .disabled-category-name:hover { background:transparent; color:var(--color-border-strong, var(--color-border)); }
 }
+
+@media (prefers-reduced-motion: reduce) { .category { transition:none; } }

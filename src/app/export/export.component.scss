@@ -3,3 +3,15 @@ button {
   font-size: 16px;
   cursor: pointer;
 }
+
+/* Add padding to back label on export page only */
+:host ::ng-deep .history-back-link { /* scoped to export component */
+  padding:6px 12px 8px;
+  border-radius:6px;
+  display:inline-block;
+  background:transparent;
+  transition:background var(--transition-fast), color var(--transition-fast);
+}
+@media (hover:hover){
+  :host ::ng-deep .history-back-link:hover { background:var(--color-bg-alt); text-decoration:none; }
+}

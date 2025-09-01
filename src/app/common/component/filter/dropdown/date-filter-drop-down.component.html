@@ -17,9 +17,7 @@
     @for(option of options; track option.value) {
     <li
       (click)="onSelectValue(option)"
-      [style.background-color]="
-        selectedOption?.display === option?.display ? '#ffe9eb' : 'white'
-      "
+      [ngClass]="{ 'is-selected': selectedOption?.display === option?.display }"
     >
       {{ option?.display }}
     </li>

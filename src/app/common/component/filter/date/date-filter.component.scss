@@ -1,13 +1,25 @@
+/* Date filter container aligned to new minimal filter styling */
 .statistics-period {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: center; /* center horizontally */
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 8px;
+  font-size: 14px;
 
+  /* Refresh icon flattened & subtle */
   .statistics-refresh-button {
-    font-size: 14px;
-    padding: 10px;
-    padding-left: 0px;
+    font-size: 15px;
+    padding: 0; /* remove extra clickable padding for compact look */
+    margin-left: 6px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: color var(--transition-fast), transform var(--transition-fast);
   }
+  @media (hover:hover) {
+    .statistics-refresh-button:hover { color: var(--color-text); }
+  }
+  .statistics-refresh-button:active { transform: scale(.9); }
 }
 

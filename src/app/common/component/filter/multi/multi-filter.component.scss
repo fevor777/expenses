@@ -1,115 +1,270 @@
+/* Themed Multi Filter (refactored to use global tokens) */
 .app-multi-filter {
-  .app-multi-filter-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem 0 0;
+  font-family: "Montserrat", sans-serif;
+}
 
-    .app-multi-filter-header {
-      margin: 10px;
-    }
+.mf-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 14px 8px;
+  margin: 12px 0px 8px;
+  box-shadow: none;
+  position: relative;
+}
 
-    .app-multi-filter-button {
-      font-family: "Montserrat", sans-serif;
-      color: #000;
-      border: 2px solid #f8d7da;
-      background-color: transparent;
-      border-radius: 5px;
-      padding: 0.5rem 1rem;
-      margin: 0.5rem;
-      cursor: pointer;
-    }
+.mf-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+}
 
-    .app-multi-filter-button-active {
-      background-color: #f8d7da;
-    }
+.mf-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  letter-spacing: .4px;
+}
+
+.mf-group--title .mf-label {
+  font-weight: 500;
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.mf-group--total,
+.mf-group--total-alt {
+  font-size: 15px;
+  gap: 8px;
+}
+
+/* .mf-group--break no longer needed when stacking all groups vertically */
+.mf-key {
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+.mf-value {
+  color: var(--color-highlight);
+  font-weight: 400;
+}
+
+.mf-value--quoted {
+  font-style: italic;
+}
+
+.mf-total {
+  font-weight: 600;
+  letter-spacing: .5px;
+  color: var(--color-highlight);
+  font-size: 16px;
+}
+
+/* Toggle */
+.mf-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.mf-toggle:hover {
+  background: var(--color-bg-alt);
+}
+
+.mf-toggle--active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 6px var(--color-primary-alpha);
+}
+
+.mf-toggle--active:hover {
+  background: var(--color-primary-hover);
+}
+
+/* Make toggle (expand/collapse) visually flat like parent */
+.mf-toggle {
+  background: transparent;
+}
+
+.mf-toggle:hover {
+  background: transparent;
+  color: var(--color-text);
+}
+
+.mf-toggle--active {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: none;
+}
+
+.mf-toggle--active:hover {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+/* Icon button */
+.mf-icon-btn {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  padding: 6px 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+@media (hover:hover) {
+  .mf-icon-btn:hover {
+    background: var(--color-bg-alt);
+    color: var(--color-text);
   }
+}
 
-  .app-multi-filter-expand {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: column;
-    margin: 0.5rem;
+.mf-icon-btn:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
 
-    .app-multi-filter-expand-items {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      width: 100%;
+/* Clear (refresh) button inside title group flat */
+.mf-group--title .mf-icon-btn {
+  background: transparent;
+}
 
-      .app-multi-filter-expand-date {
-        select {
-          width: 100%;
-          font-family: "Montserrat", sans-serif;
-          padding: 0.5rem;
-          border: 2px solid #f8d7da;
-          border-radius: 5px;
-          cursor: pointer;
-        }
-      }
-    }
+@media (hover:hover) {
+  .mf-group--title .mf-icon-btn:hover {
+    background: transparent;
+    color: var(--color-text);
   }
+}
 
-  .app-multi-filter-total-amount {
-    color: #ff6f61;
-    font-weight: 500;
-    letter-spacing: 1.5px;
-    font-size: 20px;
+/* Extra left padding for refresh & navigation buttons */
+/* Use left margin (not extra padding) to create spacing from preceding text */
+.mf-icon-btn--refresh {
+  margin-left: 14px;
+}
+
+.mf-icon-btn--nav {
+  margin-left: 10px;
+}
+
+/* Navigation buttons (history/details) should visually blend with parent background */
+.mf-group--total .mf-icon-btn,
+.mf-group--total-alt .mf-icon-btn {
+  background: transparent;
+}
+
+@media (hover:hover) {
+
+  .mf-group--total .mf-icon-btn:hover,
+  .mf-group--total-alt .mf-icon-btn:hover {
+    background: transparent;
+    color: var(--color-text);
   }
+}
 
+/* Statistics navigation button inherits same flat style */
+.mf-icon-btn--stats {
+  background: transparent;
+  border-color: var(--color-border);
+}
 
-  /* Description filter (collapsed / expanded states) */
-  .description-filter-wrapper {
-    margin-top: 8px;
+@media (hover:hover) {
+  .mf-icon-btn--stats:hover {
+    background: transparent;
+    color: var(--color-text);
   }
+}
 
-  .description-filter-input {
-    width: 100%;
-    padding: 6px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    box-sizing: border-box;
+/* Expanded section */
+.mf-expanded {
+  margin: 0 0px 14px;
+}
 
-    &:focus {
-      outline: none;
-      border-color: #ff6f61;
-      box-shadow: 0 0 0 2px rgba(255, 111, 97, 0.15);
-    }
+.mf-expanded-inner {
+  border: 1px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-bg-alt), #fff);
+  border-radius: 8px;
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: none;
+}
+
+.mf-field {
+  width: 100%;
+}
+
+.mf-field--description {
+  max-width: 240px;
+  width: 100%;
+}
+
+@media (max-width:640px) {
+  .mf-field--description {
+    max-width: 100%;
   }
+}
 
-  .description-filter-label {
-    margin-right: 10px;
-  }
+/* Inputs */
+.mf-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 15px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .description-filter-value {
-    color: #ff6f61;
-  }
+.mf-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-alpha);
+}
 
-  /* Chart icon inside header */
-  .history-item-chart {
-    padding-left: 25px;
-    cursor: pointer;
-    color: rgb(209, 209, 209);
-    font-size: 15px;
-  }
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
 
-  .category-details-icon {
-    padding: 15px;
-    padding-bottom: 0;
-    padding-left: 25px;
-    font-size: 15px;
-    color: rgb(209, 209, 209);
-    cursor: pointer;
+  .mf-toggle,
+  .mf-icon-btn,
+  .mf-input {
+    transition: none;
   }
+}
 
-  .statistics-nav-icon {
-    color: rgb(209, 209, 209);
-    font-size: 15px;
-    cursor: pointer;
-    padding-left: 25px;
-    transition: color .15s;
-  }
-  .statistics-nav-icon:hover { color: #b7b7b7; }
+/* Dark theme tweaks */
+.dark .mf-expanded-inner,
+[data-theme='dark'] .mf-expanded-inner {
+  background: var(--color-bg-alt);
+}
+
+.dark .mf-toggle--active,
+[data-theme='dark'] .mf-toggle--active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }

@@ -1,14 +1,86 @@
-/* You can add global styles to this file, and also import other style files */
-body {
-    margin: 0px;
-    font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
+/* Theme: Vivid Bright Pulse – Orange Primary Variant */
+/* Reverted: warm white surfaces, vivid orange primary, emerald accent, indigo highlight. */
+
+:root {
+    --color-bg: #ffffff; /* pure white */
+    --color-bg-alt: #fff7f2; /* faint warm tint */
+    --color-border: #e5e5ea;
+    --color-border-strong: #c7c7d1;
+
+    --color-primary: #ffb400; /* brighter yellow-orange */
+    --color-primary-hover: #e6a200; /* deeper hover */
+    --color-accent: #059669; /* emerald accent */
+    --color-amount: #6366f1; /* dedicated amount color (indigo) */
+    --color-highlight: #6366f1; /* indigo highlight */
+    --color-positive: #16a34a; /* fresh green */
+    --color-negative: #dc2626; /* semantic red */
+
+    --color-text: #1c1f23; /* neutral dark */
+    --color-text-secondary: #525860; /* medium gray */
+    --color-muted: #7a8189;
+    --color-focus: #6366f1; /* indigo focus */
+    --color-primary-alpha: rgba(255,180,0,0.26);
+    --color-accent-alpha: rgba(5,150,105,0.22);
+
+    --radius-sm: 6px; --radius-md: 12px; --radius-lg: 20px;
+    --shadow-soft: 0 1px 2px rgba(0,0,0,0.05), 0 3px 6px rgba(0,0,0,0.08);
+    --shadow-hard: 0 6px 18px rgba(0,0,0,0.18);
+    --transition-fast: .16s cubic-bezier(.4,0,.2,1);
 }
 
-.app-link {
-    color: #0171da;
-    text-decoration: none;
-    cursor: pointer;
-    display: inline-block;
+.dark, [data-theme='dark'] {
+    --color-bg: #12141a;
+    --color-bg-alt: #1d2027;
+    --color-border: #2c3037;
+    --color-border-strong: #464b55;
+    --color-text: #eef1f5;
+    --color-text-secondary: #b5bcc4;
+    --color-muted: #8e959d;
+    --color-primary: #ffad33; /* lifted orange */
+    --color-primary-hover: #ff9c0d;
+    --color-accent: #ffad33;
+    --color-highlight: #8183ff;
+    --color-amount: #8094ff; /* amount color in dark */
+    --shadow-soft: 0 1px 2px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.45);
+    --shadow-hard: 0 6px 24px rgba(0,0,0,.6);
 }
+
+html, body { height:100%; }
+body { margin:0; font-family:"Montserrat", sans-serif; font-style:normal; font-optical-sizing:auto; background:var(--color-bg); color:var(--color-text); -webkit-font-smoothing:antialiased; }
+html, body { height:100%; }
+body { margin:0; font-family:"Montserrat", sans-serif; font-style:normal; font-optical-sizing:auto; background:var(--color-bg); color:var(--color-text); -webkit-font-smoothing:antialiased; }
+
+a, .app-link { color:var(--color-primary); text-decoration:none; cursor:pointer; display:inline-block; font-weight:600; }
+a:hover, .app-link:hover { color:var(--color-highlight); text-decoration:underline; }
+
+/* Buttons */
+.btn { border:1px solid var(--color-border); background:var(--color-bg-alt); color:var(--color-text); padding:9px 16px; border-radius:var(--radius-sm); font-size:14px; cursor:pointer; font-weight:600; letter-spacing:.3px; box-shadow:var(--shadow-soft); transition:background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast); }
+.btn:hover { background:#fff2e0; }
+.btn:active { background:#ffe7c7; transform:translateY(1px); }
+.btn-primary { background:var(--color-primary); border-color:var(--color-primary); color:#fff; box-shadow:0 2px 6px var(--color-primary-alpha); }
+.btn-primary:hover { background:var(--color-primary-hover); }
+.btn-accent { background:var(--color-accent); border-color:var(--color-accent); color:#fff; font-weight:600; }
+.btn-accent:hover { filter:brightness(.95); }
+.btn-highlight { background:var(--color-highlight); border-color:var(--color-highlight); color:#fff; }
+.btn:focus-visible { outline:3px solid var(--color-focus); outline-offset:2px; }
+
+/* Panels */
+.panel { background:linear-gradient(135deg, var(--color-bg-alt), #fff); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:16px; box-shadow:var(--shadow-soft); }
+
+/* Text utils */
+.u-muted { color:var(--color-text-secondary); }
+small, .text-xs { font-size:12px; line-height:1.25; }
+
+/* Accessibility */
+.sr-only { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); border:0; }
+* { outline-color:var(--color-focus); }
+
+/* Gradient accent utility */
+.bg-accent-gradient { background:linear-gradient(135deg, var(--color-primary) 0%, var(--color-highlight) 50%, var(--color-accent) 100%); color:#fff; }
+
+/* Subtle badge */
+.badge { display:inline-block; padding:3px 8px; font-size:11px; border-radius:999px; background:var(--color-primary-alpha); color:var(--color-primary); font-weight:600; letter-spacing:.3px; }
+
+/* Emphasis text */
+.text-highlight { color:var(--color-highlight); }
+.text-accent { color:var(--color-accent); }

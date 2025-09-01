@@ -1,17 +1,17 @@
+/* History page themed similar to expenses page */
 .history-container {
-  height: 100dvh;
-  overflow-y: scroll;
+  height:100dvh;
+  overflow-y:auto;
+  background:var(--color-bg);
+  color:var(--color-text);
+  display:flex;
+  flex-direction:column;
+  padding-bottom:24px;
 
-  .history-back-link {
-    margin: 10px;
-    margin-bottom: 0px;
-  }
+  .history-back-link { margin:10px; margin-bottom:0; font-weight:400; }
+  .history-back-link:hover { text-decoration:underline; }
 
-  .history-empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: "Montserrat", sans-serif;
-    color: #000;
-  }
+  .history-empty { flex:1; display:flex; justify-content:center; align-items:center; font-family:"Montserrat", sans-serif; color:var(--color-text-secondary); letter-spacing:.5px; }
 }
+
+@media (prefers-reduced-motion: reduce) { .history-container { scroll-behavior:auto; } }

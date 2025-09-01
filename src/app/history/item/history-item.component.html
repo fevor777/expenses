@@ -1,62 +1,44 @@
-<div class="history-item-container">
-  <span
-    class="history-item-date-title"
-    *ngIf="item.showDateTitle; else elseBlock"
-    ><span>{{ item.date | date : "dd-MM-YYYY" }} - </span
-    ><span class="history-item-date-title-amount-value"
-      >{{ totalAmountPerDays }}€</span
-    ></span
-  >
-  <ng-template #elseBlock>
-    <div class="history-item-separator"> </div>
-  </ng-template>
-  <div class="history-item">
-    <div class="history-item-amount">
-      Цена:
-      <span class="history-item-amount-value">{{ item.amount }}€</span>
-      <i
-        class="history-item-edit-icon fas fa-pencil-alt"
-        (click)="onEditAmountIconClick(item)"
-      ></i>
+<article class="h-entry" [class.h-entry--with-date]="item.showDateTitle">
+  <header *ngIf="item.showDateTitle" class="h-date-group">
+    <span class="h-date">{{ item.date | date: 'dd-MM-YYYY' }}</span>
+    <span class="h-date-total">{{ totalAmountPerDays }}€</span>
+  </header>
+  <div class="h-card">
+    <div class="h-accent"></div>
+    <div class="h-body">
+      <div class="h-row h-row--top">
+        <span class="h-amount" aria-label="Amount">{{ item.amount }}€</span>
+        <div class="h-actions" aria-label="Actions">
+          <button type="button" class="h-btn" (click)="onEditAmountIconClick(item)" aria-label="Edit amount">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button type="button" class="h-btn" (click)="onChartIconClick(item.category)" aria-label="Show chart">
+            <i class="fas fa-chart-bar"></i>
+          </button>
+        </div>
+      </div>
+      <div class="h-row h-meta">
+        <span class="h-category-label">Category:</span>
+        <span class="h-category app-link" (click)="onFilterByCategory(item.category)">{{ getCategoryNameByIdFunc(item.category) }}</span>
+        <span class="h-dot">•</span>
+        <time class="h-time" [attr.datetime]="item.date | date: 'yyyy-MM-ddTHH:mm'">{{ item.date | date: 'HH:mm' }}</time>
+      </div>
+      <div class="h-row h-desc">
+        <span class="h-description-label">Description:</span>
+        <ng-container *ngIf="item.description; else noDescText">
+          <span class="h-description">"{{ item.description }}"</span>
+        </ng-container>
+        <ng-template #noDescText><span class="h-description h-description--empty">(none)</span></ng-template>
+        <button type="button" class="h-btn h-btn--inline h-btn-text" (click)="onEditDescriptionIconClick(item)">
+          <i class="fas fa-pencil-alt"></i>
+          <span>{{ item.description ? 'Edit' : 'Add' }}</span>
+        </button>
+      </div>
+      <div class="h-row h-ops">
+        <button type="button" class="h-linkdanger" (click)="onDeleteLabelClick(item)">Delete</button>
+        <button *ngIf="!item.isDeletedFromBalance && getCategoryByIdFunc(item.category).includeInBalance" type="button" class="h-linkdanger" (click)="onDeleteFromBalanceLabelClick(item)">Delete from balance</button>
+      </div>
     </div>
-    <div>
-      Category:
-      <span class="app-link" (click)="onFilterByCategory(item.category)">{{
-        getCategoryNameByIdFunc(item.category)
-      }}</span>
-      <i
-        class="fas fa-chart-bar history-item-chart"
-        (click)="onChartIconClick(item.category)"
-      ></i>
-    </div>
-    Date: {{ item.date | date : "HH:mm" }} ({{
-      item.date | date : "dd-MM-YYYY"
-    }})
-    <div>
-      <span class="history-item-description-label">Description:</span>
-      <ng-container *ngIf="item.description">
-        <span>"</span>
-        <span>{{ item.description }}</span>
-        <span>"</span>
-      </ng-container>
-
-      <i
-        class="history-item-edit-icon fas fa-pencil-alt"
-        (click)="onEditDescriptionIconClick(item)"
-      ></i>
-    </div>
-    <span class="history-item-delete-label" (click)="onDeleteLabelClick(item)"
-      >Delete</span
-    >
-    <span
-      *ngIf="
-        !item.isDeletedFromBalance &&
-        getCategoryByIdFunc(item.category).includeInBalance
-      "
-      class="history-item-delete-label"
-      (click)="onDeleteFromBalanceLabelClick(item)"
-    >
-      | Delete from balance</span
-    >
   </div>
-</div>
+  <div *ngIf="!item.showDateTitle" class="h-spacer" aria-hidden="true"></div>
+</article>

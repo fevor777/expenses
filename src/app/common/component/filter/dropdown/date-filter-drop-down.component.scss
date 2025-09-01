@@ -1,45 +1,80 @@
+/* Date filter dropdown: flattened & themed */
 .date-filter-drop-down {
   display: inline-block;
   position: relative;
+  font-family: "Montserrat", sans-serif;
 
   .date-filter-drop-down-button {
-    margin: 0 1px;
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    font-family: "Montserrat", sans-serif;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    background-color: transparent;
+    margin: 0;
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text-secondary);
     cursor: pointer;
+    line-height: 1.1;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+  }
+  @media (hover:hover) {
+    .date-filter-drop-down-button:hover { color: var(--color-text); }
+  }
+  .date-filter-drop-down-button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+
+  .date-filter-drop-down-button-toggle { font-weight: 600; padding-left: 6px; padding-right: 6px; }
+
+  .date-filter-drop-down-button-active {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
   }
 
-  .date-filter-drop-down-button-toggle {
-    font-weight: 600;
-  }
-
+  /* Dropdown panel */
   .date-filter-drop-down-list {
     position: absolute;
     top: 100%;
     left: 0;
-    right: 0;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    max-height: 300px;
+    min-width: 160px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    max-height: 280px;
     overflow-y: auto;
     z-index: 1000;
     list-style: none;
-    padding: 0;
-    margin: 0;
-
-    li {
-      padding: 10px 10px;
-      cursor: pointer;
-      border: 1px solid #e7e7e7;
-    }
+    padding: 4px 0;
+    margin: 4px 0 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .date-filter-drop-down-list li {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+  @media (hover:hover) {
+    .date-filter-drop-down-list li:hover { background: var(--color-bg-alt); color: var(--color-text); }
+  }
+  .date-filter-drop-down-list li.is-selected {
+    background: var(--color-primary-alpha);
+    color: var(--color-primary);
+    font-weight: 600;
   }
 
-  .date-filter-drop-down-button-active {
-    background-color: #f8d7da;
-    border: #f8d7da 1px solid;
+  /* Dark theme overrides */
+  .dark & .date-filter-drop-down-list,
+  [data-theme='dark'] & .date-filter-drop-down-list {
+    background: var(--color-bg-alt);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .dark & .date-filter-drop-down-list li.is-selected,
+  [data-theme='dark'] & .date-filter-drop-down-list li.is-selected {
+    background: var(--color-primary-alpha);
   }
 }

@@ -1,7 +1,8 @@
 <div class="history-container">
   <span id="back" class="app-link history-back-link" [routerLink]="'/'"
     >< Back</span
-  ><br />
+  >
+  <div [style.marginLeft.px]="15" [style.marginRight.px]="15">
   <app-multi-filter
     [value]="defaultFilter"
     [totalAmount]="totalAmount"
@@ -9,6 +10,7 @@
     [showDetailsIcon]="true"
     (selectedFilters)="updateFilterAndLoadExpenses($event)"
   ></app-multi-filter>
+  </div>
   <ng-container
     *ngIf="(expenses$ | async)?.length > 0 && (expenses$ | async); let expenses; else: elseBlock"
   >

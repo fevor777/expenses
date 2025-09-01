@@ -8,18 +8,17 @@ import { TabComponent } from './tab.component';
     imports: [NgFor, NgClass, NgIf, NgTemplateOutlet],
     styles: [`
     :host { display:block; font-family:"Montserrat", sans-serif; }
-    /* Header bar mimics expense header palette */
-  .tabs-header { display:flex; gap:6px; margin:24px 0 16px; overflow-x:auto; padding:10px 16px 6px; background:#f8d7da; box-shadow:0 1px 1px #87002466, 0 1px 1px rgba(0,0,0,0.08); border-radius:18px; scrollbar-width:none; }
+  .tabs-header { display:flex; gap:6px; margin:24px 0 16px; overflow-x:auto; padding:10px 16px 6px; background:var(--color-bg-alt); border:1px solid var(--color-border); box-shadow:0 1px 2px rgba(0,0,0,0.06); border-radius:10px; scrollbar-width:none; position:relative; }
     .tabs-header::-webkit-scrollbar{display:none;}
-    .tab-btn { position:relative; padding:6px 18px 8px; font-size:14px; letter-spacing:.3px; cursor:pointer; border-radius:10px; color:#346078; user-select:none; font-weight:500; transition:background .18s, color .18s, transform .18s; }
-    .tab-btn:hover { background:rgba(255,255,255,0.55); }
+  .tab-btn { position:relative; padding:6px 18px 8px; font-size:14px; letter-spacing:.3px; cursor:pointer; border-radius:6px; color:var(--color-text-secondary); user-select:none; font-weight:600; transition:background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
+  .tab-btn:hover { background:var(--color-bg); color:var(--color-text); }
     .tab-btn:active { transform:translateY(1px); }
-    .tab-btn.active { background:#ffffff; color:#870024; box-shadow:0 2px 4px rgba(0,0,0,0.12); }
-    .tab-btn.active::after { content:''; position:absolute; left:14px; right:14px; bottom:2px; height:3px; background:#870024; border-radius:2px; }
+  .tab-btn.active { background:var(--color-bg); color:var(--color-primary); box-shadow:0 0 0 1px var(--color-primary-alpha); }
+  .tab-btn.active::after { content:''; position:absolute; left:12px; right:12px; bottom:3px; height:3px; background:var(--color-primary); border-radius:2px; opacity:.9; }
+  .dark .tab-btn.active, [data-theme='dark'] .tab-btn.active { background:var(--color-bg); box-shadow:0 0 0 1px var(--color-primary-alpha); }
     .tab-btn.disabled { opacity:.4; cursor:default; }
     .tab-btn .lbl { text-decoration:none; }
     .tabs-body { min-height:40px; padding:4px 4px 10px; }
-    /* Compact mode (future) */
     :host(.compact) .tab-btn { padding:4px 12px 6px; font-size:12px; }
   `],
     template: `
