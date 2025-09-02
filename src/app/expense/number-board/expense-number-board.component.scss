@@ -4,6 +4,8 @@
 
 .expense-number-board-header { display:flex; justify-content:space-between; align-items:center; font-size:18px; padding:12px 14px; position:relative; border-bottom:1px solid var(--color-border); gap:10px; }
 .expense-description-icon { color:var(--color-muted); cursor:pointer; font-size:18px; transition:color var(--transition-fast), transform var(--transition-fast); }
+.expense-number-board-header span { color:var(--color-muted); font-weight:600; letter-spacing:.5px; cursor:pointer; transition:color var(--transition-fast); }
+.expense-number-board-header span:hover { color:var(--color-text-secondary); }
 .expense-description-icon:hover { color:var(--color-highlight); }
 .expense-description-icon:active { transform:scale(.9); }
 .expense-number-board-input { flex:1; text-align:center; border:none; background:none; font-size:22px; outline:none; font-weight:700; letter-spacing:1px; color:var(--color-muted); text-transform:uppercase; caret-color:var(--color-muted); }
