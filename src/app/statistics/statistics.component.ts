@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, HostListener, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import * as echarts from 'echarts';
 import { first, Subject, takeUntil } from 'rxjs';
 
@@ -29,6 +29,7 @@ import { CompositionChartsComponent } from './composition/composition-charts.com
     BarChartComponent,
     CommonModule,
     CompositionChartsComponent,
+    RouterModule,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {

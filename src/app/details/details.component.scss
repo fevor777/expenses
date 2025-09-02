@@ -8,6 +8,10 @@
   color: var(--color-text);
   font-family: "Montserrat", sans-serif;
 
+  .details-nav { display:flex; justify-content:space-between; align-items:center; margin-top:2px; }
+  .details-history-link, .details-home-link { font-weight:400; }
+  .details-history-link:hover, .details-home-link:hover { text-decoration:underline; }
+
   &-item {
     display: flex;
     justify-content: space-between;

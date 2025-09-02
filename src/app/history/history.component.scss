@@ -8,8 +8,12 @@
   flex-direction:column;
   padding-bottom:24px;
 
+  .history-nav { display:flex; justify-content:space-between; align-items:center; }
+
   .history-back-link { margin:10px; margin-bottom:0; font-weight:400; }
   .history-back-link:hover { text-decoration:underline; }
+  .history-stats-link { margin:10px; margin-bottom:0; font-weight:400; }
+  .history-stats-link:hover { text-decoration:underline; }
 
   .history-empty { flex:1; display:flex; justify-content:center; align-items:center; font-family:"Montserrat", sans-serif; color:var(--color-text-secondary); letter-spacing:.5px; }
 }

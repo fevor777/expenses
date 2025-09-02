@@ -1,4 +1,8 @@
 <div class="details">
+  <div class="details-nav">
+    <span class="app-link details-history-link" [routerLink]="backUrl">{{ backLabel }}</span>
+    <span class="app-link details-home-link" [routerLink]="altUrl">{{ altLabel }}</span>
+  </div>
   <app-multi-filter [value]="initialFilter" [totalAmount]="totalAmount" [defaultDateValue]="defaultDateValue"
     [showHistoryIcon]="true" (selectedFilters)="applyFilters($event)"></app-multi-filter>
   <div class="section">

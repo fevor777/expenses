@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { first, Subject, takeUntil } from 'rxjs';
 
 import { Categories } from '../common/model/categories';
@@ -27,13 +27,16 @@ import { Mode } from '../common/component/filter/date/dateFrame.model';
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
   standalone: true,
-  imports: [CommonModule, MultiFilterComponent, BarChartComponent, CompositionChartsComponent, MicroVisualsComponent, IrregularBudgetGaugeComponent, IrregularCumulativeComponent],
+  imports: [CommonModule, RouterModule, MultiFilterComponent, BarChartComponent, CompositionChartsComponent, MicroVisualsComponent, IrregularBudgetGaugeComponent, IrregularCumulativeComponent],
 })
 export class DetailsComponent implements OnInit, OnDestroy {
   amountForDay: number = 0;
   amountForMonth: number = 0;
   amountForYear: number = 0;
   backUrl: string = '';
+  backLabel: string = '< Home';
+  altUrl: string = '/history';
+  altLabel: string = 'History >';
   selectedCategory: string = '';
   initialFilter: MultiFilter;
   defaultDateValue: DateFrame;
@@ -85,6 +88,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   initDetails(): void {
     this.backUrl = this.activatedRoute.snapshot.queryParamMap.get('back-url');
+    this.configureNav();
     const categoryFilters = this.dateFilterService.categories;
     const descriptionFilter = this.dateFilterService.description;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
@@ -110,6 +114,26 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
     this.applyFilters(this.initialFilter);
     this.irregularBudgetService.getValue().pipe(takeUntil(this.destroySubject)).subscribe(v => this.irregularBudget = v || 0);
+  }
+
+  private configureNav(): void {
+    switch (this.backUrl) {
+      case '/history':
+        this.backLabel = '< History';
+        this.altUrl = this.backUrl;
+        this.altLabel = 'History >';
+        break;
+      case '/statistics':
+        this.backLabel = '< Statistics';
+        this.altUrl = this.backUrl;
+        this.altLabel = 'Statistics >';
+        break;
+      default:
+        this.backLabel = '< History';
+        this.altUrl = this.backUrl;
+        this.altLabel = 'History >';
+        break;
+    }
   }
 
   applyFilters(filter: MultiFilter): void {

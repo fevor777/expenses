@@ -1,4 +1,8 @@
 <div class="statistics">
+  <div class="statistics-nav">
+    <span class="app-link statistics-history-link" routerLink="/history">< History</span>
+    <span class="app-link statistics-home-link" routerLink="/">Home ></span>
+  </div>
   <app-date-filter class="statistics-filter" [value]="currentFilter" [defaultValue]="initialFilterValue" (changeFilter)="onFilterChange($event)"></app-date-filter>
 
   <div class="stats-section stats-section--donut">
