@@ -1,14 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
+export interface NotificationPayload { message: string; type?: 'info' | 'success' | 'error' | 'warning'; }
+
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationService {
-  private readonly messageSubject: Subject<string> = new Subject<string>();
+  private readonly messageSubject: Subject<string | NotificationPayload> = new Subject();
   readonly message$ = this.messageSubject.asObservable();
 
-  showMessage(message: string) {
-    this.messageSubject.next(message);
+  showMessage(message: string, type: NotificationPayload['type'] = 'info') {
+    // For backward compatibility keep emitting plain string when type is info and no HTML semantics needed
+    if (type === 'info') {
+      this.messageSubject.next(message);
+    } else {
+      this.messageSubject.next({ message, type });
+    }
   }
+
+  show(payload: NotificationPayload) { this.messageSubject.next(payload); }
 }

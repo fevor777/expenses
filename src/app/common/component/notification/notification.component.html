@@ -1,4 +1,12 @@
-<div class="notification-container" *ngIf="show">
-  <span [innerHTML]="message"></span>
-  <span (click)="onCloseNotification()" class="notification-close">X</span>
+<div
+  *ngIf="show"
+  class="notification-container {{ variant }}"
+  [class.is-hidden]="hiding"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+>
+  <span class="notification-icon" *ngIf="icon" [innerHTML]="icon"></span>
+  <span class="notification-content" [innerHTML]="message"></span>
+  <button type="button" (click)="onCloseNotification()" class="notification-close" aria-label="Close notification">×</button>
 </div>

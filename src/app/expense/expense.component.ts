@@ -200,11 +200,11 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     );
     const monthlyAmount = this.getMonthlyAmount();
     this.notificationService.showMessage(
-      `<u>Добавлено:</u> ${amount} €` +
+      `Добавлено: ${amount} €` +
       ` - ${getCategoryNameById(categoryName)}<br><br>` +
-      `<u>Сегодня по категории:</u> ${todaysAmountByCategory} €<br><br>` +
-      `<u>За месяц по категории:</u> ${monthlyAmountByCategory} €` +
-      `<br><br><u>Всего за месяц:</u> ${monthlyAmount} €`
+      `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
+      `За месяц по категории: ${monthlyAmountByCategory} €` +
+      `<br><br>Всего за месяц: ${monthlyAmount} €`
     );
   }
 

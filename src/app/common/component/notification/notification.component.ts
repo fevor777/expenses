@@ -4,6 +4,8 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { NotificationService } from './notification.service';
 
+type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
+
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
@@ -11,33 +13,72 @@ import { NotificationService } from './notification.service';
   standalone: true,
   imports: [CommonModule]
 })
+
 export class NotificationComponent implements OnDestroy {
   message = '';
   show = false;
+  hiding = false;
+  variant: NotificationVariant = 'info';
+  icon: string | null = null;
+
+  private hideTimeout: any;
+  private autoCloseMs = 60000; // shorter default for UX
 
   private readonly destroySubject: Subject<void> = new Subject();
 
   constructor(private notificationService: NotificationService) {
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))
-      .subscribe((message) => {
-        this.showMessage(message);
+      .subscribe((payload: any) => {
+        // Support both legacy string and new object payload
+        if (typeof payload === 'string') {
+          this.showMessage(payload, 'info');
+        } else if (payload && typeof payload === 'object' && 'message' in payload) {
+          this.showMessage(payload.message, (payload.type as any) || 'info');
+        }
       });
   }
 
-  showMessage(message: string) {
+  showMessage(message: string, variant: NotificationVariant = 'info') {
+    this.clearPending();
     this.message = message;
+    this.variant = variant;
+    this.icon = this.resolveIcon(variant);
+    this.hiding = false;
     this.show = true;
-    setTimeout(() => {
-      this.show = false;
-    }, 60000);
+    this.hideTimeout = setTimeout(() => this.startHide(), this.autoCloseMs);
+  }
+
+  private resolveIcon(v: NotificationVariant): string | null {
+    switch (v) {
+      case 'success': return '&#10003;'; // check mark
+      case 'error': return '&#9888;'; // warning symbol (triangle) could use 26A0; or heavy X
+      case 'warning': return '&#9888;';
+      case 'info':
+      default: return '&#9432;'; // info symbol
+    }
+  }
+
+  private startHide() {
+    if (!this.show) return;
+    this.hiding = true;
+    // allow animation to finish
+    setTimeout(() => { this.show = false; this.hiding = false; }, 250);
   }
 
   onCloseNotification() {
-    this.show = false;
+    this.startHide();
+  }
+
+  private clearPending() {
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
   }
 
   ngOnDestroy(): void {
+    this.clearPending();
     this.destroySubject.next();
     this.destroySubject.complete();
   }
