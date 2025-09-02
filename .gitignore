@@ -50,4 +50,3 @@ android-webview/local.properties
 local.properties
 app-release-signed*.apk
 app-release-aligned*.apk
-/docs
