@@ -1,8 +1,8 @@
 <div class="expense-container">
   <app-expense-header [currentAmount]="currentAmount" [currentBalanceAmount]="currentBalanceAmount"
     [balance]="balance$ | async" [balanceDate]="balanceDate$ | async" (menuIconClick)="navigateToExport()"
-    (historyIconClick)="navigateToHistory()" (balanceChange)="onBalanceChange($event)"
-    (balanceDateChange)="onBalanceDateChange($event)">
+    (historyIconClick)="navigateToHistory()" (statisticsIconClick)="navigateToStatistics()" (detailsIconClick)="navigateToDetails()"
+    (balanceChange)="onBalanceChange($event)" (balanceDateChange)="onBalanceDateChange($event)">
   </app-expense-header>
 
   <app-categories *ngIf="showNumberBoard; else categoriesWithScroll" [style.overflow]="'hidden'"

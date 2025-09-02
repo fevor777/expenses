@@ -129,9 +129,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
         this.altLabel = 'Statistics >';
         break;
       default:
-        this.backLabel = '< History';
-        this.altUrl = this.backUrl;
-        this.altLabel = 'History >';
+        this.backLabel = '< Home';
+        this.altUrl = '/';
+        this.altLabel = 'Home >';
+        this.backUrl = '/';
         break;
     }
   }

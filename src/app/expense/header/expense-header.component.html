@@ -1,21 +1,37 @@
 <div class="expense-header-container">
   <div class="expense-header-main">
-    <div class="expense-header-menu-icon" (click)="onMenuIconClick()">
-      <i class="fas fa-bars"></i>
+    <div class="expense-header-left-group">
+
+      <div class="expense-header-menu-icon" (click)="onMenuIconClick()" title="Export / Settings"
+        aria-label="Export and settings">
+        <i class="fas fa-bars"></i>
+      </div>
+      <div class="expense-header-stats-icon" (click)="onStatisticsIconClick()" title="Statistics"
+        aria-label="Statistics">
+        <i class="fas fa-chart-pie"></i>
+      </div>
     </div>
 
-    <div class="expense-header-title" (click)="onCurrentAmountClick()">
+    <div class="expense-header-title" (click)="onCurrentAmountClick()" title="Toggle amount"
+      aria-label="Toggle amount view">
       <ng-container *ngIf="isShowCurrentBalanceAmount; else elseBlock">
         <div class="expense-header-irregular-title">нерегул.</div>
-        <span class="expense-header-total-title">{{ currentBalanceAmount }}<span class="expense-header-total-title-currency">€</span></span>
+        <span class="expense-header-total-title">{{ currentBalanceAmount }}<span
+            class="expense-header-total-title-currency">€</span></span>
       </ng-container>
 
       <ng-template #elseBlock>
-        <span class="expense-header-total-title">{{ currentAmount }}<span class="expense-header-total-title-currency">€</span></span>
+        <span class="expense-header-total-title">{{ currentAmount }}<span
+            class="expense-header-total-title-currency">€</span></span>
       </ng-template>
     </div>
-    <div class="expense-header-clock-icon" (click)="onHistoryIconClick()">
-      <i class="fas fa-clock"></i>
+    <div class="expense-header-icons-group">
+      <div class="expense-header-details-icon" (click)="onDetailsIconClick()" title="Details" aria-label="Details">
+        <i class="fas fa-list"></i>
+      </div>
+      <div class="expense-header-clock-icon" (click)="onHistoryIconClick()" title="History" aria-label="History">
+        <i class="fas fa-clock"></i>
+      </div>
     </div>
   </div>
   <div class="expense-header-bottom">
