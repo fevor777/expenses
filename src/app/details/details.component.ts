@@ -162,7 +162,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         updatedFilter.categories,
         updatedFilter.description
       )
-      .pipe(first(), takeUntil(this.destroySubject))
+      .pipe(takeUntil(this.destroySubject))
       .subscribe((expenses) => {
         this.currentFilter = updatedFilter;
         this.expenses = expenses;

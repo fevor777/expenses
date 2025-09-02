@@ -12,6 +12,7 @@ import { appInitializer } from './common/app-initializer';
 import { NotificationComponent } from './common/component/notification/notification.component';
 import { CustomHammerConfig } from './common/custom-hammer.config';
 import { AuthService } from './common/service/auth.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -43,7 +44,7 @@ export class HammerConfig extends HammerGestureConfig {
       provide: APP_INITIALIZER,
       multi: true,
       useFactory: appInitializer,
-      deps: [AuthService],
+      deps: [AngularFireAuth, AuthService],
     }
   ],
   bootstrap: [AppComponent],

@@ -22,7 +22,6 @@ import { TabComponent } from '../common/tab.component';
   imports: [CommonModule, RouterModule, TabsContainerComponent, TabComponent],
 })
 export class ExportComponent implements OnDestroy {
-  user$: Observable<User>; // Observable to track the logged-in user
   activeTab = 'general';
   irregularBudget$!: Observable<number>;
   irregularBudgetValue: number = 0;
@@ -39,11 +38,14 @@ export class ExportComponent implements OnDestroy {
     private irregularBudgetService: IrregularBudgetService,
     private savingService: SavingService
   ) {
-    this.user$ = this.authService.user$;
     this.irregularBudget$ = this.irregularBudgetService.getValue();
     this.irregularBudget$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.irregularBudgetValue = v || 0);
     this.savings$ = this.savingService.getSavings();
     this.savings$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.savingsValue = v || 0);
+  }
+
+  getUser(): User | null {
+    return this.authService.user;
   }
 
   // Method to trigger Google Sign-in

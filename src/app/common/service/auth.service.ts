@@ -7,14 +7,9 @@ import { Observable, from, of, tap, catchError, BehaviorSubject, filter, firstVa
   providedIn: 'root',
 })
 export class AuthService {
-  private userSubject = new BehaviorSubject<User | null>(null);
-  user$ = this.userSubject.asObservable();
   user: User;
 
   constructor(private afAuth: AngularFireAuth) {
-    this.afAuth.authState.subscribe(u => {
-      this.updateUser(u as any);
-    });
   }
 
   signInWithGoogle() {
@@ -48,17 +43,20 @@ export class AuthService {
     }
     // Web fallback
     return from(this.afAuth.signInWithPopup(new GoogleAuthProvider())).pipe(
+      tap(res => { if (res?.user) { this.updateUser(res.user); } }),
       catchError(err => { console.error('[AuthService] signInWithPopup error'); return of(null); })
     );
   }
 
   signOut() {
-    return this.afAuth.signOut();
+    return this.afAuth.signOut().then(() => {
+      // Optimistically clear current user immediately; authState will confirm.
+      this.updateUser(null as any);
+    });
   }
 
   updateUser(user: User) {
     this.user = user;
-    this.userSubject.next(user);
   }
 
   private attachNativeTokenHandler() {

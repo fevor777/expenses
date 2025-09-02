@@ -1,11 +1,7 @@
-import { first, tap } from 'rxjs';
-
+import { firstValueFrom } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthService } from './service/auth.service';
 
-export const appInitializer = (authService: AuthService) => {
-  return () =>
-    authService.user$.pipe(
-      first(),
-      tap((user) => authService.updateUser(user))
-    );
+export const appInitializer = (afAuth: AngularFireAuth, authService: AuthService) => {
+  return () => firstValueFrom(afAuth.authState).then((v) => { authService.updateUser(v); });
 };
