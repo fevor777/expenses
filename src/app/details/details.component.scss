@@ -10,7 +10,6 @@
 
   .details-nav { display:flex; justify-content:space-between; align-items:center; margin-top:2px; }
   .details-history-link, .details-home-link { font-weight:400; }
-  .details-history-link:hover, .details-home-link:hover { text-decoration:underline; }
 
   &-item {
     display: flex;
@@ -33,11 +32,9 @@
   background:var(--color-bg-alt); border:1px solid var(--color-border);
   border-radius:6px; transition:background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
-@media (hover:hover){ .section-header:hover { background:var(--color-bg); } }
 .section-header:active { transform:translateY(1px); }
 
 .collapse-btn { font:inherit; border:none; background:transparent; cursor:pointer; padding:2px 6px; line-height:1; font-size:14px; color:var(--color-text-secondary); transition:color var(--transition-fast); }
-@media (hover:hover){ .collapse-btn:hover { color:var(--color-text); } }
 
 .section-body { padding:6px 4px 2px; }
 

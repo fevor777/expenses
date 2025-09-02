@@ -12,6 +12,4 @@ button {
   background:transparent;
   transition:background var(--transition-fast), color var(--transition-fast);
 }
-@media (hover:hover){
-  :host ::ng-deep .history-back-link:hover { background:var(--color-bg-alt); text-decoration:none; }
-}
+/* hover styles removed */

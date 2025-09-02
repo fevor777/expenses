@@ -8,7 +8,6 @@ article.h-entry--with-date { margin-top:20px; }
 
 /* Card */
 .h-card { display:flex; background:var(--color-bg); border:1px solid var(--color-border); border-radius:16px; box-shadow:none; position:relative; overflow:hidden; transition:border-color var(--transition-fast), background var(--transition-fast); }
-.h-card:hover { border-color:var(--color-border-strong); }
 .h-accent { width:4px; background:linear-gradient(var(--color-primary), var(--color-highlight)); opacity:.9; }
 .h-body { padding:10px 20px 12px 22px; flex:1; display:flex; flex-direction:column; gap:4px; }
 
@@ -24,7 +23,6 @@ article.h-entry--with-date { margin-top:20px; }
 /* Buttons / actions */
 .h-actions { display:flex; gap:4px; }
 .h-btn { border:1px solid var(--color-border); background:var(--color-bg-alt); padding:6px 14px 6px 16px; font-size:14px; border-radius:8px; cursor:pointer; color:var(--color-text-secondary); display:inline-flex; align-items:center; justify-content:center; line-height:1.05; transition:background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast); }
-.h-btn:hover { background:var(--color-bg-alt); color:var(--color-text-secondary); border-color:var(--color-border); }
 .h-btn:active { background:var(--color-bg-alt); color:var(--color-text-secondary); border-color:var(--color-border); transform:none; }
 .h-btn--inline { padding:5px 12px 5px 14px; font-size:13px; }
 .h-btn i { pointer-events:none; }
@@ -32,7 +30,7 @@ article.h-entry--with-date { margin-top:20px; }
 .h-btn-text span { line-height:1; }
 .h-category { font-weight:400; }
 .h-category.app-link { color:var(--color-accent); font-weight:400; text-decoration:none; }
-.h-category.app-link:hover { color:var(--color-highlight); text-decoration:underline; }
+/* removed hover state for category link */
 
 /* Description */
 .h-description-label { font-size:14px; color:var(--color-text-secondary); }
@@ -43,7 +41,7 @@ article.h-entry--with-date { margin-top:20px; }
 
 /* Danger links */
 .h-linkdanger { background:none; border:none; color:var(--color-muted); font-size:14px; cursor:pointer; padding:3px 5px; border-radius:4px; opacity:.55; transition:opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast); text-decoration:none; }
-.h-linkdanger:hover { opacity:.75; color:var(--color-text-secondary); text-decoration:underline; background:transparent; }
+/* removed danger link hover */
 .h-linkdanger:focus-visible { opacity:.85; color:var(--color-text-secondary); }
 .h-ops { gap:14px; margin-top:10px; padding-top:8px; }
 
@@ -58,4 +56,4 @@ article.h-entry--with-date { margin-top:20px; }
 
 /* Dark mode tweaks */
 .dark .h-card, [data-theme='dark'] .h-card { background:var(--color-bg-alt); }
-.dark .h-btn:hover, [data-theme='dark'] .h-btn:hover { filter:brightness(1.1); }
+/* removed dark hover filter */

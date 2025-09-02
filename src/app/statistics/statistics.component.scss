@@ -39,7 +39,6 @@
 
   .statistics-nav { display:flex; justify-content:space-between; align-items:center; }
   .statistics-home-link, .statistics-history-link { margin:2px 0 4px; font-weight:400; }
-  .statistics-home-link:hover, .statistics-history-link:hover { text-decoration:underline; }
 
   .statistics-filter { padding-bottom: 4px; display:flex; justify-content:center; }
 
@@ -47,11 +46,9 @@
   .statistic-excluded-wrapper { font-weight:400; font-size:13px; margin-left:4px; }
   .statistic-excluded-category { color: var(--color-primary); font-weight:600; }
   .statistic-refresh-button { font-size:13px; margin-left:6px; cursor:pointer; color:var(--color-text-secondary); }
-  @media (hover:hover){ .statistic-refresh-button:hover { color:var(--color-text); } }
 
   .statistics-checkbox { display:flex; flex-direction:column; gap:6px; padding:6px 0 4px; }
   .statistics-checkbox-item { display:flex; align-items:center; gap:10px; background:var(--color-bg-alt); border:1px solid var(--color-border); border-radius:8px; padding:8px 12px; cursor:pointer; }
-  .statistics-checkbox-item:hover { background:var(--color-bg); }
   .statistics-checkbox-input { width:18px; height:18px; cursor:pointer; margin:0; }
   .statistics-checkbox-label { font-size:13px; font-weight:500; color:var(--color-text-secondary); }
   .statistics-amount-muted { color:var(--color-text-secondary); font-weight:400; }
@@ -86,8 +83,7 @@
 .stats-section { display:flex; flex-direction:column; gap:4px; }
 .stats-section-header { display:flex; align-items:center; gap:16px; padding:2px 2px 0 4px; }
 .stats-section-title { font-size:14px; font-weight:600; letter-spacing:.3px; color:var(--color-text-secondary); }
-.stats-action-icon { font-size:12px; color:var(--color-text-secondary); cursor:pointer; transition:color var(--transition-fast); }
-@media (hover:hover){ .stats-action-icon:hover { color:var(--color-text); } }
+.stats-action-icon { font-size:12px; color:var(--color-text-secondary); cursor:pointer; }
 
 .stats-section--donut { height:200px; }
 .stats-donut-chart { width:100%; height:calc(100% - 22px); }

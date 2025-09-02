@@ -17,9 +17,7 @@
     color: var(--color-text-secondary);
     transition: color var(--transition-fast), transform var(--transition-fast);
   }
-  @media (hover:hover) {
-    .statistics-refresh-button:hover { color: var(--color-text); }
-  }
+  /* hover style removed */
   .statistics-refresh-button:active { transform: scale(.9); }
 }
 

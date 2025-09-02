@@ -81,10 +81,6 @@
   transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.mf-toggle:hover {
-  background: var(--color-bg-alt);
-}
-
 .mf-toggle--active {
   background: var(--color-primary);
   color: #fff;
@@ -92,18 +88,9 @@
   box-shadow: 0 2px 6px var(--color-primary-alpha);
 }
 
-.mf-toggle--active:hover {
-  background: var(--color-primary-hover);
-}
-
 /* Make toggle (expand/collapse) visually flat like parent */
 .mf-toggle {
   background: transparent;
-}
-
-.mf-toggle:hover {
-  background: transparent;
-  color: var(--color-text);
 }
 
 .mf-toggle--active {
@@ -111,11 +98,6 @@
   color: var(--color-primary);
   border-color: var(--color-primary);
   box-shadow: none;
-}
-
-.mf-toggle--active:hover {
-  background: transparent;
-  color: var(--color-primary);
 }
 
 /* Icon button */
@@ -134,13 +116,6 @@
   transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
-@media (hover:hover) {
-  .mf-icon-btn:hover {
-    background: var(--color-bg-alt);
-    color: var(--color-text);
-  }
-}
-
 .mf-icon-btn:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
@@ -149,13 +124,6 @@
 /* Clear (refresh) button inside title group flat */
 .mf-group--title .mf-icon-btn {
   background: transparent;
-}
-
-@media (hover:hover) {
-  .mf-group--title .mf-icon-btn:hover {
-    background: transparent;
-    color: var(--color-text);
-  }
 }
 
 /* Extra left padding for refresh & navigation buttons */
@@ -174,26 +142,10 @@
   background: transparent;
 }
 
-@media (hover:hover) {
-
-  .mf-group--total .mf-icon-btn:hover,
-  .mf-group--total-alt .mf-icon-btn:hover {
-    background: transparent;
-    color: var(--color-text);
-  }
-}
-
 /* Statistics navigation button inherits same flat style */
 .mf-icon-btn--stats {
   background: transparent;
   border-color: var(--color-border);
-}
-
-@media (hover:hover) {
-  .mf-icon-btn--stats:hover {
-    background: transparent;
-    color: var(--color-text);
-  }
 }
 
 /* Expanded section */

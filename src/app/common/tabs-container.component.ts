@@ -11,7 +11,7 @@ import { TabComponent } from './tab.component';
   .tabs-header { display:flex; gap:6px; margin:24px 0 16px; overflow-x:auto; padding:10px 16px 6px; background:var(--color-bg-alt); border:1px solid var(--color-border); box-shadow:0 1px 2px rgba(0,0,0,0.06); border-radius:10px; scrollbar-width:none; position:relative; }
     .tabs-header::-webkit-scrollbar{display:none;}
   .tab-btn { position:relative; padding:6px 18px 8px; font-size:14px; letter-spacing:.3px; cursor:pointer; border-radius:6px; color:var(--color-text-secondary); user-select:none; font-weight:600; transition:background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
-  .tab-btn:hover { background:var(--color-bg); color:var(--color-text); }
+  /* hover style removed */
     .tab-btn:active { transform:translateY(1px); }
   .tab-btn.active { background:var(--color-bg); color:var(--color-primary); box-shadow:0 0 0 1px var(--color-primary-alpha); }
   .tab-btn.active::after { content:''; position:absolute; left:12px; right:12px; bottom:3px; height:3px; background:var(--color-primary); border-radius:2px; opacity:.9; }

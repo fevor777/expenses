@@ -73,20 +73,20 @@ interface CategoryStat {
   .micro-table td { padding:7px 2px; vertical-align:middle; border-bottom:1px solid #f5f5f5; }
   .micro-table tbody tr.cat-row:last-child td { border-bottom: none; }
     .micro-table tbody tr.cat-row{cursor:pointer;}
-  .micro-table tbody tr.cat-row:hover{background:#f7faff;}
+  /* hover background removed */
   .micro-table tbody tr.cat-row.active{background:#e6f3ff;}
   .cat-cell{display:flex;align-items:center;gap:4px;}
   .row-x{font-size:10px;color:#666;cursor:pointer;padding:2px 8px;border-radius:3px;}
-  .row-x:hover{background:#ddd;color:#222;}
+  /* hover state removed */
   .cat-name{color:#1a73e8;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-size:12px;}
-  .cat-name:hover{color:#0b5ec9;}
+  /* hover state removed */
   .micro-table tbody tr.cat-row.active .cat-name{font-weight:600;color:#0b5ec9;}
     .cat-cell { white-space:nowrap; min-width:200px; }
   .share-col { width:40px; }
   .trend-col { width:120px; }
     .sum-col { width:60px; text-align:right; }
   .sortable{cursor:pointer; user-select:none;}
-  .sortable:hover{text-decoration:underline;}
+  /* hover state removed */
   .sort-indicator{font-size:10px; margin-left:2px;}
   .lollipop-track { position:relative; width:100%; height:8px; background:#f0f0f0; border-radius:4px; }
   .lollipop-fill { position:absolute; left:0; top:0; bottom:0; background:#8ab4f8; border-radius:4px 0 0 4px; }

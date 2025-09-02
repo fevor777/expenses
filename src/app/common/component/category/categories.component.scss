@@ -14,9 +14,7 @@
     align-content:flex-start;
     gap:8px 6px;
   }
-  .category { display:flex; flex-direction:column; align-items:center; width:90px; height:64px; padding:12px; text-align:center; font-size:14px; touch-action:manipulation; border-radius:14px; position:relative; color:var(--color-text-secondary); transition:background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast); }
-  /* Remove scale transform to prevent flex re-flow affecting vertical distribution */
-  .category:hover { background:var(--color-bg-alt); color:var(--color-text); }
+  .category { display:flex; flex-direction:column; align-items:center; width:90px; height:64px; padding:12px; text-align:center; font-size:14px; touch-action:manipulation; border-radius:14px; position:relative; color:var(--color-text-secondary); }
   .category:active { background:var(--color-bg-alt); }
   .category-icon { font-size:30px; margin-bottom:4px; line-height:1; color:var(--color-primary); transition:color var(--transition-fast), filter var(--transition-fast); }
   .disabled-category-icon { color:var(--color-border-strong, var(--color-border)); opacity:.28; position:relative; filter:grayscale(1) brightness(.9) sepia(.35) hue-rotate(-8deg) saturate(1.4); }
@@ -28,13 +26,10 @@
   .categories-with-show-more { height:calc(100% - 40px); }
   .categories-with-scroll { overflow:scroll; scrollbar-gutter:stable; }
   .categories-center-aligned { align-items:center; justify-content:center; }
-  .categories-more { text-align:center; color:var(--color-text-secondary); background:transparent; font-size:12px; letter-spacing:.5px; padding:8px 0; transition:color var(--transition-fast), background var(--transition-fast); border-radius:10px; }
-  .categories-more:hover { color:var(--color-primary); }
-  .categories-more:not(.disabled-categories-more) { color:var(--color-text); }
-  .categories-more:not(.disabled-categories-more):hover { background:var(--color-bg-alt); }
+  .categories-more { text-align:center; color:var(--color-text-secondary); background:transparent; font-size:12px; letter-spacing:.5px; padding:8px 0; border-radius:10px; }
   .disabled-categories-more { color:var(--color-border-strong, var(--color-border)); opacity:.30; }
   /* Prevent hover pop for disabled state (icon gets disabled class externally) */
-  .disabled-category-icon:hover, .disabled-category-name:hover { background:transparent; color:var(--color-border-strong, var(--color-border)); }
+  /* hover removed for disabled category elements */
 }
 
 @media (prefers-reduced-motion: reduce) { .category { transition:none; } }
