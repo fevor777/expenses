@@ -25,6 +25,7 @@ import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
 import { ExpenseHeaderComponent } from './header/expense-header.component';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
+import { IrregularBudgetService } from '../common/service/irregular-budget.service';
 import { GLOBAL_LONG_PRESS_DURATION } from '../constants';
 
 @Component({
@@ -71,7 +72,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
-    private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService,
+    private irregularBudgetService: IrregularBudgetService
   ) { }
 
   ngOnInit(): void {
@@ -159,6 +161,28 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   navigateToDetails(): void {
     this.router.navigate(['/details']);
+  }
+
+  onHeaderBudgetInfoClick(): void {
+    // Show budget info notification using irregular budget value (if available) and monthly total expenses.
+    // Irregular budget considered monthly budget for this feature.
+    this.irregularBudgetService.getValue().pipe(takeUntil(this.unsubscribe)).subscribe(val => {
+      const monthlyBudget = val || 0;
+      const monthlySpent = this.getMonthlyAmount();
+      if (!monthlyBudget) {
+        this.notificationService.showMessage('Бюджет не установлен', 'warning');
+        return;
+      }
+      const remaining = Math.max(monthlyBudget - monthlySpent, 0);
+      const percentUsed = monthlyBudget ? Math.min(monthlySpent / monthlyBudget * 100, 100) : 0;
+      const percentRemaining = 100 - percentUsed;
+      const msg = `Бюджет: ${monthlyBudget} €<br>` +
+        `<span style="display:block;margin:6px 0;height:1px;background:var(--color-border);"></span>` +
+        `Потрачено: ${monthlySpent} € (${percentUsed.toFixed(1)}%)<br>` +
+        `Осталось: ${remaining.toFixed(2)} € (${percentRemaining.toFixed(1)}%)<hr>` +
+        `Потрачено за месяц: ${this.getMonthlyAmount()} €`;
+      this.notificationService.showMessage(msg, remaining <= 0 ? 'error' : percentUsed > 80 ? 'warning' : 'info');
+    });
   }
 
   onBalanceChange(balance: number): void {

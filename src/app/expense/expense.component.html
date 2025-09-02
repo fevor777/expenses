@@ -1,7 +1,7 @@
 <div class="expense-container">
   <app-expense-header [currentAmount]="currentAmount" [currentBalanceAmount]="currentBalanceAmount"
     [balance]="balance$ | async" [balanceDate]="balanceDate$ | async" (menuIconClick)="navigateToExport()"
-    (historyIconClick)="navigateToHistory()" (statisticsIconClick)="navigateToStatistics()" (detailsIconClick)="navigateToDetails()"
+    (historyIconClick)="navigateToHistory()" (statisticsIconClick)="navigateToStatistics()" (detailsIconClick)="onHeaderBudgetInfoClick()"
     (balanceChange)="onBalanceChange($event)" (balanceDateChange)="onBalanceDateChange($event)">
   </app-expense-header>
 

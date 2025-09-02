@@ -8,5 +8,10 @@
 >
   <span class="notification-icon" *ngIf="icon" [innerHTML]="icon"></span>
   <span class="notification-content" [innerHTML]="message"></span>
-  <button type="button" (click)="onCloseNotification()" class="notification-close" aria-label="Close notification">×</button>
+  <div class="notification-actions">
+    <button type="button" (click)="onCloseNotification()" class="notification-close" aria-label="Close notification">×</button>
+    <button type="button" (click)="onNavigateDetails()" class="notification-details" aria-label="Open details" title="Details">
+      <i class="fas fa-list"></i>
+    </button>
+  </div>
 </div>

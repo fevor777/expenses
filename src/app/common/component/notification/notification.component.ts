@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { NotificationService } from './notification.service';
@@ -26,7 +27,7 @@ export class NotificationComponent implements OnDestroy {
 
   private readonly destroySubject: Subject<void> = new Subject();
 
-  constructor(private notificationService: NotificationService) {
+  constructor(private notificationService: NotificationService, private router: Router) {
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))
       .subscribe((payload: any) => {
@@ -67,6 +68,11 @@ export class NotificationComponent implements OnDestroy {
   }
 
   onCloseNotification() {
+    this.startHide();
+  }
+
+  onNavigateDetails() {
+    this.router.navigate(['/details']);
     this.startHide();
   }
 

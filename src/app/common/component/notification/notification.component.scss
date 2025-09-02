@@ -46,6 +46,11 @@
     line-height: 1;
   }
 
+  .notification-actions { display:flex; flex-direction:column; gap:12px; }
+  .notification-details { cursor:pointer; background:none; border:none; color:var(--color-header-icon); border-radius:8px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-size:18px; transition:background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast); }
+  .notification-details:hover { background:var(--color-primary-alpha); }
+  .notification-details:active { transform:scale(.9); }
+
   .notification-close:hover {
     opacity: 1;
     transform: scale(1.08);
