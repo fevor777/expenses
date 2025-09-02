@@ -18,6 +18,8 @@
     --color-text: #1c1f23; /* neutral dark */
     --color-text-secondary: #525860; /* medium gray */
     --color-muted: #7a8189;
+    /* Header / chrome icon base color (between secondary and muted for softer presence) */
+    --color-header-icon: #f2d7a2; /* warm pastel amber (harmonizes with primary, subtle) */
     --color-focus: #6366f1; /* indigo focus */
     --color-primary-alpha: rgba(255,180,0,0.26);
     --color-accent-alpha: rgba(5,150,105,0.22);
@@ -36,6 +38,7 @@
     --color-text: #eef1f5;
     --color-text-secondary: #b5bcc4;
     --color-muted: #8e959d;
+    --color-header-icon: #e3c27a; /* warm pastel amber variant for dark theme (slightly deeper for contrast) */
     --color-primary: #ffad33; /* lifted orange */
     --color-primary-hover: #ff9c0d;
     --color-accent: #ffad33;

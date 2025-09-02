@@ -2,7 +2,7 @@
 .expense-header-main { display:flex; justify-content:space-between; align-items:center; padding:0 20px; height:72px; background:var(--color-bg-alt); border-bottom:1px solid var(--color-border); box-shadow:var(--shadow-soft); position:relative; }
 .expense-header-main::after { content:""; position:absolute; left:0; right:0; bottom:0; height:4px; background:linear-gradient(90deg, rgba(255,180,0,0) 0%, rgba(255,180,0,0.85) 35%, rgba(255,180,0,0.85) 65%, rgba(255,180,0,0) 100%); pointer-events:none; }
 .expense-header-menu-icon,
-.expense-header-clock-icon { font-size:24px; color:var(--color-text-secondary); cursor:pointer; transition:color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); border-radius:10px; }
+.expense-header-clock-icon { font-size:24px; color:var(--color-header-icon); cursor:pointer; transition:color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); border-radius:10px; }
 .expense-header-menu-icon:hover,
 .expense-header-clock-icon:hover { color:var(--color-primary); box-shadow:0 0 0 4px rgba(255,180,0,0.18); }
 .expense-header-menu-icon:active,
