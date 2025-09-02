@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Observable, of, Subject, switchMap, takeUntil, tap, take } from 'rxjs';
 
 import { CategoriesComponent } from '../common/component/category/categories.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
@@ -168,7 +168,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     // Irregular budget considered monthly budget for this feature.
     this.irregularBudgetService.getValue().pipe(takeUntil(this.unsubscribe)).subscribe(val => {
       const monthlyBudget = val || 0;
-      const monthlySpent = this.getMonthlyAmount();
+      const monthlySpent = this.getMonthlyIrregularAmount();
       if (!monthlyBudget) {
         this.notificationService.showMessage('Бюджет не установлен', 'warning');
         return;
@@ -180,7 +180,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         `<span style="display:block;margin:6px 0;height:1px;background:var(--color-border);"></span>` +
         `Потрачено: ${monthlySpent} € (${percentUsed.toFixed(1)}%)<br>` +
         `Осталось: ${remaining.toFixed(2)} € (${percentRemaining.toFixed(1)}%)<hr>` +
-        `Потрачено за месяц: ${this.getMonthlyAmount()} €`;
+        `Потрачено за месяц: ${this.getMonthlyIrregularAmount()} €`;
       this.notificationService.showMessage(msg, remaining <= 0 ? 'error' : percentUsed > 80 ? 'warning' : 'info');
     });
   }
@@ -219,17 +219,25 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   showNotification(categoryName, amount): void {
     const todaysAmountByCategory = this.getTodaysAmount(categoryName);
-    const monthlyAmountByCategory = this.getMonthlyAmountByCategory(
-      categoryName
-    );
-    const monthlyAmount = this.getMonthlyAmount();
-    this.notificationService.showMessage(
-      `Добавлено: ${amount} €` +
-      ` - ${getCategoryNameById(categoryName)}<br><br>` +
-      `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
-      `За месяц по категории: ${monthlyAmountByCategory} €` +
-      `<br><br>Всего за месяц: ${monthlyAmount} €`
-    );
+    const monthlyAmountByCategory = this.getMonthlyAmountByCategory(categoryName);
+    const monthlyTotal = this.getMonthlyAmount();
+    // Fetch irregular (monthly) budget and append info
+    this.irregularBudgetService.getValue().pipe(take(1)).subscribe(val => {
+      const monthlyBudget = val || 0;
+      const irregularSpent = this.getMonthlyIrregularAmount();
+      const remaining = Math.max(monthlyBudget - irregularSpent, 0);
+      const percentUsed = monthlyBudget ? Math.min(irregularSpent / monthlyBudget * 100, 100) : 0;
+      const budgetLine = monthlyBudget
+        ? `<br><br>Бюджет: ${monthlyBudget} € | Потрачено (учёт): ${irregularSpent} € (${percentUsed.toFixed(1)}%) | Осталось: ${remaining.toFixed(2)} €`
+        : '';
+      this.notificationService.showMessage(
+        `Добавлено: ${amount} € - ${getCategoryNameById(categoryName)}<br><br>` +
+        `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
+        `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
+        `Всего за месяц: ${monthlyTotal} €` +
+        budgetLine
+      );
+    });
   }
 
   private getTodaysAmount(categoryName: string): number {
@@ -246,6 +254,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   private getMonthlyAmount(): number {
     return this.monthlyExpenses
+      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
+  }
+
+  private getMonthlyIrregularAmount(): number {
+    return this.monthlyExpenses
+      .filter(expense => getCategoryById(expense.category)?.includeInBalance)
       .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
   }
 
