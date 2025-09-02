@@ -8,7 +8,7 @@ import { TabComponent } from './tab.component';
     imports: [NgFor, NgClass, NgIf, NgTemplateOutlet],
     styles: [`
     :host { display:block; font-family:"Montserrat", sans-serif; }
-  .tabs-header { display:flex; gap:6px; margin:24px 0 16px; overflow-x:auto; padding:10px 16px 6px; background:var(--color-bg-alt); border:1px solid var(--color-border); box-shadow:0 1px 2px rgba(0,0,0,0.06); border-radius:10px; scrollbar-width:none; position:relative; }
+  .tabs-header { display:flex; gap:6px; overflow-x:auto; padding:10px 16px 6px; background:var(--color-bg-alt); border:1px solid var(--color-border); box-shadow:0 1px 2px rgba(0,0,0,0.06); border-radius:10px; scrollbar-width:none; position:relative; }
     .tabs-header::-webkit-scrollbar{display:none;}
   .tab-btn { position:relative; padding:6px 18px 8px; font-size:14px; letter-spacing:.3px; cursor:pointer; border-radius:6px; color:var(--color-text-secondary); user-select:none; font-weight:600; transition:background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
   /* hover style removed */
