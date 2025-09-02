@@ -117,23 +117,29 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   private configureNav(): void {
-    switch (this.backUrl) {
-      case '/history':
-        this.backLabel = '< History';
-        this.altUrl = this.backUrl;
-        this.altLabel = 'History >';
-        break;
-      case '/statistics':
-        this.backLabel = '< Statistics';
-        this.altUrl = this.backUrl;
-        this.altLabel = 'Statistics >';
-        break;
-      default:
-        this.backLabel = '< Home';
-        this.altUrl = '/';
-        this.altLabel = 'Home >';
-        this.backUrl = '/';
-        break;
+    const raw = this.backUrl || '';
+    if (raw === '/history') {
+      this.backLabel = '< History';
+      this.backUrl = '/history';
+      this.altUrl = '/';
+      this.altLabel = 'Home >';
+    } else if (raw === '/statistics') {
+      this.backLabel = '< Statistics';
+      this.backUrl = '/statistics';
+      this.altUrl = '/';
+      this.altLabel = 'Home >';
+    } else if (!raw || raw === '/') {
+      // Already at home context – both sides show Home semantics
+      this.backLabel = '< Home';
+      this.backUrl = '/';
+      this.altUrl = '/';
+      this.altLabel = 'Home >';
+    } else {
+      // Any other non-empty path: treat as generic back, right side is Home
+      this.backLabel = '< Back';
+      this.backUrl = raw;
+      this.altUrl = '/';
+      this.altLabel = 'Home >';
     }
   }
 
@@ -191,14 +197,17 @@ export class DetailsComponent implements OnInit, OnDestroy {
       if (deltaX > 100) {
         this.navigateBack();
       } else if (deltaX < -100) {
-        this.navigateBack();
+        this.navigateAlt();
       }
     }
   }
 
   navigateBack() {
     this.router.navigate([this.backUrl || '/']);
-    // Handle the left swipe action here
+  }
+
+  navigateAlt() {
+    this.router.navigate([this.altUrl || '/']);
   }
 
   private sumValues(): void {
