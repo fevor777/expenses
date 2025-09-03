@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { catchError, from, map, Observable } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { from, map, Observable, tap } from 'rxjs';
 
 import { BalanceDate } from '../model/balance-date.model';
-import { AuthService } from './auth.service';
 import { BalanceDateStoreService } from './balance-date-store.service';
+import { withUserId } from './with-user-id.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -14,41 +15,35 @@ export class BalanceDateService {
 
   constructor(
     private fireStore: AngularFirestore,
-    private authService: AuthService,
-    private balanceDateStoreService: BalanceDateStoreService
+    private balanceDateStoreService: BalanceDateStoreService,
+    private afAuth: AngularFireAuth
   ) {
     this.balanceCollection =
       this.fireStore.collection<BalanceDate>('balance-date');
   }
 
   addBalanceDate(balance: string): Observable<string> {
-    localStorage.setItem('balanceDate', balance.toString());
-    if (this.authService.user) {
-      const uid = this.authService.user.uid;
-      const balanceObj = { value: balance, uid: this.authService.user.uid };
+    const fallback = () => this.balanceDateStoreService.addBalanceDateObs(balance);
+    fallback();
+    const request = (uid: string) => {
+      const balanceObj = { value: balance, uid };
       return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(
         map(() => balance),
-        catchError(() =>
-          this.balanceDateStoreService.addBalanceDateObs(balance)
-        )
       );
-    } else {
-      return this.balanceDateStoreService.addBalanceDateObs(balance);
-    }
+    };
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 
   getBalanceDate(): Observable<string> {
-    if (this.authService.user) {
-      const uid = this.authService.user.uid;
-      return this.fireStore
+    const fallback = () => this.balanceDateStoreService.getBalanceDateObs();
+    const request = (uid: string) =>
+      this.fireStore
         .doc<BalanceDate>(`balance-date/${uid}`)
         .valueChanges()
         .pipe(
           map((v) => v?.value || ''),
-          catchError(() => this.balanceDateStoreService.getBalanceDateObs())
+          tap((value) => this.balanceDateStoreService.addBalanceDateObs(value))
         );
-    } else {
-      return this.balanceDateStoreService.getBalanceDateObs();
-    }
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 }

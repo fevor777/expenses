@@ -1,46 +1,43 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { catchError, from, map, Observable } from 'rxjs';
-import { AuthService } from './auth.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { from, map, Observable, tap } from 'rxjs';
 import { IrregularBudget } from '../model/irregular-budget.model';
 import { IrregularBudgetStoreService } from './irregular-budget-store.service';
+import { withUserId } from './with-user-id.helper';
 
 @Injectable({ providedIn: 'root' })
 export class IrregularBudgetService {
     private collection;
     constructor(
         private fireStore: AngularFirestore,
-        private authService: AuthService,
-        private store: IrregularBudgetStoreService
+        private store: IrregularBudgetStoreService,
+        private afAuth: AngularFireAuth
     ) {
         this.collection = this.fireStore.collection<IrregularBudget>('irregularBudget');
     }
 
     addValue(value: number): Observable<number> {
-        localStorage.setItem('irregularBudget', value.toString());
-        if (this.authService.user) {
-            const uid = this.authService.user.uid;
+        const fallback = () => this.store.addValueObs(value);
+        fallback();
+        const request = (uid: string) => {
             const obj = { value, uid };
             return from(this.collection.doc(uid).set(obj)).pipe(
                 map(() => value),
-                catchError(() => this.store.addValueObs(value))
             );
-        } else {
-            return this.store.addValueObs(value);
-        }
+        };
+        return withUserId(this.afAuth, request, fallback, fallback);
     }
 
     getValue(): Observable<number> {
-        if (this.authService.user) {
-            const uid = this.authService.user.uid;
-            return this.fireStore.doc<IrregularBudget>(`irregularBudget/${uid}`)
-                .valueChanges()
-                .pipe(
-                    map(v => v?.value || 0),
-                    catchError(() => this.store.getValueObs())
-                );
-        } else {
-            return this.store.getValueObs();
-        }
+        const fallback = () => this.store.getValueObs();
+        const request = (uid: string) => this.fireStore
+            .doc<IrregularBudget>(`irregularBudget/${uid}`)
+            .valueChanges()
+            .pipe(
+                map(v => v?.value || 0),
+                tap(value => this.store.addValueObs(value))
+            );
+        return withUserId(this.afAuth, request, fallback, fallback);
     }
 }

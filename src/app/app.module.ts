@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
@@ -8,11 +8,8 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { firebaseConfig } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { appInitializer } from './common/app-initializer';
 import { NotificationComponent } from './common/component/notification/notification.component';
 import { CustomHammerConfig } from './common/custom-hammer.config';
-import { AuthService } from './common/service/auth.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 export class HammerConfig extends HammerGestureConfig {
   override = {
@@ -40,12 +37,6 @@ export class HammerConfig extends HammerGestureConfig {
       useClass: CustomHammerConfig,
     },
     provideCharts(withDefaultRegisterables()),
-    {
-      provide: APP_INITIALIZER,
-      multi: true,
-      useFactory: appInitializer,
-      deps: [AngularFireAuth, AuthService],
-    }
   ],
   bootstrap: [AppComponent],
 })

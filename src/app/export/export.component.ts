@@ -2,17 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { User } from 'firebase/auth';
-import { first, forkJoin, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { first, forkJoin, Observable, Subject, takeUntil } from 'rxjs';
 
 import { Expense } from '../common/model/expense.model';
 import { AuthService } from '../common/service/auth.service';
-import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
-import { BalanceStoreService } from '../common/service/balance-store.service';
 import { IrregularBudgetService } from '../common/service/irregular-budget.service';
 import { SavingService } from '../common/service/saving.service';
 import { TabsContainerComponent } from '../common/tabs-container.component';
 import { TabComponent } from '../common/tab.component';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-export',
@@ -27,25 +26,22 @@ export class ExportComponent implements OnDestroy {
   irregularBudgetValue: number = 0;
   savings$!: Observable<number>;
   savingsValue: number = 0;
+  user$: Observable<User>;
 
   private readonly destroySubject: Subject<void> = new Subject();
 
   constructor(
     private expenseService: ExpenseService,
     private authService: AuthService,
-    private balanceService: BalanceService,
-    private balanceStoreService: BalanceStoreService,
     private irregularBudgetService: IrregularBudgetService,
-    private savingService: SavingService
+    private savingService: SavingService,
+    private afAuth: AngularFireAuth
   ) {
     this.irregularBudget$ = this.irregularBudgetService.getValue();
     this.irregularBudget$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.irregularBudgetValue = v || 0);
     this.savings$ = this.savingService.getSavings();
     this.savings$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.savingsValue = v || 0);
-  }
-
-  getUser(): User | null {
-    return this.authService.user;
+    this.user$ = this.afAuth.user;
   }
 
   // Method to trigger Google Sign-in
@@ -107,11 +103,11 @@ export class ExportComponent implements OnDestroy {
       .join('\n');
   }
 
-  exportFirebase(): void {
+  exportFirebase(uid: string): void {
     const data = JSON.parse(localStorage.getItem('expenses') || '[]');
     if (data.length > 0) {
       const responses = data
-        .map((expense) => ({ ...expense, uid: this.authService.user.uid }))
+        .map((expense) => ({ ...expense, uid }))
         .map((expense) => this.expenseService.addExpense(expense));
       forkJoin(responses)
         .pipe(takeUntil(this.destroySubject))

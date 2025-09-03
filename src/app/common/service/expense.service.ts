@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { catchError, from, map, Observable } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { from, map, Observable } from 'rxjs';
 
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { Expense } from '../model/expense.model';
-import { AuthService } from './auth.service';
 import { ExpenseStoreService } from './expense-store.service';
+import { withUserId } from './with-user-id.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +16,8 @@ export class ExpenseService {
 
   constructor(
     private fireStore: AngularFirestore,
-    private authService: AuthService,
-    private expenseStoreService: ExpenseStoreService
+    private expenseStoreService: ExpenseStoreService,
+    private afAuth: AngularFireAuth
   ) {
     this.expensesCollection = this.fireStore.collection<Expense>('expenses');
   }
@@ -24,19 +25,12 @@ export class ExpenseService {
   addExpense(expense: Expense): Observable<Expense> {
     const id = this.fireStore.createId();
     const itemWithId = { ...expense, id };
-    if (this.authService.user) {
-      const uid = this.authService.user.uid;
-      return from(
-        this.expensesCollection.doc(id).set({ ...itemWithId, uid })
-      ).pipe(
+    const fallback = () => this.expenseStoreService.addExpense(itemWithId);
+    const request = (uid: string) =>
+      from(this.expensesCollection.doc(id).set({ ...itemWithId, uid })).pipe(
         map(() => ({ ...itemWithId, uid })),
-        catchError(() => {
-          return this.expenseStoreService.addExpense(itemWithId);
-        })
       );
-    } else {
-      return this.expenseStoreService.addExpense(itemWithId);
-    }
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 
   getExpenses(
@@ -51,44 +45,40 @@ export class ExpenseService {
         (e.description || '').toLowerCase().includes(desc)
       );
     };
-    if (this.authService.user) {
-      return this.getExpensesFromFirebase(dateFilter, category).pipe(
+    const fallback = () =>
+      this.expenseStoreService
+        .getExpensesObs(dateFilter, category, descriptionFilter)
+    const request = (userId: string) =>
+      this.getExpensesFromFirebase(dateFilter, category, userId).pipe(
         map(applyDescriptionFilter)
       );
-    } else {
-      return this.expenseStoreService
-        .getExpensesObs(dateFilter, category, descriptionFilter)
-        .pipe(map(applyDescriptionFilter));
-    }
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 
   updateExpense(expense: Expense): Observable<unknown> {
-    if (this.authService.user) {
-      return from(this.expensesCollection.doc(expense.id).update(expense)).pipe(
-        catchError(() => this.expenseStoreService.updateExpense(expense))
-      );
-    } else {
-      return this.expenseStoreService.updateExpense(expense);
-    }
+    const fallback = () => this.expenseStoreService.updateExpense(expense);
+    const request = () =>
+      from(this.expensesCollection.doc(expense.id).update(expense));
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 
   deleteExpense(id: string): Observable<string> {
-    if (this.authService.user) {
-      return from(this.expensesCollection.doc(id).delete())
-        .pipe(map(() => id))
-        .pipe(catchError(() => this.expenseStoreService.deleteExpense(id)));
-    } else {
-      return this.expenseStoreService.deleteExpense(id);
-    }
+    const fallback = () => this.expenseStoreService.deleteExpense(id);
+    const request = () =>
+      from(this.expensesCollection.doc(id).delete()).pipe(
+        map(() => id),
+      );
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 
   private getExpensesFromFirebase(
     dateFilter?: DateFrame,
-    category?: string[]
+    category?: string[],
+    userId?: string
   ): Observable<Expense[]> {
     return this.fireStore
       .collection<Expense>('expenses', (ref) => {
-        let query = ref.where('uid', '==', this.authService.user.uid);
+        let query = ref.where('uid', '==', userId);
 
         // If dateFilter is provided, add the date conditions to the query
         if (dateFilter?.start && dateFilter?.finish) {
@@ -113,9 +103,6 @@ export class ExpenseService {
             return { id, ...data };
           })
         ),
-        catchError(() => {
-          return this.expenseStoreService.getExpensesObs(dateFilter, category);
-        })
       );
   }
 }

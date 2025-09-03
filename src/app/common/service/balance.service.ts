@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { catchError, from, map, Observable } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { from, map, Observable, tap } from 'rxjs';
 
 import { Balance } from '../model/balance.model';
-import { AuthService } from './auth.service';
 import { BalanceStoreService } from './balance-store.service';
+import { withUserId } from './with-user-id.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -14,38 +15,34 @@ export class BalanceService {
 
   constructor(
     private fireStore: AngularFirestore,
-    private authService: AuthService,
-    private balanceStoreService: BalanceStoreService
+    private balanceStoreService: BalanceStoreService,
+    private afAuth: AngularFireAuth
   ) {
     this.balanceCollection = this.fireStore.collection<Balance>('balance');
   }
 
   addBalance(balance: number): Observable<number> {
-    localStorage.setItem('balance', balance.toString());
-    if (this.authService.user) {
-      const uid = this.authService.user.uid;
-      const balanceObj = { value: balance, uid: this.authService.user.uid };
+    const fallback = () => this.balanceStoreService.addBalanceObs(balance);
+    fallback();
+    const project = (uid: string) => {
+      const balanceObj = { value: balance, uid };
       return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(
         map(() => balance),
-        catchError(() => this.balanceStoreService.addBalanceObs(balance))
       );
-    } else {
-      return this.balanceStoreService.addBalanceObs(balance);
-    }
+    };
+    return withUserId(this.afAuth, project, fallback, fallback);
   }
 
   getBalance(): Observable<number> {
-    if (this.authService.user) {
-      const uid = this.authService.user.uid;
-      return this.fireStore
+    const fallback = () => this.balanceStoreService.getBalanceObs();
+    const request = (uid: string) =>
+      this.fireStore
         .doc<Balance>(`balance/${uid}`)
         .valueChanges()
         .pipe(
           map((v) => v?.value || 0),
-          catchError(() => this.balanceStoreService.getBalanceObs())
+          tap((value) => this.balanceStoreService.addBalanceObs(value))
         );
-    } else {
-      return this.balanceStoreService.getBalanceObs();
-    }
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 }

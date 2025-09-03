@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { GoogleAuthProvider, User } from 'firebase/auth';
-import { Observable, from, of, tap, catchError, BehaviorSubject, filter, firstValueFrom } from 'rxjs';
+import { GoogleAuthProvider } from 'firebase/auth';
+import { Observable, from, of, catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  user: User;
 
   constructor(private afAuth: AngularFireAuth) {
   }
@@ -43,20 +42,12 @@ export class AuthService {
     }
     // Web fallback
     return from(this.afAuth.signInWithPopup(new GoogleAuthProvider())).pipe(
-      tap(res => { if (res?.user) { this.updateUser(res.user); } }),
       catchError(err => { console.error('[AuthService] signInWithPopup error'); return of(null); })
     );
   }
 
   signOut() {
-    return this.afAuth.signOut().then(() => {
-      // Optimistically clear current user immediately; authState will confirm.
-      this.updateUser(null as any);
-    });
-  }
-
-  updateUser(user: User) {
-    this.user = user;
+    return this.afAuth.signOut();
   }
 
   private attachNativeTokenHandler() {
@@ -68,7 +59,6 @@ export class AuthService {
         this.afAuth.signInWithCredential(cred)
           .then(res => {
             if (res?.user) {
-              this.updateUser(res.user);
               // Force full reload so services/components re-run constructors with user present (no other service edits)
               setTimeout(() => { try { window.location.reload(); } catch (_) { } }, 100);
             }
