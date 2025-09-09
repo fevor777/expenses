@@ -176,11 +176,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       const remaining = Math.max(monthlyBudget - monthlySpent, 0);
       const percentUsed = monthlyBudget ? Math.min(monthlySpent / monthlyBudget * 100, 100) : 0;
       const percentRemaining = 100 - percentUsed;
-      const msg = `Бюджет: ${monthlyBudget} €<br>` +
+      const msg = `Нерегулярные расходы:<br>` +
+        `Бюджет: ${monthlyBudget} €<br>` +
         `<span style="display:block;margin:6px 0;height:1px;background:var(--color-border);"></span>` +
         `Потрачено: ${monthlySpent} € (${percentUsed.toFixed(1)}%)<br>` +
         `Осталось: ${remaining.toFixed(2)} € (${percentRemaining.toFixed(1)}%)<hr>` +
-        `Потрачено за месяц: ${this.getMonthlyIrregularAmount()} €`;
+        `Всего потрачено за месяц: ${this.getMonthlyAmount()} €`;
       this.notificationService.showMessage(msg, remaining <= 0 ? 'error' : percentUsed > 80 ? 'warning' : 'info');
     });
   }
