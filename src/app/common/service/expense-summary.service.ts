@@ -73,7 +73,6 @@ export class ExpenseSummaryService {
     return this.expenseService
       .getExpenses(this.dateFilterService.getInitialMonthValue())
       .pipe(
-        delay(3000),
         map(expenses => ({
           todaysTotal: this.getTodaysTotal(expenses),
           monthlyTotal: this.getMonthlyTotal(expenses),
