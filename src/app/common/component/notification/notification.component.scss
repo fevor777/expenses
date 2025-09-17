@@ -53,6 +53,8 @@
     flex-direction: column;
     gap: 12px;
   }
+
+  .notification-browser,
   .notification-details {
     cursor: pointer;
     background: none;
@@ -70,9 +72,13 @@
       color var(--transition-fast),
       transform var(--transition-fast);
   }
+
+  .notification-browser:hover,
   .notification-details:hover {
     background: var(--color-primary-alpha);
   }
+
+  .notification-browser:active,
   .notification-details:active {
     transform: scale(0.9);
   }

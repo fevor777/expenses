@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { NotificationService } from './notification.service';
+import { ExpenseSummaryService } from '../../service/expense-summary.service';
 
 type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
 
@@ -28,7 +29,8 @@ export class NotificationComponent implements OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private expenseSummaryService: ExpenseSummaryService
   ) {
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))
@@ -91,6 +93,13 @@ export class NotificationComponent implements OnDestroy {
   onNavigateDetails() {
     this.router.navigate(['/details']);
     this.startHide();
+  }
+
+  onSendBrowserNotification() {
+    this.expenseSummaryService
+      .sendBrowserNotificationSummary()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe();
   }
 
   private clearPending() {

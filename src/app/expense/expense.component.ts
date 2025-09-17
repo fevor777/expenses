@@ -27,6 +27,7 @@ import { ExpenseHeaderComponent } from './header/expense-header.component';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
 import { IrregularBudgetService } from '../common/service/irregular-budget.service';
 import { GLOBAL_LONG_PRESS_DURATION } from '../constants';
+import { ExpenseSummaryService } from '../common/service/expense-summary.service';
 
 @Component({
   selector: 'app-expense',
@@ -73,7 +74,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
-    private irregularBudgetService: IrregularBudgetService
+    private irregularBudgetService: IrregularBudgetService,
+    private expenseSummaryService: ExpenseSummaryService
   ) {}
 
   ngOnInit(): void {
@@ -262,20 +264,15 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
         // Show in-app notification
         this.notificationService.showMessage(inAppMessage);
-
-        // Show browser notification
-        const browserTitle = `+: ${amount} € - ${getCategoryNameById(categoryName)}`;
-        const browserMessage =
-          `Сегодня по категории: ${todaysAmountByCategory} € \n` +
-          `За месяц по категории: ${monthlyAmountByCategory} €\n` +
-          `Всего за месяц: ${monthlyTotal} €\n` +
-          budgetLine;
-
-        this.notificationService
-          .showBrowserNotification(browserTitle, browserMessage)
-          .pipe(takeUntil(this.unsubscribe))
-          .subscribe();
+        this.sendBrowserNotification();
       });
+  }
+
+  private sendBrowserNotification(): void {
+    this.expenseSummaryService
+      .sendBrowserNotificationSummary()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe();
   }
 
   private getTodaysAmount(categoryName: string): number {

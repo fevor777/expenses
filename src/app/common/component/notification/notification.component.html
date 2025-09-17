@@ -19,6 +19,15 @@
     </button>
     <button
       type="button"
+      (click)="onSendBrowserNotification()"
+      class="notification-browser"
+      aria-label="Send browser notification"
+      title="Send browser notification"
+    >
+      <i class="fas fa-bell"></i>
+    </button>
+    <button
+      type="button"
       (click)="onNavigateDetails()"
       class="notification-details"
       aria-label="Open details"
