@@ -266,12 +266,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         // Show browser notification
         const browserTitle = `+: ${amount} € - ${getCategoryNameById(categoryName)}`;
         const browserMessage =
-          `T(Cat): ${todaysAmountByCategory} € | ` +
-          `M(Cat): ${monthlyAmountByCategory} € |` +
-          `T(Month): ${monthlyTotal} €` +
-          (monthlyBudget
-            ? `\n B: ${monthlyBudget} € | Sp: ${irregularSpent} € (${percentUsed.toFixed(1)}%) \n L: ${remaining.toFixed(2)} €`
-            : '');
+          `Сегодня по категории: ${todaysAmountByCategory} € \n` +
+          `За месяц по категории: ${monthlyAmountByCategory} €\n` +
+          `Всего за месяц: ${monthlyTotal} €\n` +
+          budgetLine;
 
         this.notificationService
           .showBrowserNotification(browserTitle, browserMessage)
