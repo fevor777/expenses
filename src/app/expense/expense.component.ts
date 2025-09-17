@@ -252,13 +252,31 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         const budgetLine = monthlyBudget
           ? `<br><br>Бюджет: ${monthlyBudget} € | Потрачено (учёт): ${irregularSpent} € (${percentUsed.toFixed(1)}%) | Осталось: ${remaining.toFixed(2)} €`
           : '';
-        this.notificationService.showMessage(
+
+        const inAppMessage =
           `Добавлено: ${amount} € - ${getCategoryNameById(categoryName)}<br><br>` +
-            `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
-            `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
-            `Всего за месяц: ${monthlyTotal} €` +
-            budgetLine
-        );
+          `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
+          `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
+          `Всего за месяц: ${monthlyTotal} €` +
+          budgetLine;
+
+        // Show in-app notification
+        this.notificationService.showMessage(inAppMessage);
+
+        // Show browser notification
+        const browserTitle = `+: ${amount} € - ${getCategoryNameById(categoryName)}`;
+        const browserMessage =
+          `T(Cat): ${todaysAmountByCategory} € | ` +
+          `M(Cat): ${monthlyAmountByCategory} € |` +
+          `T(Month): ${monthlyTotal} €` +
+          (monthlyBudget
+            ? `\n B: ${monthlyBudget} € | Sp: ${irregularSpent} € (${percentUsed.toFixed(1)}%) \n L: ${remaining.toFixed(2)} €`
+            : '');
+
+        this.notificationService
+          .showBrowserNotification(browserTitle, browserMessage)
+          .pipe(takeUntil(this.unsubscribe))
+          .subscribe();
       });
   }
 
