@@ -132,6 +132,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
             }
             return balanceObs;
           }),
+          switchMap(() =>
+            this.expenseSummaryService.sendBrowserNotificationSummary()
+          ),
           takeUntil(this.unsubscribe)
         )
         .subscribe(() => {
@@ -264,16 +267,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
         // Show in-app notification
         this.notificationService.showMessage(inAppMessage);
-        this.sendBrowserNotification();
       });
   }
 
-  private sendBrowserNotification(): void {
-    this.expenseSummaryService
-      .sendBrowserNotificationSummary()
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe();
-  }
 
   private getTodaysAmount(categoryName: string): number {
     return this.todaysExpenses

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { delay, map, switchMap } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { ExpenseService } from './expense.service';
 import { DateFilterService } from '../component/filter/date/date-filter.service';
@@ -30,7 +30,10 @@ export class ExpenseSummaryService {
   ) {}
 
   sendBrowserNotificationSummary(): Observable<void> {
+    // One-shot summary: take(1) ensures we don't keep an open subscription that would
+    // fire a new browser notification on every subsequent expenses change.
     return this.getExpenseSummary().pipe(
+      take(1),
       switchMap(summary => {
         const title = 'Сводка расходов';
         const budgetChart = this.generateBudgetChart(summary.percentUsed);
