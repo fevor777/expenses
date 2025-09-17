@@ -11,6 +11,7 @@ import { Expense } from '../model/expense.model';
 
 export interface ExpenseSummary {
   todaysTotal: number;
+  todaysIrregular: number;
   monthlyTotal: number;
   monthlyIrregular: number;
   budget: number;
@@ -27,7 +28,7 @@ export class ExpenseSummaryService {
     private dateFilterService: DateFilterService,
     private irregularBudgetService: IrregularBudgetService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   sendBrowserNotificationSummary(): Observable<void> {
     // One-shot summary: take(1) ensures we don't keep an open subscription that would
@@ -38,7 +39,7 @@ export class ExpenseSummaryService {
         const title = 'Сводка расходов';
         const budgetChart = this.generateBudgetChart(summary.percentUsed);
         const dailyAvgChart = this.generateDailyAverageChart(
-          summary.monthlyTotal,
+          summary.monthlyIrregular,
           summary.todaysTotal
         );
         const velocityChart = this.generateSpendingVelocityChart(
@@ -48,13 +49,13 @@ export class ExpenseSummaryService {
 
         const message =
           `${budgetChart}\n` +
-          `Сегодня: ${summary.todaysTotal}€\n` +
+          `Сегодня: ${summary.todaysTotal}€ (${summary.todaysIrregular}€)\n` +
           `Месяц: ${summary.monthlyTotal}€\n` +
           `Нерегулярные: ${summary.monthlyIrregular}€ (${summary.percentUsed.toFixed(0)}%)` +
           (summary.budget
             ? `\nБюджет: ${summary.budget}€ | Осталось: ${summary.remaining.toFixed(0)}€`
             : '') +
-          `\n ${dailyAvgChart}\n` +
+          `\n\n ${dailyAvgChart}\n\n` +
           `${velocityChart}\n`;
 
         // Generate a data URL icon based on budget percentage
@@ -78,6 +79,7 @@ export class ExpenseSummaryService {
       .pipe(
         map(expenses => ({
           todaysTotal: this.getTodaysTotal(expenses),
+          todaysIrregular: this.getTodaysIrregular(expenses),
           monthlyTotal: this.getMonthlyTotal(expenses),
           monthlyIrregular: this.getMonthlyIrregularTotal(expenses),
         })),
@@ -115,6 +117,20 @@ export class ExpenseSummaryService {
 
     return expenses
       .filter(expense => expense.date >= startOfDay)
+      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
+  }
+
+  private getTodaysIrregular(expenses: Expense[]): number {
+    const today = new Date();
+    const startOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ).getTime();
+
+    return expenses
+      .filter(expense => expense.date >= startOfDay)
+      .filter(expense => getCategoryById(expense.category)?.includeInBalance)
       .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
   }
 
@@ -169,14 +185,13 @@ export class ExpenseSummaryService {
     const svg = `
       <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
         <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#E0E0E0" stroke-width="4"/>
-        ${
-          percentUsed > 0
-            ? `
+        ${percentUsed > 0
+        ? `
           <path d="M ${center} ${center - radius} A ${radius} ${radius} 0 ${largeArc} 1 ${x} ${y}" 
                 fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
         `
-            : ''
-        }
+        : ''
+      }
         <text x="${center}" y="${center + 5}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#333">
           ${percentUsed.toFixed(0)}%
         </text>
@@ -264,6 +279,6 @@ export class ExpenseSummaryService {
       velocityText = `экономия (-${saving.toFixed(0)}€)`;
     }
 
-    return `${velocityIcon} Скорость: ${velocityText}`;
+    return ` ${velocityIcon} Скорость: ${velocityText}`;
   }
 }
