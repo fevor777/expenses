@@ -1,5 +1,11 @@
 import { CommonModule, getCurrencySymbol } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Currency } from '../../common/model/currency';

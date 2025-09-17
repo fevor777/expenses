@@ -12,7 +12,7 @@ export class SavingStoreService {
   getSaving(): number {
     return this.savingSubject.value;
   }
-  
+
   updateSaving(balance: number): void {
     this.savingSubject.next(balance);
   }

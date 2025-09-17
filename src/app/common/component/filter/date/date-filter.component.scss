@@ -15,9 +15,12 @@
     line-height: 1;
     cursor: pointer;
     color: var(--color-text-secondary);
-    transition: color var(--transition-fast), transform var(--transition-fast);
+    transition:
+      color var(--transition-fast),
+      transform var(--transition-fast);
   }
   /* hover style removed */
-  .statistics-refresh-button:active { transform: scale(.9); }
+  .statistics-refresh-button:active {
+    transform: scale(0.9);
+  }
 }
-

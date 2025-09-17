@@ -26,10 +26,10 @@ export class SavingService {
     fallback();
     return withUserId(
       this.afAuth,
-      (uid) => {
+      uid => {
         const savingsObj = { value: savings, uid };
         return from(this.savingCollection.doc(uid).set(savingsObj)).pipe(
-          map(() => savings),
+          map(() => savings)
         );
       },
       fallback,
@@ -44,14 +44,9 @@ export class SavingService {
         .doc<Savings>(`savings/${uid}`)
         .valueChanges()
         .pipe(
-          map((v) => v?.value || 0),
+          map(v => v?.value || 0),
           tap(value => this.savingStoreService.addSavingObs(value))
         );
-    return withUserId(
-      this.afAuth,
-      request,
-      fallback,
-      fallback
-    );
+    return withUserId(this.afAuth, request, fallback, fallback);
   }
 }

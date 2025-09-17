@@ -58,10 +58,9 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   constructor(
     private router: Router,
     private dateFilterService: DateFilterService
-  ) { }
+  ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['value'] && this.value) {
@@ -81,7 +80,11 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     this.predefineCategories = [];
     this.selectedCategories = [];
     this.descriptionFilter = '';
-    this.selectedFilters.emit({ categories: [], date: this.defaultDateValue, description: '' });
+    this.selectedFilters.emit({
+      categories: [],
+      date: this.defaultDateValue,
+      description: '',
+    });
   }
 
   emitDateFilter(dateFilter: DateFrame): void {
@@ -118,11 +121,12 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   get isToday(): boolean {
     if (!this.dateFilter?.start || !this.dateFilter?.finish) return false;
     const today = DateTime.local();
-    return (this.dateFilter.mode === Mode.DAY || !this.dateFilter.mode) &&
+    return (
+      (this.dateFilter.mode === Mode.DAY || !this.dateFilter.mode) &&
       this.dateFilter.start.hasSame(today, 'day') &&
-      this.dateFilter.finish.hasSame(today, 'day');
+      this.dateFilter.finish.hasSame(today, 'day')
+    );
   }
-
 
   navigateToDetails(): void {
     // Match history navigation pattern: store filter state in DateFilterService
@@ -135,7 +139,9 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     if (this.descriptionFilter?.trim()) {
       this.dateFilterService.description = this.descriptionFilter.trim();
     }
-    this.router.navigate(['/details'], { queryParams: { 'back-url': '/history' } });
+    this.router.navigate(['/details'], {
+      queryParams: { 'back-url': '/history' },
+    });
   }
 
   navigateToHistory(): void {

@@ -73,14 +73,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
-    private irregularBudgetService: IrregularBudgetService,
+    private irregularBudgetService: IrregularBudgetService
   ) {}
 
   ngOnInit(): void {
     this.expenseService
       .getExpenses(this.dateFilterService.getInitialMonthValue())
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe((expenses) => {
+      .subscribe(expenses => {
         this.calculateAmounts(expenses);
       });
 
@@ -88,7 +88,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
     this.balance$ = this.balanceService
       .getBalance()
-      .pipe(tap((balance) => (this.currentBalance = balance)));
+      .pipe(tap(balance => (this.currentBalance = balance)));
 
     const currencyInLocalStorage = localStorage.getItem('currency');
     if (currencyInLocalStorage) {
@@ -130,7 +130,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
             }
             return balanceObs;
           }),
-          takeUntil(this.unsubscribe),
+          takeUntil(this.unsubscribe)
         )
         .subscribe(() => {
           this.onShowNumberBoard();
@@ -169,13 +169,13 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.irregularBudgetService
       .getValue()
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe((val) => {
+      .subscribe(val => {
         const monthlyBudget = val || 0;
         const monthlySpent = this.getMonthlyIrregularAmount();
         if (!monthlyBudget) {
           this.notificationService.showMessage(
             'Бюджет не установлен',
-            'warning',
+            'warning'
           );
           return;
         }
@@ -193,7 +193,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           `Всего потрачено за месяц: ${this.getMonthlyAmount()} €`;
         this.notificationService.showMessage(
           msg,
-          remaining <= 0 ? 'error' : percentUsed > 80 ? 'warning' : 'info',
+          remaining <= 0 ? 'error' : percentUsed > 80 ? 'warning' : 'info'
         );
       });
   }
@@ -242,7 +242,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.irregularBudgetService
       .getValue()
       .pipe(take(1))
-      .subscribe((val) => {
+      .subscribe(val => {
         const monthlyBudget = val || 0;
         const irregularSpent = this.getMonthlyIrregularAmount();
         const remaining = Math.max(monthlyBudget - irregularSpent, 0);
@@ -257,33 +257,33 @@ export class ExpenseComponent implements OnInit, OnDestroy {
             `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
             `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
             `Всего за месяц: ${monthlyTotal} €` +
-            budgetLine,
+            budgetLine
         );
       });
   }
 
   private getTodaysAmount(categoryName: string): number {
     return this.todaysExpenses
-      .filter((expense) => expense.category === categoryName)
+      .filter(expense => expense.category === categoryName)
       .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
   }
 
   private getMonthlyAmountByCategory(categoryName: string): number {
     return this.monthlyExpenses
-      .filter((expense) => expense.category === categoryName)
+      .filter(expense => expense.category === categoryName)
       .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
   }
 
   private getMonthlyAmount(): number {
     return this.monthlyExpenses.reduce(
       (total, expense) => this.roundUp(total + expense.amount),
-      0,
+      0
     );
   }
 
   private getMonthlyIrregularAmount(): number {
     return this.monthlyExpenses
-      .filter((expense) => getCategoryById(expense.category)?.includeInBalance)
+      .filter(expense => getCategoryById(expense.category)?.includeInBalance)
       .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
   }
 
@@ -296,7 +296,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     const startOfDay = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate(),
+      today.getDate()
     ).getTime();
     expenses
       .filter((expense: Expense) => expense.date >= startOfDay)

@@ -28,7 +28,7 @@ export class NotificationComponent implements OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private router: Router,
+    private router: Router
   ) {
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))

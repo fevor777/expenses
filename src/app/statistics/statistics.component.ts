@@ -1,4 +1,9 @@
-import { AfterViewInit, Component, HostListener, OnDestroy } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  OnDestroy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import * as echarts from 'echarts';
@@ -8,7 +13,10 @@ import { BarChartComponent } from '../common/component/chart/bar/bar-chart.compo
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
-import { getCategoryById, getCategoryNameById } from '../common/model/categories';
+import {
+  getCategoryById,
+  getCategoryNameById,
+} from '../common/model/categories';
 import { Expense } from '../common/model/expense.model';
 import { CategoryListNamePipe } from '../common/pipe/category-list-name.pipe';
 import { ExpenseService } from '../common/service/expense.service';
@@ -120,7 +128,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
             length: 5,
             length2: 5,
           },
-          data: this.categoryTotals.map((item) => ({
+          data: this.categoryTotals.map(item => ({
             value: item.amount,
             name: getCategoryNameById(item.category),
           })),
@@ -171,7 +179,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     // open details page with current date filter and no preselected categories
     this.dateFilterService.categories = [];
     this.dateFilterService.dateFilter = this.currentFilter;
-    this.router.navigate(['/details'], { queryParams: { 'back-url': '/statistics' } });
+    this.router.navigate(['/details'], {
+      queryParams: { 'back-url': '/statistics' },
+    });
   }
 
   calculateCategoryTotals(
@@ -188,15 +198,15 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.expenseService
       .getExpenses(this.currentFilter, categories)
       .pipe(first(), takeUntil(this.destroySubject))
-      .subscribe((expenses) => {
+      .subscribe(expenses => {
         expensesFilteredByDate = expenses;
         if (isCurrentCategoriesUpdate) {
           this.currentCategories = Array.from(
-            new Set(expensesFilteredByDate.map((expense) => expense.category))
+            new Set(expensesFilteredByDate.map(expense => expense.category))
           );
         }
         this.filteredExpenses = expensesFilteredByDate;
-        expensesFilteredByDate.forEach((expense) => {
+        expensesFilteredByDate.forEach(expense => {
           if (!categoryMap[expense.category]) {
             categoryMap[expense.category] = 0;
           }
@@ -307,8 +317,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       if (this.irregularCategoriesCheckboxValue) {
         const regularCategories = this.currentCategories
           .map(getCategoryById)
-          .filter((category) => !category.includeInBalance)
-          .map((category) => category.id);
+          .filter(category => !category.includeInBalance)
+          .map(category => category.id);
         this.excludedCategories = [...regularCategories];
         this.calculateCategoryTotals(null, false);
       } else {
@@ -330,8 +340,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       if (this.regularCategoriesCheckboxValue) {
         const irregularCategories = this.currentCategories
           .map(getCategoryById)
-          .filter((category) => category.includeInBalance)
-          .map((category) => category.id);
+          .filter(category => category.includeInBalance)
+          .map(category => category.id);
         this.excludedCategories = [...irregularCategories];
         this.calculateCategoryTotals(null, false);
       } else {
@@ -350,7 +360,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   filterByCategory(category: string): void {
     const filteredCategories = this.currentCategories.filter(
-      (item) => item !== category
+      item => item !== category
     );
     this.excludedCategories = Array.from(
       new Set([...this.excludedCategories, ...filteredCategories])
@@ -377,7 +387,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       return [];
     }
     return this.currentCategories.filter(
-      (category) => !this.excludedCategories.includes(category)
+      category => !this.excludedCategories.includes(category)
     );
   }
 

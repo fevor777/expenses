@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Categories } from '../../../model/categories';
@@ -23,8 +30,8 @@ export class CategoryFilterComponent implements OnChanges {
   }, {});
 
   categories = {
-    regular: Categories.filter((category) => !category.includeInBalance),
-    irregular: Categories.filter((category) => category.includeInBalance),
+    regular: Categories.filter(category => !category.includeInBalance),
+    irregular: Categories.filter(category => category.includeInBalance),
   };
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -49,10 +56,10 @@ export class CategoryFilterComponent implements OnChanges {
       type === this.regularValue
         ? this.categories.regular
         : this.categories.irregular;
-    idList = idList.map((category) => category.id);
+    idList = idList.map(category => category.id);
 
     if (this.filterCategories[type]) {
-      idList.forEach((id) => {
+      idList.forEach(id => {
         this.filterCategories[id] = false;
       });
     }
@@ -80,13 +87,11 @@ export class CategoryFilterComponent implements OnChanges {
     regularChecked: boolean;
     irregularChecked: boolean;
   } {
-    const regularIds = this.categories.regular.map((category) => category.id);
-    const irregularIds = this.categories.irregular.map(
-      (category) => category.id
-    );
-    const regularChecked = regularIds.every((id) => this.filterCategories[id]);
+    const regularIds = this.categories.regular.map(category => category.id);
+    const irregularIds = this.categories.irregular.map(category => category.id);
+    const regularChecked = regularIds.every(id => this.filterCategories[id]);
     const irregularChecked = irregularIds.every(
-      (id) => this.filterCategories[id]
+      id => this.filterCategories[id]
     );
     this.filterCategories.regular = regularChecked;
     this.filterCategories.irregular = irregularChecked;

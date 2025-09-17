@@ -161,7 +161,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  private onSwipeDown(): void { }
+  private onSwipeDown(): void {}
 
   private isScrolledUp(): boolean {
     const scrollTop =

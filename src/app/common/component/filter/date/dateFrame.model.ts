@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { DateTime } from 'luxon';
 
 export enum Mode {
   DAY = 'day',
@@ -12,4 +12,4 @@ export type DateFrame = {
   finish: DateTime;
   display?: string;
   mode?: Mode;
-}
+};

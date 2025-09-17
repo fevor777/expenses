@@ -1,9 +1,13 @@
-import { Expense } from "../../common/model/expense.model";
-import { DateTime } from "luxon";
+import { Expense } from '../../common/model/expense.model';
+import { DateTime } from 'luxon';
 
-export function getExpensesFromTo(expenses: any[], from: DateTime, to: DateTime) {
+export function getExpensesFromTo(
+  expenses: any[],
+  from: DateTime,
+  to: DateTime
+) {
   return expenses.filter((expense: Expense) => {
     const date = DateTime.fromMillis(expense.date);
     return date >= from && date <= to;
-  })
+  });
 }

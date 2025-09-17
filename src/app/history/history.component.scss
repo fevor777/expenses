@@ -1,19 +1,42 @@
 /* History page themed similar to expenses page */
 .history-container {
-  height:100dvh;
-  overflow-y:auto;
-  background:var(--color-bg);
-  color:var(--color-text);
-  display:flex;
-  flex-direction:column;
-  padding-bottom:24px;
+  height: 100dvh;
+  overflow-y: auto;
+  background: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 24px;
 
-  .history-nav { display:flex; justify-content:space-between; align-items:center; }
+  .history-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-  .history-back-link { margin:10px; margin-bottom:0; }
-  .history-stats-link { margin:10px; margin-bottom:0; font-weight:400; }
+  .history-back-link {
+    margin: 10px;
+    margin-bottom: 0;
+  }
+  .history-stats-link {
+    margin: 10px;
+    margin-bottom: 0;
+    font-weight: 400;
+  }
 
-  .history-empty { flex:1; display:flex; justify-content:center; align-items:center; font-family:"Montserrat", sans-serif; color:var(--color-text-secondary); letter-spacing:.5px; }
+  .history-empty {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.5px;
+  }
 }
 
-@media (prefers-reduced-motion: reduce) { .history-container { scroll-behavior:auto; } }
+@media (prefers-reduced-motion: reduce) {
+  .history-container {
+    scroll-behavior: auto;
+  }
+}

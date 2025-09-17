@@ -1,27 +1,53 @@
-<span id="back" class="app-link history-back-link" routerLink="/">&lt; Back</span>
+<span id="back" class="app-link history-back-link" routerLink="/"
+  >&lt; Back</span
+>
 <app-tabs-container [(active)]="activeTab">
   <app-tab key="general" label="General">
-    <div style="margin-top:12px">
-      <div style="margin-bottom:10px">
-        <span>Irregular Budget: <strong>{{ (irregularBudget$ | async) || 0 }}</strong>
-          <span (click)="onEditIrregularBudget()" title="Edit irregular budget" style="cursor:pointer;display:inline-block;margin-left:8px;vertical-align:middle">✏️</span>
+    <div style="margin-top: 12px">
+      <div style="margin-bottom: 10px">
+        <span
+          >Irregular Budget:
+          <strong>{{ (irregularBudget$ | async) || 0 }}</strong>
+          <span
+            (click)="onEditIrregularBudget()"
+            title="Edit irregular budget"
+            style="
+              cursor: pointer;
+              display: inline-block;
+              margin-left: 8px;
+              vertical-align: middle;
+            "
+            >✏️</span
+          >
         </span>
       </div>
       <div>
-        <span>Savings: <strong>{{ (savings$ | async) || 0 }}</strong>
-          <span (click)="onEditSavings()" title="Edit savings" style="cursor:pointer;display:inline-block;margin-left:8px;vertical-align:middle">✏️</span>
+        <span
+          >Savings: <strong>{{ (savings$ | async) || 0 }}</strong>
+          <span
+            (click)="onEditSavings()"
+            title="Edit savings"
+            style="
+              cursor: pointer;
+              display: inline-block;
+              margin-left: 8px;
+              vertical-align: middle;
+            "
+            >✏️</span
+          >
         </span>
       </div>
     </div>
   </app-tab>
   <app-tab key="export" label="Export">
-    <div style="margin-top:12px" *ngIf="user$ | async as user;">
-      <button (click)="exportCSV()" >Export from cloud to CSV!</button><br /><br />
+    <div style="margin-top: 12px" *ngIf="user$ | async as user">
+      <button (click)="exportCSV()">Export from cloud to CSV!</button
+      ><br /><br />
       <button (click)="exportFirebase(user?.uid)">Export Firebase</button>
     </div>
   </app-tab>
   <app-tab key="auth" label="Auth">
-    <div style="margin-top:12px">
+    <div style="margin-top: 12px">
       <div *ngIf="user$ | async as user; else loginBlock">
         <h3>Welcome, {{ user.displayName }}!!!</h3>
         <button (click)="logout()">Sign Out</button>

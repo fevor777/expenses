@@ -1,23 +1,48 @@
 <span class="categories-general-container">
-  <div class="categories-container" [ngClass]="{
+  <div
+    class="categories-container"
+    [ngClass]="{
       'categories-with-scroll': isContentDown,
-      'categories-with-show-more': showMore || isContentDown
-    }">
-    <div class="categories" [ngClass]="{
+      'categories-with-show-more': showMore || isContentDown,
+    }"
+  >
+    <div
+      class="categories"
+      [ngClass]="{
         'categories-scrollable-content-down': isContentDown && !showMore,
-        'categories-center-aligned': !isContentDown
-      }">
-      <div *ngFor="let category of categories; let i = index" class="category" (click)="onCategoryClick(category.id)">
-        <i class="category-icon" [ngClass]="{ 'disabled-category-icon': !enteredAmount }"
-          [style.color]="enteredAmount?.length > 0 ? category.color : ''" [class]="category.icon"></i>
-        <span class="category-name"
-          [ngClass]="{ 'disabled-category-name': !enteredAmount || enteredAmount.length === 0 }">{{ category.name
-          }}</span>
+        'categories-center-aligned': !isContentDown,
+      }"
+    >
+      <div
+        *ngFor="let category of categories; let i = index"
+        class="category"
+        (click)="onCategoryClick(category.id)"
+      >
+        <i
+          class="category-icon"
+          [ngClass]="{ 'disabled-category-icon': !enteredAmount }"
+          [style.color]="enteredAmount?.length > 0 ? category.color : ''"
+          [class]="category.icon"
+        ></i>
+        <span
+          class="category-name"
+          [ngClass]="{
+            'disabled-category-name':
+              !enteredAmount || enteredAmount.length === 0,
+          }"
+          >{{ category.name }}</span
+        >
       </div>
     </div>
   </div>
-  <div class="categories-more" [ngClass]="{ 'disabled-categories-more': !enteredAmount || enteredAmount.length === 0 }"
-    *ngIf="showMore || isContentDown" (click)="onClickMore()">
+  <div
+    class="categories-more"
+    [ngClass]="{
+      'disabled-categories-more': !enteredAmount || enteredAmount.length === 0,
+    }"
+    *ngIf="showMore || isContentDown"
+    (click)="onClickMore()"
+  >
     <div>{{ isContentDown ? 'Меньше' : 'Еще' }}</div>
     <i *ngIf="isContentDown" class="fa-solid fa-chevron-up"></i>
     <i *ngIf="!isContentDown" class="fa-solid fa-chevron-down"></i>

@@ -10,6 +10,6 @@ export class CategoryListNamePipe {
     if (!value || value.length === 0) {
       return '';
     }
-    return value.map((id) => getCategoryNameById(id)).join(', ');
+    return value.map(id => getCategoryNameById(id)).join(', ');
   }
 }

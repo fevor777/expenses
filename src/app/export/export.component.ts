@@ -38,9 +38,13 @@ export class ExportComponent implements OnDestroy {
     private afAuth: AngularFireAuth
   ) {
     this.irregularBudget$ = this.irregularBudgetService.getValue();
-    this.irregularBudget$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.irregularBudgetValue = v || 0);
+    this.irregularBudget$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(v => (this.irregularBudgetValue = v || 0));
     this.savings$ = this.savingService.getSavings();
-    this.savings$.pipe(takeUntil(this.destroySubject)).subscribe(v => this.savingsValue = v || 0);
+    this.savings$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(v => (this.savingsValue = v || 0));
     this.user$ = this.afAuth.user;
   }
 
@@ -48,10 +52,8 @@ export class ExportComponent implements OnDestroy {
   login() {
     this.authService
       .signInWithGoogle()
-      .pipe(
-        takeUntil(this.destroySubject)
-      )
-      .subscribe((res) => {
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(res => {
         console.log('Logged in with Google:', res);
       });
   }
@@ -74,9 +76,9 @@ export class ExportComponent implements OnDestroy {
     this.expenseService
       .getExpenses()
       .pipe(first(), takeUntil(this.destroySubject))
-      .subscribe((expenses) => {
+      .subscribe(expenses => {
         if (Array.isArray(expenses) && expenses?.length) {
-          const data = expenses.map((exp) => this.formatData(exp));
+          const data = expenses.map(exp => this.formatData(exp));
           this.exportToFile(data);
         }
       });
@@ -86,9 +88,9 @@ export class ExportComponent implements OnDestroy {
     const array = [Object.keys(data[0])].concat(data);
 
     return array
-      .map((row) => {
+      .map(row => {
         return Object.values(row)
-          .map((value) => {
+          .map(value => {
             // Escape double quotes and commas if necessary
             if (typeof value === 'string') {
               value = value.replace(/"/g, '""');
@@ -107,8 +109,8 @@ export class ExportComponent implements OnDestroy {
     const data = JSON.parse(localStorage.getItem('expenses') || '[]');
     if (data.length > 0) {
       const responses = data
-        .map((expense) => ({ ...expense, uid }))
-        .map((expense) => this.expenseService.addExpense(expense));
+        .map(expense => ({ ...expense, uid }))
+        .map(expense => this.expenseService.addExpense(expense));
       forkJoin(responses)
         .pipe(takeUntil(this.destroySubject))
         .subscribe(() => {
@@ -147,11 +149,17 @@ export class ExportComponent implements OnDestroy {
   }
 
   onEditIrregularBudget(): void {
-    const newVal = prompt('Enter irregular budget', this.irregularBudgetValue.toString());
+    const newVal = prompt(
+      'Enter irregular budget',
+      this.irregularBudgetValue.toString()
+    );
     if (newVal !== null) {
       const num = Number(newVal);
       if (!isNaN(num) && num >= 0) {
-        this.irregularBudgetService.addValue(num).pipe(first(), takeUntil(this.destroySubject)).subscribe();
+        this.irregularBudgetService
+          .addValue(num)
+          .pipe(first(), takeUntil(this.destroySubject))
+          .subscribe();
       }
     }
   }
@@ -161,7 +169,10 @@ export class ExportComponent implements OnDestroy {
     if (newVal !== null) {
       const num = Number(newVal);
       if (!isNaN(num) && num >= 0) {
-        this.savingService.addSaving(num).pipe(first(), takeUntil(this.destroySubject)).subscribe();
+        this.savingService
+          .addSaving(num)
+          .pipe(first(), takeUntil(this.destroySubject))
+          .subscribe();
       }
     }
   }

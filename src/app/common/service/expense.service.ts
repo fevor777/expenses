@@ -28,7 +28,7 @@ export class ExpenseService {
     const fallback = () => this.expenseStoreService.addExpense(itemWithId);
     const request = (uid: string) =>
       from(this.expensesCollection.doc(id).set({ ...itemWithId, uid })).pipe(
-        map(() => ({ ...itemWithId, uid })),
+        map(() => ({ ...itemWithId, uid }))
       );
     return withUserId(this.afAuth, request, fallback, fallback);
   }
@@ -41,13 +41,16 @@ export class ExpenseService {
     const desc = (descriptionFilter || '').trim().toLowerCase();
     const applyDescriptionFilter = (expenses: Expense[]) => {
       if (!desc) return expenses;
-      return expenses.filter((e) =>
+      return expenses.filter(e =>
         (e.description || '').toLowerCase().includes(desc)
       );
     };
     const fallback = () =>
-      this.expenseStoreService
-        .getExpensesObs(dateFilter, category, descriptionFilter)
+      this.expenseStoreService.getExpensesObs(
+        dateFilter,
+        category,
+        descriptionFilter
+      );
     const request = (userId: string) =>
       this.getExpensesFromFirebase(dateFilter, category, userId).pipe(
         map(applyDescriptionFilter)
@@ -65,9 +68,7 @@ export class ExpenseService {
   deleteExpense(id: string): Observable<string> {
     const fallback = () => this.expenseStoreService.deleteExpense(id);
     const request = () =>
-      from(this.expensesCollection.doc(id).delete()).pipe(
-        map(() => id),
-      );
+      from(this.expensesCollection.doc(id).delete()).pipe(map(() => id));
     return withUserId(this.afAuth, request, fallback, fallback);
   }
 
@@ -77,7 +78,7 @@ export class ExpenseService {
     userId?: string
   ): Observable<Expense[]> {
     return this.fireStore
-      .collection<Expense>('expenses', (ref) => {
+      .collection<Expense>('expenses', ref => {
         let query = ref.where('uid', '==', userId);
 
         // If dateFilter is provided, add the date conditions to the query
@@ -96,13 +97,13 @@ export class ExpenseService {
       })
       .snapshotChanges()
       .pipe(
-        map((actions) =>
-          actions.map((a) => {
+        map(actions =>
+          actions.map(a => {
             const data = a.payload.doc.data();
             const id = a.payload.doc.id;
             return { id, ...data };
           })
-        ),
+        )
       );
   }
 }

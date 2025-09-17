@@ -2,7 +2,7 @@
 .date-filter-drop-down {
   display: inline-block;
   position: relative;
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 
   .date-filter-drop-down-button {
     margin: 0;
@@ -17,12 +17,22 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+    transition:
+      color var(--transition-fast),
+      border-color var(--transition-fast),
+      background var(--transition-fast);
   }
   /* hover style removed */
-  .date-filter-drop-down-button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+  .date-filter-drop-down-button:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
 
-  .date-filter-drop-down-button-toggle { font-weight: 600; padding-left: 6px; padding-right: 6px; }
+  .date-filter-drop-down-button-toggle {
+    font-weight: 600;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
 
   .date-filter-drop-down-button-active {
     color: var(--color-primary);
@@ -44,7 +54,9 @@
     padding: 4px 0;
     margin: 4px 0 0;
     border-radius: 8px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow:
+      0 4px 18px rgba(0, 0, 0, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.08);
   }
   .date-filter-drop-down-list li {
     padding: 8px 12px;
@@ -54,7 +66,9 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: background var(--transition-fast), color var(--transition-fast);
+    transition:
+      background var(--transition-fast),
+      color var(--transition-fast);
   }
   /* hover style removed */
   .date-filter-drop-down-list li.is-selected {
@@ -67,7 +81,9 @@
   .dark & .date-filter-drop-down-list,
   [data-theme='dark'] & .date-filter-drop-down-list {
     background: var(--color-bg-alt);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5);
+    box-shadow:
+      0 4px 18px rgba(0, 0, 0, 0.6),
+      0 1px 3px rgba(0, 0, 0, 0.5);
   }
   .dark & .date-filter-drop-down-list li.is-selected,
   [data-theme='dark'] & .date-filter-drop-down-list li.is-selected {

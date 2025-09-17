@@ -97,7 +97,7 @@ export class BarChartComponent implements OnChanges {
         }
       }
 
-      expenses.forEach((expense) => {
+      expenses.forEach(expense => {
         //sum data for chart
         if (!filter.mode || filter.mode === Mode.DAY) {
           const hour = new Date(expense.date).getHours();

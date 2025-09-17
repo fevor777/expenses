@@ -23,12 +23,13 @@ export class BalanceDateService {
   }
 
   addBalanceDate(balance: string): Observable<string> {
-    const fallback = () => this.balanceDateStoreService.addBalanceDateObs(balance);
+    const fallback = () =>
+      this.balanceDateStoreService.addBalanceDateObs(balance);
     fallback();
     const request = (uid: string) => {
       const balanceObj = { value: balance, uid };
       return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(
-        map(() => balance),
+        map(() => balance)
       );
     };
     return withUserId(this.afAuth, request, fallback, fallback);
@@ -41,8 +42,8 @@ export class BalanceDateService {
         .doc<BalanceDate>(`balance-date/${uid}`)
         .valueChanges()
         .pipe(
-          map((v) => v?.value || ''),
-          tap((value) => this.balanceDateStoreService.addBalanceDateObs(value))
+          map(v => v?.value || ''),
+          tap(value => this.balanceDateStoreService.addBalanceDateObs(value))
         );
     return withUserId(this.afAuth, request, fallback, fallback);
   }

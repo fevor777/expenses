@@ -27,7 +27,7 @@ export class BalanceService {
     const project = (uid: string) => {
       const balanceObj = { value: balance, uid };
       return from(this.balanceCollection.doc(uid).set(balanceObj)).pipe(
-        map(() => balance),
+        map(() => balance)
       );
     };
     return withUserId(this.afAuth, project, fallback, fallback);
@@ -40,8 +40,8 @@ export class BalanceService {
         .doc<Balance>(`balance/${uid}`)
         .valueChanges()
         .pipe(
-          map((v) => v?.value || 0),
-          tap((value) => this.balanceStoreService.addBalanceObs(value))
+          map(v => v?.value || 0),
+          tap(value => this.balanceStoreService.addBalanceObs(value))
         );
     return withUserId(this.afAuth, request, fallback, fallback);
   }

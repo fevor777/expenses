@@ -8,7 +8,7 @@ import { getCategoryNameById } from '../../common/model/categories';
   templateUrl: './statistics-bar.component.html',
   styleUrls: ['./statistics-bar.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
 export class StatisticsBarComponent {
   @Input() category: string;
@@ -37,7 +37,6 @@ export class StatisticsBarComponent {
   onChartIconClick(categoryId: string): void {
     this.chartIconClick.emit(categoryId);
   }
-
 
   onHide(): void {
     this.isVisible = false;

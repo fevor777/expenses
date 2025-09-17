@@ -34,9 +34,19 @@
     <div (click)="onNumberClick('7')" class="expense-number-board-item">7</div>
     <div (click)="onNumberClick('8')" class="expense-number-board-item">8</div>
     <div (click)="onNumberClick('9')" class="expense-number-board-item">9</div>
-    <div (click)="onNumberClick('.')" class="expense-number-board-item key-func" aria-label="Decimal point">.</div>
+    <div
+      (click)="onNumberClick('.')"
+      class="expense-number-board-item key-func"
+      aria-label="Decimal point"
+    >
+      .
+    </div>
     <div (click)="onNumberClick('0')" class="expense-number-board-item">0</div>
-    <div (click)="onDeleteClick()" class="expense-number-board-item key-delete" aria-label="Delete last digit">
+    <div
+      (click)="onDeleteClick()"
+      class="expense-number-board-item key-delete"
+      aria-label="Delete last digit"
+    >
       <i class="fas fa-backspace"></i>
     </div>
   </div>

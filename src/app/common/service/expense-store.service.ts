@@ -34,7 +34,11 @@ export class ExpenseStoreService {
       category,
       descriptionFilter
     );
-    this.filter = { date: dateFilter, categories: category, description: descriptionFilter } as MultiFilter;
+    this.filter = {
+      date: dateFilter,
+      categories: category,
+      description: descriptionFilter,
+    } as MultiFilter;
     this.updateExpenses(expensesFromLocStorage);
     return this.expenses$;
   }
@@ -116,14 +120,14 @@ export class ExpenseStoreService {
       }
 
       if (Array.isArray(category) && category.length > 0) {
-        filteredExpenses = filteredExpenses.filter((expense) => {
+        filteredExpenses = filteredExpenses.filter(expense => {
           return category.includes(expense.category);
         });
       }
 
       if (descriptionFilter && descriptionFilter.trim()) {
         const desc = descriptionFilter.trim().toLowerCase();
-        filteredExpenses = filteredExpenses.filter((expense) =>
+        filteredExpenses = filteredExpenses.filter(expense =>
           (expense.description || '').toLowerCase().includes(desc)
         );
       }

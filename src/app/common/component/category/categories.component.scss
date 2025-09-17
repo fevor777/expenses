@@ -2,34 +2,121 @@
    when a category briefly changed size/triggered reflow). Use flex-start + gap so rows
    stay pinned to top. Added scrollbar-gutter to avoid width/height shifts when overflow. */
 .categories-general-container {
-  .categories-container { display:flex; height:100%; width:100%; overflow:hidden; }
-  .categories {
-    display:flex;
-    flex-wrap:wrap;
-    width:100%;
-    opacity:.92;
-    touch-action:manipulation;
-    padding:4px 0;
-    justify-content:center; /* center the category icons horizontally */
-    align-content:flex-start;
-    gap:8px 6px;
+  .categories-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
   }
-  .category { display:flex; flex-direction:column; align-items:center; width:90px; height:64px; padding:12px; text-align:center; font-size:14px; touch-action:manipulation; border-radius:14px; position:relative; color:var(--color-text-secondary); }
-  .category:active { background:var(--color-bg-alt); }
-  .category-icon { font-size:30px; margin-bottom:4px; line-height:1; color:var(--color-primary); transition:color var(--transition-fast), filter var(--transition-fast); }
-  .disabled-category-icon { color:var(--color-border-strong, var(--color-border)); opacity:.28; position:relative; filter:grayscale(1) brightness(.9) sepia(.35) hue-rotate(-8deg) saturate(1.4); }
-  .disabled-category-icon::after { content:""; position:absolute; inset:2px 4px 8px 4px; top:45%; left:50%; width:55%; height:55%; transform:translate(-50%,-50%); pointer-events:none; background:radial-gradient(circle at 50% 50%, rgba(255,180,40,0.35) 0%, rgba(255,180,40,0.05) 62%, rgba(255,180,40,0) 75%); filter:blur(2px); opacity:.55; }
-  .category-name { color:var(--color-text-secondary); font-size:12px; letter-spacing:.5px; }
-  .category-name:not(.disabled-category-name) { color:var(--color-text); letter-spacing:.4px; }
-  .disabled-category-name { color:var(--color-border-strong, var(--color-border)); opacity:.33; letter-spacing:.4px; text-shadow:0 0 4px rgba(255,170,30,0.25); }
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    opacity: 0.92;
+    touch-action: manipulation;
+    padding: 4px 0;
+    justify-content: center; /* center the category icons horizontally */
+    align-content: flex-start;
+    gap: 8px 6px;
+  }
+  .category {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90px;
+    height: 64px;
+    padding: 12px;
+    text-align: center;
+    font-size: 14px;
+    touch-action: manipulation;
+    border-radius: 14px;
+    position: relative;
+    color: var(--color-text-secondary);
+  }
+  .category:active {
+    background: var(--color-bg-alt);
+  }
+  .category-icon {
+    font-size: 30px;
+    margin-bottom: 4px;
+    line-height: 1;
+    color: var(--color-primary);
+    transition:
+      color var(--transition-fast),
+      filter var(--transition-fast);
+  }
+  .disabled-category-icon {
+    color: var(--color-border-strong, var(--color-border));
+    opacity: 0.28;
+    position: relative;
+    filter: grayscale(1) brightness(0.9) sepia(0.35) hue-rotate(-8deg)
+      saturate(1.4);
+  }
+  .disabled-category-icon::after {
+    content: '';
+    position: absolute;
+    inset: 2px 4px 8px 4px;
+    top: 45%;
+    left: 50%;
+    width: 55%;
+    height: 55%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 180, 40, 0.35) 0%,
+      rgba(255, 180, 40, 0.05) 62%,
+      rgba(255, 180, 40, 0) 75%
+    );
+    filter: blur(2px);
+    opacity: 0.55;
+  }
+  .category-name {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  .category-name:not(.disabled-category-name) {
+    color: var(--color-text);
+    letter-spacing: 0.4px;
+  }
+  .disabled-category-name {
+    color: var(--color-border-strong, var(--color-border));
+    opacity: 0.33;
+    letter-spacing: 0.4px;
+    text-shadow: 0 0 4px rgba(255, 170, 30, 0.25);
+  }
   /* Removed align-self flex-end to avoid content jump (class retained in template but no styling needed) */
-  .categories-with-show-more { height:calc(100% - 40px); }
-  .categories-with-scroll { overflow:scroll; scrollbar-gutter:stable; }
-  .categories-center-aligned { align-items:center; justify-content:center; }
-  .categories-more { text-align:center; color:var(--color-text-secondary); background:transparent; font-size:12px; letter-spacing:.5px; padding:8px 0; border-radius:10px; }
-  .disabled-categories-more { color:var(--color-border-strong, var(--color-border)); opacity:.30; }
+  .categories-with-show-more {
+    height: calc(100% - 40px);
+  }
+  .categories-with-scroll {
+    overflow: scroll;
+    scrollbar-gutter: stable;
+  }
+  .categories-center-aligned {
+    align-items: center;
+    justify-content: center;
+  }
+  .categories-more {
+    text-align: center;
+    color: var(--color-text-secondary);
+    background: transparent;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 8px 0;
+    border-radius: 10px;
+  }
+  .disabled-categories-more {
+    color: var(--color-border-strong, var(--color-border));
+    opacity: 0.3;
+  }
   /* Prevent hover pop for disabled state (icon gets disabled class externally) */
   /* hover removed for disabled category elements */
 }
 
-@media (prefers-reduced-motion: reduce) { .category { transition:none; } }
+@media (prefers-reduced-motion: reduce) {
+  .category {
+    transition: none;
+  }
+}

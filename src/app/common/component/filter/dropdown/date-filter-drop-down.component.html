@@ -14,13 +14,15 @@
     v
   </button>
   <ul *ngIf="dropdownOpen" class="date-filter-drop-down-list">
-    @for(option of options; track option.value) {
-    <li
-      (click)="onSelectValue(option)"
-      [ngClass]="{ 'is-selected': selectedOption?.display === option?.display }"
-    >
-      {{ option?.display }}
-    </li>
+    @for (option of options; track option.value) {
+      <li
+        (click)="onSelectValue(option)"
+        [ngClass]="{
+          'is-selected': selectedOption?.display === option?.display,
+        }"
+      >
+        {{ option?.display }}
+      </li>
     }
   </ul>
 </div>

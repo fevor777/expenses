@@ -7,12 +7,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class BalanceDateStoreService {
   private readonly balanceDateSubject: BehaviorSubject<string> =
     new BehaviorSubject<string>('');
-  readonly balanceDate$: Observable<string> = this.balanceDateSubject.asObservable();
+  readonly balanceDate$: Observable<string> =
+    this.balanceDateSubject.asObservable();
 
   getBalanceDate(): string {
     return this.balanceDateSubject.value;
   }
-  
+
   updateBalanceDate(balance: string): void {
     this.balanceDateSubject.next(balance);
   }

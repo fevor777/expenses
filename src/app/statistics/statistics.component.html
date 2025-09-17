@@ -1,14 +1,25 @@
 <div class="statistics">
   <div class="statistics-nav">
-    <span class="app-link statistics-history-link" routerLink="/history">< History</span>
+    <span class="app-link statistics-history-link" routerLink="/history"
+      >< History</span
+    >
     <span class="app-link statistics-home-link" routerLink="/">Home ></span>
   </div>
-  <app-date-filter class="statistics-filter" [value]="currentFilter" [defaultValue]="initialFilterValue" (changeFilter)="onFilterChange($event)"></app-date-filter>
+  <app-date-filter
+    class="statistics-filter"
+    [value]="currentFilter"
+    [defaultValue]="initialFilterValue"
+    (changeFilter)="onFilterChange($event)"
+  ></app-date-filter>
 
   <div class="stats-section stats-section--donut">
     <div class="stats-section-header">
       <span class="stats-section-title">Категории (доля расходов)</span>
-      <i class="fa-solid fa-list stats-action-icon" title="Перейти в детализацию" (click)="navigateToDetailsPage()"></i>
+      <i
+        class="fa-solid fa-list stats-action-icon"
+        title="Перейти в детализацию"
+        (click)="navigateToDetailsPage()"
+      ></i>
     </div>
     <div id="donut-chart" class="stats-donut-chart"></div>
   </div>
@@ -18,25 +29,68 @@
   <div class="stats-section stats-section--filters">
     <span class="statistic-category-label">
       Категории:
-      <span *ngIf="excludedCategories?.length > 0" class="statistic-excluded-wrapper">
-        (За исключением <span class="statistic-excluded-category">{{ excludedCategories | categoryListName }}</span>)
-        <i (click)="onRefresh()" class="fas fa-redo-alt statistic-refresh-button"></i>
+      <span
+        *ngIf="excludedCategories?.length > 0"
+        class="statistic-excluded-wrapper"
+      >
+        (За исключением
+        <span class="statistic-excluded-category">{{
+          excludedCategories | categoryListName
+        }}</span
+        >)
+        <i
+          (click)="onRefresh()"
+          class="fas fa-redo-alt statistic-refresh-button"
+        ></i>
       </span>
     </span>
     <div class="statistics-checkbox">
       <label class="statistics-checkbox-item">
-        <input type="checkbox" value="regular" class="statistics-checkbox-input" [checked]="true" [(ngModel)]="regularCategoriesCheckboxValue" (ngModelChange)="onRegularCategoriesCheckboxClick($event)" />
-        <span class="statistics-checkbox-label">Регулярное <span class="statistics-amount-muted">({{ regularAmount }}€)</span></span>
+        <input
+          type="checkbox"
+          value="regular"
+          class="statistics-checkbox-input"
+          [checked]="true"
+          [(ngModel)]="regularCategoriesCheckboxValue"
+          (ngModelChange)="onRegularCategoriesCheckboxClick($event)"
+        />
+        <span class="statistics-checkbox-label"
+          >Регулярное
+          <span class="statistics-amount-muted"
+            >({{ regularAmount }}€)</span
+          ></span
+        >
       </label>
       <label class="statistics-checkbox-item">
-        <input type="checkbox" value="irregular" class="statistics-checkbox-input" [checked]="true" [(ngModel)]="irregularCategoriesCheckboxValue" (ngModelChange)="onIrregularCategoriesCheckboxClick($event)" />
-        <span class="statistics-checkbox-label">Нерегулярное <span class="statistics-amount-muted">({{ irregularAmount }}€)</span></span>
+        <input
+          type="checkbox"
+          value="irregular"
+          class="statistics-checkbox-input"
+          [checked]="true"
+          [(ngModel)]="irregularCategoriesCheckboxValue"
+          (ngModelChange)="onIrregularCategoriesCheckboxClick($event)"
+        />
+        <span class="statistics-checkbox-label"
+          >Нерегулярное
+          <span class="statistics-amount-muted"
+            >({{ irregularAmount }}€)</span
+          ></span
+        >
       </label>
     </div>
   </div>
 
   <div class="stats-bars">
-    <app-statistics-bar *ngFor="let categoryTotal of categoryTotals" [amount]="categoryTotal.amount" [category]="categoryTotal.category" [percentage]="categoryTotal.percentage" (categoryLabelClick)="filterByCategory($event)" (detailsIconClick)="navigateToDetails($event)" (chartIconClick)="navigateToChart($event)" (close)="onBarClose($event)"></app-statistics-bar>
+    <app-statistics-bar
+      *ngFor="let categoryTotal of categoryTotals"
+      [amount]="categoryTotal.amount"
+      [category]="categoryTotal.category"
+      [percentage]="categoryTotal.percentage"
+      (categoryLabelClick)="filterByCategory($event)"
+      (detailsIconClick)="navigateToDetails($event)"
+      (chartIconClick)="navigateToChart($event)"
+      (close)="onBarClose($event)"
+    ></app-statistics-bar>
   </div>
 
   <hr class="statistics-separator statistics-separator--spaced" />
@@ -45,7 +99,10 @@
     <div class="stats-section-header">
       <span class="stats-section-title">Расходы по периодам</span>
     </div>
-    <app-bar-chart [filter]="currentFilter" [expenses]="filteredExpenses"></app-bar-chart>
+    <app-bar-chart
+      [filter]="currentFilter"
+      [expenses]="filteredExpenses"
+    ></app-bar-chart>
   </div>
 
   <hr class="statistics-separator" />
@@ -54,6 +111,8 @@
     <div class="stats-section-header">
       <span class="stats-section-title">Состав расходов (аналитика)</span>
     </div>
-    <app-composition-charts [expenses]="filteredExpenses"></app-composition-charts>
+    <app-composition-charts
+      [expenses]="filteredExpenses"
+    ></app-composition-charts>
   </div>
 </div>

@@ -7,7 +7,10 @@ import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
-import { MultiFilter, MultiFilterComponent } from '../common/component/filter/multi/multi-filter.component';
+import {
+  MultiFilter,
+  MultiFilterComponent,
+} from '../common/component/filter/multi/multi-filter.component';
 import { getCategoryById } from '../common/model/categories';
 import { Expense } from '../common/model/expense.model';
 import { BalanceService } from '../common/service/balance.service';
@@ -52,7 +55,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private dateFilterService: DateFilterService
-  ) { }
+  ) {}
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -96,7 +99,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
         .pipe(
           switchMap(() => this.balanceService.getBalance()),
           first(),
-          switchMap((balance) => {
+          switchMap(balance => {
             const newBalance =
               Math.round((balance + oldAmount - newAmount) * 100) / 100;
             return this.balanceService.addBalance(newBalance);
@@ -174,7 +177,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
         .getBalance()
         .pipe(
           first(),
-          switchMap((balance) => {
+          switchMap(balance => {
             const newBalance = Math.round((balance + item.amount) * 100) / 100;
             return this.balanceService.addBalance(newBalance);
           }),
@@ -220,9 +223,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
         this.currentFilter?.categories,
         this.currentFilter?.description
       )
-      .pipe(
-        map((expenses) => this.calculateAmountsAndModifyExpenses(expenses))
-      );
+      .pipe(map(expenses => this.calculateAmountsAndModifyExpenses(expenses)));
   }
 
   private isDatePanelVisible(timestamp: number): boolean {
@@ -245,7 +246,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   ): HistoryExpense[] {
     this.temporaryDate = 0;
     let newAmount = 0;
-    const result = expenses.map((expense) => {
+    const result = expenses.map(expense => {
       newAmount = this.roundUp(newAmount + expense.amount);
       const showDateTitle = this.isDatePanelVisible(expense.date);
       if (showDateTitle) {

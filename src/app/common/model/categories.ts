@@ -7,12 +7,12 @@ export type Category = {
 };
 
 export const getCategoryNameById = (id: string): string => {
-  const category = Categories.find((category) => category.id === id);
+  const category = Categories.find(category => category.id === id);
   return category ? category.name : '';
 };
 
 export const getCategoryById = (id: string): Category => {
-  return Categories.find((category) => category.id === id);
+  return Categories.find(category => category.id === id);
 };
 
 export const Categories: Category[] = [

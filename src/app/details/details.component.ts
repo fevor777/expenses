@@ -27,7 +27,16 @@ import { Mode } from '../common/component/filter/date/dateFrame.model';
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, MultiFilterComponent, BarChartComponent, CompositionChartsComponent, MicroVisualsComponent, IrregularBudgetGaugeComponent, IrregularCumulativeComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MultiFilterComponent,
+    BarChartComponent,
+    CompositionChartsComponent,
+    MicroVisualsComponent,
+    IrregularBudgetGaugeComponent,
+    IrregularCumulativeComponent,
+  ],
 })
 export class DetailsComponent implements OnInit, OnDestroy {
   amountForDay: number = 0;
@@ -45,12 +54,15 @@ export class DetailsComponent implements OnInit, OnDestroy {
   expenses: Expense[] = [];
   irregularBudget = 0;
   // collapse state for each chart section
-  collapsed: Record<'irregularGauge' | 'irregularCumulative' | 'bar' | 'composition' | 'micro', boolean> = {
+  collapsed: Record<
+    'irregularGauge' | 'irregularCumulative' | 'bar' | 'composition' | 'micro',
+    boolean
+  > = {
     irregularGauge: false,
     irregularCumulative: false,
     bar: false,
     composition: false,
-    micro: false
+    micro: false,
   };
 
   private readonly destroySubject: Subject<void> = new Subject();
@@ -61,7 +73,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private dateFilterService: DateFilterService,
     private irregularBudgetService: IrregularBudgetService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.initialFilter = {
@@ -78,12 +90,22 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.initDetails();
   }
 
-  toggle(section: 'irregularGauge' | 'irregularCumulative' | 'bar' | 'composition' | 'micro') {
+  toggle(
+    section:
+      | 'irregularGauge'
+      | 'irregularCumulative'
+      | 'bar'
+      | 'composition'
+      | 'micro'
+  ) {
     this.collapsed[section] = !this.collapsed[section];
   }
 
   get isMonth(): boolean {
-    return (this.currentFilter?.date?.mode || this.defaultDateValue?.mode) === Mode.MONTH;
+    return (
+      (this.currentFilter?.date?.mode || this.defaultDateValue?.mode) ===
+      Mode.MONTH
+    );
   }
 
   initDetails(): void {
@@ -113,7 +135,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this.dateFilterService.description = undefined;
     }
     this.applyFilters(this.initialFilter);
-    this.irregularBudgetService.getValue().pipe(takeUntil(this.destroySubject)).subscribe(v => this.irregularBudget = v || 0);
+    this.irregularBudgetService
+      .getValue()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(v => (this.irregularBudget = v || 0));
   }
 
   private configureNav(): void {
@@ -163,7 +188,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         updatedFilter.description
       )
       .pipe(takeUntil(this.destroySubject))
-      .subscribe((expenses) => {
+      .subscribe(expenses => {
         this.currentFilter = updatedFilter;
         this.expenses = expenses;
         this.sumValues();
@@ -222,7 +247,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   onCategorySelected(catId: string) {
     if (!catId) return;
-    const date = this.currentFilter?.date || this.dateFilterService.getInitialMonthValue();
+    const date =
+      this.currentFilter?.date || this.dateFilterService.getInitialMonthValue();
     const description = this.currentFilter?.description || '';
     this.currentFilter = { categories: [catId], date, description };
     this.initialFilter = { categories: [catId], date, description }; // keep description
@@ -230,10 +256,14 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   onCategoryRemoved(catId: string) {
-    const date = this.currentFilter?.date || this.dateFilterService.getInitialMonthValue();
+    const date =
+      this.currentFilter?.date || this.dateFilterService.getInitialMonthValue();
     const description = this.currentFilter?.description || '';
     // remove category if present
-    const categories = this.currentFilter?.categories.length > 0 ? this.currentFilter?.categories : Categories.map(c => c.id);
+    const categories =
+      this.currentFilter?.categories.length > 0
+        ? this.currentFilter?.categories
+        : Categories.map(c => c.id);
     let remaining = categories.filter(c => c !== catId);
     // if we removed the last visible category, interpret as clearing category filter (empty array)
     if (remaining.length === 0) {

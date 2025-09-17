@@ -1,6 +1,6 @@
 /* Themed Multi Filter (refactored to use global tokens) */
 .app-multi-filter {
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .mf-bar {
@@ -29,7 +29,7 @@
   gap: 6px;
   font-size: 14px;
   color: var(--color-text-secondary);
-  letter-spacing: .4px;
+  letter-spacing: 0.4px;
 }
 
 .mf-group--title .mf-label {
@@ -61,7 +61,7 @@
 
 .mf-total {
   font-weight: 600;
-  letter-spacing: .5px;
+  letter-spacing: 0.5px;
   color: var(--color-highlight);
   font-size: 16px;
 }
@@ -78,7 +78,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .mf-toggle--active {
@@ -113,7 +116,10 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .mf-icon-btn:focus-visible {
@@ -173,7 +179,7 @@
   width: 100%;
 }
 
-@media (max-width:640px) {
+@media (max-width: 640px) {
   .mf-field--description {
     max-width: 100%;
   }
@@ -188,7 +194,10 @@
   font-size: 15px;
   background: var(--color-bg);
   color: var(--color-text);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
   box-sizing: border-box;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -202,7 +211,6 @@
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-
   .mf-toggle,
   .mf-icon-btn,
   .mf-input {

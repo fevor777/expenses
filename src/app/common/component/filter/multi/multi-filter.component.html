@@ -1,16 +1,37 @@
 <div class="app-multi-filter">
   <div class="mf-bar">
-    <div class="mf-groups" *ngIf="(dateFilter?.display || getCategoryFilters()?.length || descriptionFilter) && !expandFilters; else totalCompact">
+    <div
+      class="mf-groups"
+      *ngIf="
+        (dateFilter?.display ||
+          getCategoryFilters()?.length ||
+          descriptionFilter) &&
+          !expandFilters;
+        else totalCompact
+      "
+    >
       <div class="mf-group mf-group--title">
         <span class="mf-label">Фильтры</span>
-  <button type="button" class="mf-icon-btn mf-icon-btn--refresh" (click)="clearFilters()" aria-label="Сбросить фильтры">
+        <button
+          type="button"
+          class="mf-icon-btn mf-icon-btn--refresh"
+          (click)="clearFilters()"
+          aria-label="Сбросить фильтры"
+        >
           <i class="fas fa-redo-alt"></i>
         </button>
       </div>
-  <div class="mf-group">
+      <div class="mf-group">
         <span class="mf-key">Период:</span>
         <span class="mf-value">{{ dateFilter?.display || 'Весь' }}</span>
-  <button *ngIf="isToday" type="button" class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats" (click)="navigateToStatistics()" title="Перейти к статистике" aria-label="Перейти к статистике">
+        <button
+          *ngIf="isToday"
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
+          (click)="navigateToStatistics()"
+          title="Перейти к статистике"
+          aria-label="Перейти к статистике"
+        >
           <i class="fas fa-chart-line"></i>
         </button>
       </div>
@@ -25,10 +46,23 @@
       <div class="mf-group mf-group--total">
         <span class="mf-key">Общий:</span>
         <span class="mf-total">{{ totalAmount }}€</span>
-  <button *ngIf="showHistoryIcon" type="button" class="mf-icon-btn mf-icon-btn--nav" (click)="navigateToHistory()" title="Перейти к истории" aria-label="Перейти к истории">
+        <button
+          *ngIf="showHistoryIcon"
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav"
+          (click)="navigateToHistory()"
+          title="Перейти к истории"
+          aria-label="Перейти к истории"
+        >
           <i class="fa-solid fa-list"></i>
         </button>
-  <button *ngIf="showDetailsIcon" type="button" class="mf-icon-btn mf-icon-btn--nav" (click)="navigateToDetails()" aria-label="Перейти к деталям">
+        <button
+          *ngIf="showDetailsIcon"
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav"
+          (click)="navigateToDetails()"
+          aria-label="Перейти к деталям"
+        >
           <i class="fas fa-chart-bar"></i>
         </button>
       </div>
@@ -37,36 +71,79 @@
       <div class="mf-group mf-group--total">
         <span class="mf-key">Общий расход:</span>
         <span class="mf-total">{{ totalAmount }}€</span>
-  <button *ngIf="showHistoryIcon" type="button" class="mf-icon-btn mf-icon-btn--nav" (click)="navigateToHistory()" title="Перейти к истории" aria-label="Перейти к истории">
+        <button
+          *ngIf="showHistoryIcon"
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav"
+          (click)="navigateToHistory()"
+          title="Перейти к истории"
+          aria-label="Перейти к истории"
+        >
           <i class="fa-solid fa-list"></i>
         </button>
-  <button *ngIf="showDetailsIcon" type="button" class="mf-icon-btn mf-icon-btn--nav" (click)="navigateToDetails()" aria-label="Перейти к деталям">
+        <button
+          *ngIf="showDetailsIcon"
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav"
+          (click)="navigateToDetails()"
+          aria-label="Перейти к деталям"
+        >
           <i class="fas fa-chart-bar"></i>
         </button>
       </div>
     </ng-template>
-    <button class="mf-toggle" [class.mf-toggle--active]="expandFilters" (click)="toggleExpandFilters()" aria-label="Показать/Скрыть фильтры">
+    <button
+      class="mf-toggle"
+      [class.mf-toggle--active]="expandFilters"
+      (click)="toggleExpandFilters()"
+      aria-label="Показать/Скрыть фильтры"
+    >
       <i class="fas fa-filter"></i>
     </button>
   </div>
   <div class="mf-expanded" *ngIf="expandFilters">
     <div class="mf-expanded-inner">
       <div class="mf-field">
-        <app-date-filter [defaultValue]="defaultDateValue" [value]="dateFilter" (changeFilter)="emitDateFilter($event)"></app-date-filter>
+        <app-date-filter
+          [defaultValue]="defaultDateValue"
+          [value]="dateFilter"
+          (changeFilter)="emitDateFilter($event)"
+        ></app-date-filter>
       </div>
-  <div class="mf-field mf-field--description">
-        <input type="text" class="mf-input" placeholder="Description..." [(ngModel)]="descriptionFilter" (ngModelChange)="emitDescriptionFilter()" />
+      <div class="mf-field mf-field--description">
+        <input
+          type="text"
+          class="mf-input"
+          placeholder="Description..."
+          [(ngModel)]="descriptionFilter"
+          (ngModelChange)="emitDescriptionFilter()"
+        />
       </div>
       <div class="mf-field">
-        <app-category-filter [value]="predefineCategories" (selectedCategories)="emitCategoryFilters($event)"></app-category-filter>
+        <app-category-filter
+          [value]="predefineCategories"
+          (selectedCategories)="emitCategoryFilters($event)"
+        ></app-category-filter>
       </div>
       <div class="mf-group mf-group--total-alt">
         <span class="mf-key">Общий расход:</span>
         <span class="mf-total">{{ totalAmount }}€</span>
-  <button *ngIf="showHistoryIcon" type="button" class="mf-icon-btn mf-icon-btn--nav" (click)="navigateToHistory()" aria-label="Перейти к истории">
+        <button
+          *ngIf="showHistoryIcon"
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav"
+          (click)="navigateToHistory()"
+          aria-label="Перейти к истории"
+        >
           <i class="fa-solid fa-list"></i>
         </button>
-  <button *ngIf="showDetailsIcon" type="button" class="mf-icon-btn mf-icon-btn--nav" (click)="navigateToDetails()" aria-label="Перейти к деталям">
+        <button
+          *ngIf="showDetailsIcon"
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav"
+          (click)="navigateToDetails()"
+          aria-label="Перейти к деталям"
+        >
           <i class="fas fa-chart-bar"></i>
         </button>
       </div>

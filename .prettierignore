@@ -1,0 +1,29 @@
+# Build outputs
+docs/
+dist/
+build/
+*.min.js
+*.min.css
+
+# Dependencies
+node_modules/
+
+# Generated files
+coverage/
+*.tgz
+*.tar.gz
+
+# Environment files
+.env*
+
+# Android specific
+android-webview/build/
+android-webview/.gradle/
+
+# Firebase
+.firebase/
+firebase-debug.log
+
+# Other
+*.log
+.DS_Store

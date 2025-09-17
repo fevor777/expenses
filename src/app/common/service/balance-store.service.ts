@@ -12,7 +12,7 @@ export class BalanceStoreService {
   getBalance(): number {
     return this.balanceSubject.value;
   }
-  
+
   updateBalance(balance: number): void {
     this.balanceSubject.next(balance);
   }
