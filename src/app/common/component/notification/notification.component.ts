@@ -12,9 +12,8 @@ type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
-
 export class NotificationComponent implements OnDestroy {
   message = '';
   show = false;
@@ -27,17 +26,28 @@ export class NotificationComponent implements OnDestroy {
 
   private readonly destroySubject: Subject<void> = new Subject();
 
-  constructor(private notificationService: NotificationService, private router: Router) {
+  constructor(
+    private notificationService: NotificationService,
+    private router: Router,
+  ) {
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))
       .subscribe((payload: any) => {
         // Support both legacy string and new object payload
         if (typeof payload === 'string') {
           this.showMessage(payload, 'info');
-        } else if (payload && typeof payload === 'object' && 'message' in payload) {
+        } else if (
+          payload &&
+          typeof payload === 'object' &&
+          'message' in payload
+        ) {
           this.showMessage(payload.message, (payload.type as any) || 'info');
         }
       });
+
+    this.notificationService.hide$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(() => this.startHide());
   }
 
   showMessage(message: string, variant: NotificationVariant = 'info') {
@@ -52,11 +62,15 @@ export class NotificationComponent implements OnDestroy {
 
   private resolveIcon(v: NotificationVariant): string | null {
     switch (v) {
-      case 'success': return '&#10003;'; // check mark
-      case 'error': return '&#9888;'; // warning symbol (triangle) could use 26A0; or heavy X
-      case 'warning': return '&#9888;';
+      case 'success':
+        return '&#10003;'; // check mark
+      case 'error':
+        return '&#9888;'; // warning symbol (triangle) could use 26A0; or heavy X
+      case 'warning':
+        return '&#9888;';
       case 'info':
-      default: return '&#9432;'; // info symbol
+      default:
+        return '&#9432;'; // info symbol
     }
   }
 
@@ -64,7 +78,10 @@ export class NotificationComponent implements OnDestroy {
     if (!this.show) return;
     this.hiding = true;
     // allow animation to finish
-    setTimeout(() => { this.show = false; this.hiding = false; }, 250);
+    setTimeout(() => {
+      this.show = false;
+      this.hiding = false;
+    }, 250);
   }
 
   onCloseNotification() {
