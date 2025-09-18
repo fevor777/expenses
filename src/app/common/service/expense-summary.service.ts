@@ -35,7 +35,7 @@ export class ExpenseSummaryService {
     // fire a new browser notification on every subsequent expenses change.
     return this.getExpenseSummary().pipe(
       take(1),
-      delay(3000),
+      delay(10000),
       switchMap(summary => {
         const title = 'Сводка расходов';
         const budgetChart = this.generateBudgetChart(summary.percentUsed);
