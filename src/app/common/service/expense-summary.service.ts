@@ -52,6 +52,7 @@ export class ExpenseSummaryService {
         // Month elapsed vs budget usage pace comparison
         let paceLine = '';
         let daysLeft = 0;
+        let exhaustionLine = '';
         if (summary.budget > 0) {
           const now = new Date();
           // total days in current month
@@ -64,6 +65,24 @@ export class ExpenseSummaryService {
           const monthElapsedPct = (daysPassed / daysInMonth) * 100;
           daysLeft = Math.max(daysInMonth - daysPassed, 0);
           paceLine = ` - Пер.: ${monthElapsedPct.toFixed(0)}%`;
+
+          // Forecast date of budget exhaustion (only if not already exceeded)
+          if (summary.monthlyIrregular < summary.budget && summary.monthlyIrregular > 0) {
+            const currentVelocity = summary.monthlyIrregular / daysPassed; // €/day
+            if (currentVelocity > 0) {
+              const remainingToSpend = summary.budget - summary.monthlyIrregular;
+              const daysToExhaust = remainingToSpend / currentVelocity; // could be fractional
+              const exhaustDate = new Date(now.getTime());
+              exhaustDate.setDate(now.getDate() + Math.ceil(daysToExhaust));
+              // Clamp to month end
+              if (exhaustDate.getMonth() !== now.getMonth()) {
+                exhaustDate.setFullYear(now.getFullYear(), now.getMonth(), daysInMonth);
+              }
+              const dd = exhaustDate.getDate().toString().padStart(2, '0');
+              const mm = (exhaustDate.getMonth() + 1).toString().padStart(2, '0');
+              exhaustionLine = `F: ${dd}.${mm}`;
+            }
+          }
         }
 
         const message =
@@ -74,9 +93,9 @@ export class ExpenseSummaryService {
           `\nЛишние(!): ${summary.extra}€` +
           `\nНеобязательные(?,!): ${summary.nonEssential}€` +
           (summary.budget
-            ? `\nБюджет: ${summary.budget}€ | Ост.: ${summary.remaining.toFixed(0)}€ - ${daysLeft}дн`
+            ? `\nB:${summary.budget} R:${summary.remaining.toFixed(0)} d${daysLeft} ${exhaustionLine}`
             : '') +
-          `\n ${dailyAvgChart}\n` +
+          `\n\n\n\n ${dailyAvgChart}\n` +
           `${velocityChart}\n`;
 
         // Generate a data URL icon based on budget percentage
