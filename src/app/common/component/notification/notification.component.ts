@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { NotificationService } from './notification.service';
 import { ExpenseSummaryService } from '../../service/expense-summary.service';
+import { ExpenseService } from '../../service/expense.service';
 
 type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
 
@@ -13,7 +15,7 @@ type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
 })
 export class NotificationComponent implements OnDestroy {
   message = '';
@@ -21,6 +23,11 @@ export class NotificationComponent implements OnDestroy {
   hiding = false;
   variant: NotificationVariant = 'info';
   icon: string | null = null;
+  // extra UI for expense-added context
+  isExpenseAddedContext = false;
+  lastExpense: any = null; // made public for template binding
+  editableDescription: string = '';
+  savingDescription = false;
 
   private hideTimeout: any;
   private autoCloseMs = 60000; // shorter default for UX
@@ -30,7 +37,8 @@ export class NotificationComponent implements OnDestroy {
   constructor(
     private notificationService: NotificationService,
     private router: Router,
-    private expenseSummaryService: ExpenseSummaryService
+    private expenseSummaryService: ExpenseSummaryService,
+    private expenseService: ExpenseService
   ) {
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))
@@ -44,6 +52,14 @@ export class NotificationComponent implements OnDestroy {
           'message' in payload
         ) {
           this.showMessage(payload.message, (payload.type as any) || 'info');
+          // detect context
+          this.isExpenseAddedContext = payload.context === 'expense-added';
+            this.lastExpense = this.isExpenseAddedContext ? payload.expense : null;
+          if (this.isExpenseAddedContext && this.lastExpense) {
+            this.editableDescription = this.lastExpense.description || '';
+          } else {
+            this.editableDescription = '';
+          }
         }
       });
 
@@ -60,6 +76,43 @@ export class NotificationComponent implements OnDestroy {
     this.hiding = false;
     this.show = true;
     this.hideTimeout = setTimeout(() => this.startHide(), this.autoCloseMs);
+  }
+
+  appendMark(mark: string) {
+    if (!this.isExpenseAddedContext || !this.lastExpense) return;
+    const desc: string = (this.lastExpense.description || '').trim();
+    // Prevent duplicate marks
+    if (desc.endsWith(mark.trim())) return; // avoid duplicates irrespective of leading space
+    const updated = desc + mark;
+    const originalDesc = desc;
+    this.lastExpense.description = updated;
+    // optimistic UI update
+    try {
+      // this.message = this.message.replace(originalDesc, updated);
+    } catch {}
+    // Persist to backend if id present
+    if (this.lastExpense.id) {
+      this.expenseService
+        .updateExpense({ ...this.lastExpense })
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe();
+    }
+  }
+
+
+  saveDescription() {
+    this.savingDescription = true;
+    if (this.lastExpense.id) {
+      this.expenseService
+        .updateExpense({ ...this.lastExpense })
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe({
+          next: () => (this.savingDescription = false),
+          error: () => (this.savingDescription = false),
+        });
+    } else {
+      this.savingDescription = false;
+    }
   }
 
   private resolveIcon(v: NotificationVariant): string | null {

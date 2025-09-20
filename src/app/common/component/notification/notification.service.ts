@@ -5,6 +5,11 @@ import { switchMap } from 'rxjs/operators';
 export interface NotificationPayload {
   message: string;
   type?: 'info' | 'success' | 'error' | 'warning';
+  /** Optional context tag to allow component to render extra UI */
+  context?: string; // e.g. 'expense-added'
+  /** When context === 'expense-added', full expense object can be passed */
+  // Using any to avoid circular import / heavyweight typing here
+  expense?: any;
 }
 
 @Injectable({
@@ -24,12 +29,16 @@ export class NotificationService {
     this.checkNotificationPermission();
   }
 
-  showMessage(message: string, type: NotificationPayload['type'] = 'info') {
-    // For backward compatibility keep emitting plain string when type is info and no HTML semantics needed
-    if (type === 'info') {
+  showMessage(
+    message: string,
+    type: NotificationPayload['type'] = 'info',
+    extras?: Pick<NotificationPayload, 'context' | 'expense'>
+  ) {
+    // Keep legacy simple string emission only if no context/expense provided
+    if (type === 'info' && !extras?.context && !extras?.expense) {
       this.messageSubject.next(message);
     } else {
-      this.messageSubject.next({ message, type });
+      this.messageSubject.next({ message, type, ...extras });
     }
   }
 

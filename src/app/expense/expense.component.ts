@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { Observable, of, Subject, switchMap, takeUntil, tap, take } from 'rxjs';
+import { Observable, of, Subject, switchMap, takeUntil, tap, take, map } from 'rxjs';
 
 import { CategoriesComponent } from '../common/component/category/categories.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
@@ -108,14 +108,15 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     const calculatedAmount = ExpressionEvaluator.evaluate(this.enteredAmount);
     const amount = Math.round((calculatedAmount / exchangeRate) * 100) / 100;
     if (amount > 0) {
+      const originalDescription = this.description; // capture before reset for notification context
       const newExpense: Expense = {
         category: categoryName,
         amount: amount,
         currency: this.currency?.code,
         date: Date.now(),
-        description: this.description || undefined,
+        description: originalDescription || undefined,
       };
-      if (!this.description) {
+      if (!originalDescription) {
         delete newExpense.description;
       }
       this.enteredAmount = '';
@@ -123,23 +124,25 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       this.expenseService
         .addExpense(newExpense)
         .pipe(
-          switchMap(() => {
+          switchMap(addedExpense => {
             let balanceObs: Observable<number> = of(this.currentBalance);
             if (getCategoryById(categoryName)?.includeInBalance) {
               this.currentBalance =
                 Math.round((this.currentBalance - amount) * 100) / 100;
               balanceObs = this.balanceService.addBalance(this.currentBalance);
             }
-            return balanceObs;
+            return balanceObs.pipe(map(() => addedExpense));
           }),
-          switchMap(() =>
-            this.expenseSummaryService.sendBrowserNotificationSummary()
+          switchMap(addedExpense =>
+            this.expenseSummaryService
+              .sendBrowserNotificationSummary()
+              .pipe(map(() => addedExpense))
           ),
           takeUntil(this.unsubscribe)
         )
-        .subscribe(() => {
+        .subscribe((addedExpense: Expense) => {
           this.onShowNumberBoard();
-          this.showNotification(categoryName, amount);
+          this.showNotification(categoryName, amount, addedExpense, originalDescription);
         });
     }
   }
@@ -238,7 +241,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.unsubscribe.complete();
   }
 
-  showNotification(categoryName, amount): void {
+  showNotification(categoryName, amount, addedExpense?: Expense, originalDescription?: string): void {
     const todaysAmountByCategory = this.getTodaysAmount(categoryName);
     const monthlyAmountByCategory =
       this.getMonthlyAmountByCategory(categoryName);
@@ -266,7 +269,18 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           budgetLine;
 
         // Show in-app notification
-        this.notificationService.showMessage(inAppMessage);
+        // Provide context and expense so notification can show extra buttons
+        this.notificationService.showMessage(inAppMessage, 'info', {
+          context: 'expense-added',
+          expense: addedExpense
+            ? { ...addedExpense }
+            : {
+                category: categoryName,
+                amount,
+                description: originalDescription || undefined,
+                date: Date.now(),
+              },
+        });
       });
   }
 

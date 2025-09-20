@@ -25,13 +25,23 @@
     animation: fadeOut 0.25s forwards;
   }
 
+  .notification-main {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    flex: 1;
+  }
   .notification-icon {
     flex: 0 0 auto;
     font-size: 18px;
     line-height: 1;
-    margin-top: 2px;
   }
-
+  .notification-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
   .notification-content {
     flex: 1 1 auto;
   }
@@ -43,7 +53,6 @@
     transition:
       opacity var(--transition-fast),
       transform var(--transition-fast);
-    font-size: 13px;
     padding: 2px 4px;
     line-height: 1;
   }
@@ -71,6 +80,37 @@
       background var(--transition-fast),
       color var(--transition-fast),
       transform var(--transition-fast);
+  }
+
+  .notification-marks-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .notification-edit-row { display:flex; gap:6px; align-items:center; }
+  .notification-edit-row .desc-input { flex:1 1 auto; min-width:120px; font-size:12px; padding:4px 8px; border:1px solid var(--color-border); border-radius:8px; background:var(--color-bg); color:var(--color-text); }
+  .notification-edit-row .desc-input:focus { outline:2px solid var(--color-primary-alpha); }
+  .notification-edit-row .save-btn { cursor:pointer; background:var(--color-primary-alpha); border:1px solid var(--color-border); color:var(--color-text); border-radius:8px; padding:4px 10px; font-size:12px; font-weight:600; transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast); }
+  .notification-edit-row .save-btn:hover:enabled { background:var(--color-primary); color:#fff; }
+  .notification-edit-row .save-btn:active:enabled { transform:scale(.94); }
+  .notification-edit-row .save-btn:disabled { opacity:.5; cursor:default; }
+
+  .mark-btn {
+    cursor: pointer;
+    background: var(--color-primary-alpha);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: 14px;
+    padding: 6px 12px 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    line-height: 1.1;
+    white-space: nowrap;
+    transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .mark-btn:hover { background: var(--color-primary); color:#fff; }
+
+  .mark-btn:active {
+    transform: scale(0.92);
   }
 
   .notification-browser:hover,

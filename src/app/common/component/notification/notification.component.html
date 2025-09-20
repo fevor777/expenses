@@ -6,8 +6,27 @@
   aria-live="polite"
   aria-atomic="true"
 >
-  <span class="notification-icon" *ngIf="icon" [innerHTML]="icon"></span>
-  <span class="notification-content" [innerHTML]="message"></span>
+  <div class="notification-main">
+    <span class="notification-icon" *ngIf="icon" [innerHTML]="icon"></span>
+    <div class="notification-body">
+      <div class="notification-content" [innerHTML]="message"></div>
+      <span>Description:</span>
+      <div *ngIf="isExpenseAddedContext" class="notification-marks-row">
+        <button type="button" class="mark-btn" (click)="appendMark(' ? ')" title="#необязательный" aria-label="#необязательный">#необязательный</button>
+        <button type="button" class="mark-btn" (click)="appendMark(' ! ')" title="#лишний" aria-label="#лишний">#лишний</button>
+      </div>
+      <div *ngIf="isExpenseAddedContext" class="notification-edit-row">
+        <input
+          type="text"
+          class="desc-input"
+          [placeholder]="lastExpense?.description ? 'Изменить описание' : 'Добавить описание'"
+          [(ngModel)]="this.lastExpense.description"
+          (keyup.enter)="saveDescription()"
+        />
+        <button type="button" class="save-btn" (click)="saveDescription()">OK</button>
+      </div>
+    </div>
+  </div>
   <div class="notification-actions">
     <button
       type="button"
