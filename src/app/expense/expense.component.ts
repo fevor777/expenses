@@ -152,7 +152,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
               originalDescription
             );
           }),
-          delay(3000),
+          delay(5000),
           switchMap(() =>
             this.expenseSummaryService.sendBrowserNotificationSummary()
           ),
