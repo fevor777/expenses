@@ -10,7 +10,7 @@
     <span class="notification-icon" *ngIf="icon" [innerHTML]="icon"></span>
     <div class="notification-body">
       <div class="notification-content" [innerHTML]="message"></div>
-      <span>Description:</span>
+      <span *ngIf="isExpenseAddedContext">Description:</span>
       <div *ngIf="isExpenseAddedContext" class="notification-marks-row">
         <button type="button" class="mark-btn" (click)="appendMark(' ? ')" title="#необязательный" aria-label="#необязательный">#необязательный</button>
         <button type="button" class="mark-btn" (click)="appendMark(' ! ')" title="#лишний" aria-label="#лишний">#лишний</button>

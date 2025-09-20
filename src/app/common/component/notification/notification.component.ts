@@ -140,6 +140,8 @@ export class NotificationComponent implements OnDestroy {
   }
 
   onCloseNotification() {
+    this.lastExpense = null;
+    this.isExpenseAddedContext = false;
     this.startHide();
   }
 

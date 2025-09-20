@@ -3,10 +3,10 @@
 .notification-container {
   position: fixed;
   top: 100px;
-  right: 15px;
+  right: 10px;
   z-index: 1100;
   max-width: 360px;
-  padding: 14px 18px 14px 16px;
+  padding: 10px;
   background: var(--color-bg-alt);
   color: var(--color-text);
   border: 1px solid var(--color-border);
@@ -108,7 +108,7 @@
 }
 
 /* Variant accents (only border + subtle bg tint) to reduce size */
-.notification-container.info { border-color: var(--color-highlight); }
+.notification-container.info { border-color: var(--color-highlight2); }
 .notification-container.success { border-color: var(--color-positive); }
 .notification-container.error { border-color: var(--color-negative); }
 .notification-container.warning { border-color: var(--color-primary); }
