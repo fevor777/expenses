@@ -16,7 +16,6 @@ import {
   tap,
   take,
   map,
-  delay,
 } from 'rxjs';
 
 import { CategoriesComponent } from '../common/component/category/categories.component';
@@ -152,7 +151,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
               originalDescription
             );
           }),
-          delay(5000),
           switchMap(() =>
             this.expenseSummaryService.sendBrowserNotificationSummary()
           ),
