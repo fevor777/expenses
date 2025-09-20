@@ -19,6 +19,22 @@ export interface ExpenseSummary {
   percentUsed: number;
   extra: number;
   nonEssential: number;
+  extraPct?: number;
+  nonEssentialPct?: number;
+  daysSinceExtra?: number;
+  daysSinceNonEssential?: number;
+  // Anomaly detection fields
+  medianDailyIrregular?: number; // median of irregular spend per day so far this month
+  irregularSpike?: boolean; // true if today irregular > 1.5 * median
+  todaysExtra?: number; // today's extra spend
+  averageDailyExtra?: number; // average extra per day so far
+  extraSpike?: boolean; // true if today's extra > 2 * average daily extra
+  todaysNonEssential?: number; // today's non-essential spend
+  averageDailyNonEssential?: number; // average non-essential per day
+  nonEssentialSpike?: boolean; // spike flag for non-essential (same rule factor 2x avg)
+  // Meta fields
+  energyScore?: number; // composite score
+  energyEmoji?: string; // mapped emoji
 }
 
 @Injectable({
@@ -85,18 +101,24 @@ export class ExpenseSummaryService {
           }
         }
 
+  const extraLinePct = summary.extraPct !== undefined ? ` (${summary.extraPct.toFixed(0)}%)` : '';
+  const nonEssentialLinePct = summary.nonEssentialPct !== undefined ? ` (${summary.nonEssentialPct.toFixed(0)}%)` : '';
+  const extraDays = summary.daysSinceExtra !== undefined && summary.daysSinceExtra >= 0 ? ` d${summary.daysSinceExtra}` : '';
+  const nonEssentialDays = summary.daysSinceNonEssential !== undefined && summary.daysSinceNonEssential >= 0 ? ` d${summary.daysSinceNonEssential}` : '';
         const message =
           `${budgetChart}\n` +
-          `Сегодня: ${summary.todaysTotal}€ (${summary.todaysIrregular}€)\n` +
+          `Сегодня: ${summary.todaysTotal}€ (${summary.todaysIrregular}€${summary.irregularSpike ? ' ⚠️' : ''})\n` +
           `Месяц: ${summary.monthlyTotal}€\n` +
           `Нерегул.: ${summary.monthlyIrregular}€ (${summary.percentUsed.toFixed(0)}%${paceLine})` +
-          `\nЛишние(!): ${summary.extra}€` +
-          `\nНеобязательные(?,!): ${summary.nonEssential}€` +
+          `\nЛишние(!): ${summary.extra}€${extraLinePct}${extraDays}${summary.extraSpike ? ' ⚠️' : ''}` +
+          `\nНеобязат.: ${summary.nonEssential}€${nonEssentialLinePct}${nonEssentialDays}` +
+          (summary.nonEssentialSpike ? ' ⚠️' : '') +
           (summary.budget
-            ? `\nB:${summary.budget} R:${summary.remaining.toFixed(0)} d${daysLeft} ${exhaustionLine}`
+            ? `\nБюд: ${summary.budget}€ Ост: ${summary.remaining.toFixed(0)}€ дн: ${daysLeft}${exhaustionLine ? ' ' + exhaustionLine : ''}`
             : '') +
           `\n${dailyAvgChart}\n` +
-          `${velocityChart}\n`;
+          `${velocityChart}\n` +
+          (summary.energyEmoji ? `Энергия: ${summary.energyEmoji} (${summary.energyScore?.toFixed(1)})\n` : '');
 
         // Generate a data URL icon based on budget percentage
         const icon = this.generateBudgetIcon(summary.percentUsed);
@@ -117,14 +139,45 @@ export class ExpenseSummaryService {
     return this.expenseService
       .getExpenses(this.dateFilterService.getInitialMonthValue())
       .pipe(
-        map(expenses => ({
-          todaysTotal: this.getTodaysTotal(expenses),
-          todaysIrregular: this.getTodaysIrregular(expenses),
-          monthlyTotal: this.getMonthlyTotal(expenses),
-          monthlyIrregular: this.getMonthlyIrregularTotal(expenses),
-          extra: this.getExtraTotal(expenses),
-          nonEssential: this.getNonEssentialTotal(expenses),
-        })),
+        map(expenses => {
+          const monthlyIrregular = this.getMonthlyIrregularTotal(expenses);
+          const extra = this.getExtraTotal(expenses);
+          const nonEssential = this.getNonEssentialTotal(expenses);
+          const extraPct = monthlyIrregular > 0 ? Math.min((extra / monthlyIrregular) * 100, 100) : 0;
+          const nonEssentialPct = monthlyIrregular > 0 ? Math.min((nonEssential / monthlyIrregular) * 100, 100) : 0;
+          const daysSinceExtra = this.getDaysSinceMarker(expenses, '!');
+          const daysSinceNonEssential = this.getDaysSinceNonEssential(expenses);
+          const todaysIrregular = this.getTodaysIrregular(expenses);
+          const todaysExtra = this.getTodaysExtra(expenses);
+          const dailyIrregularBuckets = this.getDailyIrregularBuckets(expenses);
+          const medianDailyIrregular = this.median(dailyIrregularBuckets);
+          const irregularSpike = medianDailyIrregular !== undefined && todaysIrregular > medianDailyIrregular * 1.5;
+          const averageDailyExtra = this.getAverageDailyExtra(expenses);
+          const extraSpike = todaysExtra > averageDailyExtra * 2 && todaysExtra > 0; // ensure positive today
+          const todaysNonEssential = this.getTodaysNonEssential(expenses);
+          const averageDailyNonEssential = this.getAverageDailyNonEssential(expenses);
+          const nonEssentialSpike = todaysNonEssential > averageDailyNonEssential * 2 && todaysNonEssential > 0;
+          return {
+            todaysTotal: this.getTodaysTotal(expenses),
+            todaysIrregular,
+            monthlyTotal: this.getMonthlyTotal(expenses),
+            monthlyIrregular,
+            extra,
+            extraPct,
+            nonEssential,
+            nonEssentialPct,
+            daysSinceExtra,
+            daysSinceNonEssential,
+            medianDailyIrregular,
+            irregularSpike,
+            todaysExtra,
+            averageDailyExtra: this.roundUp(averageDailyExtra),
+            extraSpike,
+            todaysNonEssential,
+            averageDailyNonEssential: this.roundUp(averageDailyNonEssential),
+            nonEssentialSpike,
+          };
+        }),
         switchMap(totals =>
           this.irregularBudgetService.getValue().pipe(
             map(budget => {
@@ -137,11 +190,33 @@ export class ExpenseSummaryService {
                 ? Math.min((totals.monthlyIrregular / budgetValue) * 100, 100)
                 : 0;
 
+              // Velocity state (0 good, 1 warning, 2 critical)
+              let velocityState = 0;
+              if (budgetValue > 0) {
+                const now = new Date();
+                const daysPassed = now.getDate();
+                const currentVelocity = totals.monthlyIrregular / Math.max(daysPassed, 1);
+                const dailyBudget = budgetValue / new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                if (currentVelocity > dailyBudget * 1.2) velocityState = 2; // >120%
+                else if (currentVelocity > dailyBudget) velocityState = 1; // over but <120%
+              }
+
+              const spikeFlags = [totals.irregularSpike, totals.extraSpike, totals.nonEssentialSpike].filter(Boolean).length;
+              const extraPctWeight = (totals.extraPct || 0) / 100; // 0..1
+              const score = extraPctWeight * 4 + velocityState * 2 + spikeFlags; // weighted composite
+              let emoji = '😇';
+              if (score >= 9) emoji = '😱';
+              else if (score >= 6) emoji = '😟';
+              else if (score >= 3) emoji = '😐';
+              else if (score >= 1.5) emoji = '🙂';
+
               return {
                 ...totals,
                 budget: budgetValue,
                 remaining,
                 percentUsed,
+                energyScore: Math.round(score * 10) / 10,
+                energyEmoji: emoji,
               };
             })
           )
@@ -203,6 +278,98 @@ export class ExpenseSummaryService {
     return expenses
       .filter(expense => getCategoryById(expense.category)?.includeInBalance)
       .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
+  }
+
+  private getTodaysNonEssential(expenses: Expense[]): number {
+    const today = new Date();
+    const startOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ).getTime();
+    return expenses
+      .filter(e => e.date >= startOfDay)
+      .filter(e => e.description?.includes('!') || e.description?.includes('?'))
+      .reduce((sum, e) => this.roundUp(sum + e.amount), 0);
+  }
+
+  private getAverageDailyNonEssential(expenses: Expense[]): number {
+    const now = new Date();
+    const daysPassed = now.getDate();
+    if (daysPassed === 0) return 0;
+    const total = expenses
+      .filter(e => e.description?.includes('!') || e.description?.includes('?'))
+      .reduce((sum, e) => this.roundUp(sum + e.amount), 0);
+    return total / daysPassed;
+  }
+
+  private getTodaysExtra(expenses: Expense[]): number {
+    const today = new Date();
+    const startOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ).getTime();
+    return expenses
+      .filter(e => e.date >= startOfDay)
+      .filter(e => e.description?.includes('!'))
+      .reduce((sum, e) => this.roundUp(sum + e.amount), 0);
+  }
+
+  private getDailyIrregularBuckets(expenses: Expense[]): number[] {
+    // Map of day (date number) -> irregular spend
+    const map = new Map<number, number>();
+    expenses
+      .filter(e => getCategoryById(e.category)?.includeInBalance)
+      .forEach(e => {
+        const d = new Date(e.date);
+        const day = d.getDate();
+        const current = map.get(day) || 0;
+        map.set(day, this.roundUp(current + e.amount));
+      });
+    return Array.from(map.values());
+  }
+
+  private median(values: number[]): number | undefined {
+    if (!values.length) return undefined;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    if (sorted.length % 2 === 0) {
+      return this.roundUp((sorted[mid - 1] + sorted[mid]) / 2);
+    }
+    return sorted[mid];
+  }
+
+  private getAverageDailyExtra(expenses: Expense[]): number {
+    // Average extra per elapsed day that had any extra? Or per elapsed calendar day? Use elapsed calendar days for consistency.
+    const now = new Date();
+    const daysPassed = now.getDate();
+    if (daysPassed === 0) return 0;
+    const totalExtra = expenses
+      .filter(e => e.description?.includes('!'))
+      .reduce((sum, e) => this.roundUp(sum + e.amount), 0);
+    return totalExtra / daysPassed;
+  }
+
+  private getDaysSinceMarker(expenses: Expense[], marker: string): number | undefined {
+    const now = Date.now();
+    // Find most recent expense containing marker in description
+    const last = expenses
+      .filter(e => e.description?.includes(marker))
+      .sort((a, b) => b.date - a.date)[0];
+    if (!last) return undefined;
+    const msPerDay = 1000 * 60 * 60 * 24;
+    return Math.floor((now - last.date) / msPerDay);
+  }
+
+  private getDaysSinceNonEssential(expenses: Expense[]): number | undefined {
+    const now = Date.now();
+    const last = expenses
+      .filter(e => e.description?.includes('!') || e.description?.includes('?'))
+      .sort((a, b) => b.date - a.date)[0];
+    if (!last) return undefined;
+    const msPerDay = 1000 * 60 * 60 * 24;
+    return Math.floor((now - last.date) / msPerDay);
   }
 
   private roundUp(value: number): number {
