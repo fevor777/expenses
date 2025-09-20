@@ -17,6 +17,8 @@ export interface ExpenseSummary {
   budget: number;
   remaining: number;
   percentUsed: number;
+  extra: number;
+  nonEssential: number;
 }
 
 @Injectable({
@@ -28,7 +30,7 @@ export class ExpenseSummaryService {
     private dateFilterService: DateFilterService,
     private irregularBudgetService: IrregularBudgetService,
     private notificationService: NotificationService
-  ) { }
+  ) {}
 
   sendBrowserNotificationSummary(): Observable<void> {
     // One-shot summary: take(1) ensures we don't keep an open subscription that would
@@ -47,15 +49,34 @@ export class ExpenseSummaryService {
           summary.budget
         );
 
+        // Month elapsed vs budget usage pace comparison
+        let paceLine = '';
+        let daysLeft = 0;
+        if (summary.budget > 0) {
+          const now = new Date();
+          // total days in current month
+          const daysInMonth = new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            0
+          ).getDate();
+          const daysPassed = now.getDate();
+          const monthElapsedPct = (daysPassed / daysInMonth) * 100;
+          daysLeft = Math.max(daysInMonth - daysPassed, 0);
+          paceLine = ` - Пер.: ${monthElapsedPct.toFixed(0)}%`;
+        }
+
         const message =
           `${budgetChart}\n` +
           `Сегодня: ${summary.todaysTotal}€ (${summary.todaysIrregular}€)\n` +
           `Месяц: ${summary.monthlyTotal}€\n` +
-          `Нерегулярные: ${summary.monthlyIrregular}€ (${summary.percentUsed.toFixed(0)}%)` +
+          `Нерегул.: ${summary.monthlyIrregular}€ (${summary.percentUsed.toFixed(0)}%${paceLine})` +
+          `\nЛишние(!): ${summary.extra}€` +
+          `\nНеобязательные(?,!): ${summary.nonEssential}€` +
           (summary.budget
-            ? `\nБюджет: ${summary.budget}€ | Осталось: ${summary.remaining.toFixed(0)}€`
+            ? `\nБюджет: ${summary.budget}€ | Ост.: ${summary.remaining.toFixed(0)}€ - ${daysLeft}дн`
             : '') +
-          `\n\n ${dailyAvgChart}\n\n` +
+          `\n ${dailyAvgChart}\n` +
           `${velocityChart}\n`;
 
         // Generate a data URL icon based on budget percentage
@@ -82,6 +103,8 @@ export class ExpenseSummaryService {
           todaysIrregular: this.getTodaysIrregular(expenses),
           monthlyTotal: this.getMonthlyTotal(expenses),
           monthlyIrregular: this.getMonthlyIrregularTotal(expenses),
+          extra: this.getExtraTotal(expenses),
+          nonEssential: this.getNonEssentialTotal(expenses),
         })),
         switchMap(totals =>
           this.irregularBudgetService.getValue().pipe(
@@ -105,6 +128,22 @@ export class ExpenseSummaryService {
           )
         )
       );
+  }
+
+  getNonEssentialTotal(expenses: Expense[]): number {
+    return expenses
+      .filter(
+        expense =>
+          expense?.description?.includes('?') ||
+          expense?.description?.includes('!')
+      )
+      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
+  }
+
+  private getExtraTotal(expenses: Expense[]): number {
+    return expenses
+      .filter(expense => expense?.description?.includes('!'))
+      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
   }
 
   private getTodaysTotal(expenses: Expense[]): number {
@@ -185,13 +224,14 @@ export class ExpenseSummaryService {
     const svg = `
       <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
         <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#E0E0E0" stroke-width="4"/>
-        ${percentUsed > 0
-        ? `
+        ${
+          percentUsed > 0
+            ? `
           <path d="M ${center} ${center - radius} A ${radius} ${radius} 0 ${largeArc} 1 ${x} ${y}" 
                 fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
         `
-        : ''
-      }
+            : ''
+        }
         <text x="${center}" y="${center + 5}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#333">
           ${percentUsed.toFixed(0)}%
         </text>
