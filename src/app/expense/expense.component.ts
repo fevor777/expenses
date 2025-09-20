@@ -7,7 +7,17 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { Observable, of, Subject, switchMap, takeUntil, tap, take, map } from 'rxjs';
+import {
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+  take,
+  map,
+  delay,
+} from 'rxjs';
 
 import { CategoriesComponent } from '../common/component/category/categories.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
@@ -133,17 +143,22 @@ export class ExpenseComponent implements OnInit, OnDestroy {
             }
             return balanceObs.pipe(map(() => addedExpense));
           }),
-          switchMap(addedExpense =>
-            this.expenseSummaryService
-              .sendBrowserNotificationSummary()
-              .pipe(map(() => addedExpense))
+          tap((addedExpense: Expense) => {
+            this.onShowNumberBoard();
+            this.showNotification(
+              categoryName,
+              amount,
+              addedExpense,
+              originalDescription
+            );
+          }),
+          delay(3000),
+          switchMap(() =>
+            this.expenseSummaryService.sendBrowserNotificationSummary()
           ),
           takeUntil(this.unsubscribe)
         )
-        .subscribe((addedExpense: Expense) => {
-          this.onShowNumberBoard();
-          this.showNotification(categoryName, amount, addedExpense, originalDescription);
-        });
+        .subscribe();
     }
   }
 
@@ -241,7 +256,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.unsubscribe.complete();
   }
 
-  showNotification(categoryName, amount, addedExpense?: Expense, originalDescription?: string): void {
+  showNotification(
+    categoryName,
+    amount,
+    addedExpense?: Expense,
+    originalDescription?: string
+  ): void {
     const todaysAmountByCategory = this.getTodaysAmount(categoryName);
     const monthlyAmountByCategory =
       this.getMonthlyAmountByCategory(categoryName);
@@ -283,7 +303,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         });
       });
   }
-
 
   private getTodaysAmount(categoryName: string): number {
     return this.todaysExpenses
