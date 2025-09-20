@@ -116,8 +116,8 @@ export class ExpenseSummaryService {
           (summary.budget
             ? `\n- Бюд: ${summary.budget}€ Ост: ${summary.remaining.toFixed(0)}€ дн: ${daysLeft}${exhaustionLine ? ' ' + exhaustionLine : ''}`
             : '') +
-          `\n${dailyAvgChart}\n` +
-          `${velocityChart}\n` +
+          `\n- ${dailyAvgChart}\n` +
+          `- ${velocityChart}\n` +
           (summary.energyEmoji ? `- Энергия: ${summary.energyEmoji} (${summary.energyScore?.toFixed(1)})\n` : '');
 
         // Generate a data URL icon based on budget percentage
