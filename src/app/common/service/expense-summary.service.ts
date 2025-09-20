@@ -95,7 +95,7 @@ export class ExpenseSummaryService {
           (summary.budget
             ? `\nB:${summary.budget} R:${summary.remaining.toFixed(0)} d${daysLeft} ${exhaustionLine}`
             : '') +
-          `\n\n\n\n ${dailyAvgChart}\n` +
+          `\n${dailyAvgChart}\n` +
           `${velocityChart}\n`;
 
         // Generate a data URL icon based on budget percentage
