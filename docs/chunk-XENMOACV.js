@@ -7,10 +7,7 @@ import{b as Lt,e as fe}from"./chunk-YW3JUP46.js";import{a as pe}from"./chunk-YU6
 \u041B\u0438\u0448\u043D\u0438\u0435(!): ${s.extra}\u20AC
 \u041D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435(?,!): ${s.nonEssential}\u20AC`+(s.budget?`
 B:${s.budget} R:${s.remaining.toFixed(0)} d${E} ${v}`:"")+`
-
-
-
- ${h}
+${h}
 ${d}
 `,S=this.generateBudgetIcon(s.percentUsed);return this.notificationService.showBrowserNotification(a,f,{icon:S,badge:S})}))}getExpenseSummary(){return this.expenseService.getExpenses(this.dateFilterService.getInitialMonthValue()).pipe($t(s=>({todaysTotal:this.getTodaysTotal(s),todaysIrregular:this.getTodaysIrregular(s),monthlyTotal:this.getMonthlyTotal(s),monthlyIrregular:this.getMonthlyIrregularTotal(s),extra:this.getExtraTotal(s),nonEssential:this.getNonEssentialTotal(s)})),rt(s=>this.irregularBudgetService.getValue().pipe($t(a=>{let c=a||0,h=Math.max(c-s.monthlyIrregular,0),d=c?Math.min(s.monthlyIrregular/c*100,100):0;return le(It({},s),{budget:c,remaining:h,percentUsed:d})}))))}getNonEssentialTotal(s){return s.filter(a=>a?.description?.includes("?")||a?.description?.includes("!")).reduce((a,c)=>this.roundUp(a+c.amount),0)}getExtraTotal(s){return s.filter(a=>a?.description?.includes("!")).reduce((a,c)=>this.roundUp(a+c.amount),0)}getTodaysTotal(s){let a=new Date,c=new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime();return s.filter(h=>h.date>=c).reduce((h,d)=>this.roundUp(h+d.amount),0)}getTodaysIrregular(s){let a=new Date,c=new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime();return s.filter(h=>h.date>=c).filter(h=>Lt(h.category)?.includeInBalance).reduce((h,d)=>this.roundUp(h+d.amount),0)}getMonthlyTotal(s){return s.reduce((a,c)=>this.roundUp(a+c.amount),0)}getMonthlyIrregularTotal(s){return s.filter(a=>Lt(a.category)?.includeInBalance).reduce((a,c)=>this.roundUp(a+c.amount),0)}roundUp(s){return Math.round(s*100)/100}generateBudgetChart(s){if(s===0)return"";let a=10,c=Math.round(s/100*a),h=a-c,d="\u25CF".repeat(c),P="\u25CB".repeat(h);return`[${d}${P}] ${s.toFixed(0)}%`}generateBudgetIcon(s){let d=s/100*2*Math.PI-Math.PI/2,P=32+20*Math.cos(d),E=32+20*Math.sin(d),v=s>50?1:0,f="#4CAF50";s>80?f="#F44336":s>60&&(f="#FF9800");let S=`
       <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
