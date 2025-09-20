@@ -107,18 +107,18 @@ export class ExpenseSummaryService {
   const nonEssentialDays = summary.daysSinceNonEssential !== undefined && summary.daysSinceNonEssential >= 0 ? ` d${summary.daysSinceNonEssential}` : '';
         const message =
           `${budgetChart}\n` +
-          `Сегодня: ${summary.todaysTotal}€ (${summary.todaysIrregular}€${summary.irregularSpike ? ' ⚠️' : ''})\n` +
-          `Месяц: ${summary.monthlyTotal}€\n` +
-          `Нерегул.: ${summary.monthlyIrregular}€ (${summary.percentUsed.toFixed(0)}%${paceLine})` +
-          `\nЛишние(!): ${summary.extra}€${extraLinePct}${extraDays}${summary.extraSpike ? ' ⚠️' : ''}` +
-          `\nНеобязат.: ${summary.nonEssential}€${nonEssentialLinePct}${nonEssentialDays}` +
+          `- Сегодня: ${summary.todaysTotal}€ (${summary.todaysIrregular}€${summary.irregularSpike ? ' ⚠️' : ''})\n` +
+          `- Месяц: ${summary.monthlyTotal}€\n` +
+          `- Нерегул.: ${summary.monthlyIrregular}€ (${summary.percentUsed.toFixed(0)}%${paceLine})` +
+          `\n- Лишние(!): ${summary.extra}€${extraLinePct}${extraDays}${summary.extraSpike ? ' ⚠️' : ''}` +
+          `\n- Необязат.: ${summary.nonEssential}€${nonEssentialLinePct}${nonEssentialDays}` +
           (summary.nonEssentialSpike ? ' ⚠️' : '') +
           (summary.budget
-            ? `\nБюд: ${summary.budget}€ Ост: ${summary.remaining.toFixed(0)}€ дн: ${daysLeft}${exhaustionLine ? ' ' + exhaustionLine : ''}`
+            ? `\n- Бюд: ${summary.budget}€ Ост: ${summary.remaining.toFixed(0)}€ дн: ${daysLeft}${exhaustionLine ? ' ' + exhaustionLine : ''}`
             : '') +
           `\n${dailyAvgChart}\n` +
           `${velocityChart}\n` +
-          (summary.energyEmoji ? `Энергия: ${summary.energyEmoji} (${summary.energyScore?.toFixed(1)})\n` : '');
+          (summary.energyEmoji ? `- Энергия: ${summary.energyEmoji} (${summary.energyScore?.toFixed(1)})\n` : '');
 
         // Generate a data URL icon based on budget percentage
         const icon = this.generateBudgetIcon(summary.percentUsed);
