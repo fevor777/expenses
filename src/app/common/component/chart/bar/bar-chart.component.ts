@@ -145,6 +145,29 @@ export class BarChartComponent implements OnChanges {
         // }
       }
 
+      // Zero out current (in-progress) period for ALL modes (treat undefined as DAY).
+      // Future periods remain null; past periods keep aggregated values.
+      const now = Date.now();
+      const frameIncludesNow =
+        (filter.start?.valueOf?.() ?? 0) <= now &&
+        (filter.finish?.valueOf?.() ?? 0) >= now;
+      if (frameIncludesNow) {
+        const currentDate = new Date();
+        if (filter.mode === Mode.MONTH) {
+          const d = currentDate.getDate() - 1; // 0-based
+          if (d >= 0 && d < this.chartOptions.datasets[0].data.length) {
+            if (this.chartOptions.datasets[0].data[d] != null) {
+              this.chartOptions.datasets[0].data[d] = 0;
+            }
+          }
+        } else if (filter.mode === Mode.YEAR) {
+          const m = currentDate.getMonth();
+          if (this.chartOptions.datasets[0].data[m] != null) {
+            this.chartOptions.datasets[0].data[m] = 0;
+          }
+        }
+      }
+
       this.chartOptions = {
         ...this.chartOptions,
         datasets: [...this.chartOptions.datasets],
