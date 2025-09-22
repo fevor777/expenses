@@ -3,6 +3,25 @@
     <span class="app-link statistics-history-link" routerLink="/history"
       >< History</span
     >
+    <div class="statistics-search-wrapper" *ngIf="true">
+      <input
+        type="text"
+        class="statistics-search-input"
+        placeholder="Поиск описания..."
+        [(ngModel)]="descriptionSearch"
+        (ngModelChange)="onDescriptionSearchChange($event)"
+        aria-label="Поиск по описанию"
+      />
+      <button
+        *ngIf="descriptionSearch"
+        type="button"
+        class="statistics-search-clear"
+        (click)="clearDescriptionSearch()"
+        aria-label="Очистить поиск"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
     <span class="app-link statistics-home-link" routerLink="/">Home ></span>
   </div>
   <app-date-filter

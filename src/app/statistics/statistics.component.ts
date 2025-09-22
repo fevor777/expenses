@@ -74,6 +74,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   });
 
   filteredExpenses: Expense[];
+  descriptionSearch: string = '';
 
   constructor(
     private router: Router,
@@ -82,6 +83,18 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   ) {
     this.initialFilterValue = this.dateFilterService.getInitialDayValue();
     this.currentFilter = this.initialFilterValue;
+  }
+
+  onDescriptionSearchChange(value: string): void {
+    // Debounce could be added if needed; for now immediate filter
+    this.descriptionSearch = value?.trim();
+    this.calculateCategoryTotals();
+  }
+
+  clearDescriptionSearch(): void {
+    if (!this.descriptionSearch) return;
+    this.descriptionSearch = '';
+    this.calculateCategoryTotals();
   }
 
   ngAfterViewInit(): void {
@@ -200,6 +213,12 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(expenses => {
         expensesFilteredByDate = expenses;
+        if (this.descriptionSearch) {
+          const lower = this.descriptionSearch.toLowerCase();
+            expensesFilteredByDate = expensesFilteredByDate.filter(e =>
+              (e.description || '').toLowerCase().includes(lower)
+            );
+        }
         if (isCurrentCategoriesUpdate) {
           this.currentCategories = Array.from(
             new Set(expensesFilteredByDate.map(expense => expense.category))

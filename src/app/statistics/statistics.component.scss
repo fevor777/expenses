@@ -29,7 +29,7 @@
 }
 
 .statistics {
-  padding: 12px 16px 32px;
+  padding: 5px;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -39,13 +39,92 @@
 
   .statistics-nav {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 10px;
+    /* Let center item (search) grow while links keep intrinsic width */
+    > .statistics-search-input {
+      flex: 1 1 auto;
+      min-width: 60px;
+    }
+    > .statistics-history-link,
+    > .statistics-home-link {
+      flex: 0 0 auto;
+    }
   }
   .statistics-home-link,
   .statistics-history-link {
     margin: 2px 0 4px;
     font-weight: 400;
+  }
+  .statistics-search-input {
+    width: 100%;
+    flex: 1 1 140px;
+    max-width: 320px;
+    padding: 3px;
+    font-size: 13px;
+    line-height: 1.2;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+    font-family: inherit;
+    outline: none;
+    margin: 0;
+    margin-bottom: 10px;
+    margin-left: 15px;
+    margin-right: 15px;
+    transition: border-color .18s, background-color .18s, box-shadow .18s;
+  }
+  .statistics-search-input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+  .statistics-search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    max-width: 100%;
+  }
+  .statistics-search-clear {
+    position: absolute;
+    right: 17px;
+    top: 37%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 2px;
+    margin: 0;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    transition: background-color .15s, color .15s;
+  }
+  .statistics-search-clear:hover {
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+  }
+  .statistics-search-clear:active {
+    transform: translateY(-50%) scale(.9);
+  }
+  .statistics-search-clear:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  .statistics-search-input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+  }
+  .statistics-search-input::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.7;
   }
 
   .statistics-filter {
