@@ -17,21 +17,17 @@
     [value]="currentFilter"
     [defaultValue]="initialFilterValue"
     (changeFilter)="onFilterChange($event)"
+  >
+    <i
+      class="fa-solid fa-list stats-action-icon"
+      title="Перейти в детализацию"
+      (click)="navigateToHistory()"
+    ></i
   ></app-date-filter>
 
   <div class="stats-section stats-section--donut">
-    <div class="stats-section-header">
-      <span class="stats-section-title">Категории (доля расходов)</span>
-      <i
-        class="fa-solid fa-list stats-action-icon"
-        title="Перейти в детализацию"
-        (click)="navigateToDetailsPage()"
-      ></i>
-    </div>
     <div id="donut-chart" class="stats-donut-chart"></div>
   </div>
-
-  <hr class="statistics-separator" />
 
   <app-collapsed-panel
     [collapsed]="collapsed.categoryFilters"
@@ -100,7 +96,7 @@
         [category]="categoryTotal.category"
         [percentage]="categoryTotal.percentage"
         (categoryLabelClick)="filterByCategory($event)"
-        (detailsIconClick)="navigateToDetails($event)"
+        (detailsIconClick)="navigateToHistory($event)"
         (chartIconClick)="navigateToChart($event)"
         (close)="onBarClose($event)"
       ></app-statistics-bar>

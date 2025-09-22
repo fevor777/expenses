@@ -181,8 +181,13 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  navigateToDetails(categoryId: string): void {
-    this.dateFilterService.categories = [categoryId];
+  navigateToHistory(categoryId?: string): void {
+    if (categoryId) {
+      this.dateFilterService.categories = [categoryId];
+    } else {
+      this.dateFilterService.categories = this.getRemainCategories();
+    }
+    this.dateFilterService.description = this.descriptionSearch;
     this.dateFilterService.dateFilter = this.currentFilter;
     this.router.navigate(['/history']);
   }
