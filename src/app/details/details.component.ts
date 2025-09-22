@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { first, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 import { Categories } from '../common/model/categories';
 import {
@@ -10,13 +10,11 @@ import {
 } from '../common/component/filter/multi/multi-filter.component';
 import { Expense } from '../common/model/expense.model';
 import { ExpenseService } from '../common/service/expense.service';
-import { getExpensesFromTo } from '../statistics/functions/expense-helpers';
-import { BarChartComponent } from '../common/component/chart/bar/bar-chart.component';
+import { MultiChartComponent } from '../common/component/chart/multi/multi-chart.component';
 import { CompositionChartsComponent } from '../statistics/composition/composition-charts.component';
 import { MicroVisualsComponent } from './micro/micro-visuals.component';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
-import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { IrregularBudgetService } from '../common/service/irregular-budget.service';
 import { IrregularBudgetGaugeComponent } from './irregular/irregular-budget-gauge.component';
 import { IrregularCumulativeComponent } from './irregular/irregular-cumulative.component';
@@ -31,7 +29,7 @@ import { Mode } from '../common/component/filter/date/dateFrame.model';
     CommonModule,
     RouterModule,
     MultiFilterComponent,
-    BarChartComponent,
+    MultiChartComponent,
     CompositionChartsComponent,
     MicroVisualsComponent,
     IrregularBudgetGaugeComponent,

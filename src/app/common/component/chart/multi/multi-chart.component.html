@@ -1,0 +1,35 @@
+<div class="multi-chart-wrapper">
+  <div class="chart-type-switch" role="group" aria-label="Chart type switcher">
+    <div class="segmented" [attr.data-active]="chartType">
+      <div class="segmented-bg" aria-hidden="true"></div>
+      <button
+        type="button"
+        class="segmented-btn"
+        (click)="switchChart('bar')"
+        [attr.aria-pressed]="chartType === 'bar'"
+        [class.is-active]="chartType === 'bar'"
+      >
+        Bar
+      </button>
+      <button
+        type="button"
+        class="segmented-btn"
+        (click)="switchChart('line')"
+        [attr.aria-pressed]="chartType === 'line'"
+        [class.is-active]="chartType === 'line'"
+      >
+        Line
+      </button>
+    </div>
+  </div>
+  <div class="chart-container">
+    <canvas
+      baseChart
+      [datasets]="chartOptions.datasets"
+      [labels]="chartOptions.labels"
+      [options]="chartOptions.options"
+      [legend]="chartOptions.legend"
+      [type]="chartType"
+    ></canvas>
+  </div>
+</div>

@@ -63,16 +63,16 @@
   </div>
   <div class="section">
     <div class="section-header" (click)="toggle('bar')">
-      <span>Месячная гистограмма</span>
+      <span>Динамика расходов (Bar / Line)</span>
       <button type="button" class="collapse-btn">
         {{ collapsed.bar ? '▼' : '▲' }}
       </button>
     </div>
     <div class="section-body" *ngIf="!collapsed.bar">
-      <app-bar-chart
+      <app-multi-chart
         [expenses]="expenses"
         [filter]="currentFilter?.date"
-      ></app-bar-chart>
+      ></app-multi-chart>
     </div>
   </div>
   <div class="section">

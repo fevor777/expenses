@@ -9,7 +9,6 @@ import { Router, RouterModule } from '@angular/router';
 import * as echarts from 'echarts';
 import { first, Subject, takeUntil } from 'rxjs';
 
-import { BarChartComponent } from '../common/component/chart/bar/bar-chart.component';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
@@ -23,6 +22,7 @@ import { ExpenseService } from '../common/service/expense.service';
 import { StatisticsBarComponent } from './bar/statistics-bar.component';
 import { CommonModule } from '@angular/common';
 import { CompositionChartsComponent } from './composition/composition-charts.component';
+import { MultiChartComponent } from '../common/component/chart/multi/multi-chart.component';
 
 @Component({
   selector: 'app-statistics',
@@ -34,7 +34,7 @@ import { CompositionChartsComponent } from './composition/composition-charts.com
     FormsModule,
     CategoryListNamePipe,
     StatisticsBarComponent,
-    BarChartComponent,
+    MultiChartComponent,
     CommonModule,
     CompositionChartsComponent,
     RouterModule,
