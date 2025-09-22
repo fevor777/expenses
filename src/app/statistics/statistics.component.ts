@@ -13,6 +13,7 @@ import { DateFilterComponent } from '../common/component/filter/date/date-filter
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import {
+  Categories,
   getCategoryById,
   getCategoryNameById,
 } from '../common/model/categories';
@@ -79,7 +80,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   filteredExpenses: Expense[];
   descriptionSearch: string = '';
-  
+
   // collapse state for category filters and bars
   collapsed: Record<'categoryFilters', boolean> = {
     categoryFilters: false,
@@ -174,9 +175,6 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   onFilterChange(frame: DateFrame): void {
     if (frame?.display !== this.currentFilter?.display) {
       this.currentFilter = frame;
-      this.excludedCategories = [];
-      this.irregularCategoriesCheckboxValue = true;
-      this.regularCategoriesCheckboxValue = true;
       this.calculateCategoryTotals();
     }
   }
@@ -227,9 +225,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
         expensesFilteredByDate = expenses;
         if (this.descriptionSearch) {
           const lower = this.descriptionSearch.toLowerCase();
-            expensesFilteredByDate = expensesFilteredByDate.filter(e =>
-              (e.description || '').toLowerCase().includes(lower)
-            );
+          expensesFilteredByDate = expensesFilteredByDate.filter(e =>
+            (e.description || '').toLowerCase().includes(lower)
+          );
         }
         if (isCurrentCategoriesUpdate) {
           this.currentCategories = Array.from(
@@ -417,9 +415,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     if (this.excludedCategories?.length === 0) {
       return [];
     }
-    return this.currentCategories.filter(
-      category => !this.excludedCategories.includes(category)
-    );
+    return Categories.filter(
+      category => !this.excludedCategories.includes(category?.id)
+    ).map(category => category.id);
   }
 
   ngOnDestroy(): void {
