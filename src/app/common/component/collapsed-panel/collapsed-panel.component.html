@@ -1,0 +1,18 @@
+<div class="section">
+  <div class="section-header" (click)="onToggle()">
+    <div class="section-title">
+      <ng-content select="[slot=header]"></ng-content>
+      <span *ngIf="title">{{ title }}</span>
+    </div>
+    <button 
+      *ngIf="showCollapseButton"
+      type="button" 
+      class="collapse-btn"
+    >
+      {{ collapsed ? '▼' : '▲' }}
+    </button>
+  </div>
+  <div class="section-body" *ngIf="!collapsed">
+    <ng-content></ng-content>
+  </div>
+</div>

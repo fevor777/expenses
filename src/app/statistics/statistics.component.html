@@ -3,25 +3,13 @@
     <span class="app-link statistics-history-link" routerLink="/history"
       >< History</span
     >
-    <div class="statistics-search-wrapper" *ngIf="true">
-      <input
-        type="text"
-        class="statistics-search-input"
-        placeholder="Поиск описания..."
-        [(ngModel)]="descriptionSearch"
-        (ngModelChange)="onDescriptionSearchChange($event)"
-        aria-label="Поиск по описанию"
-      />
-      <button
-        *ngIf="descriptionSearch"
-        type="button"
-        class="statistics-search-clear"
-        (click)="clearDescriptionSearch()"
-        aria-label="Очистить поиск"
-      >
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
+    <app-search-input
+      placeholder="Поиск описания..."
+      [(ngModel)]="descriptionSearch"
+      (searchChange)="onDescriptionSearchChange($event)"
+      aria-label="Поиск по описанию"
+      clear-button-aria-label="Очистить поиск"
+    ></app-search-input>
     <span class="app-link statistics-home-link" routerLink="/">Home ></span>
   </div>
   <app-date-filter
@@ -45,8 +33,11 @@
 
   <hr class="statistics-separator" />
 
-  <div class="stats-section stats-section--filters">
-    <span class="statistic-category-label">
+  <app-collapsed-panel
+    [collapsed]="collapsed.categoryFilters"
+    (toggle)="toggle('categoryFilters')"
+  >
+    <div slot="header" class="statistic-category-label">
       Категории:
       <span
         *ngIf="excludedCategories?.length > 0"
@@ -57,60 +48,64 @@
           excludedCategories | categoryListName
         }}</span
         >)
+
         <i
-          (click)="onRefresh()"
+          (click)="onRefresh(); $event.stopPropagation()"
           class="fas fa-redo-alt statistic-refresh-button"
+          title="Сбросить фильтры"
         ></i>
       </span>
-    </span>
-    <div class="statistics-checkbox">
-      <label class="statistics-checkbox-item">
-        <input
-          type="checkbox"
-          value="regular"
-          class="statistics-checkbox-input"
-          [checked]="true"
-          [(ngModel)]="regularCategoriesCheckboxValue"
-          (ngModelChange)="onRegularCategoriesCheckboxClick($event)"
-        />
-        <span class="statistics-checkbox-label"
-          >Регулярное
-          <span class="statistics-amount-muted"
-            >({{ regularAmount }}€)</span
-          ></span
-        >
-      </label>
-      <label class="statistics-checkbox-item">
-        <input
-          type="checkbox"
-          value="irregular"
-          class="statistics-checkbox-input"
-          [checked]="true"
-          [(ngModel)]="irregularCategoriesCheckboxValue"
-          (ngModelChange)="onIrregularCategoriesCheckboxClick($event)"
-        />
-        <span class="statistics-checkbox-label"
-          >Нерегулярное
-          <span class="statistics-amount-muted"
-            >({{ irregularAmount }}€)</span
-          ></span
-        >
-      </label>
     </div>
-  </div>
 
-  <div class="stats-bars">
-    <app-statistics-bar
-      *ngFor="let categoryTotal of categoryTotals"
-      [amount]="categoryTotal.amount"
-      [category]="categoryTotal.category"
-      [percentage]="categoryTotal.percentage"
-      (categoryLabelClick)="filterByCategory($event)"
-      (detailsIconClick)="navigateToDetails($event)"
-      (chartIconClick)="navigateToChart($event)"
-      (close)="onBarClose($event)"
-    ></app-statistics-bar>
-  </div>
+    <div class="stats-section stats-section--filters">
+      <div class="statistics-checkbox">
+        <label class="statistics-checkbox-item">
+          <input
+            type="checkbox"
+            value="regular"
+            class="statistics-checkbox-input"
+            [checked]="true"
+            [(ngModel)]="regularCategoriesCheckboxValue"
+            (ngModelChange)="onRegularCategoriesCheckboxClick($event)"
+          />
+          <span class="statistics-checkbox-label"
+            >Регулярное
+            <span class="statistics-amount-muted"
+              >({{ regularAmount }}€)</span
+            ></span
+          >
+        </label>
+        <label class="statistics-checkbox-item">
+          <input
+            type="checkbox"
+            value="irregular"
+            class="statistics-checkbox-input"
+            [checked]="true"
+            [(ngModel)]="irregularCategoriesCheckboxValue"
+            (ngModelChange)="onIrregularCategoriesCheckboxClick($event)"
+          />
+          <span class="statistics-checkbox-label"
+            >Нерегулярное
+            <span class="statistics-amount-muted"
+              >({{ irregularAmount }}€)</span
+            ></span
+          >
+        </label>
+      </div>
+    </div>
+    <div class="stats-bars">
+      <app-statistics-bar
+        *ngFor="let categoryTotal of categoryTotals"
+        [amount]="categoryTotal.amount"
+        [category]="categoryTotal.category"
+        [percentage]="categoryTotal.percentage"
+        (categoryLabelClick)="filterByCategory($event)"
+        (detailsIconClick)="navigateToDetails($event)"
+        (chartIconClick)="navigateToChart($event)"
+        (close)="onBarClose($event)"
+      ></app-statistics-bar>
+    </div>
+  </app-collapsed-panel>
 
   <hr class="statistics-separator statistics-separator--spaced" />
 

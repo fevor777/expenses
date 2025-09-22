@@ -1,0 +1,19 @@
+<div class="search-wrapper">
+  <input
+    type="text"
+    class="search-input"
+    [placeholder]="placeholder"
+    [(ngModel)]="value"
+    (ngModelChange)="onSearchChange($event)"
+    [attr.aria-label]="ariaLabel"
+  />
+  <button
+    *ngIf="value"
+    type="button"
+    class="search-clear"
+    (click)="onClear()"
+    [attr.aria-label]="clearButtonAriaLabel"
+  >
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+</div>

@@ -1,0 +1,127 @@
+/* Modern Collapsible Panel */
+.section {
+  width: 100%;
+  background: var(--color-bg);
+  border-radius: 12px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  overflow: hidden;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-border) 40%, transparent);
+  transition:
+    background 0.25s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+  position: relative;
+}
+
+.section-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, var(--color-accent, #6366f1))
+      100%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.section-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text);
+}
+
+.collapse-btn {
+  font: inherit;
+  border: none;
+  background: color-mix(in srgb, var(--color-bg-alt) 60%, transparent);
+  cursor: pointer;
+  padding: 8px 12px;
+  line-height: 1;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+  transition:
+    all 0.2s ease,
+    transform 0.1s ease;
+  flex-shrink: 0;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-body {
+  padding: 5px;
+  background: var(--color-bg);
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark theme enhancements */
+:where(.dark, [data-theme='dark']) .section {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.16);
+  border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
+}
+
+:where(.dark, [data-theme='dark']) .section-header {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-bg-alt) 80%, var(--color-primary) 20%) 0%,
+    color-mix(in srgb, var(--color-bg-alt) 90%, var(--color-primary) 10%) 100%
+  );
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .section-header {
+    padding: 10px 10px;
+    font-size: 14px;
+  }
+
+  .section-body {
+    padding: 5px;
+  }
+
+  .collapse-btn {
+    padding: 6px 10px;
+    min-width: 36px;
+  }
+}

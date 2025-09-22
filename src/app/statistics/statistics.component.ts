@@ -23,6 +23,8 @@ import { StatisticsBarComponent } from './bar/statistics-bar.component';
 import { CommonModule } from '@angular/common';
 import { CompositionChartsComponent } from './composition/composition-charts.component';
 import { MultiChartComponent } from '../common/component/chart/multi/multi-chart.component';
+import { CollapsedPanelComponent } from '../common/component/collapsed-panel';
+import { SearchInputComponent } from '../common/component/search-input';
 
 @Component({
   selector: 'app-statistics',
@@ -38,6 +40,8 @@ import { MultiChartComponent } from '../common/component/chart/multi/multi-chart
     CommonModule,
     CompositionChartsComponent,
     RouterModule,
+    CollapsedPanelComponent,
+    SearchInputComponent,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
@@ -75,6 +79,11 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   filteredExpenses: Expense[];
   descriptionSearch: string = '';
+  
+  // collapse state for category filters and bars
+  collapsed: Record<'categoryFilters', boolean> = {
+    categoryFilters: false,
+  };
 
   constructor(
     private router: Router,
@@ -91,16 +100,14 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.calculateCategoryTotals();
   }
 
-  clearDescriptionSearch(): void {
-    if (!this.descriptionSearch) return;
-    this.descriptionSearch = '';
-    this.calculateCategoryTotals();
-  }
-
   ngAfterViewInit(): void {
     this.chartDom = document.getElementById('donut-chart')!;
     this.myChart = echarts.init(this.chartDom);
     this.calculateCategoryTotals();
+  }
+
+  toggle(section: 'categoryFilters') {
+    this.collapsed[section] = !this.collapsed[section];
   }
 
   initPieChart() {
