@@ -483,7 +483,11 @@ export class ExpenseSummaryService {
     return this.generateBudgetChart(s.percentUsed);
   }
   private lineToday(s: ExpenseSummary) {
-    return `- Сегодня: ${s.todaysTotal}€ (${s.todaysIrregular}€${s.irregularSpike ? ' ⚠️' : ''})`;
+    const irr =
+      s.todaysTotal !== s.todaysIrregular
+        ? ` (${s.todaysIrregular}€${s.irregularSpike ? ' ⚠️' : ''})`
+        : '';
+    return `- Сегодня: ${s.todaysTotal}€${irr}`;
   }
   private lineMonth(s: ExpenseSummary) {
     return `- Месяц: ${s.monthlyTotal}€`;

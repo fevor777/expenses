@@ -43,6 +43,8 @@ export class NotificationComponent implements OnDestroy {
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))
       .subscribe((payload: any) => {
+        this.lastExpense = null;
+        this.isExpenseAddedContext = false;
         // Support both legacy string and new object payload
         if (typeof payload === 'string') {
           this.showMessage(payload, 'info');
@@ -54,7 +56,9 @@ export class NotificationComponent implements OnDestroy {
           this.showMessage(payload.message, (payload.type as any) || 'info');
           // detect context
           this.isExpenseAddedContext = payload.context === 'expense-added';
-            this.lastExpense = this.isExpenseAddedContext ? payload.expense : null;
+          this.lastExpense = this.isExpenseAddedContext
+            ? payload.expense
+            : null;
           if (this.isExpenseAddedContext && this.lastExpense) {
             this.editableDescription = this.lastExpense.description || '';
           } else {
@@ -99,7 +103,6 @@ export class NotificationComponent implements OnDestroy {
     }
   }
 
-
   saveDescription() {
     this.savingDescription = true;
     if (this.lastExpense.id) {
@@ -140,8 +143,6 @@ export class NotificationComponent implements OnDestroy {
   }
 
   onCloseNotification() {
-    this.lastExpense = null;
-    this.isExpenseAddedContext = false;
     this.startHide();
   }
 
