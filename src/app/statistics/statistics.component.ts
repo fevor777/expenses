@@ -38,7 +38,7 @@ import { SearchInputComponent } from '../common/component/search-input';
     StatisticsBarComponent,
     MultiChartComponent,
     CommonModule,
-  AnalyticsSwitchComponent,
+    AnalyticsSwitchComponent,
     RouterModule,
     CollapsedPanelComponent,
     SearchInputComponent,
@@ -72,8 +72,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   descriptionSearch: string = '';
 
   // collapse state for category filters and bars
-  collapsed: Record<'categoryFilters', boolean> = {
+  collapsed: Record<'categoryFilters' | 'multiChart', boolean> = {
     categoryFilters: false,
+    multiChart: false,
   };
 
   constructor(
@@ -96,7 +97,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.calculateCategoryTotals();
   }
 
-  toggle(section: 'categoryFilters') {
+  toggle(section: 'categoryFilters' | 'multiChart'): void {
     this.collapsed[section] = !this.collapsed[section];
   }
 

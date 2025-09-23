@@ -102,16 +102,18 @@
       ></app-statistics-bar>
     </div>
   </app-collapsed-panel>
-
-  <div class="stats-section stats-section--periods">
-    <div class="stats-section-header">
+  <app-collapsed-panel
+    [style.marginTop]="'7px'"
+    [collapsed]="collapsed.multiChart"
+    (toggle)="toggle('multiChart')"
+  >
+    <div slot="header" class="stats-section-header">
       <span class="stats-section-title">Расходы по периодам</span>
     </div>
     <app-multi-chart
       [filter]="currentFilter"
       [expenses]="filteredExpenses"
     ></app-multi-chart>
-  </div>
-
+  </app-collapsed-panel>
   <!-- Composition charts now accessible via segmented switch above -->
 </div>
