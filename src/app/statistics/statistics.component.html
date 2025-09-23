@@ -26,7 +26,7 @@
   ></app-date-filter>
 
   <div class="stats-section stats-section--donut">
-    <div id="donut-chart" class="stats-donut-chart"></div>
+    <app-analytics-switch [expenses]="filteredExpenses"></app-analytics-switch>
   </div>
 
   <app-collapsed-panel
@@ -103,8 +103,6 @@
     </div>
   </app-collapsed-panel>
 
-  <hr class="statistics-separator statistics-separator--spaced" />
-
   <div class="stats-section stats-section--periods">
     <div class="stats-section-header">
       <span class="stats-section-title">Расходы по периодам</span>
@@ -115,14 +113,5 @@
     ></app-multi-chart>
   </div>
 
-  <hr class="statistics-separator" />
-
-  <div class="stats-section stats-section--composition">
-    <div class="stats-section-header">
-      <span class="stats-section-title">Состав расходов (аналитика)</span>
-    </div>
-    <app-composition-charts
-      [expenses]="filteredExpenses"
-    ></app-composition-charts>
-  </div>
+  <!-- Composition charts now accessible via segmented switch above -->
 </div>

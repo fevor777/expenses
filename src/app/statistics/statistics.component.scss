@@ -38,12 +38,12 @@
  .statistics-separator--spaced{margin:14px 0}
 
 /* New semantic sections */
- .stats-section{display:flex;flex-direction:column;gap:4px}
+ .stats-section{display:flex;flex-direction:column;gap:4px; margin-top: 10px;}
  .stats-section-header{display:flex;align-items:center;gap:16px;padding:2px 2px 0 4px}
  .stats-section-title{font-size:14px;font-weight:600;color:var(--color-text-secondary)}
  .stats-action-icon{font-size:12px;color:var(--color-text-secondary);cursor:pointer; margin-left: 15px;}
 
- .stats-section--donut{height:200px}
+ .stats-section--donut{height:auto; min-height:260px; margin-bottom:8px}
  .stats-donut-chart{width:100%;height:calc(100% - 22px)}
 
  .stats-bars{display:flex;flex-direction:column;gap:4px}

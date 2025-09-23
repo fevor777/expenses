@@ -5,6 +5,7 @@ import {
   SimpleChanges,
   AfterViewInit,
   ElementRef,
+  HostListener,
 } from '@angular/core';
 import * as echarts from 'echarts';
 import { Expense } from '../../common/model/expense.model';
@@ -15,7 +16,6 @@ import { CategoryAnalyticsService } from '../functions/category-analytics.servic
   template: `
     <div class="composition-grid">
       <div class="chart-wrapper">
-        <div class="chart-title">Дерево категорий</div>
         <div
           class="chart"
           #treemapContainer
@@ -28,13 +28,6 @@ import { CategoryAnalyticsService } from '../functions/category-analytics.servic
     `
       .composition-grid {
         display: block;
-      }
-      .chart-wrapper {
-        background: #fff;
-        border: 1px solid #eee;
-        border-radius: 6px;
-        padding: 4px 6px 8px 6px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
       }
       .chart-title {
         font-size: 12px;
@@ -94,5 +87,16 @@ export class CompositionChartsComponent implements OnChanges, AfterViewInit {
         },
       ],
     });
+  }
+
+  /** External trigger to fix layout when parent visibility toggles */
+  refreshLayout(): void {
+    if (this.treemapChart) {
+      this.treemapChart.resize();
+    }
+  }
+
+  @HostListener('window:resize') onResize() {
+    this.refreshLayout();
   }
 }

@@ -4,8 +4,8 @@
   background: var(--color-bg);
   border-radius: 12px;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    0 1px 3px rgba(0, 0, 0, 0.06);
+    0 0px 0px rgba(0, 0, 0, 0.04),
+    0 1px 1px rgba(0, 0, 0, 0.06);
   border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
   overflow: hidden;
   transition:
@@ -96,8 +96,8 @@
 /* Dark theme enhancements */
 :where(.dark, [data-theme='dark']) .section {
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.12),
-    0 1px 3px rgba(0, 0, 0, 0.16);
+    0 0px 0px rgba(0, 0, 0, 0.12),
+    0 1px 1px rgba(0, 0, 0, 0.16);
   border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
 }
 

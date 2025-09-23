@@ -2,13 +2,18 @@
   class="segmented"
   role="group"
   [attr.aria-label]="ariaLabel"
-  [attr.data-active]="active"
 >
-  <div class="segmented-bg" aria-hidden="true"></div>
+  <div
+    class="segmented-bg"
+    aria-hidden="true"
+    [style.width]="bgStyle.width"
+    [style.transform]="bgStyle.transform"
+  ></div>
   <button
     *ngFor="let opt of options"
     type="button"
     class="segmented-btn"
+    #segBtn
     (click)="onClick(opt.value)"
     [attr.aria-pressed]="active === opt.value"
     [class.is-active]="active === opt.value"
