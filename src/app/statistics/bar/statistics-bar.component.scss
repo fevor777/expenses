@@ -2,7 +2,6 @@
   .category-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
 
     .category-label {
       font-weight: 600;
@@ -10,7 +9,7 @@
     }
 
     .category-details-icon {
-      padding: 15px;
+      padding-top: 7px;
       padding-bottom: 0px;
       padding-left: 25px;
       font-size: 15px;
@@ -18,7 +17,7 @@
     }
 
     .category-details-amount {
-      padding-top: 12px;
+      padding-top: 7px;
     }
   }
 

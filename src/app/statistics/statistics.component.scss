@@ -60,8 +60,8 @@
 .statistics-checkbox {
   display: flex;
   flex-direction: row;
-  gap: 8px;
-  padding: 6px 0 4px;
+  gap: 3px;
+  margin-left: 37px;
   flex-wrap: nowrap;
 }
 .statistics-checkbox-item {
@@ -69,7 +69,6 @@
   align-items: center;
   gap: 10px;
   border-radius: 8px;
-  padding: 8px 12px;
   cursor: pointer;
   flex: 1 1 0;
   min-width: 0; /* allow text to truncate or wrap within equal halves */
@@ -124,6 +123,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-bottom: 10px;
 }
 .stats-section-header {
   display: flex;
