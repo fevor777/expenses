@@ -15,6 +15,7 @@ export class MultiChartComponent implements OnChanges {
   @Input() filter?: DateFrame;
 
   chartType: 'bar' | 'line' = 'bar';
+  nonZeroCount = 0;
 
   chartOptions: any = {
     datasets: [
@@ -59,6 +60,7 @@ export class MultiChartComponent implements OnChanges {
         ...this.chartOptions,
         datasets: [...this.chartOptions.datasets],
       };
+      this.calculateNonZeroCount();
     }
   }
 
@@ -195,6 +197,8 @@ export class MultiChartComponent implements OnChanges {
       ...this.chartOptions,
       datasets: [...this.chartOptions.datasets],
     };
+
+    this.calculateNonZeroCount();
   }
 
   private postProcessForLineGaps() {
@@ -236,5 +240,10 @@ export class MultiChartComponent implements OnChanges {
 
   private roundAdd(existing: number, add: number): number {
     return Math.round((existing + add) * 100) / 100;
+  }
+
+  private calculateNonZeroCount(): void {
+    const data = this.chartOptions.datasets[0].data;
+    this.nonZeroCount = data.filter((value: number | null) => value != null && value !== 0).length;
   }
 }

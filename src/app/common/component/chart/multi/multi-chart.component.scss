@@ -83,3 +83,18 @@
   position: relative;
   height: 260px;
 }
+
+.chart-summary {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.non-zero-count {
+  font-size: 12px;
+  color: var(--seg-text, #535a63);
+  font-weight: 500;
+  padding: 4px 8px;
+  background: var(--seg-accent-bg, rgba(110, 125, 150, 0.08));
+  border-radius: 12px;
+  border: 1px solid var(--seg-border, rgba(110, 125, 150, 0.22));
+}
