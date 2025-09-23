@@ -250,8 +250,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   onRegularCategoriesCheckboxClick(value: boolean): void {
     if (!value) {
       if (this.irregularCategoriesCheckboxValue) {
-        const regularCategories = this.currentCategories
-          .map(getCategoryById)
+        const regularCategories = Categories
           .filter(category => !category.includeInBalance)
           .map(category => category.id);
         this.excludedCategories = [...regularCategories];
@@ -273,8 +272,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   onIrregularCategoriesCheckboxClick(value: boolean): void {
     if (!value) {
       if (this.regularCategoriesCheckboxValue) {
-        const irregularCategories = this.currentCategories
-          .map(getCategoryById)
+        const irregularCategories = Categories
           .filter(category => category.includeInBalance)
           .map(category => category.id);
         this.excludedCategories = [...irregularCategories];
@@ -297,9 +295,10 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     const filteredCategories = this.currentCategories.filter(
       item => item !== category
     );
-    this.excludedCategories = Array.from(
+    const updatedCategorises = Array.from(
       new Set([...this.excludedCategories, ...filteredCategories])
     );
+    this.excludedCategories = updatedCategorises;
     this.calculateCategoryTotals(category, false);
   }
 
@@ -307,7 +306,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     const updatedExcludedCategories = Array.from(
       new Set([...this.excludedCategories, ...categories])
     );
-    if (updatedExcludedCategories.length === this.currentCategories.length) {
+    if (updatedExcludedCategories.length === Categories.length) {
       this.excludedCategories = [];
       this.irregularCategoriesCheckboxValue = true;
       this.regularCategoriesCheckboxValue = true;
