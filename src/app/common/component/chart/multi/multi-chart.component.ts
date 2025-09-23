@@ -2,19 +2,32 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { Expense } from '../../../model/expense.model';
 import { DateFrame, Mode } from '../../filter/date/dateFrame.model';
+import {
+  SegmentedSwitchComponent,
+  SegmentedOption,
+} from '../../segmented/segmented-switch.component';
 
 @Component({
   selector: 'app-multi-chart',
   templateUrl: './multi-chart.component.html',
   styleUrls: ['./multi-chart.component.scss'],
   standalone: true,
-  imports: [BaseChartDirective],
+  imports: [BaseChartDirective, SegmentedSwitchComponent],
 })
 export class MultiChartComponent implements OnChanges {
   @Input() expenses: Expense[] = [];
   @Input() filter?: DateFrame;
 
   chartType: 'bar' | 'line' = 'bar';
+  chartTypeOptions: SegmentedOption[] = [
+    { value: 'bar', label: 'Bar' },
+    { value: 'line', label: 'Line' },
+  ];
+
+  // Template bridge for stricter typing
+  onChartTypeSelect(v: string) {
+    if (v === 'bar' || v === 'line') this.switchChart(v);
+  }
   nonZeroCount = 0;
 
   chartOptions: any = {
@@ -244,6 +257,8 @@ export class MultiChartComponent implements OnChanges {
 
   private calculateNonZeroCount(): void {
     const data = this.chartOptions.datasets[0].data;
-    this.nonZeroCount = data.filter((value: number | null) => value != null && value !== 0).length;
+    this.nonZeroCount = data.filter(
+      (value: number | null) => value != null && value !== 0
+    ).length;
   }
 }
