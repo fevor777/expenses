@@ -59,19 +59,20 @@
 }
 .statistics-checkbox {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  gap: 8px;
   padding: 6px 0 4px;
+  flex-wrap: nowrap;
 }
 .statistics-checkbox-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--color-bg-alt);
-  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 8px 12px;
   cursor: pointer;
+  flex: 1 1 0;
+  min-width: 0; /* allow text to truncate or wrap within equal halves */
 }
 .statistics-checkbox-input {
   width: 18px;
