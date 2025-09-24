@@ -116,7 +116,7 @@ export class ExpenseSummaryService {
     const stats = this.monthProgressStats();
     const exhaustion = this.budgetExhaustionDate(summary, stats) || '';
     return {
-      line: ` Пер.: ${stats.elapsedPct.toFixed(0)}%`,
+      line: `${stats.elapsedPct.toFixed(0)}`,
       daysLeft: stats.daysLeft,
       exhaustion,
     };
@@ -513,12 +513,12 @@ export class ExpenseSummaryService {
   }
   private lineMonthlyIrregular(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
-    return `• Расход бюд.: ${s.monthlyIrregular}€ (${s.percentUsed.toFixed(0)}%${p.line})`;
+    return `• Б(%): ${s.percentUsed.toFixed(0)} М(%): ${p.line} дн: ${p.daysLeft}${p.exhaustion ? ' ' + p.exhaustion : ''}`;
   }
   private lineBudget(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
     return s.budget
-      ? `• Ост: ${s.remaining.toFixed(0)}€ Бюд: ${s.budget}€ дн: ${p.daysLeft}${p.exhaustion ? ' ' + p.exhaustion : ''}`
+      ? `• Б: ${s.budget}€ O: ${s.remaining.toFixed(0)}€ P: ${s.monthlyIrregular}€`
       : '';
   }
   private lineDailyAverage(s: ExpenseSummary) {
