@@ -445,7 +445,7 @@ export class ExpenseSummaryService {
     const ctx = this.dailyAverageContext(monthlyTotal);
     const ratio = ctx.dailyAverage > 0 ? todaysTotal / ctx.dailyAverage : 0;
     const icon = this.dailyPaceIcon(ratio);
-    return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день)`;
+    return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день`;
   }
   private dailyAverageContext(monthlyTotal: number) {
     const now = new Date();
