@@ -82,7 +82,6 @@ export class ExpenseSummaryService {
       this.lineBudget(summary),
       this.lineVelocity(summary),
       this.lineDailyAverage(summary),
-      this.lineBehaviorToday(summary),
       this.lineExtra(summary),
       this.lineNonEssential(summary),
       this.lineEnergy(summary),
