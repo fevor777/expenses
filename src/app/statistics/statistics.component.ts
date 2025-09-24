@@ -26,6 +26,8 @@ import { MultiChartComponent } from '../common/component/chart/multi/multi-chart
 import { CollapsedPanelComponent } from '../common/component/collapsed-panel';
 import { SearchInputComponent } from '../common/component/search-input';
 import { IrregularSummaryComponent } from '../common/component/irregular-summary.component';
+import { SegmentedSwitchComponent } from '../common/component/segmented/segmented-switch.component';
+import { MicroVisualsComponent } from '../details/micro/micro-visuals.component';
 
 @Component({
   selector: 'app-statistics',
@@ -42,8 +44,11 @@ import { IrregularSummaryComponent } from '../common/component/irregular-summary
     AnalyticsSwitchComponent,
     RouterModule,
     CollapsedPanelComponent,
-  SearchInputComponent,
-  IrregularSummaryComponent,
+    SearchInputComponent,
+    IrregularSummaryComponent,
+    // Newly added components for category view switch
+    SegmentedSwitchComponent,
+    MicroVisualsComponent,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
@@ -70,15 +75,31 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   regularCategoriesCheckboxValue: boolean = true;
   irregularCategoriesCheckboxValue: boolean = true;
 
-  filteredExpenses: Expense[];
+  filteredExpenses: Expense[] = [];
   descriptionSearch: string = '';
 
   // collapse state for category filters and bars
-  collapsed: Record<'categoryFilters' | 'multiChart' | 'irregularSummary', boolean> = {
+  collapsed: Record<
+    'categoryFilters' | 'multiChart' | 'irregularSummary',
+    boolean
+  > = {
     categoryFilters: false,
     multiChart: false,
     irregularSummary: true,
   };
+
+  // Category view switch state (bars | micro table)
+  categoryView: 'bars' | 'micro' = 'bars';
+  readonly categoryViewOptions: { value: 'bars' | 'micro'; label: string }[] = [
+    { value: 'bars', label: 'Бары' },
+    { value: 'micro', label: 'Тренды' },
+  ];
+
+  // Reference to ensure Angular/linters detect template usage of standalone imports (workaround for any false positive diagnostics)
+  private readonly _standaloneRefs = [
+    SegmentedSwitchComponent,
+    MicroVisualsComponent,
+  ];
 
   constructor(
     private router: Router,
@@ -87,6 +108,31 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   ) {
     this.initialFilterValue = this.dateFilterService.getInitialDayValue();
     this.initFilter();
+  }
+
+  onCategoryViewSelect(v: string) {
+    if (v === 'bars' || v === 'micro') {
+      this.categoryView = v;
+    }
+  }
+
+  onMicroCategorySelected(id: string) {
+    // Reuse existing bar filtering logic
+    this.filterByCategory(id);
+  }
+
+  onMicroCategoryRemoved(id: string) {
+    this.onBarClose(id);
+  }
+
+  getActiveCategories(): string[] {
+    // Active categories are those currently displayed (not excluded). If none excluded, use currentCategories.
+    if (!this.excludedCategories || this.excludedCategories.length === 0) {
+      return this.currentCategories;
+    }
+    return this.currentCategories.filter(
+      c => !this.excludedCategories.includes(c)
+    );
   }
 
   private initFilter(): void {
@@ -331,7 +377,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   filterByCategory(category: string): void {
-    const filteredCategories = this.currentCategories.filter(
+    const filteredCategories = Categories.map(cat => cat.id).filter(
       item => item !== category
     );
     const updatedCategorises = Array.from(

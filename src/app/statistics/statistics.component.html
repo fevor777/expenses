@@ -94,7 +94,16 @@
         </label>
       </div>
     </div>
-    <div class="stats-bars">
+    <div class="stats-section stats-section--category-switch" style="margin:6px 0 4px; display:flex; gap:12px; align-items:center;">
+      <app-segmented-switch
+        [options]="categoryViewOptions"
+        [active]="categoryView"
+        ariaLabel="Переключатель вида категорий"
+        (select)="onCategoryViewSelect($event)"
+      ></app-segmented-switch>
+    </div>
+
+    <div class="stats-bars" *ngIf="categoryView === 'bars'">
       <app-statistics-bar
         *ngFor="let categoryTotal of categoryTotals"
         [amount]="categoryTotal.amount"
@@ -105,6 +114,15 @@
         (chartIconClick)="navigateToChart($event)"
         (close)="onBarClose($event)"
       ></app-statistics-bar>
+    </div>
+    <div *ngIf="categoryView === 'micro'" class="stats-micro" style="margin-top:4px;">
+      <app-micro-visuals
+        [expenses]="filteredExpenses"
+        [dateFrame]="currentFilter"
+        [selectedCategories]="getActiveCategories()"
+        (categorySelected)="onMicroCategorySelected($event)"
+        (categoryRemoved)="onMicroCategoryRemoved($event)"
+      ></app-micro-visuals>
     </div>
   </app-collapsed-panel>
   <app-collapsed-panel
