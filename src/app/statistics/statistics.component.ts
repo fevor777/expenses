@@ -266,6 +266,16 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.irregularCategoriesCheckboxValue = true;
     this.regularCategoriesCheckboxValue = true;
     this.excludedCategories = [];
+    this.descriptionSearch = '';
+    this.currentFilter = { ...this.initialFilterValue };
+    this.calculateCategoryTotals(null, false);
+  }
+
+  onCategoriesRefresh(): void {
+    this.categoryTotals = [];
+    this.irregularCategoriesCheckboxValue = true;
+    this.regularCategoriesCheckboxValue = true;
+    this.excludedCategories = [];
     this.calculateCategoryTotals(null, false);
   }
 

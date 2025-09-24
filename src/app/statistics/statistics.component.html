@@ -23,6 +23,11 @@
       title="Перейти в детализацию"
       (click)="navigateToHistory()"
     ></i>
+    <i
+      (click)="onRefresh(); $event.stopPropagation()"
+      class="fas fa-trash stats-action-icon"
+      title="Сбросить фильтры"
+    ></i>
   </app-date-filter>
 
   <div class="stats-section stats-section--donut">
@@ -46,7 +51,7 @@
         >)
 
         <i
-          (click)="onRefresh(); $event.stopPropagation()"
+          (click)="onCategoriesRefresh(); $event.stopPropagation()"
           class="fas fa-redo-alt statistic-refresh-button"
           title="Сбросить фильтры"
         ></i>
