@@ -28,6 +28,7 @@ import { SearchInputComponent } from '../common/component/search-input';
 import { IrregularSummaryComponent } from '../common/component/irregular-summary.component';
 import { SegmentedSwitchComponent } from '../common/component/segmented/segmented-switch.component';
 import { MicroVisualsComponent } from '../details/micro/micro-visuals.component';
+import { CategoryTypeFiltersComponent } from './category-type-filters.component';
 
 @Component({
   selector: 'app-statistics',
@@ -49,6 +50,7 @@ import { MicroVisualsComponent } from '../details/micro/micro-visuals.component'
     // Newly added components for category view switch
     SegmentedSwitchComponent,
     MicroVisualsComponent,
+    CategoryTypeFiltersComponent,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
@@ -333,6 +335,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   onRegularCategoriesCheckboxClick(value: boolean): void {
+    this.regularCategoriesCheckboxValue = value;
     if (!value) {
       if (this.irregularCategoriesCheckboxValue) {
         const regularCategories = Categories.filter(
@@ -355,6 +358,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   onIrregularCategoriesCheckboxClick(value: boolean): void {
+    this.irregularCategoriesCheckboxValue = value;
     if (!value) {
       if (this.regularCategoriesCheckboxValue) {
         const irregularCategories = Categories.filter(

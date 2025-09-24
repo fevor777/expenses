@@ -126,6 +126,7 @@
   flex-direction: column;
   gap: 4px;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 .stats-section-header {
   display: flex;
@@ -153,12 +154,6 @@
 .stats-donut-chart {
   width: 100%;
   height: calc(100% - 22px);
-}
-
-.stats-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 /* Dark theme base */

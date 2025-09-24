@@ -12,7 +12,10 @@ import {
 import { CommonModule } from '@angular/common';
 import * as echarts from 'echarts';
 import { Expense } from '../../common/model/expense.model';
-import { SegmentedSwitchComponent, SegmentedOption } from '../../common/component/segmented/segmented-switch.component';
+import {
+  SegmentedSwitchComponent,
+  SegmentedOption,
+} from '../../common/component/segmented/segmented-switch.component';
 import { CompositionChartsComponent } from '../composition/composition-charts.component';
 import { CategoryAnalyticsService } from '../functions/category-analytics.service';
 
@@ -38,20 +41,39 @@ import { CategoryAnalyticsService } from '../functions/category-analytics.servic
       ></app-segmented-switch>
 
       <div class="analytics-switch__panel" [hidden]="activeView !== 'donut'">
-        <div class="analytics-switch__chart" #donutContainer aria-label="Кольцевая диаграмма категорий"></div>
+        <div
+          class="analytics-switch__chart"
+          #donutContainer
+          aria-label="Кольцевая диаграмма категорий"
+        ></div>
       </div>
 
-      <div class="analytics-switch__panel" [hidden]="activeView !== 'composition'">
+      <div
+        class="analytics-switch__panel"
+        [hidden]="activeView !== 'composition'"
+      >
         <app-composition-charts [expenses]="expenses"></app-composition-charts>
       </div>
     </div>
   `,
   styles: [
     `
-      .analytics-switch { display: flex; flex-direction: column; gap: 10px; }
-      .analytics-switch__segmented { align-self: flex-start; }
-      .analytics-switch__chart { width:100%; height:220px; }
-      :where(.dark,[data-theme='dark']) .analytics-switch__panel { background: var(--color-bg-alt); border-color: var(--color-border); }
+      .analytics-switch {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .analytics-switch__segmented {
+        align-self: center;
+      }
+      .analytics-switch__chart {
+        width: 100%;
+        height: 220px;
+      }
+      :where(.dark, [data-theme='dark']) .analytics-switch__panel {
+        background: var(--color-bg-alt);
+        border-color: var(--color-border);
+      }
     `,
   ],
 })
@@ -61,7 +83,8 @@ export class AnalyticsSwitchComponent
   /** Filtered expenses to visualize */
   @Input() expenses: Expense[] = [];
   @ViewChild('donutContainer') donutContainer?: ElementRef<HTMLDivElement>;
-  @ViewChild(CompositionChartsComponent) compositionCmp?: CompositionChartsComponent;
+  @ViewChild(CompositionChartsComponent)
+  compositionCmp?: CompositionChartsComponent;
 
   activeView: 'donut' | 'composition' = 'donut';
   segmentOptions: SegmentedOption[] = [
@@ -128,9 +151,9 @@ export class AnalyticsSwitchComponent
 
   private renderDonut(): void {
     if (!this.donutChart) return;
-  let aggs = this.analytics.buildAggregates(this.expenses || []);
-  // Sort by total descending (same ordering as original statistics page donut)
-  aggs = aggs.sort((a, b) => b.total - a.total);
+    let aggs = this.analytics.buildAggregates(this.expenses || []);
+    // Sort by total descending (same ordering as original statistics page donut)
+    aggs = aggs.sort((a, b) => b.total - a.total);
     const total = aggs.reduce((s, a) => s + a.total, 0);
     this.donutChart.setOption({
       tooltip: { trigger: 'item', formatter: '{b}: {c}€ ({d}%)' },

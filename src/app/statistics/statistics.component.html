@@ -58,43 +58,10 @@
       </span>
     </div>
 
-    <div class="stats-section stats-section--filters">
-      <div class="statistics-checkbox">
-        <label class="statistics-checkbox-item">
-          <input
-            type="checkbox"
-            value="regular"
-            class="statistics-checkbox-input"
-            [checked]="true"
-            [(ngModel)]="regularCategoriesCheckboxValue"
-            (ngModelChange)="onRegularCategoriesCheckboxClick($event)"
-          />
-          <span class="statistics-checkbox-label"
-            >Регулярное
-            <span class="statistics-amount-muted"
-              >({{ regularAmount }}€)</span
-            ></span
-          >
-        </label>
-        <label class="statistics-checkbox-item">
-          <input
-            type="checkbox"
-            value="irregular"
-            class="statistics-checkbox-input"
-            [checked]="true"
-            [(ngModel)]="irregularCategoriesCheckboxValue"
-            (ngModelChange)="onIrregularCategoriesCheckboxClick($event)"
-          />
-          <span class="statistics-checkbox-label"
-            >Нерегулярное
-            <span class="statistics-amount-muted"
-              >({{ irregularAmount }}€)</span
-            ></span
-          >
-        </label>
-      </div>
-    </div>
-    <div class="stats-section stats-section--category-switch" style="margin:6px 0 4px; display:flex; gap:12px; align-items:center;">
+    <div
+      class="stats-section stats-section--category-switch"
+      style="margin: 6px 0 4px; display: flex; gap: 12px; align-items: center"
+    >
       <app-segmented-switch
         [options]="categoryViewOptions"
         [active]="categoryView"
@@ -104,6 +71,14 @@
     </div>
 
     <div class="stats-bars" *ngIf="categoryView === 'bars'">
+      <app-category-type-filters
+        [regularAmount]="regularAmount"
+        [irregularAmount]="irregularAmount"
+        [regularValue]="regularCategoriesCheckboxValue"
+        [irregularValue]="irregularCategoriesCheckboxValue"
+        (regularChange)="onRegularCategoriesCheckboxClick($event)"
+        (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
+      ></app-category-type-filters>
       <app-statistics-bar
         *ngFor="let categoryTotal of categoryTotals"
         [amount]="categoryTotal.amount"
@@ -115,7 +90,15 @@
         (close)="onBarClose($event)"
       ></app-statistics-bar>
     </div>
-    <div *ngIf="categoryView === 'micro'" class="stats-micro" style="margin-top:4px;">
+    <div *ngIf="categoryView === 'micro'" class="stats-micro">
+      <app-category-type-filters
+        [regularAmount]="regularAmount"
+        [irregularAmount]="irregularAmount"
+        [regularValue]="regularCategoriesCheckboxValue"
+        [irregularValue]="irregularCategoriesCheckboxValue"
+        (regularChange)="onRegularCategoriesCheckboxClick($event)"
+        (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
+      ></app-category-type-filters>
       <app-micro-visuals
         [expenses]="filteredExpenses"
         [dateFrame]="currentFilter"
