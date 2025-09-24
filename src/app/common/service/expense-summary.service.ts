@@ -75,19 +75,54 @@ export class ExpenseSummaryService {
   }
 
   private composeSummaryMessage(summary: ExpenseSummary): string {
+    // Re-ordered by actionable priority: overview/budget -> today -> pace -> behavioral levers -> aggregates -> context.
     const parts = [
       this.lineHeader(summary),
       this.lineToday(summary),
-      this.lineMonth(summary),
-      this.lineMonthlyIrregular(summary),
+
       this.lineBudget(summary),
-      this.lineDailyAverage(summary),
       this.lineVelocity(summary),
+      this.lineForecast(summary),
+      this.lineBehaviorToday(summary),
       this.lineExtra(summary),
       this.lineNonEssential(summary),
       this.lineEnergy(summary),
+      this.lineMonthlyIrregular(summary),
+      this.lineMonth(summary),
     ].filter(Boolean);
     return parts.join('\n');
+  }
+  /**
+   * Forecast line: shows projected irregular spend vs budget difference.
+   * Suppressed if no budget or too early (first 2 days) or already over budget.
+   */
+  private lineForecast(s: ExpenseSummary) {
+    if (!s.budget || s.budget <= 0) return '';
+    // days passed inference from percentUsed vs monthlyIrregular; reuse monthProgressStats for consistency
+    const stats = this.monthProgressStats();
+    if (stats.daysPassed <= 2) return '';
+    const dim = stats.daysInMonth;
+    const currentVelocity = s.monthlyIrregular / stats.daysPassed;
+    if (currentVelocity <= 0) return '';
+    const projected = currentVelocity * dim;
+    const diff = projected - s.budget;
+    const sign = diff > 0 ? '+' : '-';
+    const abs = Math.abs(diff).toFixed(0);
+    // Skip if within 3% tolerance to reduce noise
+    if (Math.abs(diff) < s.budget * 0.03) return '';
+    const icon = diff > 0 ? '📈' : '✅';
+    return `- Прогноз: ${projected.toFixed(0)}€ (${icon} ${sign}${abs}€)`;
+  }
+  /**
+   * Behavior today: combine today's extra / non-essential if present and concise.
+   */
+  private lineBehaviorToday(s: ExpenseSummary) {
+    const parts: string[] = [];
+    if (s.todaysExtra) parts.push(`!${s.todaysExtra}€${s.extraSpike ? '⚠️' : ''}`);
+    if (s.todaysNonEssential && s.todaysNonEssential !== s.todaysExtra)
+      parts.push(`?${s.todaysNonEssential}€${s.nonEssentialSpike ? '⚠️' : ''}`);
+    if (!parts.length) return '';
+    return `- Сегодня кат.: ${parts.join(' ')}`;
   }
   private buildPaceAndForecast(summary: ExpenseSummary) {
     if (summary.budget <= 0) return { line: '', daysLeft: 0, exhaustion: '' };
@@ -499,7 +534,7 @@ export class ExpenseSummaryService {
   private lineBudget(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
     return s.budget
-      ? `- Бюд: ${s.budget}€ Ост: ${s.remaining.toFixed(0)}€ дн: ${p.daysLeft}${p.exhaustion ? ' ' + p.exhaustion : ''}`
+      ? `- Ост: ${s.remaining.toFixed(0)}€ Бюд: ${s.budget}€ дн: ${p.daysLeft}${p.exhaustion ? ' ' + p.exhaustion : ''}`
       : '';
   }
   private lineDailyAverage(s: ExpenseSummary) {
