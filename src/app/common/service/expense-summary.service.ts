@@ -103,20 +103,20 @@ export class ExpenseSummaryService {
     const icon = diff > 0 ? '📈' : '✅';
     const sign = diff > 0 ? '+' : '-';
     const abs = Math.abs(diff).toFixed(0);
-    return ` (${icon} ${sign}${abs}€) - ${projected.toFixed(0)}€`;
+    return ` (${icon} ${sign}${abs}€) ${projected.toFixed(0)}€`;
   }
   /**
    * Behavior today: combine today's extra / non-essential if present and concise.
    */
   private lineBehaviorToday(s: ExpenseSummary) {
-    return s.todaysNonEssential ? ` - 💸: ${s.todaysNonEssential}€` : '';
+    return s.todaysNonEssential ? ` 💸: ${s.todaysNonEssential}€` : '';
   }
   private buildPaceAndForecast(summary: ExpenseSummary) {
     if (summary.budget <= 0) return { line: '', daysLeft: 0, exhaustion: '' };
     const stats = this.monthProgressStats();
     const exhaustion = this.budgetExhaustionDate(summary, stats) || '';
     return {
-      line: ` - Пер.: ${stats.elapsedPct.toFixed(0)}%`,
+      line: ` Пер.: ${stats.elapsedPct.toFixed(0)}%`,
       daysLeft: stats.daysLeft,
       exhaustion,
     };
@@ -506,38 +506,38 @@ export class ExpenseSummaryService {
       s.todaysTotal !== s.todaysIrregular
         ? ` (${s.todaysIrregular}€${s.irregularSpike ? ' ⚠️' : ''})`
         : '';
-    return `- Сегодня: ${s.todaysTotal}€${irr}${this.lineBehaviorToday(s)}`;
+    return `• Сегодня: ${s.todaysTotal}€${irr}${this.lineBehaviorToday(s)}`;
   }
   private lineMonth(s: ExpenseSummary) {
-    return `- Месяц: ${s.monthlyTotal}€`;
+    return `• Месяц: ${s.monthlyTotal}€`;
   }
   private lineMonthlyIrregular(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
-    return `- Нерегул.: ${s.monthlyIrregular}€ (${s.percentUsed.toFixed(0)}%${p.line})`;
+    return `• Нерегул.: ${s.monthlyIrregular}€ (${s.percentUsed.toFixed(0)}%${p.line})`;
   }
   private lineBudget(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
     return s.budget
-      ? `- Ост: ${s.remaining.toFixed(0)}€ Бюд: ${s.budget}€ дн: ${p.daysLeft}${p.exhaustion ? ' ' + p.exhaustion : ''}`
+      ? `• Ост: ${s.remaining.toFixed(0)}€ Бюд: ${s.budget}€ дн: ${p.daysLeft}${p.exhaustion ? ' ' + p.exhaustion : ''}`
       : '';
   }
   private lineDailyAverage(s: ExpenseSummary) {
-    return `- ${this.generateDailyAverageChart(s.monthlyIrregular, s.todaysTotal)}`;
+    return `• ${this.generateDailyAverageChart(s.monthlyIrregular, s.todaysTotal)}`;
   }
   private lineVelocity(s: ExpenseSummary) {
     const base = this.generateSpendingVelocityChart(s.monthlyIrregular, s.budget);
     const forecast = this.velocityForecastSnippet(s);
-    return `- ${base}${forecast}`;
+    return `• ${base}${forecast}`;
   }
   private lineExtra(s: ExpenseSummary) {
-    return `- Лишние(!): ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
+    return `• Лишние(!): ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
   }
   private lineNonEssential(s: ExpenseSummary) {
-    return `- Необязат.: ${s.nonEssential}€${this.percentLine(s.nonEssentialPct)}${this.daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
+    return `• Необязат.: ${s.nonEssential}€${this.percentLine(s.nonEssentialPct)}${this.daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
   }
   private lineEnergy(s: ExpenseSummary) {
     return s.energyEmoji
-      ? `- Энергия: ${s.energyEmoji} (${s.energyScore?.toFixed(1)})`
+      ? `• Энергия: ${s.energyEmoji} (${s.energyScore?.toFixed(1)})`
       : '';
   }
 }
