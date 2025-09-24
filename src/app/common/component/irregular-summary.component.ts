@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, combineLatest, takeUntil } from 'rxjs';
+import { Subject, combineLatest, first, takeUntil } from 'rxjs';
 import { Expense } from '../../common/model/expense.model';
 import { ExpenseService } from '../../common/service/expense.service';
 import { DateFilterService } from './filter/date/date-filter.service';
@@ -75,7 +75,10 @@ export class IrregularSummaryComponent implements OnInit, OnDestroy {
     const expenses$ = this.expenseService.getExpenses(this.monthFrame, [], '');
     const budget$ = this.irregularBudgetService.getValue();
     combineLatest([expenses$, budget$])
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        first(),
+        takeUntil(this.destroy$)
+      )
       .subscribe({
         next: ([expenses, budget]) => {
           this.expenses = expenses || [];
