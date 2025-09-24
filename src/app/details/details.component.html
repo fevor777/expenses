@@ -15,50 +15,14 @@
     (selectedFilters)="applyFilters($event)"
   ></app-multi-filter>
   <div class="section">
-    <div class="section-header" (click)="toggle('irregularGauge')">
-      <span>Использование нерегулярного бюджета</span>
+    <div class="section-header" (click)="toggle('irregularSummary')">
+      <span>Нерегулярный бюджет (гейдж + накопление)</span>
       <button type="button" class="collapse-btn">
-        {{ collapsed.irregularGauge ? '▼' : '▲' }}
+        {{ collapsed.irregularSummary ? '▼' : '▲' }}
       </button>
     </div>
-    <div class="section-body" *ngIf="!collapsed.irregularGauge">
-      <ng-container *ngIf="isMonth; else gaugeMsg">
-        <div class="irregular-block single">
-          <div class="ib-chart">
-            <app-irregular-budget-gauge
-              [expenses]="expenses"
-              [budget]="irregularBudget"
-            ></app-irregular-budget-gauge>
-          </div>
-        </div>
-      </ng-container>
-      <ng-template #gaugeMsg>
-        <div class="placeholder-msg">Доступно только для месячного периода</div>
-      </ng-template>
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-header" (click)="toggle('irregularCumulative')">
-      <span>Накопленные нерегулярные расходы</span>
-      <button type="button" class="collapse-btn">
-        {{ collapsed.irregularCumulative ? '▼' : '▲' }}
-      </button>
-    </div>
-    <div class="section-body" *ngIf="!collapsed.irregularCumulative">
-      <ng-container *ngIf="isMonth; else cumulativeMsg">
-        <div class="irregular-block single">
-          <div class="ib-chart wide">
-            <app-irregular-cumulative
-              [expenses]="expenses"
-              [budget]="irregularBudget"
-              [date]="currentFilter?.date"
-            ></app-irregular-cumulative>
-          </div>
-        </div>
-      </ng-container>
-      <ng-template #cumulativeMsg>
-        <div class="placeholder-msg">Доступно только для месячного периода</div>
-      </ng-template>
+    <div class="section-body" *ngIf="!collapsed.irregularSummary">
+        <app-irregular-summary></app-irregular-summary>
     </div>
   </div>
   <div class="section">

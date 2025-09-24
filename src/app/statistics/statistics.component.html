@@ -121,4 +121,14 @@
     ></app-multi-chart>
   </app-collapsed-panel>
   <!-- Composition charts now accessible via segmented switch above -->
+  <app-collapsed-panel
+    [style.marginTop]="'7px'"
+    [collapsed]="collapsed.irregularSummary"
+    (toggle)="toggle('irregularSummary')"
+  >
+    <div slot="header" class="stats-section-header">
+      <span class="stats-section-title">Бюджет</span>
+    </div>
+    <app-irregular-summary></app-irregular-summary>
+  </app-collapsed-panel>
 </div>

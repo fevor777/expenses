@@ -15,9 +15,7 @@ import { CompositionChartsComponent } from '../statistics/composition/compositio
 import { MicroVisualsComponent } from './micro/micro-visuals.component';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
-import { IrregularBudgetService } from '../common/service/irregular-budget.service';
-import { IrregularBudgetGaugeComponent } from './irregular/irregular-budget-gauge.component';
-import { IrregularCumulativeComponent } from './irregular/irregular-cumulative.component';
+import { IrregularSummaryComponent } from '../common/component/irregular-summary.component';
 import { Mode } from '../common/component/filter/date/dateFrame.model';
 
 @Component({
@@ -32,8 +30,7 @@ import { Mode } from '../common/component/filter/date/dateFrame.model';
     MultiChartComponent,
     CompositionChartsComponent,
     MicroVisualsComponent,
-    IrregularBudgetGaugeComponent,
-    IrregularCumulativeComponent,
+  IrregularSummaryComponent,
   ],
 })
 export class DetailsComponent implements OnInit, OnDestroy {
@@ -50,14 +47,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
   currentFilter: MultiFilter;
   totalAmount: number = 0;
   expenses: Expense[] = [];
-  irregularBudget = 0;
   // collapse state for each chart section
-  collapsed: Record<
-    'irregularGauge' | 'irregularCumulative' | 'bar' | 'composition' | 'micro',
-    boolean
-  > = {
-    irregularGauge: false,
-    irregularCumulative: false,
+  collapsed: Record<'irregularSummary' | 'bar' | 'composition' | 'micro', boolean> = {
+    irregularSummary: false,
     bar: false,
     composition: false,
     micro: false,
@@ -69,8 +61,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService,
-    private irregularBudgetService: IrregularBudgetService
+    private dateFilterService: DateFilterService
   ) {}
 
   ngOnInit(): void {
@@ -88,14 +79,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.initDetails();
   }
 
-  toggle(
-    section:
-      | 'irregularGauge'
-      | 'irregularCumulative'
-      | 'bar'
-      | 'composition'
-      | 'micro'
-  ) {
+  toggle(section: 'irregularSummary' | 'bar' | 'composition' | 'micro') {
     this.collapsed[section] = !this.collapsed[section];
   }
 
@@ -133,10 +117,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this.dateFilterService.description = undefined;
     }
     this.applyFilters(this.initialFilter);
-    this.irregularBudgetService
-      .getValue()
-      .pipe(takeUntil(this.destroySubject))
-      .subscribe(v => (this.irregularBudget = v || 0));
   }
 
   private configureNav(): void {

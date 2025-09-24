@@ -25,6 +25,7 @@ import { AnalyticsSwitchComponent } from './analytics/analytics-switch.component
 import { MultiChartComponent } from '../common/component/chart/multi/multi-chart.component';
 import { CollapsedPanelComponent } from '../common/component/collapsed-panel';
 import { SearchInputComponent } from '../common/component/search-input';
+import { IrregularSummaryComponent } from '../common/component/irregular-summary.component';
 
 @Component({
   selector: 'app-statistics',
@@ -41,7 +42,8 @@ import { SearchInputComponent } from '../common/component/search-input';
     AnalyticsSwitchComponent,
     RouterModule,
     CollapsedPanelComponent,
-    SearchInputComponent,
+  SearchInputComponent,
+  IrregularSummaryComponent,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
@@ -72,9 +74,10 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   descriptionSearch: string = '';
 
   // collapse state for category filters and bars
-  collapsed: Record<'categoryFilters' | 'multiChart', boolean> = {
+  collapsed: Record<'categoryFilters' | 'multiChart' | 'irregularSummary', boolean> = {
     categoryFilters: false,
     multiChart: false,
+    irregularSummary: true,
   };
 
   constructor(
@@ -123,7 +126,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.calculateCategoryTotals();
   }
 
-  toggle(section: 'categoryFilters' | 'multiChart'): void {
+  toggle(section: 'categoryFilters' | 'multiChart' | 'irregularSummary'): void {
     this.collapsed[section] = !this.collapsed[section];
   }
 
