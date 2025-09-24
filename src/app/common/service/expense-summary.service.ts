@@ -109,12 +109,7 @@ export class ExpenseSummaryService {
    * Behavior today: combine today's extra / non-essential if present and concise.
    */
   private lineBehaviorToday(s: ExpenseSummary) {
-    const parts: string[] = [];
-    if (s.todaysExtra) parts.push(`!${s.todaysExtra}€${s.extraSpike ? '⚠️' : ''}`);
-    if (s.todaysNonEssential && s.todaysNonEssential !== s.todaysExtra)
-      parts.push(`?${s.todaysNonEssential}€${s.nonEssentialSpike ? '⚠️' : ''}`);
-    if (!parts.length) return '';
-    return `- Сегодня кат.: ${parts.join(' ')}`;
+    return s.todaysNonEssential ? ` - 💸: ${s.todaysNonEssential}€` : '';
   }
   private buildPaceAndForecast(summary: ExpenseSummary) {
     if (summary.budget <= 0) return { line: '', daysLeft: 0, exhaustion: '' };
@@ -511,7 +506,7 @@ export class ExpenseSummaryService {
       s.todaysTotal !== s.todaysIrregular
         ? ` (${s.todaysIrregular}€${s.irregularSpike ? ' ⚠️' : ''})`
         : '';
-    return `- Сегодня: ${s.todaysTotal}€${irr}`;
+    return `- Сегодня: ${s.todaysTotal}€${irr}${this.lineBehaviorToday(s)}`;
   }
   private lineMonth(s: ExpenseSummary) {
     return `- Месяц: ${s.monthlyTotal}€`;
