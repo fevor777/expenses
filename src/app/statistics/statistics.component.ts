@@ -83,7 +83,33 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     private dateFilterService: DateFilterService
   ) {
     this.initialFilterValue = this.dateFilterService.getInitialDayValue();
-    this.currentFilter = this.initialFilterValue;
+    this.initFilter();
+  }
+
+  private initFilter(): void {
+    if (this.dateFilterService.dateFilter) {
+      this.currentFilter = {
+        ...this.dateFilterService.dateFilter,
+      };
+      this.dateFilterService.dateFilter = undefined;
+    } else {
+      this.currentFilter = {
+        ...this.initialFilterValue,
+      };
+    }
+    const categoryFilters = this.dateFilterService.categories;
+    if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
+      this.excludedCategories = Categories.filter(
+        category => !this.dateFilterService.categories.includes(category?.id)
+      ).map(category => category.id);
+      this.dateFilterService.categories = undefined;
+    }
+
+    const descriptionFilter = this.dateFilterService.description;
+    if (descriptionFilter) {
+      this.descriptionSearch = descriptionFilter;
+      this.dateFilterService.description = undefined;
+    }
   }
 
   onDescriptionSearchChange(value: string): void {
@@ -250,9 +276,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   onRegularCategoriesCheckboxClick(value: boolean): void {
     if (!value) {
       if (this.irregularCategoriesCheckboxValue) {
-        const regularCategories = Categories
-          .filter(category => !category.includeInBalance)
-          .map(category => category.id);
+        const regularCategories = Categories.filter(
+          category => !category.includeInBalance
+        ).map(category => category.id);
         this.excludedCategories = [...regularCategories];
         this.calculateCategoryTotals(null, false);
       } else {
@@ -272,9 +298,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   onIrregularCategoriesCheckboxClick(value: boolean): void {
     if (!value) {
       if (this.regularCategoriesCheckboxValue) {
-        const irregularCategories = Categories
-          .filter(category => category.includeInBalance)
-          .map(category => category.id);
+        const irregularCategories = Categories.filter(
+          category => category.includeInBalance
+        ).map(category => category.id);
         this.excludedCategories = [...irregularCategories];
         this.calculateCategoryTotals(null, false);
       } else {

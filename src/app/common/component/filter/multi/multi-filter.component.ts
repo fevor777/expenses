@@ -46,6 +46,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   @Input() showDetailsIcon: boolean = false; // show list/chart icon on details/statistics page
 
   @Output() selectedFilters: EventEmitter<MultiFilter> = new EventEmitter();
+  @Output() navigateToStatisticsIconClick: EventEmitter<void> =
+    new EventEmitter();
 
   dateFilter?: DateFrame;
   selectedCategories: string[] = [];
@@ -159,7 +161,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   navigateToStatistics(): void {
-    this.router.navigate(['/statistics']);
+    this.navigateToStatisticsIconClick.emit();
   }
 
   ngOnDestroy(): void {

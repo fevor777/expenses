@@ -24,16 +24,6 @@
       <div class="mf-group">
         <span class="mf-key">Период:</span>
         <span class="mf-value">{{ dateFilter?.display || 'Весь' }}</span>
-        <button
-          *ngIf="isToday"
-          type="button"
-          class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
-          (click)="navigateToStatistics()"
-          title="Перейти к статистике"
-          aria-label="Перейти к статистике"
-        >
-          <i class="fas fa-chart-line"></i>
-        </button>
       </div>
       <div class="mf-group" *ngIf="descriptionFilter">
         <span class="mf-key">Description:</span>
@@ -47,23 +37,13 @@
         <span class="mf-key">Общий:</span>
         <span class="mf-total">{{ totalAmount }}€</span>
         <button
-          *ngIf="showHistoryIcon"
           type="button"
-          class="mf-icon-btn mf-icon-btn--nav"
-          (click)="navigateToHistory()"
-          title="Перейти к истории"
-          aria-label="Перейти к истории"
+          class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
+          (click)="navigateToStatistics()"
+          title="Перейти к статистике"
+          aria-label="Перейти к статистике"
         >
-          <i class="fa-solid fa-list"></i>
-        </button>
-        <button
-          *ngIf="showDetailsIcon"
-          type="button"
-          class="mf-icon-btn mf-icon-btn--nav"
-          (click)="navigateToDetails()"
-          aria-label="Перейти к деталям"
-        >
-          <i class="fas fa-chart-bar"></i>
+          <i class="fas fa-chart-line"></i>
         </button>
       </div>
     </div>
@@ -72,23 +52,13 @@
         <span class="mf-key">Общий расход:</span>
         <span class="mf-total">{{ totalAmount }}€</span>
         <button
-          *ngIf="showHistoryIcon"
           type="button"
-          class="mf-icon-btn mf-icon-btn--nav"
-          (click)="navigateToHistory()"
-          title="Перейти к истории"
-          aria-label="Перейти к истории"
+          class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
+          (click)="navigateToStatistics()"
+          title="Перейти к статистике"
+          aria-label="Перейти к статистике"
         >
-          <i class="fa-solid fa-list"></i>
-        </button>
-        <button
-          *ngIf="showDetailsIcon"
-          type="button"
-          class="mf-icon-btn mf-icon-btn--nav"
-          (click)="navigateToDetails()"
-          aria-label="Перейти к деталям"
-        >
-          <i class="fas fa-chart-bar"></i>
+          <i class="fas fa-chart-line"></i>
         </button>
       </div>
     </ng-template>
@@ -136,15 +106,6 @@
           aria-label="Перейти к истории"
         >
           <i class="fa-solid fa-list"></i>
-        </button>
-        <button
-          *ngIf="showDetailsIcon"
-          type="button"
-          class="mf-icon-btn mf-icon-btn--nav"
-          (click)="navigateToDetails()"
-          aria-label="Перейти к деталям"
-        >
-          <i class="fas fa-chart-bar"></i>
         </button>
       </div>
     </div>

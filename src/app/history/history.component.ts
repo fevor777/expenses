@@ -208,7 +208,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private navigateToStatistics(): void {
+  navigateToStatistics(): void {
+    this.dateFilterService.categories = this.currentFilter?.categories;
+    this.dateFilterService.description = this.currentFilter?.description;
+    this.dateFilterService.dateFilter = this.currentFilter?.date;
     this.router.navigate(['/statistics']);
   }
 
