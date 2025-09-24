@@ -79,10 +79,9 @@ export class ExpenseSummaryService {
     const parts = [
       this.lineHeader(summary),
       this.lineToday(summary),
-
       this.lineBudget(summary),
       this.lineVelocity(summary),
-      this.lineForecast(summary),
+      this.lineDailyAverage(summary),
       this.lineBehaviorToday(summary),
       this.lineExtra(summary),
       this.lineNonEssential(summary),
@@ -92,26 +91,20 @@ export class ExpenseSummaryService {
     ].filter(Boolean);
     return parts.join('\n');
   }
-  /**
-   * Forecast line: shows projected irregular spend vs budget difference.
-   * Suppressed if no budget or too early (first 2 days) or already over budget.
-   */
-  private lineForecast(s: ExpenseSummary) {
+  // Forecast snippet used inside velocity line.
+  private velocityForecastSnippet(s: ExpenseSummary) {
     if (!s.budget || s.budget <= 0) return '';
-    // days passed inference from percentUsed vs monthlyIrregular; reuse monthProgressStats for consistency
     const stats = this.monthProgressStats();
     if (stats.daysPassed <= 2) return '';
-    const dim = stats.daysInMonth;
     const currentVelocity = s.monthlyIrregular / stats.daysPassed;
     if (currentVelocity <= 0) return '';
-    const projected = currentVelocity * dim;
+    const projected = currentVelocity * stats.daysInMonth;
     const diff = projected - s.budget;
-    const sign = diff > 0 ? '+' : '-';
-    const abs = Math.abs(diff).toFixed(0);
-    // Skip if within 3% tolerance to reduce noise
     if (Math.abs(diff) < s.budget * 0.03) return '';
     const icon = diff > 0 ? '📈' : '✅';
-    return `- Прогноз: ${projected.toFixed(0)}€ (${icon} ${sign}${abs}€)`;
+    const sign = diff > 0 ? '+' : '-';
+    const abs = Math.abs(diff).toFixed(0);
+    return ` (${icon} ${sign}${abs}€) - ${projected.toFixed(0)}€`;
   }
   /**
    * Behavior today: combine today's extra / non-essential if present and concise.
@@ -458,7 +451,7 @@ export class ExpenseSummaryService {
     const ctx = this.dailyAverageContext(monthlyTotal);
     const ratio = ctx.dailyAverage > 0 ? todaysTotal / ctx.dailyAverage : 0;
     const icon = this.dailyPaceIcon(ratio);
-    return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день (прогноз: ${ctx.projectedMonthly.toFixed(0)}€)`;
+    return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день)`;
   }
   private dailyAverageContext(monthlyTotal: number) {
     const now = new Date();
@@ -487,7 +480,7 @@ export class ExpenseSummaryService {
       ctx.currentVelocity,
       ctx.dailyBudget
     );
-    return ` ${cls.icon} Скорость: ${cls.text}`;
+    return `${cls.icon} Скорость: ${cls.text}`;
   }
   private velocityContext(irregularSpent: number, budget: number) {
     const now = new Date();
@@ -504,13 +497,10 @@ export class ExpenseSummaryService {
     currentVelocity: number,
     dailyBudget: number
   ) {
-    if (overrun > budget * 0.2)
-      return { icon: '🚨', text: `критичная (+${overrun.toFixed(0)}€)` };
-    if (overrun > 0)
-      return { icon: '⚠️', text: `превышение (+${overrun.toFixed(0)}€)` };
-    if (currentVelocity > dailyBudget * 0.9)
-      return { icon: '📊', text: `норма (${currentVelocity.toFixed(1)}€/д)` };
-    return { icon: '💚', text: `экономия (-${Math.abs(overrun).toFixed(0)}€)` };
+    if (overrun > budget * 0.2) return { icon: '🚨', text: 'крит.' };
+    if (overrun > 0) return { icon: '⚠️', text: 'прев.' };
+    if (currentVelocity > dailyBudget * 0.9) return { icon: '📊', text: 'норм.' };
+    return { icon: '💚', text: 'эконом.' };
   }
 
   // Message line helpers
@@ -541,7 +531,9 @@ export class ExpenseSummaryService {
     return `- ${this.generateDailyAverageChart(s.monthlyIrregular, s.todaysTotal)}`;
   }
   private lineVelocity(s: ExpenseSummary) {
-    return `- ${this.generateSpendingVelocityChart(s.monthlyIrregular, s.budget)}`;
+    const base = this.generateSpendingVelocityChart(s.monthlyIrregular, s.budget);
+    const forecast = this.velocityForecastSnippet(s);
+    return `- ${base}${forecast}`;
   }
   private lineExtra(s: ExpenseSummary) {
     return `- Лишние(!): ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
