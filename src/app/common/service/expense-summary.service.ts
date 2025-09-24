@@ -80,12 +80,12 @@ export class ExpenseSummaryService {
       this.lineHeader(summary),
       this.lineToday(summary),
       this.lineBudget(summary),
+      this.lineMonthlyIrregular(summary),
       this.lineVelocity(summary),
       this.lineDailyAverage(summary),
       this.lineExtra(summary),
       this.lineNonEssential(summary),
       this.lineEnergy(summary),
-      this.lineMonthlyIrregular(summary),
       this.lineMonth(summary),
     ].filter(Boolean);
     return parts.join('\n');
@@ -513,7 +513,7 @@ export class ExpenseSummaryService {
   }
   private lineMonthlyIrregular(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
-    return `• Нерегул.: ${s.monthlyIrregular}€ (${s.percentUsed.toFixed(0)}%${p.line})`;
+    return `• Расход бюд.: ${s.monthlyIrregular}€ (${s.percentUsed.toFixed(0)}%${p.line})`;
   }
   private lineBudget(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
