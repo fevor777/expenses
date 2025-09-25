@@ -17,7 +17,12 @@
     (click)="onClick(opt.value)"
     [attr.aria-pressed]="active === opt.value"
     [class.is-active]="active === opt.value"
+    [attr.aria-label]="opt.iconClass ? (opt.ariaLabel || opt.label) : null"
   >
-    {{ opt.label }}
+    <ng-container *ngIf="opt.iconClass; else textLabel">
+      <i [class]="opt.iconClass" aria-hidden="true"></i>
+      <span class="sr-only">{{ opt.ariaLabel || opt.label }}</span>
+    </ng-container>
+    <ng-template #textLabel>{{ opt.label }}</ng-template>
   </button>
 </div>

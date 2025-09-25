@@ -20,8 +20,8 @@ export class MultiChartComponent implements OnChanges {
 
   chartType: 'bar' | 'line' = 'bar';
   chartTypeOptions: SegmentedOption[] = [
-    { value: 'bar', label: 'Bar' },
-    { value: 'line', label: 'Line' },
+    { value: 'bar', label: 'Столбцы', iconClass: 'fa-solid fa-chart-column', ariaLabel: 'Столбиковая диаграмма' },
+    { value: 'line', label: 'Линия', iconClass: 'fa-solid fa-chart-line', ariaLabel: 'Линейная диаграмма' },
   ];
 
   // Template bridge for stricter typing

@@ -16,7 +16,9 @@ import { CommonModule } from '@angular/common';
 
 export interface SegmentedOption {
   value: string; // kept generic; parent may cast
-  label: string;
+  label: string; // fallback accessible label
+  iconClass?: string; // optional icon (e.g., 'fa-solid fa-bars')
+  ariaLabel?: string; // override for screen readers if icon only
 }
 
 @Component({

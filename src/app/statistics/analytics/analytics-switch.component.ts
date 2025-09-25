@@ -88,8 +88,8 @@ export class AnalyticsSwitchComponent
 
   activeView: 'donut' | 'composition' = 'donut';
   segmentOptions: SegmentedOption[] = [
-    { value: 'donut', label: 'Донат' },
-    { value: 'composition', label: 'Состав' },
+    { value: 'donut', label: 'Кольцевая', iconClass: 'fa-solid fa-circle-notch', ariaLabel: 'Кольцевая диаграмма' },
+    { value: 'composition', label: 'Состав', iconClass: 'fa-solid fa-layer-group', ariaLabel: 'Состав категорий' },
   ];
 
   private donutChart: echarts.ECharts | null = null;

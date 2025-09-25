@@ -37,7 +37,12 @@
     background-color var(--seg-t);
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
+.segmented-btn i { font-size: 13px; line-height: 1; }
+.segmented-btn:has(i):not(:has(span:not(.sr-only))) { padding: 4px 10px 5px; }
 .segmented-btn.is-active {
   color: var(--seg-text-active);
   font-weight: 600;
@@ -68,4 +73,18 @@
   .segmented-btn {
     transition: none;
   }
+}
+
+/* Visually hidden text for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
 }

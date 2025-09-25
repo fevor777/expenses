@@ -98,10 +98,12 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   readonly categoryViewOptions: {
     value: 'bars' | 'micro' | 'filter';
     label: string;
+    iconClass?: string;
+    ariaLabel?: string;
   }[] = [
-    { value: 'bars', label: 'Бары' },
-    { value: 'micro', label: 'Тренды' },
-    { value: 'filter', label: 'Фильтр' },
+    { value: 'bars', label: 'Бары', iconClass: 'fa-solid fa-chart-bar', ariaLabel: 'Бары' },
+    { value: 'micro', label: 'Тренды', iconClass: 'fa-solid fa-wave-square', ariaLabel: 'Тренды' },
+    { value: 'filter', label: 'Фильтр', iconClass: 'fa-solid fa-filter', ariaLabel: 'Фильтр' },
   ];
 
   // Reference to ensure Angular/linters detect template usage of standalone imports (workaround for any false positive diagnostics)

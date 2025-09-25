@@ -527,7 +527,7 @@ export class ExpenseSummaryService {
     return `• ${base}${forecast}`;
   }
   private lineExtra(s: ExpenseSummary) {
-    return `• Отказ: ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
+    return `• Экстра: ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
   }
   private lineNonEssential(s: ExpenseSummary) {
     return `• Хотелки: ${s.nonEssential}€${this.percentLine(s.nonEssentialPct)}${this.daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
