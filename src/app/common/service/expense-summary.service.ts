@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
-import { ExpenseService } from './expense.service';
-import { DateFilterService } from '../component/filter/date/date-filter.service';
-import { IrregularBudgetService } from './irregular-budget.service';
+import { BudgetDataService } from './budget-data.service';
 import { NotificationService } from '../component/notification/notification.service';
 import { getCategoryById } from '../model/categories';
 import { Expense } from '../model/expense.model';
@@ -42,22 +40,14 @@ export interface ExpenseSummary {
 })
 export class ExpenseSummaryService {
   constructor(
-    private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService,
-    private irregularBudgetService: IrregularBudgetService,
+    private budgetDataService: BudgetDataService,
     private notificationService: NotificationService
   ) {}
 
   sendBrowserNotificationSummary(): Observable<void> {
-    // Using combineLatest so the first expenses emission is not dropped while waiting for budget.
-    return combineLatest([
-      this.expenseService.getExpenses(
-        this.dateFilterService.getInitialMonthValue()
-      ),
-      this.irregularBudgetService.getValue(),
-    ]).pipe(
-      take(1),
-      map(([expenses, budget]) =>
+    // Single source for expenses + budget (current month) from BudgetDataService.
+    return this.budgetDataService.getExpensesWithBudget().pipe(
+      map(({ expenses, budget }) =>
         this.enrichWithBudget(this.computeBaseMetrics(expenses), budget || 0)
       ),
       switchMap(summary => this.pushSummaryNotification(summary))
@@ -490,7 +480,8 @@ export class ExpenseSummaryService {
   ) {
     if (overrun > budget * 0.2) return { icon: '🚨', text: 'крит.' };
     if (overrun > 0) return { icon: '⚠️', text: 'прев.' };
-    if (currentVelocity > dailyBudget * 0.9) return { icon: '📊', text: 'норм.' };
+    if (currentVelocity > dailyBudget * 0.9)
+      return { icon: '📊', text: 'норм.' };
     return { icon: '💚', text: 'эконом.' };
   }
 
@@ -522,7 +513,10 @@ export class ExpenseSummaryService {
     return `• ${this.generateDailyAverageChart(s.monthlyIrregular, s.todaysTotal)}`;
   }
   private lineVelocity(s: ExpenseSummary) {
-    const base = this.generateSpendingVelocityChart(s.monthlyIrregular, s.budget);
+    const base = this.generateSpendingVelocityChart(
+      s.monthlyIrregular,
+      s.budget
+    );
     const forecast = this.velocityForecastSnippet(s);
     return `• ${base}${forecast}`;
   }
