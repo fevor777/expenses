@@ -203,9 +203,13 @@ export class HistoryComponent implements OnInit, OnDestroy {
       if (deltaX > 100) {
         this.navigateHome();
       } else if (deltaX < -100) {
-        this.navigateToStatistics();
+        this.navigateToDefaultStatistics();
       }
     }
+  }
+
+  navigateToDefaultStatistics(): void {
+    this.router.navigate(['/statistics']);
   }
 
   navigateToStatistics(): void {

@@ -1,16 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, combineLatest, first, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Expense } from '../../common/model/expense.model';
-import { ExpenseService } from '../../common/service/expense.service';
-import { DateFilterService } from './filter/date/date-filter.service';
-import { IrregularBudgetService } from '../../common/service/irregular-budget.service';
+import { BudgetDataService } from '../../common/service/budget-data.service';
 import { IrregularBudgetGaugeComponent } from '../../details/irregular/irregular-budget-gauge.component';
 import { IrregularCumulativeComponent } from '../../details/irregular/irregular-cumulative.component';
 import { DateFrame } from './filter/date/dateFrame.model';
 
 // This component combines gauge and cumulative irregular charts.
-// It is responsible for loading current month expenses and irregular budget itself – no inputs required.
+// Data (current month expenses + budget) now loaded via BudgetDataService (single source).
 @Component({
   selector: 'app-irregular-summary',
   standalone: true,
@@ -63,26 +61,17 @@ export class IrregularSummaryComponent implements OnInit, OnDestroy {
   loaded = false;
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService,
-    private irregularBudgetService: IrregularBudgetService
-  ) {}
+  constructor(private budgetDataService: BudgetDataService) {}
 
   ngOnInit(): void {
-    this.monthFrame = this.dateFilterService.getInitialMonthValue();
-    // Load month expenses (no category/description filters) and budget.
-    const expenses$ = this.expenseService.getExpenses(this.monthFrame, [], '');
-    const budget$ = this.irregularBudgetService.getValue();
-    combineLatest([expenses$, budget$])
-      .pipe(
-        first(),
-        takeUntil(this.destroy$)
-      )
+    this.budgetDataService
+      .getExpensesWithBudget()
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: ([expenses, budget]) => {
-          this.expenses = expenses || [];
-          this.budget = budget || 0;
+        next: data => {
+          this.expenses = data.expenses || [];
+          this.budget = data.budget || 0;
+          this.monthFrame = data.dateFrame;
           this.loaded = true;
         },
         error: () => (this.loaded = true),

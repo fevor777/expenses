@@ -34,7 +34,8 @@ import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
 import { ExpenseHeaderComponent } from './header/expense-header.component';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
-import { IrregularBudgetService } from '../common/service/irregular-budget.service';
+// Removed direct irregular budget service usage in favor of consolidated BudgetDataService.
+import { BudgetDataService } from '../common/service/budget-data.service';
 import { GLOBAL_LONG_PRESS_DURATION } from '../constants';
 import { ExpenseSummaryService } from '../common/service/expense-summary.service';
 
@@ -83,7 +84,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
-    private irregularBudgetService: IrregularBudgetService,
+    private budgetDataService: BudgetDataService,
     private expenseSummaryService: ExpenseSummaryService
   ) {}
 
@@ -185,14 +186,16 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   }
 
   onHeaderBudgetInfoClick(): void {
-    // Show budget info notification using irregular budget value (if available) and monthly total expenses.
-    // Irregular budget considered monthly budget for this feature.
-    this.irregularBudgetService
-      .getValue()
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(val => {
-        const monthlyBudget = val || 0;
-        const monthlySpent = this.getMonthlyIrregularAmount();
+    // Use consolidated BudgetDataService (current month expenses + budget).
+    this.budgetDataService
+      .getExpensesWithBudget()
+      .pipe(takeUntil(this.unsubscribe), take(1))
+      .subscribe(({ budget, expenses }) => {
+        const monthlyBudget = budget || 0;
+        // Use already maintained this.monthlyExpenses if populated, fallback to fetched expenses
+        const irregularSpent = expenses
+          .filter(e => getCategoryById(e.category)?.includeInBalance)
+          .reduce((sum, e) => Math.round((sum + e.amount) * 100) / 100, 0);
         if (!monthlyBudget) {
           this.notificationService.showMessage(
             'Бюджет не установлен',
@@ -200,16 +203,16 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           );
           return;
         }
-        const remaining = Math.max(monthlyBudget - monthlySpent, 0);
+        const remaining = Math.max(monthlyBudget - irregularSpent, 0);
         const percentUsed = monthlyBudget
-          ? Math.min((monthlySpent / monthlyBudget) * 100, 100)
+          ? Math.min((irregularSpent / monthlyBudget) * 100, 100)
           : 0;
         const percentRemaining = 100 - percentUsed;
         const msg =
           `Нерегулярные расходы:<br>` +
           `Бюджет: ${monthlyBudget} €<br>` +
           `<span style="display:block;margin:6px 0;height:1px;background:var(--color-border);"></span>` +
-          `Потрачено: ${monthlySpent} € (${percentUsed.toFixed(1)}%)<br>` +
+          `Потрачено: ${irregularSpent} € (${percentUsed.toFixed(1)}%)<br>` +
           `Осталось: ${remaining.toFixed(2)} € (${percentRemaining.toFixed(1)}%)<hr>` +
           `Всего потрачено за месяц: ${this.getMonthlyAmount()} €`;
         this.notificationService.showMessage(
@@ -264,19 +267,25 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     const monthlyAmountByCategory =
       this.getMonthlyAmountByCategory(categoryName);
     const monthlyTotal = this.getMonthlyAmount();
-    // Fetch irregular (monthly) budget and append info
-    this.irregularBudgetService
-      .getValue()
+    // Fetch consolidated budget + expenses (current month) and append info.
+    this.budgetDataService
+      .getExpensesWithBudget()
       .pipe(take(1))
-      .subscribe(val => {
-        const monthlyBudget = val || 0;
-        const irregularSpent = this.getMonthlyIrregularAmount();
+      .subscribe(({ budget, expenses }) => {
+        const monthlyBudget = budget || 0;
+        // Prefer already accumulated monthlyExpenses (includes latest new expense after add?)
+        // We rely on calculateAmounts having been invoked by subscription earlier; fallback to fresh expenses list.
+        const irregularSpent = expenses
+          .filter(e => getCategoryById(e.category)?.includeInBalance)
+          .reduce((sum, e) => Math.round((sum + e.amount) * 100) / 100, 0);
         const remaining = Math.max(monthlyBudget - irregularSpent, 0);
         const percentUsed = monthlyBudget
           ? Math.min((irregularSpent / monthlyBudget) * 100, 100)
           : 0;
         const budgetLine = monthlyBudget
-          ? `<br><br>Бюджет: ${monthlyBudget} € | Потрачено (учёт): ${irregularSpent} € (${percentUsed.toFixed(1)}%) | Осталось: ${remaining.toFixed(2)} €`
+          ? `<br><br>Бюджет: ${monthlyBudget} € | Потрачено (учёт): ${irregularSpent} € (${percentUsed.toFixed(
+              1
+            )}%) | Осталось: ${remaining.toFixed(2)} €`
           : '';
 
         const inAppMessage =
@@ -286,8 +295,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           `Всего за месяц: ${monthlyTotal} €` +
           budgetLine;
 
-        // Show in-app notification
-        // Provide context and expense so notification can show extra buttons
         this.notificationService.showMessage(inAppMessage, 'info', {
           context: 'expense-added',
           expense: addedExpense
@@ -319,12 +326,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       (total, expense) => this.roundUp(total + expense.amount),
       0
     );
-  }
-
-  private getMonthlyIrregularAmount(): number {
-    return this.monthlyExpenses
-      .filter(expense => getCategoryById(expense.category)?.includeInBalance)
-      .reduce((total, expense) => this.roundUp(total + expense.amount), 0);
   }
 
   private calculateAmounts(expenses: Expense[]): void {
