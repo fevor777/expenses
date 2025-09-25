@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { map, switchMap, first } from 'rxjs/operators';
 
 import { BudgetDataService } from './budget-data.service';
 import { NotificationService } from '../component/notification/notification.service';
+import { ExpenseService } from './expense.service';
+import { DateFilterService } from '../component/filter/date/date-filter.service';
 import { getCategoryById } from '../model/categories';
 import { Expense } from '../model/expense.model';
 
@@ -33,6 +35,8 @@ export interface ExpenseSummary {
   // Meta fields
   energyScore?: number; // composite score
   energyEmoji?: string; // mapped emoji
+  dateFrameStart?: number; // rolling frame start (ms)
+  dateFrameFinish?: number; // rolling frame finish (ms)
 }
 
 @Injectable({
@@ -41,15 +45,46 @@ export interface ExpenseSummary {
 export class ExpenseSummaryService {
   constructor(
     private budgetDataService: BudgetDataService,
+    private expenseService: ExpenseService,
+    private dateFilterService: DateFilterService,
     private notificationService: NotificationService
   ) {}
 
   sendBrowserNotificationSummary(): Observable<void> {
-    // Single source for expenses + budget (current month) from BudgetDataService.
-    return this.budgetDataService.getExpensesWithBudget().pipe(
-      map(({ expenses, budget }) =>
-        this.enrichWithBudget(this.computeBaseMetrics(expenses), budget || 0)
-      ),
+    // Use rolling period (BudgetDataService) for irregular/budget metrics BUT
+    // compute calendar month (1..last day) total separately for monthlyTotal display.
+    const calendarMonthFrame = this.dateFilterService.getInitialMonthValue();
+    return combineLatest([
+      this.budgetDataService.getExpensesWithBudget(), // rolling frame
+      this.expenseService.getExpenses(calendarMonthFrame).pipe(first()), // calendar month
+    ]).pipe(
+      first(),
+      map(([rolling, calendarMonthExpenses]) => {
+        const frameStart = rolling.dateFrame.start.toMillis();
+        const frameFinish = rolling.dateFrame.finish.toMillis();
+        const base = this.computeBaseMetrics(
+          rolling.expenses,
+          frameStart,
+          frameFinish
+        );
+        const enriched = this.enrichWithBudget(
+          base,
+          rolling.budget || 0,
+          frameStart,
+          frameFinish
+        );
+        // Override only monthlyTotal with calendar month total; keep monthlyIrregular etc from rolling frame
+        const calendarMonthTotal = calendarMonthExpenses.reduce(
+          (sum, e) => sum + (e.amount || 0),
+          0
+        );
+        return {
+          ...enriched,
+          monthlyTotal: this.roundUp(calendarMonthTotal),
+          dateFrameStart: frameStart,
+          dateFrameFinish: frameFinish,
+        };
+      }),
       switchMap(summary => this.pushSummaryNotification(summary))
     );
   }
@@ -83,7 +118,10 @@ export class ExpenseSummaryService {
   // Forecast snippet used inside velocity line.
   private velocityForecastSnippet(s: ExpenseSummary) {
     if (!s.budget || s.budget <= 0) return '';
-    const stats = this.monthProgressStats();
+    const stats = this.monthProgressStats(
+      s.dateFrameStart,
+      s.dateFrameFinish
+    );
     if (stats.daysPassed <= 2) return '';
     const currentVelocity = s.monthlyIrregular / stats.daysPassed;
     if (currentVelocity <= 0) return '';
@@ -103,7 +141,10 @@ export class ExpenseSummaryService {
   }
   private buildPaceAndForecast(summary: ExpenseSummary) {
     if (summary.budget <= 0) return { line: '', daysLeft: 0, exhaustion: '' };
-    const stats = this.monthProgressStats();
+    const stats = this.monthProgressStats(
+      summary.dateFrameStart,
+      summary.dateFrameFinish
+    );
     const exhaustion = this.budgetExhaustionDate(summary, stats) || '';
     return {
       line: `${stats.elapsedPct.toFixed(0)}`,
@@ -111,13 +152,48 @@ export class ExpenseSummaryService {
       exhaustion,
     };
   }
-  private monthProgressStats() {
+  private monthProgressStats(frameStart?: number, frameFinish?: number) {
     const now = new Date();
-    const daysInMonth = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      0
-    ).getDate();
+    if (frameStart && frameFinish) {
+      const start = new Date(frameStart);
+      const finish = new Date(frameFinish);
+      // normalize start to start-of-day, finish to end-of-day
+      const startDay = new Date(
+        start.getFullYear(),
+        start.getMonth(),
+        start.getDate()
+      ).getTime();
+      const finishDayEnd = new Date(
+        finish.getFullYear(),
+        finish.getMonth(),
+        finish.getDate(),
+        23,
+        59,
+        59,
+        999
+      ).getTime();
+      const totalDays = Math.max(
+        1,
+        Math.ceil((finishDayEnd - startDay + 1) / (1000 * 60 * 60 * 24))
+      );
+      const daysPassed = Math.min(
+        totalDays,
+        Math.max(
+          0,
+          Math.floor((now.getTime() - startDay) / (1000 * 60 * 60 * 24)) + 1
+        )
+      );
+      const daysLeft = Math.max(totalDays - daysPassed, 0);
+      return {
+        daysInMonth: totalDays,
+        daysPassed,
+        daysLeft,
+        elapsedPct: (daysPassed / totalDays) * 100,
+        now,
+      };
+    }
+    // fallback calendar month
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     const daysPassed = now.getDate();
     return {
       daysInMonth,
@@ -140,14 +216,28 @@ export class ExpenseSummaryService {
     if (velocity <= 0) return undefined;
     const remaining = summary.budget - summary.monthlyIrregular;
     const daysToExhaust = remaining / velocity;
+    // Build candidate exhaustion date relative to 'now'
     const exhaustDate = new Date(stats.now.getTime());
-    exhaustDate.setDate(stats.now.getDate() + Math.ceil(daysToExhaust));
-    if (exhaustDate.getMonth() !== stats.now.getMonth())
-      exhaustDate.setFullYear(
-        stats.now.getFullYear(),
-        stats.now.getMonth(),
-        stats.daysInMonth
-      );
+    exhaustDate.setDate(exhaustDate.getDate() + Math.ceil(daysToExhaust));
+
+    // Clamp to rolling frame finish if provided (avoid spilling past frame)
+    if (summary.dateFrameFinish) {
+      const frameFinishDate = new Date(summary.dateFrameFinish);
+      const frameFinishEnd = new Date(
+        frameFinishDate.getFullYear(),
+        frameFinishDate.getMonth(),
+        frameFinishDate.getDate(),
+        23,
+        59,
+        59,
+        999
+      ).getTime();
+      if (exhaustDate.getTime() > frameFinishEnd) {
+        // Use frame finish date
+        exhaustDate.setTime(frameFinishDate.getTime());
+      }
+    }
+
     const dd = exhaustDate.getDate().toString().padStart(2, '0');
     const mm = (exhaustDate.getMonth() + 1).toString().padStart(2, '0');
     return `F: ${dd}.${mm}`;
@@ -164,25 +254,42 @@ export class ExpenseSummaryService {
   // getExpenseSummary removed (logic inlined into sendBrowserNotificationSummary)
 
   private computeBaseMetrics(
-    expenses: Expense[]
+    expenses: Expense[],
+    frameStart?: number,
+    frameFinish?: number
   ): Omit<
     ExpenseSummary,
     'budget' | 'remaining' | 'percentUsed' | 'energyScore' | 'energyEmoji'
   > {
-    const ctx = this.initMetricsContext();
+    const ctx = this.initMetricsContext(frameStart, frameFinish);
     this.scanExpenses(expenses, ctx);
     return this.finalizeMetrics(ctx);
   }
 
-  private initMetricsContext() {
+  private initMetricsContext(frameStart?: number, frameFinish?: number) {
     const today = new Date();
+    const startOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ).getTime();
+    let daysPassed = today.getDate(); // fallback calendar month
+    if (frameStart && frameFinish) {
+      // compute daysPassed inside rolling frame
+      const startDay = new Date(frameStart);
+      const startMidnight = new Date(
+        startDay.getFullYear(),
+        startDay.getMonth(),
+        startDay.getDate()
+      ).getTime();
+      if (startMidnight <= startOfToday) {
+        daysPassed =
+          Math.floor((startOfToday - startMidnight) / (1000 * 60 * 60 * 24)) + 1;
+      }
+    }
     return {
-      startOfDay: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate()
-      ).getTime(),
-      daysPassed: today.getDate(),
+      startOfDay: startOfToday,
+      daysPassed,
       monthlyTotal: 0,
       monthlyIrregular: 0,
       todaysTotal: 0,
@@ -311,7 +418,9 @@ export class ExpenseSummaryService {
 
   private enrichWithBudget(
     base: ReturnType<typeof this.computeBaseMetrics>,
-    budgetValue: number
+    budgetValue: number,
+    frameStart?: number,
+    frameFinish?: number
   ): ExpenseSummary {
     const remaining = this.calcRemaining(base.monthlyIrregular, budgetValue);
     const percentUsed = this.calcPercentUsed(
@@ -320,7 +429,9 @@ export class ExpenseSummaryService {
     );
     const velocityState = this.calcVelocityState(
       base.monthlyIrregular,
-      budgetValue
+      budgetValue,
+      frameStart,
+      frameFinish
     );
     const score = this.calcEnergyScore(base, velocityState);
     return { ...base, budget: budgetValue, remaining, percentUsed, ...score };
@@ -333,13 +444,17 @@ export class ExpenseSummaryService {
     return budget ? Math.min((spent / budget) * 100, 100) : 0;
   }
 
-  private calcVelocityState(spent: number, budget: number) {
+  private calcVelocityState(
+    spent: number,
+    budget: number,
+    frameStart?: number,
+    frameFinish?: number
+  ) {
     if (budget <= 0) return 0;
-    const now = new Date();
-    const daysPassed = now.getDate();
-    const currentVelocity = spent / Math.max(daysPassed, 1);
-    const dailyBudget =
-      budget / new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const stats = this.monthProgressStats(frameStart, frameFinish);
+    const daysPassed = Math.max(stats.daysPassed, 1);
+    const currentVelocity = spent / daysPassed;
+    const dailyBudget = budget / stats.daysInMonth;
     if (currentVelocity > dailyBudget * 1.2) return 2;
     if (currentVelocity > dailyBudget) return 1;
     return 0;
@@ -427,19 +542,23 @@ export class ExpenseSummaryService {
 
   private generateDailyAverageChart(
     monthlyTotal: number,
-    todaysTotal: number
+    todaysTotal: number,
+    frameStart?: number,
+    frameFinish?: number
   ): string {
-    const ctx = this.dailyAverageContext(monthlyTotal);
+    const ctx = this.dailyAverageContext(monthlyTotal, frameStart, frameFinish);
     const ratio = ctx.dailyAverage > 0 ? todaysTotal / ctx.dailyAverage : 0;
     const icon = this.dailyPaceIcon(ratio);
     return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день`;
   }
-  private dailyAverageContext(monthlyTotal: number) {
-    const now = new Date();
-    const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    const dp = now.getDate();
-    const dailyAverage = monthlyTotal / dp;
-    return { dailyAverage, projectedMonthly: dailyAverage * dim };
+  private dailyAverageContext(
+    monthlyTotal: number,
+    frameStart?: number,
+    frameFinish?: number
+  ) {
+    const stats = this.monthProgressStats(frameStart, frameFinish);
+    const dailyAverage = monthlyTotal / Math.max(stats.daysPassed, 1);
+    return { dailyAverage, projectedMonthly: dailyAverage * stats.daysInMonth };
   }
   private dailyPaceIcon(ratio: number) {
     if (ratio >= 2) return '🔥';
@@ -451,10 +570,17 @@ export class ExpenseSummaryService {
 
   private generateSpendingVelocityChart(
     irregularSpent: number,
-    budget: number
+    budget: number,
+    frameStart?: number,
+    frameFinish?: number
   ): string {
     if (!budget || budget <= 0) return '⚡ Скорость: бюджет не установлен';
-    const ctx = this.velocityContext(irregularSpent, budget);
+    const ctx = this.velocityContext(
+      irregularSpent,
+      budget,
+      frameStart,
+      frameFinish
+    );
     const cls = this.velocityClassification(
       ctx.projectedOverrun,
       budget,
@@ -463,13 +589,16 @@ export class ExpenseSummaryService {
     );
     return `${cls.icon} Скорость: ${cls.text}`;
   }
-  private velocityContext(irregularSpent: number, budget: number) {
-    const now = new Date();
-    const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    const dp = now.getDate();
-    const dailyBudget = budget / dim;
-    const currentVelocity = irregularSpent / dp;
-    const projectedOverrun = currentVelocity * dim - budget;
+  private velocityContext(
+    irregularSpent: number,
+    budget: number,
+    frameStart?: number,
+    frameFinish?: number
+  ) {
+    const stats = this.monthProgressStats(frameStart, frameFinish);
+    const dailyBudget = budget / stats.daysInMonth;
+    const currentVelocity = irregularSpent / Math.max(stats.daysPassed, 1);
+    const projectedOverrun = currentVelocity * stats.daysInMonth - budget;
     return { dailyBudget, currentVelocity, projectedOverrun };
   }
   private velocityClassification(
@@ -510,12 +639,19 @@ export class ExpenseSummaryService {
       : '';
   }
   private lineDailyAverage(s: ExpenseSummary) {
-    return `• ${this.generateDailyAverageChart(s.monthlyIrregular, s.todaysTotal)}`;
+    return `• ${this.generateDailyAverageChart(
+      s.monthlyIrregular,
+      s.todaysTotal,
+      s.dateFrameStart,
+      s.dateFrameFinish
+    )}`;
   }
   private lineVelocity(s: ExpenseSummary) {
     const base = this.generateSpendingVelocityChart(
       s.monthlyIrregular,
-      s.budget
+      s.budget,
+      s.dateFrameStart,
+      s.dateFrameFinish
     );
     const forecast = this.velocityForecastSnippet(s);
     return `• ${base}${forecast}`;
