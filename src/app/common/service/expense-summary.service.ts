@@ -400,15 +400,12 @@ export class ExpenseSummaryService {
   }
 
   private generateBudgetChart(percentUsed: number): string {
-    if (percentUsed === 0) return '';
-    // Condensed bar (reduced width from 10 -> 6 cells)
-    const barLength = 6;
-    const filled = Math.round((percentUsed / 100) * barLength);
-    const empty = barLength - filled;
-    const filledBar = '●'.repeat(filled);
-    const emptyBar = '·'.repeat(empty); // lighter dot for unused
-    // Tight format without extra space to reduce overall line width
-    return `[${filledBar}${emptyBar}]${percentUsed.toFixed(0)}%`;
+    // Option 5: ASCII-safe compact bar. Example 43% => |====--|43%
+    if (percentUsed <= 0) return '';
+    const width = 7; // compact, readable
+    const filled = Math.round((percentUsed / 100) * width);
+    const bar = '='.repeat(filled) + '-'.repeat(width - filled);
+    return `[${bar}] ${percentUsed.toFixed(0)}%`;
   }
 
   private generateBudgetIcon(percentUsed: number): string {
