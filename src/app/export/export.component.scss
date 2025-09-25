@@ -4,6 +4,43 @@ button {
   cursor: pointer;
 }
 
+/* Budget Start Day controls */
+.budget-start-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.budget-start-row .bsd-input {
+  width: 72px;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-alt);
+  font-size: 14px;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.budget-start-row .bsd-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: #fff5e1;
+}
+.budget-start-row .bsd-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+}
+.budget-start-row .bsd-hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.budget-start-row .bsd-save {
+  padding: 6px 14px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
 /* Add padding to back label on export page only */
 :host ::ng-deep .history-back-link {
   /* scoped to export component */

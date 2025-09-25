@@ -229,13 +229,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       .subscribe(() => (this.currentBalance = balance));
   }
 
-  onBalanceDateChange(newBalanceDate: string): void {
-    this.balanceDateService
-      .addBalanceDate(newBalanceDate)
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe();
-  }
-
   onAmountChange(amount: string): void {
     this.enteredAmount = amount;
     if (amount) {

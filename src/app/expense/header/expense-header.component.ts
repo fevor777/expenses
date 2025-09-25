@@ -19,8 +19,6 @@ export class ExpenseHeaderComponent implements OnInit {
   @Output() statisticsIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() detailsIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() balanceChange: EventEmitter<number> = new EventEmitter<number>();
-  @Output() balanceDateChange: EventEmitter<string> =
-    new EventEmitter<string>();
 
   isShowCurrentBalanceAmount: boolean = false;
 
@@ -60,16 +58,6 @@ export class ExpenseHeaderComponent implements OnInit {
     const newBalance = prompt('Enter new balance', this.balance.toString());
     if (Number(newBalance)) {
       this.balanceChange.emit(Number(newBalance));
-    }
-  }
-
-  onBalanceDateChange(): void {
-    const newBalanceDate = prompt(
-      'Enter new balance date',
-      this.balanceDate || ''
-    );
-    if (newBalanceDate) {
-      this.balanceDateChange.emit(newBalanceDate);
     }
   }
 }

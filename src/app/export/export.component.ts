@@ -12,6 +12,7 @@ import { SavingService } from '../common/service/saving.service';
 import { TabsContainerComponent } from '../common/tabs-container.component';
 import { TabComponent } from '../common/tab.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { BalanceDateService } from '../common/service/balance-date.service';
 
 @Component({
   selector: 'app-export',
@@ -27,6 +28,7 @@ export class ExportComponent implements OnDestroy {
   savings$!: Observable<number>;
   savingsValue: number = 0;
   user$: Observable<User>;
+  budgetStartDay: number = 1; // default fallback
 
   private readonly destroySubject: Subject<void> = new Subject();
 
@@ -35,7 +37,8 @@ export class ExportComponent implements OnDestroy {
     private authService: AuthService,
     private irregularBudgetService: IrregularBudgetService,
     private savingService: SavingService,
-    private afAuth: AngularFireAuth
+    private afAuth: AngularFireAuth,
+    private balanceDateService: BalanceDateService
   ) {
     this.irregularBudget$ = this.irregularBudgetService.getValue();
     this.irregularBudget$
@@ -46,6 +49,25 @@ export class ExportComponent implements OnDestroy {
       .pipe(takeUntil(this.destroySubject))
       .subscribe(v => (this.savingsValue = v || 0));
     this.user$ = this.afAuth.user;
+    // Load stored budget start day (balance date). Expecting format like 'YYYY-MM-DD' or empty.
+    this.balanceDateService
+      .getBalanceDate()
+      .pipe(
+        first(),
+        takeUntil(this.destroySubject)
+      )
+      .subscribe(v => {
+        // If value is a date string parse the day, if numeric use it directly.
+        if (!v) return;
+        let dayNum: number | undefined;
+        if (/^\d+$/.test(v)) {
+          dayNum = Number(v);
+        } else {
+          const d = new Date(v);
+            if (!isNaN(d.getTime())) dayNum = d.getDate();
+        }
+        if (dayNum && dayNum >= 1 && dayNum <= 31) this.budgetStartDay = dayNum;
+      });
   }
 
   // Method to trigger Google Sign-in
@@ -174,6 +196,25 @@ export class ExportComponent implements OnDestroy {
           .pipe(first(), takeUntil(this.destroySubject))
           .subscribe();
       }
+    }
+  }
+
+  onBudgetStartDayChange(raw: string | number | null): void {
+    const num = Number(raw);
+    if (isNaN(num) || num < 1 || num > 31) {
+      // revert UI silently (Angular will keep previous value)
+      return;
+    }
+    this.budgetStartDay = num;
+  }
+
+  onSaveBudgetStartDay(): void {
+    // Explicit user-triggered save (keeps auto-save behavior as well; could remove auto-save if desired).
+    if (this.budgetStartDay >= 1 && this.budgetStartDay <= 31) {
+      this.balanceDateService
+        .addBalanceDate(String(this.budgetStartDay))
+        .pipe(first(), takeUntil(this.destroySubject))
+        .subscribe();
     }
   }
 }
