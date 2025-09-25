@@ -543,13 +543,22 @@ export class ExpenseSummaryService {
   private generateDailyAverageChart(
     monthlyTotal: number,
     todaysTotal: number,
-    frameStart?: number,
-    frameFinish?: number
+    frameStart: number | undefined,
+    frameFinish: number | undefined,
+    remaining?: number
   ): string {
     const ctx = this.dailyAverageContext(monthlyTotal, frameStart, frameFinish);
     const ratio = ctx.dailyAverage > 0 ? todaysTotal / ctx.dailyAverage : 0;
     const icon = this.dailyPaceIcon(ratio);
-    return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день`;
+    let recommended = '';
+    if (remaining !== undefined) {
+      const stats = this.monthProgressStats(frameStart, frameFinish);
+      if (stats.daysLeft > 0) {
+        const rec = remaining / stats.daysLeft;
+        if (rec > 0.01) recommended = ` | норм: ${rec.toFixed(1)}€/д`;
+      }
+    }
+    return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день${recommended}`;
   }
   private dailyAverageContext(
     monthlyTotal: number,
@@ -643,7 +652,8 @@ export class ExpenseSummaryService {
       s.monthlyIrregular,
       s.todaysTotal,
       s.dateFrameStart,
-      s.dateFrameFinish
+      s.dateFrameFinish,
+      s.remaining
     )}`;
   }
   private lineVelocity(s: ExpenseSummary) {
