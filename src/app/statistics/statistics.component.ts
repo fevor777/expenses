@@ -29,6 +29,7 @@ import { IrregularSummaryComponent } from '../common/component/irregular-summary
 import { SegmentedSwitchComponent } from '../common/component/segmented/segmented-switch.component';
 import { MicroVisualsComponent } from '../details/micro/micro-visuals.component';
 import { CategoryTypeFiltersComponent } from './category-type-filters.component';
+import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
 
 @Component({
   selector: 'app-statistics',
@@ -51,6 +52,7 @@ import { CategoryTypeFiltersComponent } from './category-type-filters.component'
     SegmentedSwitchComponent,
     MicroVisualsComponent,
     CategoryTypeFiltersComponent,
+    CategoryFilterComponent,
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
@@ -79,6 +81,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   filteredExpenses: Expense[] = [];
   descriptionSearch: string = '';
+  categoryFilterValues: string[] = [];
 
   // collapse state for category filters and bars
   collapsed: Record<
@@ -90,11 +93,15 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     irregularSummary: true,
   };
 
-  // Category view switch state (bars | micro table)
-  categoryView: 'bars' | 'micro' = 'bars';
-  readonly categoryViewOptions: { value: 'bars' | 'micro'; label: string }[] = [
+  // Category view switch state (bars | micro | filter)
+  categoryView: 'bars' | 'micro' | 'filter' = 'bars';
+  readonly categoryViewOptions: {
+    value: 'bars' | 'micro' | 'filter';
+    label: string;
+  }[] = [
     { value: 'bars', label: 'Бары' },
     { value: 'micro', label: 'Тренды' },
+    { value: 'filter', label: 'Фильтр' },
   ];
 
   // Reference to ensure Angular/linters detect template usage of standalone imports (workaround for any false positive diagnostics)
@@ -113,7 +120,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   onCategoryViewSelect(v: string) {
-    if (v === 'bars' || v === 'micro') {
+    if (v === 'bars' || v === 'micro' || v === 'filter') {
       this.categoryView = v;
     }
   }
@@ -137,6 +144,17 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     );
   }
 
+  updateCategoriesFilterValues(): void {
+    // Active categories are those currently displayed (not excluded). If none excluded, use currentCategories.
+    if (!this.excludedCategories || this.excludedCategories.length === 0) {
+      this.categoryFilterValues = [];
+    }
+    this.categoryFilterValues = Categories.map(c => c.id).filter(
+      c => !this.excludedCategories.includes(c)
+    );
+  }
+
+
   private initFilter(): void {
     if (this.dateFilterService.dateFilter) {
       this.currentFilter = {
@@ -153,6 +171,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       this.excludedCategories = Categories.filter(
         category => !this.dateFilterService.categories.includes(category?.id)
       ).map(category => category.id);
+      this.categoryFilterValues = [...this.dateFilterService.categories];
       this.dateFilterService.categories = undefined;
     }
 
@@ -318,6 +337,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.regularCategoriesCheckboxValue = true;
     this.excludedCategories = [];
     this.descriptionSearch = '';
+    this.categoryFilterValues = [];
     this.currentFilter = { ...this.initialFilterValue };
     this.calculateCategoryTotals(null, false);
   }
@@ -327,6 +347,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.irregularCategoriesCheckboxValue = true;
     this.regularCategoriesCheckboxValue = true;
     this.excludedCategories = [];
+    this.categoryFilterValues = [];
     this.calculateCategoryTotals(null, false);
   }
 
@@ -342,14 +363,17 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
           category => !category.includeInBalance
         ).map(category => category.id);
         this.excludedCategories = [...regularCategories];
+        this.updateCategoriesFilterValues();
         this.calculateCategoryTotals(null, false);
       } else {
         this.excludedCategories = [];
+        this.updateCategoriesFilterValues();
         this.calculateCategoryTotals(null, false);
       }
     } else {
       if (this.irregularCategoriesCheckboxValue) {
         this.excludedCategories = [];
+        this.updateCategoriesFilterValues();
         this.calculateCategoryTotals(null, false);
       } else {
         this.onIrregularCategoriesCheckboxClick(false);
@@ -365,14 +389,17 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
           category => category.includeInBalance
         ).map(category => category.id);
         this.excludedCategories = [...irregularCategories];
+        this.updateCategoriesFilterValues();
         this.calculateCategoryTotals(null, false);
       } else {
         this.excludedCategories = [];
+        this.updateCategoriesFilterValues();
         this.calculateCategoryTotals(null, false);
       }
     } else {
       if (this.regularCategoriesCheckboxValue) {
         this.excludedCategories = [];
+        this.updateCategoriesFilterValues();
         this.calculateCategoryTotals(null, false);
       } else {
         this.onRegularCategoriesCheckboxClick(false);
@@ -388,6 +415,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       new Set([...this.excludedCategories, ...filteredCategories])
     );
     this.excludedCategories = updatedCategorises;
+    this.updateCategoriesFilterValues();
     this.calculateCategoryTotals(category, false);
   }
 
@@ -397,10 +425,12 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     );
     if (updatedExcludedCategories.length === Categories.length) {
       this.excludedCategories = [];
+      this.updateCategoriesFilterValues();
       this.irregularCategoriesCheckboxValue = true;
       this.regularCategoriesCheckboxValue = true;
     } else {
       this.excludedCategories = updatedExcludedCategories;
+      this.updateCategoriesFilterValues();
     }
     this.calculateCategoryTotals(null, false);
   }
@@ -412,6 +442,21 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     return Categories.filter(
       category => !this.excludedCategories.includes(category?.id)
     ).map(category => category.id);
+  }
+
+  onCategoryFilterSelected(categories: string[]): void {
+    // Selected categories represent the ONLY categories to include.
+    // Convert to excludedCategories list used by rest of logic.
+    if (!categories || categories.length === 0) {
+      // empty array means all categories
+      this.excludedCategories = [];
+      this.categoryFilterValues = [];
+    } else {
+      const allIds = Categories.map(c => c.id);
+      this.excludedCategories = allIds.filter(id => !categories.includes(id));
+      this.categoryFilterValues = categories;
+    }
+    this.calculateCategoryTotals(null, true);
   }
 
   ngOnDestroy(): void {

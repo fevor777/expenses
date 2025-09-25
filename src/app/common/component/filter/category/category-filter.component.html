@@ -1,10 +1,10 @@
 <div class="category-filter">
-  <span>Категория:</span>
-  <br />
-  <button (click)="clearCategoryFilters()" class="category-filter-clear">
+  <span *ngIf="!hideCategoryTitle">Категория:</span>
+  <br *ngIf="!hideCategoryTitle"/>
+  <button *ngIf="!hideReset" (click)="clearCategoryFilters()" class="category-filter-clear">
     Очистить все фильтры
   </button>
-  <br />
+  <br *ngIf="!hideReset"/>
   <div class="category-filter-checkbox category-filter-checkbox-main">
     <input
       type="checkbox"

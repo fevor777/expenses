@@ -20,6 +20,8 @@ import { Categories } from '../../../model/categories';
 })
 export class CategoryFilterComponent implements OnChanges {
   @Input() value: string[];
+  @Input() hideCategoryTitle: boolean;
+  @Input() hideReset: boolean;
   @Output() selectedCategories: EventEmitter<string[]> = new EventEmitter();
 
   readonly regularValue: string = 'regular';

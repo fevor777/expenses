@@ -7,6 +7,12 @@
   gap: 5px;
   background: var(--color-bg);
   color: var(--color-text);
+
+  .stats-filter {
+    margin-left: 30px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
 }
 .statistics-nav {
   display: flex;

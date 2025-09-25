@@ -527,10 +527,10 @@ export class ExpenseSummaryService {
     return `• ${base}${forecast}`;
   }
   private lineExtra(s: ExpenseSummary) {
-    return `• Лишние(!): ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
+    return `• Отказ: ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
   }
   private lineNonEssential(s: ExpenseSummary) {
-    return `• Необязат.: ${s.nonEssential}€${this.percentLine(s.nonEssentialPct)}${this.daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
+    return `• Хотелки: ${s.nonEssential}€${this.percentLine(s.nonEssentialPct)}${this.daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
   }
   private lineEnergy(s: ExpenseSummary) {
     return s.energyEmoji

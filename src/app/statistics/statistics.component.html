@@ -107,6 +107,14 @@
         (categoryRemoved)="onMicroCategoryRemoved($event)"
       ></app-micro-visuals>
     </div>
+    <div *ngIf="categoryView === 'filter'" class="stats-filter">
+      <app-category-filter
+        [value]="categoryFilterValues"
+        [hideCategoryTitle]="true"
+        [hideReset]="true"
+        (selectedCategories)="onCategoryFilterSelected($event)"
+      ></app-category-filter>
+    </div>
   </app-collapsed-panel>
   <app-collapsed-panel
     [style.marginTop]="'7px'"
