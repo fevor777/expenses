@@ -1,18 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, switchMap, first } from 'rxjs/operators';
 
 import { BudgetDataService } from './budget-data.service';
 import { NotificationService } from '../component/notification/notification.service';
-import { ExpenseService } from './expense.service';
-import { DateFilterService } from '../component/filter/date/date-filter.service';
 import { getCategoryById } from '../model/categories';
 import { Expense } from '../model/expense.model';
 
 export interface ExpenseSummary {
   todaysTotal: number;
   todaysIrregular: number;
+  /**
+   * @deprecated Use frameTotal. This previously represented calendar month total; now the frame is authoritative.
+   */
   monthlyTotal: number;
+  /** Total spend inside the current rolling frame (all categories). */
+  frameTotal: number;
   monthlyIrregular: number;
   budget: number;
   remaining: number;
@@ -45,21 +48,15 @@ export interface ExpenseSummary {
 export class ExpenseSummaryService {
   constructor(
     private budgetDataService: BudgetDataService,
-    private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService,
     private notificationService: NotificationService
   ) {}
 
   sendBrowserNotificationSummary(): Observable<void> {
-    // Use rolling period (BudgetDataService) for irregular/budget metrics BUT
-    // compute calendar month (1..last day) total separately for monthlyTotal display.
-    const calendarMonthFrame = this.dateFilterService.getInitialMonthValue();
-    return combineLatest([
-      this.budgetDataService.getExpensesWithBudget(), // rolling frame
-      this.expenseService.getExpenses(calendarMonthFrame).pipe(first()), // calendar month
-    ]).pipe(
+    // All metrics computed strictly within the rolling frame provided by BudgetDataService.
+    // NOTE: "monthlyTotal" below now represents the FRAME total (not forced calendar month).
+    return this.budgetDataService.getExpensesWithBudget().pipe(
       first(),
-      map(([rolling, calendarMonthExpenses]) => {
+      map(rolling => {
         const frameStart = rolling.dateFrame.start.toMillis();
         const frameFinish = rolling.dateFrame.finish.toMillis();
         const base = this.computeBaseMetrics(
@@ -73,14 +70,11 @@ export class ExpenseSummaryService {
           frameStart,
           frameFinish
         );
-        // Override only monthlyTotal with calendar month total; keep monthlyIrregular etc from rolling frame
-        const calendarMonthTotal = calendarMonthExpenses.reduce(
-          (sum, e) => sum + (e.amount || 0),
-          0
-        );
+        // monthlyTotal kept for backward compatibility; equal to frameTotal
         return {
           ...enriched,
-          monthlyTotal: this.roundUp(calendarMonthTotal),
+          monthlyTotal: this.roundUp(base.monthlyTotal),
+          frameTotal: this.roundUp(base.frameTotal),
           dateFrameStart: frameStart,
           dateFrameFinish: frameFinish,
         };
@@ -291,6 +285,7 @@ export class ExpenseSummaryService {
       startOfDay: startOfToday,
       daysPassed,
       monthlyTotal: 0,
+      frameTotal: 0,
       monthlyIrregular: 0,
       todaysTotal: 0,
       todaysIrregular: 0,
@@ -316,6 +311,7 @@ export class ExpenseSummaryService {
   ) {
     const amt = e.amount || 0;
     c.monthlyTotal = this.roundUp(c.monthlyTotal + amt);
+    c.frameTotal = this.roundUp(c.frameTotal + amt);
     const include = getCategoryById(e.category)?.includeInBalance;
     if (include) this.addIrregular(e, amt, c);
     this.classifyExpense(e, amt, c);
@@ -386,6 +382,7 @@ export class ExpenseSummaryService {
       todaysTotal: c.todaysTotal,
       todaysIrregular: c.todaysIrregular,
       monthlyTotal: c.monthlyTotal,
+      frameTotal: c.frameTotal,
       monthlyIrregular: c.monthlyIrregular,
       extra: this.roundUp(c.extra),
       extraPct,
@@ -635,11 +632,14 @@ export class ExpenseSummaryService {
     return `• Сегодня: ${s.todaysTotal}€${irr}${this.lineBehaviorToday(s)}`;
   }
   private lineMonth(s: ExpenseSummary) {
-    return `• Месяц: ${s.monthlyTotal}€`;
+    if (s.frameTotal !== undefined && s.frameTotal !== s.monthlyTotal) {
+      return `• Период: ${s.frameTotal}€ (old: ${s.monthlyTotal}€)`;
+    }
+    return `• Период: ${s.frameTotal ?? s.monthlyTotal}€`;
   }
   private lineMonthlyIrregular(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
-    return `• Б: ${s.percentUsed.toFixed(0)}% М: ${p.line}% ${p.exhaustion ? ' ' + p.exhaustion : ''}`;
+    return `• Б: ${s.percentUsed.toFixed(0)}% П: ${p.line}% ${p.exhaustion ? ' ' + p.exhaustion : ''}`;
   }
   private lineBudget(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
