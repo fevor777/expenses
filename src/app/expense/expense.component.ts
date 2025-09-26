@@ -191,7 +191,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       .getExpensesWithBudget()
       .pipe(takeUntil(this.unsubscribe), take(1))
       .subscribe(({ budget, expenses }) => {
-        const monthlyBudget = budget || 0;
+        const monthlyBudget = budget?.value || 0;
         // Use already maintained this.monthlyExpenses if populated, fallback to fetched expenses
         const irregularSpent = expenses
           .filter(e => getCategoryById(e.category)?.includeInBalance)
@@ -265,7 +265,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       .getExpensesWithBudget()
       .pipe(take(1))
       .subscribe(({ budget, expenses }) => {
-        const monthlyBudget = budget || 0;
+        const monthlyBudget = budget?.value || 0;
         // Prefer already accumulated monthlyExpenses (includes latest new expense after add?)
         // We rely on calculateAmounts having been invoked by subscription earlier; fallback to fresh expenses list.
         const irregularSpent = expenses

@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { from, map, Observable, tap } from 'rxjs';
-import { IrregularBudget } from '../model/irregular-budget.model';
 import { IrregularBudgetStoreService } from './irregular-budget-store.service';
 import { withUserId } from './with-user-id.helper';
+import { Budget } from '../model/budget.model';
 
 @Injectable({ providedIn: 'root' })
 export class IrregularBudgetService {
@@ -15,27 +15,26 @@ export class IrregularBudgetService {
     private afAuth: AngularFireAuth
   ) {
     this.collection =
-      this.fireStore.collection<IrregularBudget>('irregularBudget');
+      this.fireStore.collection<Budget>('irregularBudget');
   }
 
-  addValue(value: number): Observable<number> {
+  addValue(value: Budget): Observable<Budget> {
     const fallback = () => this.store.addValueObs(value);
     fallback();
     const request = (uid: string) => {
-      const obj = { value, uid };
+      const obj = { ...value, uid };
       return from(this.collection.doc(uid).set(obj)).pipe(map(() => value));
     };
     return withUserId(this.afAuth, request, fallback, fallback);
   }
 
-  getValue(): Observable<number> {
+  getValue(): Observable<Budget> {
     const fallback = () => this.store.getValueObs();
     const request = (uid: string) =>
       this.fireStore
-        .doc<IrregularBudget>(`irregularBudget/${uid}`)
+        .doc<Budget>(`irregularBudget/${uid}`)
         .valueChanges()
         .pipe(
-          map(v => v?.value || 0),
           tap(value => this.store.addValueObs(value))
         );
     return withUserId(this.afAuth, request, fallback, fallback);

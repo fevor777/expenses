@@ -13,22 +13,62 @@ import { TabsContainerComponent } from '../common/tabs-container.component';
 import { TabComponent } from '../common/tab.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { BalanceDateService } from '../common/service/balance-date.service';
+import { Budget } from '../common/model/budget.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, TabsContainerComponent, TabComponent],
+  imports: [CommonModule, RouterModule, TabsContainerComponent, TabComponent, FormsModule],
 })
 export class ExportComponent implements OnDestroy {
   activeTab = 'general';
-  irregularBudget$!: Observable<number>;
-  irregularBudgetValue: number = 0;
   savings$!: Observable<number>;
   savingsValue: number = 0;
   user$: Observable<User>;
-  budgetStartDay: number = 1; // default fallback
+  budgetStartDay: number = 1;
+  budgetPeriodDuration: number = 1;
+  irregularBudgetValue: number = 0;
+
+  // Display-only derived label for current period preview (e.g., "September 5 - October 8")
+  get budgetPeriodLabel(): string {
+    const periodDays = Math.floor(this.budgetPeriodDuration - 1);
+    const startDay = Math.floor(this.budgetStartDay);
+    if (periodDays <= 1 || startDay < 1 || startDay > 31) return '';
+    const now = new Date();
+    // Build candidate anchor this month.
+    const daysInThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    let candidate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      Math.min(startDay, daysInThisMonth)
+    );
+    if (candidate.getTime() > now.getTime()) {
+      // Use previous month
+      const prevMonthDate = new Date(now.getFullYear(), now.getMonth(), 0); // last day previous month
+      const daysInPrev = prevMonthDate.getDate();
+      candidate = new Date(
+        prevMonthDate.getFullYear(),
+        prevMonthDate.getMonth(),
+        Math.min(startDay, daysInPrev)
+      );
+    }
+    // Slide forward by full periods if candidate too far in past
+    const msPerDay = 86400000;
+    let diffDays = Math.floor((now.getTime() - candidate.getTime()) / msPerDay);
+    if (diffDays >= periodDays) {
+      const periodsToAdvance = Math.floor(diffDays / periodDays);
+      candidate = new Date(candidate.getTime() + periodsToAdvance * periodDays * msPerDay);
+      diffDays = Math.floor((now.getTime() - candidate.getTime()) / msPerDay);
+    }
+    const start = candidate;
+    // NOTE: UI expectation (per user example) shows end = start + periodDays (not periodDays - 1)
+    const end = new Date(start.getTime() + periodDays * msPerDay);
+    const fmt = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' });
+    return `${fmt.format(start)} - ${fmt.format(end)}`;
+  }
 
   private readonly destroySubject: Subject<void> = new Subject();
 
@@ -38,36 +78,20 @@ export class ExportComponent implements OnDestroy {
     private irregularBudgetService: IrregularBudgetService,
     private savingService: SavingService,
     private afAuth: AngularFireAuth,
-    private balanceDateService: BalanceDateService
   ) {
-    this.irregularBudget$ = this.irregularBudgetService.getValue();
-    this.irregularBudget$
+    this.irregularBudgetService.getValue()
       .pipe(takeUntil(this.destroySubject))
-      .subscribe(v => (this.irregularBudgetValue = v || 0));
+      .subscribe(v => {
+        this.irregularBudgetValue = v?.value || 0;
+        this.budgetPeriodDuration = v?.period || 1;
+        this.budgetStartDay = v?.periodStart || 1;
+      });
     this.savings$ = this.savingService.getSavings();
     this.savings$
       .pipe(takeUntil(this.destroySubject))
       .subscribe(v => (this.savingsValue = v || 0));
     this.user$ = this.afAuth.user;
     // Load stored budget start day (balance date). Expecting format like 'YYYY-MM-DD' or empty.
-    this.balanceDateService
-      .getBalanceDate()
-      .pipe(
-        first(),
-        takeUntil(this.destroySubject)
-      )
-      .subscribe(v => {
-        // If value is a date string parse the day, if numeric use it directly.
-        if (!v) return;
-        let dayNum: number | undefined;
-        if (/^\d+$/.test(v)) {
-          dayNum = Number(v);
-        } else {
-          const d = new Date(v);
-            if (!isNaN(d.getTime())) dayNum = d.getDate();
-        }
-        if (dayNum && dayNum >= 1 && dayNum <= 31) this.budgetStartDay = dayNum;
-      });
   }
 
   // Method to trigger Google Sign-in
@@ -170,22 +194,6 @@ export class ExportComponent implements OnDestroy {
     window.URL.revokeObjectURL(url);
   }
 
-  onEditIrregularBudget(): void {
-    const newVal = prompt(
-      'Enter irregular budget',
-      this.irregularBudgetValue.toString()
-    );
-    if (newVal !== null) {
-      const num = Number(newVal);
-      if (!isNaN(num) && num >= 0) {
-        this.irregularBudgetService
-          .addValue(num)
-          .pipe(first(), takeUntil(this.destroySubject))
-          .subscribe();
-      }
-    }
-  }
-
   onEditSavings(): void {
     const newVal = prompt('Enter savings', this.savingsValue.toString());
     if (newVal !== null) {
@@ -199,20 +207,15 @@ export class ExportComponent implements OnDestroy {
     }
   }
 
-  onBudgetStartDayChange(raw: string | number | null): void {
-    const num = Number(raw);
-    if (isNaN(num) || num < 1 || num > 31) {
-      // revert UI silently (Angular will keep previous value)
-      return;
-    }
-    this.budgetStartDay = num;
-  }
-
-  onSaveBudgetStartDay(): void {
-    // Explicit user-triggered save (keeps auto-save behavior as well; could remove auto-save if desired).
-    if (this.budgetStartDay >= 1 && this.budgetStartDay <= 31) {
-      this.balanceDateService
-        .addBalanceDate(String(this.budgetStartDay))
+  onSaveBudget(): void {
+    if (this.irregularBudgetValue >= 0 && this.budgetPeriodDuration >= 1 && this.budgetPeriodDuration <= 60 && this.budgetStartDay >= 1 && this.budgetStartDay <= 31) {
+      const budget: Budget = {
+        value: this.irregularBudgetValue,
+        period: this.budgetPeriodDuration,
+        periodStart: this.budgetStartDay,
+      };
+      this.irregularBudgetService
+        .addValue(budget)
         .pipe(first(), takeUntil(this.destroySubject))
         .subscribe();
     }

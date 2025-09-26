@@ -4,23 +4,6 @@
 <app-tabs-container [(active)]="activeTab">
   <app-tab key="general" label="General">
     <div style="margin-top: 12px">
-      <div style="margin-bottom: 10px">
-        <span
-          >Irregular Budget:
-          <strong>{{ (irregularBudget$ | async) || 0 }}</strong>
-          <span
-            (click)="onEditIrregularBudget()"
-            title="Edit irregular budget"
-            style="
-              cursor: pointer;
-              display: inline-block;
-              margin-left: 8px;
-              vertical-align: middle;
-            "
-            >✏️</span
-          >
-        </span>
-      </div>
       <div>
         <span
           >Savings: <strong>{{ (savings$ | async) || 0 }}</strong>
@@ -37,27 +20,66 @@
           >
         </span>
       </div>
+    </div>
+  </app-tab>
+  <app-tab key="budget" label="Budget">
+    <div style="margin-top: 12px">
       <div class="budget-start-row">
-        <label for="budgetStartDay" class="bsd-label">Budget Start Day:</label>
+        <label for="irregularBudgetValue" class="bsd-label"
+          >Budget:</label
+        >
+        <input
+          id="irregularBudgetValue"
+          type="number"
+          min="1"
+          [(ngModel)]="irregularBudgetValue"
+          class="bsd-input"
+        />
+      </div>
+      <div class="budget-start-row">
+        <label for="budgetStartDay" class="bsd-label"
+          >Start Budget Period:</label
+        >
         <input
           id="budgetStartDay"
           type="number"
           min="1"
           max="31"
-          [value]="budgetStartDay"
-          (change)="onBudgetStartDayChange($any($event.target).value)"
+          [(ngModel)]="budgetStartDay"
           class="bsd-input"
         />
-        <button type="button" (click)="onSaveBudgetStartDay()" class="btn btn-primary bsd-save">Save</button>
-        <span class="bsd-hint">(1–31)</span>
       </div>
+      <div class="budget-start-row">
+        <label for="budgetDuration" class="bsd-label"
+          >Budget Period Duration:</label
+        >
+        <input
+          id="budgetDuration"
+          type="number"
+          min="1"
+          max="60"
+          [(ngModel)]="budgetPeriodDuration"
+          class="bsd-input"
+        />
+        <span class="bsd-hint">(1–60)</span>
+      </div>
+      <div class="budget-start-row" *ngIf="budgetPeriodLabel">
+        <span class="bsd-label">Period Preview:</span>
+        <span class="bsd-value">{{ budgetPeriodLabel }}</span>
+      </div>
+      <button
+        type="button"
+        (click)="onSaveBudget()"
+        class="btn btn-primary bsd-save"
+      >
+        Save
+      </button>
     </div>
   </app-tab>
   <app-tab key="export" label="Export">
     <div style="margin-top: 12px" *ngIf="user$ | async as user">
       <button (click)="exportCSV()">Export from cloud to CSV!</button
       ><br /><br />
-      <button (click)="exportFirebase(user?.uid)">Export Firebase</button>
     </div>
   </app-tab>
   <app-tab key="auth" label="Auth">

@@ -70,7 +70,7 @@ export class IrregularSummaryComponent implements OnInit, OnDestroy {
       .subscribe({
         next: data => {
           this.expenses = data.expenses || [];
-          this.budget = data.budget || 0;
+          this.budget = data.budget?.value || 0;
           this.monthFrame = data.dateFrame;
           this.loaded = true;
         },

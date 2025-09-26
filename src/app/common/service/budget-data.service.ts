@@ -9,6 +9,7 @@ import { Expense } from '../model/expense.model';
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { BalanceDateService } from './balance-date.service';
 import { DateTime } from 'luxon';
+import { Budget } from '../model/budget.model';
 
 /**
  * Minimal service requested: only provide (expenses for a period, budget value, date frame).
@@ -17,7 +18,7 @@ import { DateTime } from 'luxon';
 export interface BudgetPeriodData {
   dateFrame: DateFrame; // always the current month frame resolved internally
   expenses: Expense[]; // raw expenses within the month
-  budget: number; // current irregular budget value
+  budget: Budget; // current irregular budget value
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,8 +26,7 @@ export class BudgetDataService {
   constructor(
     private expenseService: ExpenseService,
     private dateFilterService: DateFilterService,
-    private irregularBudgetService: IrregularBudgetService,
-    private balanceDateService: BalanceDateService
+    private irregularBudgetService: IrregularBudgetService
   ) {}
 
   /**
@@ -36,14 +36,14 @@ export class BudgetDataService {
    */
   getExpensesWithBudget(): Observable<BudgetPeriodData> {
     // Resolve rolling frame based on stored balance date day (1-31). If not set or invalid, fallback to calendar month.
-    return this.balanceDateService.getBalanceDate().pipe(
+    return this.irregularBudgetService.getValue().pipe(
       first(),
-      switchMap(value => {
-        const frame = this.buildRollingFrame(value);
+      switchMap(budget => {
+        const frame = this.buildRollingFrame(budget);
         return combineLatest([
           this.expenseService.getExpenses(frame),
-          this.irregularBudgetService.getValue(),
-          of(frame)
+          of(budget),
+          of(frame),
         ]);
       }),
       first(),
@@ -51,7 +51,7 @@ export class BudgetDataService {
         ([expenses, budget, frame]): BudgetPeriodData => ({
           dateFrame: frame,
           expenses,
-          budget: budget || 0,
+          budget: budget || { uid: '', value: 600, period: 30, periodStart: 3 },
         })
       ),
       shareReplay({ bufferSize: 1, refCount: true })
@@ -63,45 +63,68 @@ export class BudgetDataService {
    * and the end is the day before the next period start. Example: value '8' => 8 Sep .. 7 Oct (inclusive).
    * Fallback: If value empty/invalid => default calendar month frame from DateFilterService.
    */
-  private buildRollingFrame(
-    balanceDayValue: string | undefined | null
-  ): DateFrame {
-    const dayNum = Number(balanceDayValue);
+  private buildRollingFrame(budget: Budget): DateFrame {
+    const dayNum = budget.periodStart; // nominal anchor day inside each period
+    const periodDays = budget.period && budget.period > 0 ? Math.floor(budget.period) : 30;
+    const now = DateTime.now();
+
+    // 1. Establish a candidate start anchored to the most recent occurrence of 'dayNum'.
+    // If periodStart invalid, fall back to today - (periodDays-1) days.
+    let start: DateTime;
     if (!dayNum || isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
-      return this.dateFilterService.getInitialMonthValue();
+      start = now.minus({ days: periodDays - 1 });
+    } else {
+      // Try to anchor within current month first.
+      let candidate = DateTime.local(
+        now.year,
+        now.month,
+        Math.min(dayNum, now.daysInMonth)
+      );
+      if (candidate > now) {
+        // Use previous month anchor
+        const prev = now.minus({ months: 1 });
+        candidate = DateTime.local(
+          prev.year,
+          prev.month,
+          Math.min(dayNum, prev.daysInMonth)
+        );
+      }
+      // If the span from candidate to now exceeds period length, slide forward in period-size steps.
+      let diffDays = Math.floor(now.diff(candidate, 'days').days);
+      if (diffDays >= periodDays) {
+        const periodsToAdvance = Math.floor(diffDays / periodDays);
+        candidate = candidate.plus({ days: periodsToAdvance * periodDays });
+        diffDays = Math.floor(now.diff(candidate, 'days').days);
+      }
+      start = candidate;
     }
 
-    const now = DateTime.now();
-    // Determine current rolling period start relative to today.
-    // Strategy: Construct potential start this month at dayNum; if in future (today before dayNum),
-    // start is previous month dayNum.
-    let start = DateTime.local(
-      now.year,
-      now.month,
-      Math.min(dayNum, now.daysInMonth)
+    // 2. Finish is start + periodDays - 1 millisecond (end-of-day of the last day).
+    const finishDay = start.plus({ days: periodDays - 1 });
+    const finish = DateTime.local(
+      finishDay.year,
+      finishDay.month,
+      finishDay.day,
+      23,
+      59,
+      59,
+      999
     );
-    if (now < start) {
-      const prev = now.minus({ months: 1 });
-      start = DateTime.local(
-        prev.year,
-        prev.month,
-        Math.min(dayNum, prev.daysInMonth)
-      );
+
+    // 3. Ensure now is inside [start, finish]. If start drifted too far (rare edge), rebase start.
+    if (now < start || now > finish) {
+      start = now.minus({ days: periodDays - 1 }).startOf('day');
     }
-    // End is (next period start) - 1 millisecond (use end of previous day before next start) for inclusivity.
-    const nextMonth = start.plus({ months: 1 });
-    const nextStart = DateTime.local(
-      nextMonth.year,
-      nextMonth.month,
-      Math.min(dayNum, nextMonth.daysInMonth)
-    );
-    const finish = nextStart.minus({ milliseconds: 1 });
+
+    const finalFinish = start
+      .plus({ days: periodDays - 1 })
+      .set({ hour: 23, minute: 59, second: 59, millisecond: 999 });
 
     return {
       start,
-      finish,
-      mode: undefined, // keep undefined; consumers treat as custom month-like period
-      display: `${start.toFormat('d LLL')} – ${finish.toFormat('d LLL')}`,
+      finish: finalFinish,
+      mode: undefined,
+      display: `${start.toFormat('d LLL')} – ${finalFinish.toFormat('d LLL')} (${periodDays}д)`,
     };
   }
 }

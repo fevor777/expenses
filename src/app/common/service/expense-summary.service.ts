@@ -66,7 +66,7 @@ export class ExpenseSummaryService {
         );
         const enriched = this.enrichWithBudget(
           base,
-          rolling.budget || 0,
+          rolling.budget?.value || 0,
           frameStart,
           frameFinish
         );
