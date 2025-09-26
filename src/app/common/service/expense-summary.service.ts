@@ -105,9 +105,9 @@ export class ExpenseSummaryService {
       this.lineHeader(summary),
       this.lineToday(summary),
       this.lineBudget(summary),
-      this.lineMonthlyIrregular(summary),
-      this.lineVelocity(summary),
       this.lineDailyAverage(summary),
+      this.lineVelocity(summary),
+      this.lineMonthlyIrregular(summary),
       this.lineExtra(summary),
       this.lineNonEssential(summary),
       this.lineEnergy(summary),
@@ -639,7 +639,7 @@ export class ExpenseSummaryService {
   }
   private lineMonthlyIrregular(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
-    return `• Б(%): ${s.percentUsed.toFixed(0)} М(%): ${p.line} дн: ${p.daysLeft}${p.exhaustion ? ' ' + p.exhaustion : ''}`;
+    return `• Б: ${s.percentUsed.toFixed(0)}% М: ${p.line}% ${p.exhaustion ? ' ' + p.exhaustion : ''}`;
   }
   private lineBudget(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
