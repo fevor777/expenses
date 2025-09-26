@@ -644,7 +644,7 @@ export class ExpenseSummaryService {
   private lineBudget(s: ExpenseSummary) {
     const p = this.buildPaceAndForecast(s);
     return s.budget
-      ? `• Б: ${s.budget}€ O: ${s.remaining.toFixed(0)}€ P: ${s.monthlyIrregular}€`
+      ? `• O: ${s.remaining.toFixed(0)}€ P: ${s.monthlyIrregular}€ Б: ${s.budget}€`
       : '';
   }
   private lineDailyAverage(s: ExpenseSummary) {
