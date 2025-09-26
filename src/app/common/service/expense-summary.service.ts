@@ -40,6 +40,8 @@ export interface ExpenseSummary {
   energyEmoji?: string; // mapped emoji
   dateFrameStart?: number; // rolling frame start (ms)
   dateFrameFinish?: number; // rolling frame finish (ms)
+  // Planned daily budget (budget value divided by configured period days)
+  budgetPerDay?: number;
 }
 
 @Injectable({
@@ -85,6 +87,7 @@ export class ExpenseSummaryService {
           frameTotal: this.roundUp(base.frameTotal),
           dateFrameStart: frameStart,
           dateFrameFinish: frameFinish,
+          budgetPerDay: this.calcBudgetPerDay(rolling.budget?.value, rolling.budget?.period, frameStart, frameFinish),
         };
         return this.pushSummaryNotification(summary);
       })
@@ -122,7 +125,6 @@ export class ExpenseSummaryService {
       this.lineMonthlyIrregular(summary),
       this.lineExtra(summary),
       this.lineNonEssential(summary),
-      this.lineEnergy(summary),
       this.lineMonth(summary),
     ].filter(Boolean);
     return parts.join('\n');
@@ -459,6 +461,18 @@ export class ExpenseSummaryService {
     return budget ? Math.min((spent / budget) * 100, 100) : 0;
   }
 
+  private calcBudgetPerDay(value?: number, period?: number, frameStart?: number, frameFinish?: number): number | undefined {
+    if (!value || value <= 0) return undefined;
+    // Prefer explicit period if provided and >0. Fallback to derived days in frame.
+    let days = period && period > 0 ? Math.floor(period) : undefined;
+    if ((!days || days <= 0) && frameStart && frameFinish) {
+      const msPerDay = 1000 * 60 * 60 * 24;
+      days = Math.max(1, Math.round((frameFinish - frameStart + msPerDay) / msPerDay));
+    }
+    if (!days || days <= 0) return undefined;
+    return this.roundUp(value / days);
+  }
+
   private calcVelocityState(
     spent: number,
     budget: number,
@@ -560,20 +574,30 @@ export class ExpenseSummaryService {
     todaysTotal: number,
     frameStart: number | undefined,
     frameFinish: number | undefined,
-    remaining?: number
+    remaining: number | undefined,
+    budgetPerDay: number | undefined
   ): string {
     const ctx = this.dailyAverageContext(monthlyTotal, frameStart, frameFinish);
     const ratio = ctx.dailyAverage > 0 ? todaysTotal / ctx.dailyAverage : 0;
     const icon = this.dailyPaceIcon(ratio);
-    let recommended = '';
+    const fmt = (n: number) => (Math.abs(n - Math.round(n)) < 0.05 ? Math.round(n).toString() : n.toFixed(1));
+    const avgStr = fmt(ctx.dailyAverage);
+    let planStr = '';
+    if (budgetPerDay && budgetPerDay > 0) planStr = `п${fmt(budgetPerDay)}`;
+    let needStr = '';
     if (remaining !== undefined) {
       const stats = this.monthProgressStats(frameStart, frameFinish);
       if (stats.daysLeft > 0) {
         const rec = remaining / stats.daysLeft;
-        if (rec > 0.01) recommended = ` | норм: ${rec.toFixed(1)}€/д`;
+        if (rec > 0.01) needStr = `н${fmt(rec)} `; // add trailing space to ease trim later
       }
     }
-    return `${icon} Темп: ср.${ctx.dailyAverage.toFixed(1)}€/день${recommended}`;
+    const inner: string[] = [];
+    if (planStr) inner.push(planStr);
+    if (needStr) inner.push(needStr.trim());
+    const paren = inner.length ? ` (${inner.join(' ')})` : '';
+    // Result: "Темп: 📊 12.3 (п15 н14.2)"
+    return `Темп: ${avgStr}${paren}`;
   }
   private dailyAverageContext(
     monthlyTotal: number,
@@ -671,18 +695,36 @@ export class ExpenseSummaryService {
       s.todaysTotal,
       s.dateFrameStart,
       s.dateFrameFinish,
-      s.remaining
+      s.remaining,
+      s.budgetPerDay
     )}`;
   }
   private lineVelocity(s: ExpenseSummary) {
-    const base = this.generateSpendingVelocityChart(
+    // Requested format: "Скорость: ⚠️ +60€ (660€) 🙂5.4"
+    if (!s.budget || s.budget <= 0) return '• Скорость: ⚡ (нет бюджета)';
+    const ctx = this.velocityContext(
       s.monthlyIrregular,
       s.budget,
       s.dateFrameStart,
       s.dateFrameFinish
     );
-    const forecast = this.velocityForecastSnippet(s);
-    return `• ${base}${forecast}`;
+    const stats = this.monthProgressStats(
+      s.dateFrameStart,
+      s.dateFrameFinish
+    );
+    const projectedTotal = ctx.currentVelocity * stats.daysInMonth;
+    const cls = this.velocityClassification(
+      ctx.projectedOverrun,
+      s.budget,
+      ctx.currentVelocity,
+      ctx.dailyBudget
+    );
+    const over = ctx.projectedOverrun;
+    const overStr = over === 0 ? '+0€' : `${over > 0 ? '+' : '-'}${Math.abs(over).toFixed(0)}€`;
+    const energy = s.energyEmoji
+      ? ` ${s.energyEmoji}${s.energyScore !== undefined ? s.energyScore.toFixed(1) : ''}`
+      : '';
+    return `• Скорость: ${overStr} (${projectedTotal.toFixed(0)}€)${energy}`;
   }
   private lineExtra(s: ExpenseSummary) {
     return `• Экстра: ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
@@ -691,8 +733,7 @@ export class ExpenseSummaryService {
     return `• Хотелки: ${s.nonEssential}€${this.percentLine(s.nonEssentialPct)}${this.daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
   }
   private lineEnergy(s: ExpenseSummary) {
-    return s.energyEmoji
-      ? `• Энергия: ${s.energyEmoji} (${s.energyScore?.toFixed(1)})`
-      : '';
+    // Deprecated: energy metric now appended to velocity line.
+    return '';
   }
 }
