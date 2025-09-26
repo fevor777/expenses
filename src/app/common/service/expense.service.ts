@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { from, map, Observable } from 'rxjs';
+import { filter, from, map, Observable } from 'rxjs';
 
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { Expense } from '../model/expense.model';
@@ -36,7 +36,8 @@ export class ExpenseService {
   getExpenses(
     dateFilter?: DateFrame,
     category?: string[],
-    descriptionFilter?: string
+    descriptionFilter?: string,
+    useCache = true,
   ): Observable<Expense[]> {
     const desc = (descriptionFilter || '').trim().toLowerCase();
     const applyDescriptionFilter = (expenses: Expense[]) => {
@@ -52,7 +53,7 @@ export class ExpenseService {
         descriptionFilter
       );
     const request = (userId: string) =>
-      this.getExpensesFromFirebase(dateFilter, category, userId).pipe(
+      this.getExpensesFromFirebase(dateFilter, category, userId, useCache).pipe(
         map(applyDescriptionFilter)
       );
     return withUserId(this.afAuth, request, fallback, fallback);
@@ -75,7 +76,8 @@ export class ExpenseService {
   private getExpensesFromFirebase(
     dateFilter?: DateFrame,
     category?: string[],
-    userId?: string
+    userId?: string,
+    useCache = true,
   ): Observable<Expense[]> {
     return this.fireStore
       .collection<Expense>('expenses', ref => {
@@ -97,6 +99,7 @@ export class ExpenseService {
       })
       .snapshotChanges()
       .pipe(
+        filter((c, i) => useCache || i > 0 && c.every(a => a.payload.doc.metadata.fromCache === false)),
         map(actions =>
           actions.map(a => {
             const data = a.payload.doc.data();

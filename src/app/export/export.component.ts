@@ -21,52 +21,36 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, TabsContainerComponent, TabComponent, FormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TabsContainerComponent,
+    TabComponent,
+    FormsModule,
+  ],
 })
 export class ExportComponent implements OnDestroy {
   activeTab = 'general';
   savings$!: Observable<number>;
   savingsValue: number = 0;
   user$: Observable<User>;
-  budgetStartDay: number = 1;
+  // Replaced legacy day-of-month anchor with explicit timestamp
   budgetPeriodDuration: number = 1;
   irregularBudgetValue: number = 0;
+  // New timestamp-based start (ms). When set, overrides legacy day-of-month logic.
+  budgetStartTs?: number;
 
   // Display-only derived label for current period preview (e.g., "September 5 - October 8")
   get budgetPeriodLabel(): string {
-    const periodDays = Math.floor(this.budgetPeriodDuration - 1);
-    const startDay = Math.floor(this.budgetStartDay);
-    if (periodDays <= 1 || startDay < 1 || startDay > 31) return '';
-    const now = new Date();
-    // Build candidate anchor this month.
-    const daysInThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    let candidate = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      Math.min(startDay, daysInThisMonth)
-    );
-    if (candidate.getTime() > now.getTime()) {
-      // Use previous month
-      const prevMonthDate = new Date(now.getFullYear(), now.getMonth(), 0); // last day previous month
-      const daysInPrev = prevMonthDate.getDate();
-      candidate = new Date(
-        prevMonthDate.getFullYear(),
-        prevMonthDate.getMonth(),
-        Math.min(startDay, daysInPrev)
-      );
-    }
-    // Slide forward by full periods if candidate too far in past
+    const periodDays = Math.floor(this.budgetPeriodDuration);
+    if (periodDays <= 0 || !this.budgetStartTs) return '';
     const msPerDay = 86400000;
-    let diffDays = Math.floor((now.getTime() - candidate.getTime()) / msPerDay);
-    if (diffDays >= periodDays) {
-      const periodsToAdvance = Math.floor(diffDays / periodDays);
-      candidate = new Date(candidate.getTime() + periodsToAdvance * periodDays * msPerDay);
-      diffDays = Math.floor((now.getTime() - candidate.getTime()) / msPerDay);
-    }
-    const start = candidate;
-    // NOTE: UI expectation (per user example) shows end = start + periodDays (not periodDays - 1)
-    const end = new Date(start.getTime() + periodDays * msPerDay);
-    const fmt = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' });
+    const start = new Date(this.budgetStartTs);
+    const end = new Date(start.getTime() + (periodDays - 1) * msPerDay);
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+    });
     return `${fmt.format(start)} - ${fmt.format(end)}`;
   }
 
@@ -77,14 +61,15 @@ export class ExportComponent implements OnDestroy {
     private authService: AuthService,
     private irregularBudgetService: IrregularBudgetService,
     private savingService: SavingService,
-    private afAuth: AngularFireAuth,
+    private afAuth: AngularFireAuth
   ) {
-    this.irregularBudgetService.getValue()
+    this.irregularBudgetService
+      .getValue()
       .pipe(takeUntil(this.destroySubject))
       .subscribe(v => {
         this.irregularBudgetValue = v?.value || 0;
         this.budgetPeriodDuration = v?.period || 1;
-        this.budgetStartDay = v?.periodStart || 1;
+        this.budgetStartTs = v?.periodStartTs;
       });
     this.savings$ = this.savingService.getSavings();
     this.savings$
@@ -207,17 +192,34 @@ export class ExportComponent implements OnDestroy {
     }
   }
 
-  onSaveBudget(): void {
-    if (this.irregularBudgetValue >= 0 && this.budgetPeriodDuration >= 1 && this.budgetPeriodDuration <= 60 && this.budgetStartDay >= 1 && this.budgetStartDay <= 31) {
-      const budget: Budget = {
-        value: this.irregularBudgetValue,
-        period: this.budgetPeriodDuration,
-        periodStart: this.budgetStartDay,
-      };
-      this.irregularBudgetService
-        .addValue(budget)
-        .pipe(first(), takeUntil(this.destroySubject))
-        .subscribe();
+  onStartDateChange(ev: Event): void {
+    const val = (ev.target as HTMLInputElement).value; // format yyyy-mm-dd
+    if (!val) {
+      this.budgetStartTs = undefined;
+      return;
+    }
+    const parts = val.split('-').map(p => parseInt(p, 10));
+    if (parts.length === 3 && !parts.some(isNaN)) {
+      const dt = new Date(parts[0], parts[1] - 1, parts[2]);
+      this.budgetStartTs = dt.getTime();
     }
   }
+
+  onSaveBudget(): void {
+    const durationOk =
+      this.budgetPeriodDuration >= 1 && this.budgetPeriodDuration <= 120;
+    const valueOk = this.irregularBudgetValue >= 0;
+    if (!durationOk || !valueOk || !this.budgetStartTs) return;
+    const budget: Budget = {
+      value: this.irregularBudgetValue,
+      period: Math.floor(this.budgetPeriodDuration),
+      periodStartTs: this.budgetStartTs,
+    };
+    this.irregularBudgetService
+      .addValue(budget)
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe();
+  }
+
+  // Legacy derivation removed – periodStartTs is now the single source of truth.
 }

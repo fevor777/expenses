@@ -37,16 +37,13 @@
         />
       </div>
       <div class="budget-start-row">
-        <label for="budgetStartDay" class="bsd-label"
-          >Start Budget Period:</label
-        >
+        <label for="budgetStartDate" class="bsd-label">Start Budget Period:</label>
         <input
-          id="budgetStartDay"
-          type="number"
-          min="1"
-          max="31"
-          [(ngModel)]="budgetStartDay"
+          id="budgetStartDate"
+          type="date"
           class="bsd-input"
+          [value]="budgetStartTs ? (budgetStartTs | date:'yyyy-MM-dd') : ''"
+          (change)="onStartDateChange($event)"
         />
       </div>
       <div class="budget-start-row">
@@ -61,7 +58,6 @@
           [(ngModel)]="budgetPeriodDuration"
           class="bsd-input"
         />
-        <span class="bsd-hint">(1–60)</span>
       </div>
       <div class="budget-start-row" *ngIf="budgetPeriodLabel">
         <span class="bsd-label">Period Preview:</span>

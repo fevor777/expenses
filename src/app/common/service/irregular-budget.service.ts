@@ -35,7 +35,9 @@ export class IrregularBudgetService {
         .doc<Budget>(`irregularBudget/${uid}`)
         .valueChanges()
         .pipe(
-          tap(value => this.store.addValueObs(value))
+          tap(value => {
+            if (value) this.store.addValueObs(value);
+          })
         );
     return withUserId(this.afAuth, request, fallback, fallback);
   }

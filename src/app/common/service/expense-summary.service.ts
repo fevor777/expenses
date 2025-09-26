@@ -53,12 +53,21 @@ export class ExpenseSummaryService {
 
   sendBrowserNotificationSummary(): Observable<void> {
     // All metrics computed strictly within the rolling frame provided by BudgetDataService.
-    // NOTE: "monthlyTotal" below now represents the FRAME total (not forced calendar month).
+    // If the current date is outside the provided frame (edge / data error), send an informational notification instead.
     return this.budgetDataService.getExpensesWithBudget().pipe(
       first(),
-      map(rolling => {
+      switchMap(rolling => {
         const frameStart = rolling.dateFrame.start.toMillis();
         const frameFinish = rolling.dateFrame.finish.toMillis();
+        const now = Date.now();
+        if (now < frameStart || now > frameFinish) {
+          const msg = this.outOfFrameMessage(frameStart, frameFinish);
+            return this.notificationService.showBrowserNotification(
+              'Сводка расходов',
+              msg,
+              { icon: undefined as any }
+            );
+        }
         const base = this.computeBaseMetrics(
           rolling.expenses,
           frameStart,
@@ -70,17 +79,26 @@ export class ExpenseSummaryService {
           frameStart,
           frameFinish
         );
-        // monthlyTotal kept for backward compatibility; equal to frameTotal
-        return {
+        const summary = {
           ...enriched,
-          monthlyTotal: this.roundUp(base.monthlyTotal),
+          monthlyTotal: this.roundUp(base.monthlyTotal), // backward compat
           frameTotal: this.roundUp(base.frameTotal),
           dateFrameStart: frameStart,
           dateFrameFinish: frameFinish,
         };
-      }),
-      switchMap(summary => this.pushSummaryNotification(summary))
+        return this.pushSummaryNotification(summary);
+      })
     );
+  }
+
+  private outOfFrameMessage(frameStart: number, frameFinish: number): string {
+    const fmt = (ms: number) => {
+      const d = new Date(ms);
+      const dd = d.getDate().toString().padStart(2, '0');
+      const mm = (d.getMonth() + 1).toString().padStart(2, '0');
+      return `${dd}.${mm}`;
+    };
+    return `Текущая дата вне активного периода (${fmt(frameStart)} – ${fmt(frameFinish)}). Обновите дату начала бюджета.`;
   }
 
   private pushSummaryNotification(summary: ExpenseSummary): Observable<void> {
