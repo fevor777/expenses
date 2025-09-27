@@ -575,7 +575,8 @@ export class ExpenseSummaryService {
     frameStart: number | undefined,
     frameFinish: number | undefined,
     remaining: number | undefined,
-    budgetPerDay: number | undefined
+    budgetPerDay: number | undefined,
+    precomputedNeed?: number
   ): string {
     const ctx = this.dailyAverageContext(monthlyTotal, frameStart, frameFinish);
     const ratio = ctx.dailyAverage > 0 ? todaysTotal / ctx.dailyAverage : 0;
@@ -585,16 +586,12 @@ export class ExpenseSummaryService {
     let planStr = '';
     if (budgetPerDay && budgetPerDay > 0) planStr = `п${fmt(budgetPerDay)}`;
     let needStr = '';
-    if (remaining !== undefined) {
-      const stats = this.monthProgressStats(frameStart, frameFinish);
-      if (stats.daysLeft > 0) {
-        const rec = remaining / stats.daysLeft;
-        if (rec > 0.01) needStr = `н${fmt(rec)} `; // add trailing space to ease trim later
-      }
+    if (precomputedNeed !== undefined && precomputedNeed > 0.01) {
+      needStr = `н${fmt(precomputedNeed)}`;
     }
     const inner: string[] = [];
     if (planStr) inner.push(planStr);
-    if (needStr) inner.push(needStr.trim());
+    if (needStr) inner.push(needStr);
     const paren = inner.length ? ` (${inner.join(' ')})` : '';
     // Result: "Темп: 📊 12.3 (п15 н14.2)"
     return `Темп: ${avgStr}${paren}`;
@@ -655,11 +652,18 @@ export class ExpenseSummaryService {
     currentVelocity: number,
     dailyBudget: number
   ) {
-    if (overrun > budget * 0.2) return { icon: '🚨', text: 'крит.' };
-    if (overrun > 0) return { icon: '⚠️', text: 'прев.' };
-    if (currentVelocity > dailyBudget * 0.9)
-      return { icon: '📊', text: 'норм.' };
-    return { icon: '💚', text: 'эконом.' };
+    // Expanded to 5 states:
+    // 1: Severe overrun (↑)
+    // 2: Mild overrun (↗)
+    // 3: On plan (→)
+    // 4: Slight under (↘)
+    // 5: Deep economy (↓)
+    if (overrun > budget * 0.2) return { icon: '↑', text: 'крит.' };
+    if (overrun > 0) return { icon: '↗', text: 'прев.' };
+    const ratio = dailyBudget > 0 ? currentVelocity / dailyBudget : 0;
+    if (ratio >= 0.9) return { icon: '→', text: 'план' };
+    if (ratio >= 0.7) return { icon: '↘', text: 'умер.' };
+    return { icon: '↓', text: 'экон.' };
   }
 
   // Message line helpers
@@ -671,7 +675,10 @@ export class ExpenseSummaryService {
       s.todaysTotal !== s.todaysIrregular
         ? ` (${s.todaysIrregular}€${s.irregularSpike ? ' ⚠️' : ''})`
         : '';
-    return `• Сегодня: ${s.todaysTotal}€${irr}${this.lineBehaviorToday(s)}`;
+    const need = this.needPerDay(s);
+    const icon = need !== undefined ? this.todayNeedIcon(s.todaysIrregular, need) : '';
+    const iconPart = icon ? ` ${icon}` : '';
+    return `• Сегодня:${iconPart} ${s.todaysTotal}€${irr}${this.lineBehaviorToday(s)}`;
   }
   private lineMonth(s: ExpenseSummary) {
     if (s.frameTotal !== undefined && s.frameTotal !== s.monthlyTotal) {
@@ -690,13 +697,15 @@ export class ExpenseSummaryService {
       : '';
   }
   private lineDailyAverage(s: ExpenseSummary) {
+    const need = this.needPerDay(s);
     return `• ${this.generateDailyAverageChart(
       s.monthlyIrregular,
       s.todaysTotal,
       s.dateFrameStart,
       s.dateFrameFinish,
       s.remaining,
-      s.budgetPerDay
+      s.budgetPerDay,
+      need
     )}`;
   }
   private lineVelocity(s: ExpenseSummary) {
@@ -724,7 +733,49 @@ export class ExpenseSummaryService {
     const energy = s.energyEmoji
       ? ` ${s.energyEmoji}${s.energyScore !== undefined ? s.energyScore.toFixed(1) : ''}`
       : '';
-    return `• Скорость: ${overStr} (${projectedTotal.toFixed(0)}€)${energy}`;
+    return `• Скорость: ${cls.icon} ${overStr} (${projectedTotal.toFixed(0)}€)${energy}`;
+  }
+
+  // --- Today vs Needed helpers ---
+  private needPerDay(s: ExpenseSummary): number | undefined {
+    // New logic: If today's irregular spend is still within a fair per-day slice,
+    // don't penalize (i.e., don't shrink the displayed 'н') until you exceed today's allowance.
+    // Steps:
+    // 1. Compute remaining BEFORE today: remainingBeforeToday = budget - (spentIrregular - todayIrregular).
+    // 2. Distribute that across (daysLeft + 1) (today + future days) => baselineNeed.
+    // 3. If todaysIrregular <= baselineNeed, show baselineNeed (stable value during the day as long as you are "within plan").
+    // 4. Once exceeded, fall back to stricter recalculation: remainingAfterToday / daysLeft (future only).
+    if (!s.dateFrameStart || !s.dateFrameFinish) return undefined;
+    if (s.budget <= 0) return undefined;
+    const stats = this.monthProgressStats(s.dateFrameStart, s.dateFrameFinish);
+    const daysLeft = stats.daysLeft; // days strictly AFTER today
+    const daysIncludingToday = daysLeft + 1;
+    if (daysIncludingToday <= 0) return undefined;
+    const spentIrregular = s.monthlyIrregular;
+    const todayIrr = s.todaysIrregular;
+    const spentBeforeToday = spentIrregular - todayIrr;
+    const remainingBeforeToday = s.budget - spentBeforeToday;
+    if (remainingBeforeToday <= 0) return undefined;
+    const baselineNeed = remainingBeforeToday / daysIncludingToday;
+    if (todayIrr <= baselineNeed + 0.0001) {
+      return this.roundUp(baselineNeed);
+    }
+    // Exceeded today's slice: recalc only for future days.
+    if (daysLeft <= 0) return undefined;
+    const remainingAfterToday = s.budget - spentIrregular;
+    if (remainingAfterToday <= 0) return undefined;
+    return this.roundUp(remainingAfterToday / daysLeft);
+  }
+  private todayNeedIcon(todayIrregular: number, needPerDay: number): string {
+    if (!needPerDay || needPerDay <= 0) return '';
+    const ratio = todayIrregular / needPerDay; // >1 means above required pace
+    // Mapping (requested arrows): -↑ (strong over), ↗ (over), → (on), ↘ (mild under), ↓ (deep under)
+    // We'll render strong over as '↑' prefixed with '!' to avoid leading minus confusion; user requested '-↑', keep literal.
+    if (ratio >= 1.4) return '↑';
+    if (ratio >= 1.1) return '↗';
+    if (ratio >= 0.9) return '→';
+    if (ratio >= 0.6) return '↘';
+    return '↓';
   }
   private lineExtra(s: ExpenseSummary) {
     return `• Экстра: ${s.extra}€${this.percentLine(s.extraPct)}${this.daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
