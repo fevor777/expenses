@@ -238,8 +238,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.irregularAmount = 0;
 
     const categories = category ? [category] : this.getRemainCategories();
+    const useCache = this.currentFilter?.mode !== 'year';
     this.expenseService
-      .getExpenses(this.currentFilter, categories)
+      .getExpenses(this.currentFilter, categories, null, useCache)
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(expenses => {
         expensesFilteredByDate = expenses;
