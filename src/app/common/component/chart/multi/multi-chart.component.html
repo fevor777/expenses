@@ -18,6 +18,10 @@
     ></canvas>
   </div>
   <div class="chart-summary">
-    <span class="non-zero-count">Non-zero values: {{ nonZeroCount }}</span>
+    <!-- Clarified labels: nonZeroCount = filled buckets; totalCount = non-zero expense entries -->
+    <span class="non-zero-count"
+      >Buckets with spending: {{ nonZeroCount }} • Expense entries:
+      {{ totalCount }}</span
+    >
   </div>
 </div>

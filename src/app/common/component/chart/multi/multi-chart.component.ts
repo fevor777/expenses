@@ -20,9 +20,20 @@ export class MultiChartComponent implements OnChanges {
 
   chartType: 'bar' | 'line' = 'bar';
   chartTypeOptions: SegmentedOption[] = [
-    { value: 'bar', label: 'Столбцы', iconClass: 'fa-solid fa-chart-column', ariaLabel: 'Столбиковая диаграмма' },
-    { value: 'line', label: 'Линия', iconClass: 'fa-solid fa-chart-line', ariaLabel: 'Линейная диаграмма' },
+    {
+      value: 'bar',
+      label: 'Столбцы',
+      iconClass: 'fa-solid fa-chart-column',
+      ariaLabel: 'Столбиковая диаграмма',
+    },
+    {
+      value: 'line',
+      label: 'Линия',
+      iconClass: 'fa-solid fa-chart-line',
+      ariaLabel: 'Линейная диаграмма',
+    },
   ];
+  totalCount: any;
 
   // Template bridge for stricter typing
   onChartTypeSelect(v: string) {
@@ -260,5 +271,8 @@ export class MultiChartComponent implements OnChanges {
     this.nonZeroCount = data.filter(
       (value: number | null) => value != null && value !== 0
     ).length;
+    this.totalCount = this.expenses?.filter(
+      (value: Expense) => value?.amount != null && value?.amount !== 0
+    )?.length;
   }
 }
