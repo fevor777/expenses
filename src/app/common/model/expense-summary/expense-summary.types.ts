@@ -122,6 +122,7 @@ export interface ExpenseSummarySnapshot {
     velocityState?: number;
     frameDays?: number;
     daysPassed?: number;
+    expenses?: Expense[];
   };
 }
 

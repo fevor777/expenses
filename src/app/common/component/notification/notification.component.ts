@@ -152,10 +152,20 @@ export class NotificationComponent implements OnDestroy {
   }
 
   onSendBrowserNotification() {
-    this.expenseSummaryService
-      .sendBrowserNotificationSummary()
-      .pipe(takeUntil(this.destroySubject))
-      .subscribe();
+    if (this.notificationService.summaryBuildResultCache) {
+      this.expenseSummaryService
+        .sendBrowserNotificationBySummary(
+          this.notificationService.summaryBuildResultCache
+        )
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe();
+      this.notificationService.summaryBuildResultCache = null;
+    } else {
+      this.expenseSummaryService
+        .sendBrowserNotificationWithBudgetSummary()
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe();
+    }
   }
 
   private clearPending() {

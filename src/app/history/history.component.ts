@@ -3,7 +3,15 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import {
+  first,
+  map,
+  Observable,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
@@ -19,6 +27,7 @@ import { ExpenseService } from '../common/service/expense.service';
 import { HistoryExpense } from './history-expense';
 import { HistoryItemComponent } from './item/history-item.component';
 import { GLOBAL_SWIPE_LENGTH } from '../constants';
+import { ExpenseSummaryService } from '../common/service/expense-summary.service';
 
 @Component({
   selector: 'app-history',
@@ -60,7 +69,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private router: Router,
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
-    private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService,
+    private expenseSummaryService: ExpenseSummaryService
   ) {}
 
   @HostListener('touchstart', ['$event'])
@@ -110,6 +120,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
               Math.round((balance + oldAmount - newAmount) * 100) / 100;
             return this.balanceService.addBalance(newBalance);
           }),
+          switchMap(() =>
+            this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
+          ),
           takeUntil(this.destroySubject)
         )
         .subscribe();
@@ -187,6 +200,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
             const newBalance = Math.round((balance + item.amount) * 100) / 100;
             return this.balanceService.addBalance(newBalance);
           }),
+          switchMap(() =>
+            this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
+          ),
           takeUntil(this.destroySubject)
         )
         .subscribe();
@@ -195,7 +211,12 @@ export class HistoryComponent implements OnInit, OnDestroy {
       item.isDeletedFromBalance = isDeleteFromBalance;
       this.expenseService
         .updateExpense(item)
-        .pipe(takeUntil(this.destroySubject))
+        .pipe(
+          takeUntil(this.destroySubject),
+          switchMap(() =>
+            this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
+          )
+        )
         .subscribe();
     }
   }
@@ -289,7 +310,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
       return;
     }
     // Count expense entries (non-zero amounts)
-    this.expenseEntryCount = expenses.filter(e => e.amount != null && e.amount !== 0).length;
+    this.expenseEntryCount = expenses.filter(
+      e => e.amount != null && e.amount !== 0
+    ).length;
     // Determine mode
     const mode: Mode = (frame.mode as Mode) || Mode.MONTH;
     let totalBuckets = 0;
@@ -304,8 +327,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
         aggregates[h] = +(aggregates[h] + e.amount).toFixed(2);
       });
       // Mirror multi-chart behavior: zero out current in-progress hour if within frame
-      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
-      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const start =
+        (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish =
+        (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
       const t = now.getTime();
       if (start.getTime() <= t && finish.getTime() >= t) {
         aggregates[now.getHours()] = 0;
@@ -319,8 +344,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
         const idx = dow === 0 ? 6 : dow - 1; // Monday=0
         aggregates[idx] = +(aggregates[idx] + e.amount).toFixed(2);
       });
-      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
-      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const start =
+        (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish =
+        (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
       const t = now.getTime();
       if (start.getTime() <= t && finish.getTime() >= t) {
         const dow = now.getDay();
@@ -329,7 +356,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
       }
     } else if (mode === Mode.MONTH) {
       // derive month length from frame.start
-      const base = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any) || now;
+      const base =
+        (frame.start as any)?.toJSDate?.() ||
+        new Date(frame.start as any) ||
+        now;
       const year = base.getFullYear();
       const month = base.getMonth();
       totalBuckets = new Date(year, month + 1, 0).getDate();
@@ -340,8 +370,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
         if (dayIdx >= 0 && dayIdx < totalBuckets)
           aggregates[dayIdx] = +(aggregates[dayIdx] + e.amount).toFixed(2);
       });
-      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
-      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const start =
+        (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish =
+        (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
       const t = now.getTime();
       if (start.getTime() <= t && finish.getTime() >= t) {
         const idx = now.getDate() - 1;
@@ -355,8 +387,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
         const m = d.getMonth();
         aggregates[m] = +(aggregates[m] + e.amount).toFixed(2);
       });
-      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
-      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const start =
+        (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish =
+        (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
       const t = now.getTime();
       if (start.getTime() <= t && finish.getTime() >= t) {
         const idx = now.getMonth();
@@ -412,7 +446,13 @@ export class HistoryComponent implements OnInit, OnDestroy {
   private updateExpense(expense: Expense): void {
     this.expenseService
       .updateExpense(expense)
-      .pipe(first(), takeUntil(this.destroySubject))
+      .pipe(
+        first(),
+        takeUntil(this.destroySubject),
+        switchMap(() =>
+          this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
+        )
+      )
       .subscribe();
   }
 

@@ -1,13 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { switchMap, first } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { switchMap, first, map, tap } from 'rxjs/operators';
 
 import { BudgetDataService } from './budget-data.service';
 import { NotificationService } from '../component/notification/notification.service';
 // Removed direct expense scanning utilities; logic moved into model class.
-import { ExpenseSummary, ExpensesSummary } from '../model/expense-summary/expense-summary.model';
-import { composeSummaryMessage } from '../model/expense-summary/expense-summary.formatter';
+import {
+  ExpenseSummary,
+  ExpensesSummary,
+} from '../model/expense-summary/expense-summary.model';
+import { composeSummaryMessage } from '../model/expense-summary/expense-summary.br-notifi-formatter';
+import { composeAppBudgetInfoMessage } from '../model/expense-summary/expense-summary.app-notifi-formatter';
 
+export interface SummaryBuildResult {
+  summary: ExpenseSummary | null;
+  error: string | null; // 'Бюджет не установлен' | 'Обновите дату начала бюджета.' | other future codes
+}
 
 @Injectable({
   providedIn: 'root',
@@ -18,39 +26,84 @@ export class ExpenseSummaryService {
     private notificationService: NotificationService
   ) {}
 
-  sendBrowserNotificationSummary(): Observable<void> {
-    // All metrics computed strictly within the rolling frame provided by BudgetDataService.
-    // If the current date is outside the provided frame (edge / data error), send an informational notification instead.
+  /**
+   * Build current rolling frame summary. Returns null if now is outside of frame
+   * OR if budget is not set (depending on consumer needs). Frame boundaries come
+   * from BudgetDataService.
+   */
+  /** Result container carrying either a summary or an error message. */
+  public static readonly BUILD_ERROR_OUT_OF_FRAME =
+    'Обновите дату начала бюджета.';
+  public static readonly BUILD_ERROR_NO_BUDGET = 'Бюджет не установлен';
+
+  buildCurrentBudgetSummary(): Observable<SummaryBuildResult> {
     return this.budgetDataService.getExpensesWithBudget().pipe(
       first(),
-      switchMap(rolling => {
+      map(rolling => {
+        if (!rolling.budget) {
+          return {
+            summary: null,
+            error: ExpenseSummaryService.BUILD_ERROR_NO_BUDGET,
+          } as SummaryBuildResult;
+        }
         const frameStart = rolling.dateFrame.start.toMillis();
         const frameFinish = rolling.dateFrame.finish.toMillis();
         const now = Date.now();
         if (now < frameStart || now > frameFinish) {
-          const msg = this.outOfFrameMessage(frameStart, frameFinish);
-          return this.notificationService.showBrowserNotification(
-            'Сводка расходов',
-            msg,
-            { icon: undefined as any }
-          );
+          return {
+            summary: null,
+            error: ExpenseSummaryService.BUILD_ERROR_OUT_OF_FRAME,
+          } as SummaryBuildResult;
         }
         const summary = new ExpensesSummary(rolling, frameStart, frameFinish);
-        return this.pushSummaryNotification(summary);
+        return { summary, error: null } as SummaryBuildResult;
       })
     );
   }
 
-  // (Removed budget computation helpers; logic now lives inside model class.)
+  /** Send browser notification given a prepared summary snapshot */
+  sendBrowserNotificationBySummary(result: SummaryBuildResult): Observable<void> {
+    if (!result.summary) {
+      const msg =
+        result.error || ExpenseSummaryService.BUILD_ERROR_OUT_OF_FRAME;
+      return this.notificationService.showBrowserNotification(
+        'Сводка расходов',
+        msg,
+        { icon: undefined as any }
+      );
+    }
+    return this.pushSummaryNotification(result.summary);
+  }
 
-  private outOfFrameMessage(frameStart: number, frameFinish: number): string {
-    const fmt = (ms: number) => {
-      const d = new Date(ms);
-      const dd = d.getDate().toString().padStart(2, '0');
-      const mm = (d.getMonth() + 1).toString().padStart(2, '0');
-      return `${dd}.${mm}`;
-    };
-    return `Текущая дата вне активного периода (${fmt(frameStart)} – ${fmt(frameFinish)}). Обновите дату начала бюджета.`;
+  /** Send in-app (toast) notification given a prepared summary snapshot */
+  sendAppNotificationBySummary(result: SummaryBuildResult): void {
+    if (!result.summary) {
+      this.notificationService.showMessage(
+        result.error || 'Неизвестная ошибка',
+        'warning'
+      );
+    }
+    const summary = result.summary;
+    const msg = composeAppBudgetInfoMessage(summary);
+    const remaining = summary.remaining;
+    const percentUsed = summary.percentUsed;
+    this.notificationService.showMessage(
+      msg,
+      remaining <= 0 ? 'error' : percentUsed > 80 ? 'warning' : 'info'
+    );
+  }
+
+  /** Backwards-compatible convenience wrappers (can be removed after migration) */
+  sendBrowserNotificationWithBudgetSummary(): Observable<void> {
+    return this.buildCurrentBudgetSummary().pipe(
+      switchMap(result => this.sendBrowserNotificationBySummary(result))
+    );
+  }
+
+  showAppBudgetInfo(): Observable<SummaryBuildResult> {
+    return this.buildCurrentBudgetSummary().pipe(
+      tap(result => this.sendAppNotificationBySummary(result))
+    );
   }
 
   private pushSummaryNotification(summary: ExpenseSummary): Observable<void> {

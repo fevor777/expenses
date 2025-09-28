@@ -141,6 +141,7 @@ export function createExpenseSummary(
       velocityState: pace.velocityState,
       frameDays: frame.daysInFrame,
       daysPassed: frame.daysPassed,
+      expenses: rolling.expenses,
     },
   };
 

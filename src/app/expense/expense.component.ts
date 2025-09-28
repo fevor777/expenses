@@ -14,8 +14,8 @@ import {
   switchMap,
   takeUntil,
   tap,
-  take,
   map,
+  combineLatest,
 } from 'rxjs';
 
 import { CategoriesComponent } from '../common/component/category/categories.component';
@@ -34,10 +34,11 @@ import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
 import { ExpenseHeaderComponent } from './header/expense-header.component';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
-// Removed direct irregular budget service usage in favor of consolidated BudgetDataService.
-import { BudgetDataService } from '../common/service/budget-data.service';
 import { GLOBAL_LONG_PRESS_DURATION } from '../constants';
-import { ExpenseSummaryService } from '../common/service/expense-summary.service';
+import {
+  ExpenseSummaryService,
+  SummaryBuildResult,
+} from '../common/service/expense-summary.service';
 
 @Component({
   selector: 'app-expense',
@@ -64,6 +65,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   showNumberBoard: boolean = true;
   monthlyExpenses: Expense[] = [];
   todaysExpenses: Expense[] = [];
+  budgetSummary: SummaryBuildResult;
 
   currency: Currency;
   description: string = '';
@@ -84,7 +86,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
-    private budgetDataService: BudgetDataService,
     private expenseSummaryService: ExpenseSummaryService
   ) {}
 
@@ -143,17 +144,25 @@ export class ExpenseComponent implements OnInit, OnDestroy {
             }
             return balanceObs.pipe(map(() => addedExpense));
           }),
-          tap((addedExpense: Expense) => {
+          switchMap(addedExpense =>
+            combineLatest([
+              this.expenseSummaryService.buildCurrentBudgetSummary(),
+              of(addedExpense),
+            ])
+          ),
+          tap(([summary, addedExpense]: [SummaryBuildResult, Expense]) => {
+            this.notificationService.summaryBuildResultCache = summary;
             this.onShowNumberBoard();
             this.showNotification(
               categoryName,
               amount,
               addedExpense,
-              originalDescription
+              originalDescription,
+              summary
             );
           }),
-          switchMap(() =>
-            this.expenseSummaryService.sendBrowserNotificationSummary()
+          switchMap(([summary]: [SummaryBuildResult, Expense]) =>
+            this.expenseSummaryService.sendBrowserNotificationBySummary(summary)
           ),
           takeUntil(this.unsubscribe)
         )
@@ -186,39 +195,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   }
 
   onHeaderBudgetInfoClick(): void {
-    // Use consolidated BudgetDataService (current month expenses + budget).
-    this.budgetDataService
-      .getExpensesWithBudget()
-      .pipe(takeUntil(this.unsubscribe), take(1))
-      .subscribe(({ budget, expenses }) => {
-        const monthlyBudget = budget?.value || 0;
-        // Use already maintained this.monthlyExpenses if populated, fallback to fetched expenses
-        const irregularSpent = expenses
-          .filter(e => getCategoryById(e.category)?.includeInBalance)
-          .reduce((sum, e) => Math.round((sum + e.amount) * 100) / 100, 0);
-        if (!monthlyBudget) {
-          this.notificationService.showMessage(
-            'Бюджет не установлен',
-            'warning'
-          );
-          return;
-        }
-        const remaining = Math.max(monthlyBudget - irregularSpent, 0);
-        const percentUsed = monthlyBudget
-          ? Math.min((irregularSpent / monthlyBudget) * 100, 100)
-          : 0;
-        const percentRemaining = 100 - percentUsed;
-        const msg =
-          `Нерегулярные расходы:<br>` +
-          `Бюджет: ${monthlyBudget} €<br>` +
-          `<span style="display:block;margin:6px 0;height:1px;background:var(--color-border);"></span>` +
-          `Потрачено: ${irregularSpent} € (${percentUsed.toFixed(1)}%)<br>` +
-          `Осталось: ${remaining.toFixed(2)} € (${percentRemaining.toFixed(1)}%)<hr>` +
-          `Всего потрачено за месяц: ${this.getMonthlyAmount()} €`;
-        this.notificationService.showMessage(
-          msg,
-          remaining <= 0 ? 'error' : percentUsed > 80 ? 'warning' : 'info'
-        );
+    this.expenseSummaryService
+      .buildCurrentBudgetSummary()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((result: SummaryBuildResult) => {
+        this.notificationService.summaryBuildResultCache = result;
+        return this.expenseSummaryService.sendAppNotificationBySummary(result);
       });
   }
 
@@ -254,52 +236,49 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     categoryName,
     amount,
     addedExpense?: Expense,
-    originalDescription?: string
+    originalDescription?: string,
+    summary?: SummaryBuildResult
   ): void {
     const todaysAmountByCategory = this.getTodaysAmount(categoryName);
     const monthlyAmountByCategory =
       this.getMonthlyAmountByCategory(categoryName);
     const monthlyTotal = this.getMonthlyAmount();
-    // Fetch consolidated budget + expenses (current month) and append info.
-    this.budgetDataService
-      .getExpensesWithBudget()
-      .pipe(take(1))
-      .subscribe(({ budget, expenses }) => {
-        const monthlyBudget = budget?.value || 0;
-        // Prefer already accumulated monthlyExpenses (includes latest new expense after add?)
-        // We rely on calculateAmounts having been invoked by subscription earlier; fallback to fresh expenses list.
-        const irregularSpent = expenses
-          .filter(e => getCategoryById(e.category)?.includeInBalance)
-          .reduce((sum, e) => Math.round((sum + e.amount) * 100) / 100, 0);
-        const remaining = Math.max(monthlyBudget - irregularSpent, 0);
-        const percentUsed = monthlyBudget
-          ? Math.min((irregularSpent / monthlyBudget) * 100, 100)
-          : 0;
-        const budgetLine = monthlyBudget
-          ? `<br><br>Бюджет: ${monthlyBudget} € | Потрачено (учёт): ${irregularSpent} € (${percentUsed.toFixed(
-              1
-            )}%) | Осталось: ${remaining.toFixed(2)} €`
-          : '';
+    const budget = summary?.summary?.budget;
+    const expensesForBudgetPeriod = summary?.summary?.meta?.expenses || [];
+    const periodBudget = budget || 0;
+    // Prefer already accumulated monthlyExpenses (includes latest new expense after add?)
+    // We rely on calculateAmounts having been invoked by subscription earlier; fallback to fresh expenses list.
+    const irregularSpent = expensesForBudgetPeriod
+      .filter(e => getCategoryById(e.category)?.includeInBalance)
+      .reduce((sum, e) => Math.round((sum + e.amount) * 100) / 100, 0);
+    const remaining = Math.max(periodBudget - irregularSpent, 0);
+    const percentUsed = periodBudget
+      ? Math.min((irregularSpent / periodBudget) * 100, 100)
+      : 0;
+    const budgetLine = periodBudget
+      ? `<br><br>Бюджет: ${periodBudget} € | Потрачено (учёт): ${irregularSpent} € (${percentUsed.toFixed(
+          1
+        )}%) | Осталось: ${remaining.toFixed(2)} €`
+      : '';
 
-        const inAppMessage =
-          `Добавлено: ${amount} € - ${getCategoryNameById(categoryName)}<br><br>` +
-          `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
-          `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
-          `Всего за месяц: ${monthlyTotal} €` +
-          budgetLine;
+    const inAppMessage =
+      `Добавлено: ${amount} € - ${getCategoryNameById(categoryName)}<br><br>` +
+      `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
+      `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
+      `Всего за месяц: ${monthlyTotal} €` +
+      budgetLine;
 
-        this.notificationService.showMessage(inAppMessage, 'info', {
-          context: 'expense-added',
-          expense: addedExpense
-            ? { ...addedExpense }
-            : {
-                category: categoryName,
-                amount,
-                description: originalDescription || undefined,
-                date: Date.now(),
-              },
-        });
-      });
+    this.notificationService.showMessage(inAppMessage, 'info', {
+      context: 'expense-added',
+      expense: addedExpense
+        ? { ...addedExpense }
+        : {
+            category: categoryName,
+            amount,
+            description: originalDescription || undefined,
+            date: Date.now(),
+          },
+    });
   }
 
   private getTodaysAmount(categoryName: string): number {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { SummaryBuildResult } from '../../service/expense-summary.service';
 
 export interface NotificationPayload {
   message: string;
@@ -24,6 +25,8 @@ export class NotificationService {
   readonly hide$ = this.hideSubject.asObservable();
 
   private browserNotificationPermission: NotificationPermission = 'default';
+  
+  summaryBuildResultCache: SummaryBuildResult;
 
   constructor() {
     this.checkNotificationPermission();
