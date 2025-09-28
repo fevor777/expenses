@@ -56,7 +56,7 @@ function lineToday(s: ExpenseSummarySnapshot): string {
 }
 
 function lineBudget(s: ExpenseSummarySnapshot): string {
-  return `Бюджет: Потрачено ${fmtMoney(s.periodIrregular)}€ / ${fmtMoney(s.budget)}€ (ост ${fmtMoney(s.remaining)}€, осталось дней: ${s.daysLeft ?? 0})`;
+  return `<strong>•</strong> Бюджет: Потрачено ${fmtMoney(s.periodIrregular)}€ / ${fmtMoney(s.budget)}€ (ост ${fmtMoney(s.remaining)}€, осталось дней: ${s.daysLeft ?? 0})`;
 }
 
 function linePace(s: ExpenseSummarySnapshot): string {
