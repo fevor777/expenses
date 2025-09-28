@@ -99,7 +99,7 @@ export class ExpenseService {
       })
       .snapshotChanges()
       .pipe(
-        filter((c, i) => useCache || i > 0 && c.every(a => a.payload.doc.metadata.fromCache === false)),
+        filter((c) => useCache || c.every(a => a.payload.doc.metadata.fromCache === false)),
         map(actions =>
           actions.map(a => {
             const data = a.payload.doc.data();

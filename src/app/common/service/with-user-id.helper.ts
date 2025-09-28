@@ -10,6 +10,12 @@ export function withUserId<T>(
 ): Observable<T> {
   return afAuth.authState.pipe(
     switchMap(user => (user ? request(user.uid) : fallback())),
-    catchError(() => (onError ? onError() : fallback()))
+    catchError((e) => { 
+      console.error('Error:', e);
+      if (onError) {
+        return onError();
+      }
+      return fallback();
+    })
   );
 }
