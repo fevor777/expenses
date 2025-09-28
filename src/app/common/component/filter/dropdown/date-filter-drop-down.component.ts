@@ -28,7 +28,11 @@ export class DateFilterDropDownComponent<T, D> implements OnChanges {
   @Input() value: SelectOption<T>;
   @Input() hideOptions: boolean = false;
   @Input() set isHowSuggestionButton(value: boolean) {
-    if (this.activatedName === this.name && value) {
+    if (
+      this.activatedName === this.name &&
+      value &&
+      this.value?.display === this.options?.[0]?.display
+    ) {
       this._isHowSuggestionButton = value;
       this.suggestionButtonTitle = this.options?.[1]?.display || '';
     }
