@@ -93,7 +93,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   > = {
     categoryFilters: false,
     multiChart: false,
-    irregularSummary: true,
+    irregularSummary: false,
   };
 
   // Category view switch state (bars | micro | filter)
