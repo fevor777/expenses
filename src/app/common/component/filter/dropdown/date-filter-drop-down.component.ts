@@ -27,6 +27,12 @@ export class DateFilterDropDownComponent<T, D> implements OnChanges {
   @Input() activatedName: D;
   @Input() value: SelectOption<T>;
   @Input() hideOptions: boolean = false;
+  @Input() set isHowSuggestionButton(value: boolean) {
+    if (this.activatedName === this.name && value) {
+      this._isHowSuggestionButton = value;
+      this.suggestionButtonTitle = this.options?.[1]?.display || '';
+    }
+  }
 
   @Output() select: EventEmitter<DateFilterDropDownChange<T, D>> =
     new EventEmitter();
@@ -35,6 +41,8 @@ export class DateFilterDropDownComponent<T, D> implements OnChanges {
   selectedOption: SelectOption<T>;
   dropdownOpen: boolean = false;
   isActivated: boolean = false;
+  _isHowSuggestionButton: boolean = false;
+  suggestionButtonTitle: string;
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -53,6 +61,9 @@ export class DateFilterDropDownComponent<T, D> implements OnChanges {
     }
     if (changes?.['activatedName']) {
       this.isActivated = this.activatedName === this.name;
+      if (this.activatedName !== this.name) {
+        this._isHowSuggestionButton = false;
+      }
       if (
         !this.isActivated &&
         Array.isArray(this.options) &&
@@ -91,6 +102,7 @@ export class DateFilterDropDownComponent<T, D> implements OnChanges {
     this.isActivated = true;
     this.select.emit({ name: this.name, value: selected.value });
     this.dropdownOpen = false;
+    this._isHowSuggestionButton = false;
   }
 
   onDisplayValueClick(): void {
@@ -101,6 +113,12 @@ export class DateFilterDropDownComponent<T, D> implements OnChanges {
     }
     this.isActivated = true;
     this.select.emit({ name: this.name, value: this.selectedOption?.value });
+  }
+
+  onSuggestionButtonClick(): void {
+    this.isActivated = true;
+    this.select.emit({ name: this.name, value: this.options?.[1]?.value });
+    this._isHowSuggestionButton = false;
   }
 
   onClick(event: MouseEvent): void {

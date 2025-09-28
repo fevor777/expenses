@@ -15,6 +15,7 @@
   <app-date-filter
     class="statistics-filter"
     [value]="currentFilter"
+    [isHowSuggestionButton]="isHowSuggestionDateButton"
     [defaultValue]="initialFilterValue"
     (changeFilter)="onFilterChange($event)"
   >

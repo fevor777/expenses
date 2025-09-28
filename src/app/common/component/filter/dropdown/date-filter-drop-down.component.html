@@ -25,4 +25,11 @@
       </li>
     }
   </ul>
+    <button
+    class="date-filter-drop-down-button date-filter-drop-down-button-suggestion"
+    (click)="onSuggestionButtonClick()"
+    *ngIf="_isHowSuggestionButton"
+  >
+    {{ suggestionButtonTitle }}
+  </button>
 </div>

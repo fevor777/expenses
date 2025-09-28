@@ -83,6 +83,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   descriptionSearch: string = '';
   // categoryFilterValuesStore: string[] = [];
   categoryFilterValues: string[] = [];
+  isHowSuggestionDateButton: boolean = false;
+  isFirstLoad: boolean = true;
 
   // collapse state for category filters and bars
   collapsed: Record<
@@ -278,6 +280,10 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
           );
         }
         this.filteredExpenses = expensesFilteredByDate;
+        if (this.isFirstLoad) {
+          this.isFirstLoad = false;
+          this.isHowSuggestionDateButton = expensesFilteredByDate.length === 0;
+        }
         expensesFilteredByDate.forEach(expense => {
           if (!categoryMap[expense.category]) {
             categoryMap[expense.category] = 0;

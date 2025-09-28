@@ -27,6 +27,7 @@ import { DateFilterService } from './date-filter.service';
 })
 export class DateFilterComponent implements OnInit, OnChanges {
   @Input() value: DateFrame;
+  @Input() isHowSuggestionButton: boolean = false;
   @Input() defaultValue: DateFrame;
   @Output() changeFilter: EventEmitter<DateFrame> = new EventEmitter();
 

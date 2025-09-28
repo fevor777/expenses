@@ -2,6 +2,7 @@
   <app-date-filter-drop-down
     [options]="optionsForDaysSelect"
     [name]="Mode.DAY"
+    [isHowSuggestionButton]="isHowSuggestionButton"
     [activatedName]="currentFilter?.value?.mode"
     [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.DAY"
@@ -12,6 +13,7 @@
   <app-date-filter-drop-down
     [options]="optionsForWeeksSelect"
     [name]="Mode.WEEK"
+    [isHowSuggestionButton]="isHowSuggestionButton"
     [activatedName]="currentFilter?.value?.mode"
     [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.WEEK"
@@ -22,6 +24,7 @@
   <app-date-filter-drop-down
     [options]="optionsForMonthsSelect"
     [name]="Mode.MONTH"
+    [isHowSuggestionButton]="isHowSuggestionButton"
     [activatedName]="currentFilter?.value?.mode"
     [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.MONTH"
@@ -32,6 +35,7 @@
   <app-date-filter-drop-down
     [options]="optionsForYearsSelect"
     [name]="Mode.YEAR"
+    [isHowSuggestionButton]="isHowSuggestionButton"
     [activatedName]="currentFilter?.value?.mode"
     [value]="currentFilter"
     [hideOptions]="clickedMode !== Mode.YEAR"
