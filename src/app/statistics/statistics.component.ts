@@ -30,6 +30,7 @@ import { SegmentedSwitchComponent } from '../common/component/segmented/segmente
 import { MicroVisualsComponent } from '../details/micro/micro-visuals.component';
 import { CategoryTypeFiltersComponent } from './category-type-filters/category-type-filters.component';
 import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
+import { GLOBAL_SWIPE_LENGTH } from '../constants';
 
 @Component({
   selector: 'app-statistics',
@@ -339,9 +340,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 150) {
+      if (deltaX > GLOBAL_SWIPE_LENGTH) {
         this.onSwipeRight();
-      } else if (deltaX < -150) {
+      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
         this.onSwipeLeft();
       }
     }

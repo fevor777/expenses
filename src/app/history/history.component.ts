@@ -17,6 +17,7 @@ import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { HistoryExpense } from './history-expense';
 import { HistoryItemComponent } from './item/history-item.component';
+import { GLOBAL_SWIPE_LENGTH } from '../constants';
 
 @Component({
   selector: 'app-history',
@@ -200,9 +201,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 100) {
+      if (deltaX > GLOBAL_SWIPE_LENGTH) {
         this.navigateHome();
-      } else if (deltaX < -100) {
+      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
         this.navigateToDefaultStatistics();
       }
     }

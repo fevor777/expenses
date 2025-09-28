@@ -17,6 +17,7 @@ import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { IrregularSummaryComponent } from '../common/component/irregular-summary.component';
 import { Mode } from '../common/component/filter/date/dateFrame.model';
+import { GLOBAL_SWIPE_LENGTH } from '../constants';
 
 @Component({
   selector: 'app-details',
@@ -197,9 +198,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 100) {
+      if (deltaX > GLOBAL_SWIPE_LENGTH) {
         this.navigateBack();
-      } else if (deltaX < -100) {
+      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
         this.navigateAlt();
       }
     }

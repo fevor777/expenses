@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Categories, Category } from '../../model/categories';
 import { CommonModule } from '@angular/common';
+import { GLOBAL_SWIPE_LENGTH } from '../../../constants';
 
 @Component({
   selector: 'app-categories',
@@ -126,16 +127,16 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 100) {
+      if (deltaX > GLOBAL_SWIPE_LENGTH) {
         this.onSwipeRight();
-      } else if (deltaX < -100) {
+      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
         this.onSwipeLeft();
       }
     } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
-      if (deltaY < -100) {
+      if (deltaY < -GLOBAL_SWIPE_LENGTH) {
         // Swiping up decreases Y coordinate
         this.onSwipeUp();
-      } else if (deltaY > 100) {
+      } else if (deltaY > GLOBAL_SWIPE_LENGTH) {
         // Swiping down increases Y coordinate
         this.onSwipeDown();
       }
