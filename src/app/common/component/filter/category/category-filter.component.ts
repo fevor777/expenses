@@ -38,6 +38,19 @@ export class CategoryFilterComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['value'] && Array.isArray(this.value)) {
+      const currentLenght = Object.keys(this.filterCategories)?.filter(
+        key =>
+          this.filterCategories[key] &&
+          key !== this.regularValue &&
+          key !== this.irregularValue
+      )?.length;
+      const isValueAll =
+        this.value.length === 0 || this.value.length === Categories.length;
+      const isFilterAll =
+        currentLenght === 0 || currentLenght === Categories.length;
+      if (currentLenght === this.value.length || (isValueAll && isFilterAll)) {
+        return;
+      }
       this.initiateFilterCategory();
       this.filterCategories = Categories.reduce((acc, category) => {
         acc[category.id] =

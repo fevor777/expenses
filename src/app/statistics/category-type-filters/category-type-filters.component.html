@@ -1,0 +1,36 @@
+<div class="stats-section stats-section--filters">
+  <div class="statistics-checkbox">
+    <label class="statistics-checkbox-item">
+      <input
+        type="checkbox"
+        value="regular"
+        class="statistics-checkbox-input"
+        [checked]="regularValue"
+        [(ngModel)]="regularValue"
+        (ngModelChange)="regularChange.emit($event)"
+      />
+      <span class="statistics-checkbox-label"
+        >Регулярное
+        <span class="statistics-amount-muted"
+          >({{ regularAmount }}€)</span
+        ></span
+      >
+    </label>
+    <label class="statistics-checkbox-item">
+      <input
+        type="checkbox"
+        value="irregular"
+        class="statistics-checkbox-input"
+        [checked]="irregularValue"
+        [(ngModel)]="irregularValue"
+        (ngModelChange)="irregularChange.emit($event)"
+      />
+      <span class="statistics-checkbox-label"
+        >Нерегулярное
+        <span class="statistics-amount-muted"
+          >({{ irregularAmount }}€)</span
+        ></span
+      >
+    </label>
+  </div>
+</div>

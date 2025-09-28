@@ -1,0 +1,46 @@
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.stats-section--filters {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.statistics-checkbox {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  margin-left: 37px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  flex-wrap: nowrap;
+}
+.statistics-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.statistics-checkbox-input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0;
+}
+.statistics-checkbox-label,
+.statistics-amount-muted {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+.statistics-checkbox-label {
+  font-weight: 500;
+}
+.statistics-amount-muted {
+  font-weight: 400;
+}
