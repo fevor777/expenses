@@ -55,9 +55,23 @@ function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
   return `• Б: ${s.percentUsed.toFixed(0)}% П: ${prog}%${exhaustion}`;
 }
 function lineBudget(s: ExpenseSummarySnapshot) {
-  return s.budget
-    ? `• O: ${s.remaining.toFixed(0)}€ d${s.daysLeft} ${s.percentLeft.toFixed(0)}% P: ${s.periodIrregular}€ Б: ${s.budget}€`
-    : '';
+  if (!s.budget) return '';
+  const daysPassed = s.meta?.daysPassed;
+  const frameDays = s.meta?.frameDays;
+  const inFirstHalf =
+    daysPassed !== undefined && frameDays
+      ? daysPassed <= frameDays / 2
+      : false;
+  // First half: emphasize progress (spent) first, show days passed + percent used; hide percent left & days left.
+  // Second half: emphasize remaining first, show days left + percent left; hide days passed & percent used after P.
+  if (inFirstHalf) {
+    return `• P: ${s.periodIrregular}€${
+      daysPassed !== undefined ? ' d' + daysPassed : ''
+    } ${s.percentUsed.toFixed(0)}% O: ${s.remaining.toFixed(0)}€ Б: ${s.budget}€`;
+  }
+  return `• O: ${s.remaining.toFixed(0)}€${
+    s.daysLeft !== undefined ? ' d' + s.daysLeft : ''
+  } ${s.percentLeft.toFixed(0)}% P: ${s.periodIrregular}€ Б: ${s.budget}€`;
 }
 function lineDailyAverage(s: ExpenseSummarySnapshot) {
   const fmt = (n: number | undefined) => {
