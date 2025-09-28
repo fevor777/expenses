@@ -7,6 +7,7 @@ import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
+import { Mode } from '../common/component/filter/date/dateFrame.model';
 import {
   MultiFilter,
   MultiFilterComponent,
@@ -37,6 +38,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
   expenses$: Observable<HistoryExpense[]>;
   totalAmount: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
+  // Coverage metrics for multi-filter summary (active buckets / total buckets • expense entries)
+  activeBucketCount: number = 0;
+  totalBucketCount: number = 0;
+  expenseEntryCount: number = 0;
 
   defaultDateValue: DateFrame;
   defaultFilter: MultiFilter;
@@ -254,6 +259,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   ): HistoryExpense[] {
     this.temporaryDate = 0;
     let newAmount = 0;
+    // Compute coverage counts before transforming
+    this.computeCoverage(expenses);
     const result = expenses.map(expense => {
       newAmount = this.roundUp(newAmount + expense.amount);
       const showDateTitle = this.isDatePanelVisible(expense.date);
@@ -271,6 +278,93 @@ export class HistoryComponent implements OnInit, OnDestroy {
     });
     this.totalAmount = newAmount;
     return result;
+  }
+
+  private computeCoverage(expenses: Expense[]): void {
+    const frame = this.currentFilter?.date;
+    if (!frame) {
+      this.activeBucketCount = 0;
+      this.totalBucketCount = 0;
+      this.expenseEntryCount = 0;
+      return;
+    }
+    // Count expense entries (non-zero amounts)
+    this.expenseEntryCount = expenses.filter(e => e.amount != null && e.amount !== 0).length;
+    // Determine mode
+    const mode: Mode = (frame.mode as Mode) || Mode.MONTH;
+    let totalBuckets = 0;
+    let aggregates: number[] = [];
+    const now = new Date();
+    if (mode === Mode.DAY) {
+      totalBuckets = 24;
+      aggregates = new Array(totalBuckets).fill(0);
+      expenses.forEach(e => {
+        const d = new Date(e.date);
+        const h = d.getHours();
+        aggregates[h] = +(aggregates[h] + e.amount).toFixed(2);
+      });
+      // Mirror multi-chart behavior: zero out current in-progress hour if within frame
+      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const t = now.getTime();
+      if (start.getTime() <= t && finish.getTime() >= t) {
+        aggregates[now.getHours()] = 0;
+      }
+    } else if (mode === Mode.WEEK) {
+      totalBuckets = 7;
+      aggregates = new Array(totalBuckets).fill(0);
+      expenses.forEach(e => {
+        const d = new Date(e.date);
+        const dow = d.getDay();
+        const idx = dow === 0 ? 6 : dow - 1; // Monday=0
+        aggregates[idx] = +(aggregates[idx] + e.amount).toFixed(2);
+      });
+      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const t = now.getTime();
+      if (start.getTime() <= t && finish.getTime() >= t) {
+        const dow = now.getDay();
+        const idx = dow === 0 ? 6 : dow - 1;
+        aggregates[idx] = 0;
+      }
+    } else if (mode === Mode.MONTH) {
+      // derive month length from frame.start
+      const base = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any) || now;
+      const year = base.getFullYear();
+      const month = base.getMonth();
+      totalBuckets = new Date(year, month + 1, 0).getDate();
+      aggregates = new Array(totalBuckets).fill(0);
+      expenses.forEach(e => {
+        const d = new Date(e.date);
+        const dayIdx = d.getDate() - 1;
+        if (dayIdx >= 0 && dayIdx < totalBuckets)
+          aggregates[dayIdx] = +(aggregates[dayIdx] + e.amount).toFixed(2);
+      });
+      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const t = now.getTime();
+      if (start.getTime() <= t && finish.getTime() >= t) {
+        const idx = now.getDate() - 1;
+        if (idx >= 0 && idx < totalBuckets) aggregates[idx] = 0;
+      }
+    } else if (mode === Mode.YEAR) {
+      totalBuckets = 12;
+      aggregates = new Array(totalBuckets).fill(0);
+      expenses.forEach(e => {
+        const d = new Date(e.date);
+        const m = d.getMonth();
+        aggregates[m] = +(aggregates[m] + e.amount).toFixed(2);
+      });
+      const start = (frame.start as any)?.toJSDate?.() || new Date(frame.start as any);
+      const finish = (frame.finish as any)?.toJSDate?.() || new Date(frame.finish as any);
+      const t = now.getTime();
+      if (start.getTime() <= t && finish.getTime() >= t) {
+        const idx = now.getMonth();
+        aggregates[idx] = 0;
+      }
+    }
+    this.totalBucketCount = totalBuckets;
+    this.activeBucketCount = aggregates.filter(v => v !== 0).length;
   }
 
   private initFilter(): void {

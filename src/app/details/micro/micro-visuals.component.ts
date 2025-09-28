@@ -15,10 +15,12 @@ interface CategoryStat {
   id: string;
   name: string;
   total: number;
-  percent: number;
+  percent: number; // retained temporarily but no longer displayed
   series: number[]; // daily totals over ordered dateKeys
   max: number; // max value in series
   trendDelta: number; // now represents count of expenses for the category (sorting metric for trend column)
+  activeCount: number; // number of days with spending > 0
+  entryCount: number; // number of expense entries contributing (non-zero amounts)
 }
 
 @Component({
@@ -31,9 +33,9 @@ interface CategoryStat {
         <thead>
           <tr>
             <th>Категория</th>
-            <th class="share-col sortable" (click)="toggleSort('percent')">
-              Доля
-              <span class="sort-indicator" *ngIf="sortKey === 'percent'">{{
+            <th class="share-col sortable" (click)="toggleSort('activeCount')">
+              Колл.
+              <span class="sort-indicator" *ngIf="sortKey === 'activeCount'">{{
                 sortDir === 1 ? '▲' : '▼'
               }}</span>
             </th>
@@ -68,9 +70,9 @@ interface CategoryStat {
               }}</span>
             </td>
             <td class="share-col">
-              <div class="lollipop-track">
-                <div class="lollipop-fill" [style.width.%]="s.percent"></div>
-                <div class="lollipop-dot" [style.left.%]="s.percent"></div>
+              <div style="font-size:11px; text-align:center; line-height:1.2;">
+                <span>{{ s.activeCount }}/{{ dateKeys.length }}</span>
+                <span style="color:#888;"> • {{ s.entryCount }}</span>
               </div>
             </td>
             <td class="trend-col">
@@ -91,7 +93,7 @@ interface CategoryStat {
                 •
               </div>
             </td>
-            <td class="sum-col" style="text-align:right">
+            <td class="sum-col sum-col-value" style="text-align:right">
               {{ s.total | number: '1.2-2' }}
             </td>
           </tr>
@@ -181,7 +183,7 @@ interface CategoryStat {
         min-width: 200px;
       }
       .share-col {
-        width: 40px;
+        width: 50px;
       }
       .trend-col {
         width: 120px;
@@ -189,6 +191,10 @@ interface CategoryStat {
       .sum-col {
         width: 60px;
         text-align: right;
+      }
+      .sum-col-value {
+        letter-spacing: 0.7px;
+        font-weight: 600;
       }
       .sortable {
         cursor: pointer;
@@ -198,33 +204,6 @@ interface CategoryStat {
       .sort-indicator {
         font-size: 10px;
         margin-left: 2px;
-      }
-      .lollipop-track {
-        position: relative;
-        width: 100%;
-        height: 8px;
-        background: #f0f0f0;
-        border-radius: 4px;
-      }
-      .lollipop-fill {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        background: #8ab4f8;
-        border-radius: 4px 0 0 4px;
-      }
-      .lollipop-dot {
-        position: absolute;
-        top: 50%;
-        width: 8px;
-        height: 8px;
-        margin-top: -4px;
-        margin-left: -4px;
-        background: #1a73e8;
-        border: 1px solid #fff;
-        border-radius: 50%;
-        box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
       }
       .spark {
         width: 100%;
@@ -249,8 +228,8 @@ export class MicroVisualsComponent implements OnChanges {
   private readonly maxSparkSpan = 40; // adjust if you prefer denser or more compressed lines
 
   stats: CategoryStat[] = [];
-  // removed top/other aggregate bar
-  private dateKeys: string[] = [];
+  // Exposed to template for active coverage calculations
+  dateKeys: string[] = [];
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses']) {
       this.recompute();
@@ -305,22 +284,23 @@ export class MicroVisualsComponent implements OnChanges {
     }
     const catMap = new Map<string, number[]>(); // category -> series aligned with dateKeys
     const totals = new Map<string, number>();
-    // we'll derive active day counts from the filled series (days with >0 spend)
-    this.dateKeys.forEach(_ => {
-      /* placeholder to guarantee index */
-    });
+    const entryCounts = new Map<string, number>();
     const indexMap: Record<string, number> = {};
     this.dateKeys.forEach((k, i) => (indexMap[k] = i));
     this.expenses.forEach(e => {
+      if (e.amount === 0) return; // mirror logic from multi-chart for non-zero only
       const d = new Date(e.date);
       const key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
       const idx = indexMap[key];
       if (idx === undefined) return;
-      if (!catMap.has(e.category))
+      if (!catMap.has(e.category)) {
         catMap.set(e.category, new Array(this.dateKeys.length).fill(0));
+        entryCounts.set(e.category, 0);
+      }
       const series = catMap.get(e.category)!;
       series[idx] = +(series[idx] + e.amount).toFixed(2);
       totals.set(e.category, (totals.get(e.category) || 0) + e.amount);
+      entryCounts.set(e.category, (entryCounts.get(e.category) || 0) + 1);
     });
     const grandTotal =
       Array.from(totals.values()).reduce((s, v) => s + v, 0) || 1;
@@ -328,11 +308,12 @@ export class MicroVisualsComponent implements OnChanges {
       ([id, series]) => {
         const name = getCategoryNameById(id);
         const total = +series.reduce((s, v) => s + v, 0).toFixed(2);
-        const percent = +((total / grandTotal) * 100).toFixed(2);
+        const percent = +((total / grandTotal) * 100).toFixed(2); // retained if needed later
         const max = Math.max(...series, 0);
-        // Use number of active days (non-zero entries) as trend sorting metric
-        const trendDelta = series.reduce((c, v) => c + (v > 0 ? 1 : 0), 0);
-        return { id, name, total, percent, series, max, trendDelta };
+        const activeCount = series.reduce((c, v) => c + (v > 0 ? 1 : 0), 0);
+        const entryCount = entryCounts.get(id) || 0;
+        const trendDelta = activeCount; // keep current meaning similar to before conceptually
+        return { id, name, total, percent, series, max, trendDelta, activeCount, entryCount };
       }
     );
     this.stats = stats;
@@ -369,16 +350,14 @@ export class MicroVisualsComponent implements OnChanges {
   }
 
   // Sorting logic
-  sortKey: 'percent' | 'trendDelta' | 'total' = 'total';
+  sortKey: 'percent' | 'trendDelta' | 'total' | 'activeCount' = 'total';
   sortDir: 1 | -1 = -1; // default desc for total
 
-  toggleSort(key: 'percent' | 'trendDelta' | 'total') {
+  toggleSort(key: 'percent' | 'trendDelta' | 'total' | 'activeCount') {
     if (this.sortKey === key) {
-      // toggle direction
       this.sortDir = this.sortDir === 1 ? -1 : 1;
     } else {
       this.sortKey = key;
-      // default direction: percent & trend descending, total descending
       this.sortDir = -1;
     }
     this.applySort();

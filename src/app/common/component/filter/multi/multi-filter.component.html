@@ -36,6 +36,55 @@
       <div class="mf-group mf-group--total">
         <span class="mf-key">Общий:</span>
         <span class="mf-total">{{ totalAmount }}€</span>
+        <span
+          class="mf-meta"
+          *ngIf="
+            activeBucketCount != null &&
+            totalBucketCount != null &&
+            expenseEntryCount != null
+          "
+        >
+          Колл: {{ activeBucketCount }}/{{ totalBucketCount }} •
+          {{ expenseEntryCount }}
+        </span>
+      </div>
+    </div>
+    <ng-template #totalCompact>
+      <div class="mf-group mf-group--total">
+        <span class="mf-key">Общий расход:</span>
+        <span class="mf-total">{{ totalAmount }}€</span>
+        <span
+          class="mf-meta"
+          *ngIf="
+            activeBucketCount != null &&
+            totalBucketCount != null &&
+            expenseEntryCount != null
+          "
+        >
+          Колл: {{ activeBucketCount }}/{{ totalBucketCount }} •
+          {{ expenseEntryCount }}
+        </span>
+        <!-- <button
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
+          (click)="navigateToStatistics()"
+          title="Перейти к статистике"
+          aria-label="Перейти к статистике"
+        >
+          <i class="fas fa-chart-line"></i>
+        </button> -->
+      </div>
+    </ng-template>
+    <div>
+      <button
+        class="mf-toggle"
+        [class.mf-toggle--active]="expandFilters"
+        (click)="toggleExpandFilters()"
+        aria-label="Показать/Скрыть фильтры"
+      >
+        <i class="fas fa-filter"></i>
+      </button>
+      <div>
         <button
           type="button"
           class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
@@ -47,29 +96,6 @@
         </button>
       </div>
     </div>
-    <ng-template #totalCompact>
-      <div class="mf-group mf-group--total">
-        <span class="mf-key">Общий расход:</span>
-        <span class="mf-total">{{ totalAmount }}€</span>
-        <button
-          type="button"
-          class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
-          (click)="navigateToStatistics()"
-          title="Перейти к статистике"
-          aria-label="Перейти к статистике"
-        >
-          <i class="fas fa-chart-line"></i>
-        </button>
-      </div>
-    </ng-template>
-    <button
-      class="mf-toggle"
-      [class.mf-toggle--active]="expandFilters"
-      (click)="toggleExpandFilters()"
-      aria-label="Показать/Скрыть фильтры"
-    >
-      <i class="fas fa-filter"></i>
-    </button>
   </div>
   <div class="mf-expanded" *ngIf="expandFilters">
     <div class="mf-expanded-inner">
@@ -98,6 +124,17 @@
       <div class="mf-group mf-group--total-alt">
         <span class="mf-key">Общий расход:</span>
         <span class="mf-total">{{ totalAmount }}€</span>
+        <span
+          class="mf-meta"
+          *ngIf="
+            activeBucketCount != null &&
+            totalBucketCount != null &&
+            expenseEntryCount != null
+          "
+        >
+          Колл: {{ activeBucketCount }}/{{ totalBucketCount }} •
+          {{ expenseEntryCount }}
+        </span>
         <button
           *ngIf="showHistoryIcon"
           type="button"

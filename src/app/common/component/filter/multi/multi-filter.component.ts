@@ -44,6 +44,9 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   @Input() defaultDateValue: DateFrame;
   @Input() showHistoryIcon: boolean = false; // show chart icon on history page
   @Input() showDetailsIcon: boolean = false; // show list/chart icon on details/statistics page
+  @Input() activeBucketCount?: number; // e.g. active time buckets with spending
+  @Input() totalBucketCount?: number; // total buckets in current frame
+  @Input() expenseEntryCount?: number; // total non-zero expense entries
 
   @Output() selectedFilters: EventEmitter<MultiFilter> = new EventEmitter();
   @Output() navigateToStatisticsIconClick: EventEmitter<void> =
