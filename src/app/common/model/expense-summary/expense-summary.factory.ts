@@ -103,6 +103,7 @@ export function createExpenseSummary(
 
   const snapshot: ExpenseSummarySnapshot = {
     percentUsed: pace.percentUsed,
+    percentLeft: Math.max(0, 100 - pace.percentUsed),
     budget: budgetValue,
     remaining: pace.remaining,
     progressPct: frame.elapsedPct,

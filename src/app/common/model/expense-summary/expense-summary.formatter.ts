@@ -56,7 +56,7 @@ function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
 }
 function lineBudget(s: ExpenseSummarySnapshot) {
   return s.budget
-    ? `• O: ${s.remaining.toFixed(0)}€ (d${s.daysLeft}) P: ${s.periodIrregular}€ Б: ${s.budget}€`
+    ? `• O: ${s.remaining.toFixed(0)}€ d${s.daysLeft} ${s.percentLeft.toFixed(0)}% P: ${s.periodIrregular}€ Б: ${s.budget}€`
     : '';
 }
 function lineDailyAverage(s: ExpenseSummarySnapshot) {

@@ -367,7 +367,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.globalLongPressTimeout = setTimeout(() => {
       this.globalLongPressTriggered = true;
       // Mimic left swipe on categories => navigate to details
-      this.navigateToDetails();
+      this.onHeaderBudgetInfoClick();
     }, GLOBAL_LONG_PRESS_DURATION);
   }
 

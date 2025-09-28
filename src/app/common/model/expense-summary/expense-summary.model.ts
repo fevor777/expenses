@@ -9,6 +9,7 @@ import {
 export class ExpenseSummary implements ExpenseSummarySnapshot {
   percentUsed: number;
   budget: number;
+  percentLeft: number;
   remaining: number;
   progressPct?: number;
   frameTotal: number;

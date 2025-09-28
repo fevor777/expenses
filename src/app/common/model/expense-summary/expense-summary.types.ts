@@ -71,6 +71,7 @@ export interface BehavioralMetrics {
 export interface ExpenseSummarySnapshot {
   // Budget / progress
   percentUsed: number;
+  percentLeft: number;
   budget: number;
   remaining: number;
   progressPct?: number;
