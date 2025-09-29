@@ -123,7 +123,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       const newExpense: Expense = {
         category: categoryName,
         amount: amount,
-        currency: this.currency?.code,
+        currency: 'EUR',
         date: Date.now(),
         description: originalDescription || undefined,
       };
