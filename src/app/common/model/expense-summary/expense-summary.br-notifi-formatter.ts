@@ -47,7 +47,8 @@ function lineToday(s: ExpenseSummarySnapshot) {
       : '';
   const iconPart = icon ? ` ${icon}` : '';
   const behavior = s.todaysNonEssential ? ` 💸: ${s.todaysNonEssential}€` : '';
-  return `• Сегодня:${iconPart} ${s.todaysTotal}€${irr}${behavior}`;
+  const todaysExpectation = s.todaysExpectation ? ` л${s.todaysExpectation}` : '';
+  return `• Сегодня:${iconPart} ${s.todaysTotal}€${irr}${behavior} ${todaysExpectation}`;
 }
 function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
   const prog = s.progressPct !== undefined ? s.progressPct.toFixed(0) : '';

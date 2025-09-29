@@ -51,7 +51,7 @@ function lineToday(s: ExpenseSummarySnapshot): string {
   const total = fmtMoney(s.todaysTotal);
   const irrPart = s.todaysIrregular !== s.todaysTotal ? ` (${fmtMoney(s.todaysIrregular)}€)` : '';
   const nonEss = s.todaysNonEssential ? ` 💸 ${fmtMoney(s.todaysNonEssential)}€` : '';
-  const need = s.needPerDay ? ` н${fmtMoney(s.needPerDay)}€/д` : '';
+  const need = s.todaysExpectation ? ` л${fmtMoney(s.todaysExpectation)}€/д` : '';
   return `<strong>•</strong> Сегодня: ${arrow ? arrow + ' ' : ''}${total}€${irrPart}${nonEss}${need}`;
 }
 

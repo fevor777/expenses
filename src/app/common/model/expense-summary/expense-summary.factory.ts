@@ -10,6 +10,7 @@ import {
   computePace,
   computeExhaustionLabel,
   computeNeedPerDay,
+  computeExpectPerDay,
 } from './expense-summary.pace';
 import { computeEnergyScore } from './expense-summary.energy';
 import {
@@ -101,6 +102,8 @@ export function createExpenseSummary(
     config.energyWeights
   );
 
+  const expectedPerDay = computeExpectPerDay(pace.dailyBudget, need.needPerDay);
+
   const snapshot: ExpenseSummarySnapshot = {
     percentUsed: pace.percentUsed,
     percentLeft: Math.max(0, 100 - pace.percentUsed),
@@ -114,6 +117,7 @@ export function createExpenseSummary(
     todaysNonEssential: classification.todays.nonEssential || undefined,
     dailyAverage,
     budgetPerDay: pace.dailyBudget,
+    todaysExpectation: expectedPerDay,
     needPerDay: need.needPerDay,
     todaysNeedRatio: need.todaysNeedRatio,
     daysLeft: frame.daysLeft,

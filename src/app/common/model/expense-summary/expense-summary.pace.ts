@@ -87,6 +87,10 @@ export function computeNeedPerDay(
   };
 }
 
+export function computeExpectPerDay(budgetPerDay: number, needPerDay): number {
+  return budgetPerDay < needPerDay ? budgetPerDay : needPerDay;
+}
+
 function round(n: number) {
   return Math.round(n * 100) / 100;
 }

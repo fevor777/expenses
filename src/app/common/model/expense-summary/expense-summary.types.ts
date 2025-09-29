@@ -84,6 +84,7 @@ export interface ExpenseSummarySnapshot {
   todaysTotal: number;
   todaysIrregular: number;
   todaysNonEssential?: number;
+  todaysExpectation?: number;
 
   // Pace
   dailyAverage?: number;
