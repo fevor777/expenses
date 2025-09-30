@@ -62,7 +62,7 @@ function lineBudget(s: ExpenseSummarySnapshot): string {
 function linePace(s: ExpenseSummarySnapshot): string {
   const avg = fmtMoney(s.dailyAverage) + '€/д';
   const plan = s.budgetPerDay ? ` план ${fmtMoney(s.budgetPerDay)}€/д` : '';
-  const need = s.needPerDay ? ` нужно ${fmtMoney(s.needPerDay)}€/д` : '';
+  const need = s.needPerDay < s.budgetPerDay ? ` нужно ${fmtMoney(s.needPerDay)}€/д` : '';
   return `<strong>•</strong> Темп: ср ${avg}${plan}${need}`;
 }
 

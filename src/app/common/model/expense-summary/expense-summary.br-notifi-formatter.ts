@@ -31,6 +31,13 @@ export function trendIconByRatio(ratio: number | undefined): string {
   return '↓';
 }
 
+const fmt = (n: number | undefined) => {
+  if (n === undefined || isNaN(n)) return '0';
+  return Math.abs(n - Math.round(n)) < 0.05
+    ? Math.round(n).toString()
+    : n.toFixed(1);
+};
+
 function lineHeader(s: ExpenseSummarySnapshot, opts: SummaryFormatterOptions) {
   if (s.percentUsed <= 0) return '';
   const width = opts.width || 7;
@@ -47,7 +54,9 @@ function lineToday(s: ExpenseSummarySnapshot) {
       : '';
   const iconPart = icon ? ` ${icon}` : '';
   const behavior = s.todaysNonEssential ? ` 💸: ${s.todaysNonEssential}€` : '';
-  const todaysExpectation = s.todaysExpectation ? ` л${s.todaysExpectation}` : '';
+  const todaysExpectation = s.todaysExpectation
+    ? ` л${fmt(s.todaysExpectation)}`
+    : '';
   return `• Сегодня:${iconPart} ${s.todaysTotal}€${irr}${behavior} ${todaysExpectation}`;
 }
 function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
@@ -60,9 +69,7 @@ function lineBudget(s: ExpenseSummarySnapshot) {
   const daysPassed = s.meta?.daysPassed;
   const frameDays = s.meta?.frameDays;
   const inFirstHalf =
-    daysPassed !== undefined && frameDays
-      ? daysPassed <= frameDays / 2
-      : false;
+    daysPassed !== undefined && frameDays ? daysPassed <= frameDays / 2 : false;
   // First half: emphasize progress (spent) first, show days passed + percent used; hide percent left & days left.
   // Second half: emphasize remaining first, show days left + percent left; hide days passed & percent used after P.
   if (inFirstHalf) {
@@ -75,17 +82,11 @@ function lineBudget(s: ExpenseSummarySnapshot) {
   } ${s.percentLeft.toFixed(0)}% P: ${s.periodIrregular}€ Б: ${s.budget}€`;
 }
 function lineDailyAverage(s: ExpenseSummarySnapshot) {
-  const fmt = (n: number | undefined) => {
-    if (n === undefined || isNaN(n)) return '0';
-    return Math.abs(n - Math.round(n)) < 0.05
-      ? Math.round(n).toString()
-      : n.toFixed(1);
-  };
   const avgStr = fmt(s.dailyAverage);
   const plan =
     s.budgetPerDay && s.budgetPerDay > 0 ? `п${fmt(s.budgetPerDay)}` : '';
   const need =
-    s.needPerDay && s.needPerDay > 0.01 ? `н${fmt(s.needPerDay)}` : '';
+    s.needPerDay && s.needPerDay < s.budgetPerDay ? `н${fmt(s.needPerDay)}` : '';
   const extras = [plan, need].filter(Boolean).join(' ');
   const pace = extras ? `Темп: ${avgStr} (${extras})` : `Темп: ${avgStr}`;
   return `• ${pace}`;
