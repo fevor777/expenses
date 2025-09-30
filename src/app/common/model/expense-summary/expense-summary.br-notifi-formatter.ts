@@ -52,12 +52,12 @@ function lineToday(s: ExpenseSummarySnapshot) {
     s.todaysNeedRatio !== undefined && s.needPerDay !== undefined
       ? trendIconByRatio(s.todaysNeedRatio)
       : '';
-  const iconPart = icon ? ` ${icon}` : '';
+  const iconPart = icon ? `${icon}` : '';
   const behavior = s.todaysNonEssential ? ` 💸: ${s.todaysNonEssential}€` : '';
   const todaysExpectation = s.todaysExpectation
-    ? ` л${fmt(s.todaysExpectation)}`
+    ? ` л: ${fmt(s.todaysExpectation)}`
     : '';
-  return `• ☀️: ${iconPart} ${s.todaysTotal}€${irr}${behavior} ${todaysExpectation}`;
+  return `• ☀️: ${s.todaysTotal}€ ${iconPart}${irr}${behavior} ${todaysExpectation}`;
 }
 function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
   const prog = s.progressPct !== undefined ? s.progressPct.toFixed(0) : '';
