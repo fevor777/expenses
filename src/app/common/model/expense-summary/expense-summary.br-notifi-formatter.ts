@@ -24,11 +24,11 @@ export function composeSummaryMessage(
 
 export function trendIconByRatio(ratio: number | undefined): string {
   if (ratio === undefined) return '';
-  if (ratio >= 1.4) return '△';
-  if (ratio >= 1.1) return '▴';
+  if (ratio >= 1.4) return '↑';
+  if (ratio >= 1.1) return '^';
   if (ratio >= 0.9) return '~';
-  if (ratio >= 0.6) return '▾';
-  return '▿';
+  if (ratio >= 0.6) return 'v';
+  return '↓';
 }
 
 const fmt = (n: number | undefined) => {
@@ -57,7 +57,7 @@ function lineToday(s: ExpenseSummarySnapshot) {
   const todaysExpectation = s.todaysExpectation
     ? ` л: ${fmt(s.todaysExpectation)}`
     : '';
-  return `• ☀️: ${s.todaysTotal}€ ${iconPart}${irr}${behavior} ${todaysExpectation}`;
+  return `• ☀️: ${s.todaysTotal}€ ${iconPart}${irr}${behavior}${todaysExpectation}`;
 }
 function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
   const prog = s.progressPct !== undefined ? s.progressPct.toFixed(0) : '';
