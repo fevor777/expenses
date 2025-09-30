@@ -25,9 +25,9 @@ export function composeSummaryMessage(
 export function trendIconByRatio(ratio: number | undefined): string {
   if (ratio === undefined) return '';
   if (ratio >= 1.4) return '↑';
-  if (ratio >= 1.1) return '↗';
+  if (ratio >= 1.1) return '\u2197';
   if (ratio >= 0.9) return '→';
-  if (ratio >= 0.6) return '↘';
+  if (ratio >= 0.6) return '\u2198';
   return '↓';
 }
 
