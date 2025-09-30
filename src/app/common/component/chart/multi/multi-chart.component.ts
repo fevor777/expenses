@@ -34,6 +34,8 @@ export class MultiChartComponent implements OnChanges {
     },
   ];
   totalCount: any;
+  // Total buckets in the current period frame (e.g. 24 hours, 7 days, N days in month, 12 months)
+  periodBucketCount = 0;
 
   // Template bridge for stricter typing
   onChartTypeSelect(v: string) {
@@ -91,6 +93,7 @@ export class MultiChartComponent implements OnChanges {
   private allocateStructure(count: number, labels: (string | number)[]) {
     this.chartOptions.labels = labels;
     this.chartOptions.datasets[0].data = new Array(count).fill(0);
+    this.periodBucketCount = count;
   }
 
   calculateChartData(expenses: Expense[], filter?: DateFrame): void {

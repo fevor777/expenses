@@ -19,9 +19,8 @@
   </div>
   <div class="chart-summary">
     <!-- Clarified labels: nonZeroCount = filled buckets; totalCount = non-zero expense entries -->
-    <span class="non-zero-count"
-      >Buckets with spending: {{ nonZeroCount }} • Expense entries:
-      {{ totalCount }}</span
-    >
+    <span class="non-zero-count">
+      {{ nonZeroCount }}/{{ periodBucketCount }} • {{ totalCount }}
+    </span>
   </div>
 </div>
