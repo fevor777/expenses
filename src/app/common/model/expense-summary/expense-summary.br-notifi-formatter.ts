@@ -57,7 +57,7 @@ function lineToday(s: ExpenseSummarySnapshot) {
   const todaysExpectation = s.todaysExpectation
     ? ` л${fmt(s.todaysExpectation)}`
     : '';
-  return `• Сегодня:${iconPart} ${s.todaysTotal}€${irr}${behavior} ${todaysExpectation}`;
+  return `• ☀️: ${iconPart} ${s.todaysTotal}€${irr}${behavior} ${todaysExpectation}`;
 }
 function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
   const prog = s.progressPct !== undefined ? s.progressPct.toFixed(0) : '';
