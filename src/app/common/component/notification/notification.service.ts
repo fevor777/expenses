@@ -82,18 +82,37 @@ export class NotificationService {
   private createNotification(title: string, message: string, options?: NotificationOptions): Observable<void> {
     // Strip HTML tags from message for browser notification
     const cleanMessage = message.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
-    
+    // Ensure a stable tag for replacement if caller did not provide one
+    const tag = options?.tag || 'app-expenses-budget-summary';
+
     const notification = new Notification(title, {
       body: cleanMessage,
       icon: '/favicon.ico',
       badge: '/favicon.ico',
-      ...options
+      tag,
+      data: {
+        ...(options as any)?.data,
+        route: '/expenses/#/' // target route for click navigation (hash routing root)
+      },
+      ...options,
     });
 
-    // Auto-close after 5 seconds
-    // setTimeout(() => {
-    //   notification.close();
-    // }, 5000);
+    // Click handler: navigate to /expenses root (hash '/') and attempt to keep notification (browser may still auto-close)
+    notification.onclick = (event: Event) => {
+      try {
+        // Bring window to front
+        window.focus();
+        const target = '/expenses/#/';
+        // If already on /expenses path just adjust hash
+        if (!location.pathname.endsWith('/expenses/') || location.hash !== '#/') {
+          // Use direct location change to avoid needing Angular Router here
+          location.href = target;
+        }
+        // Do NOT call notification.close(); we want to keep it if browser allows
+      } catch (err) {
+        console.warn('Notification click navigation failed', err);
+      }
+    };
 
     return of(undefined);
   }
