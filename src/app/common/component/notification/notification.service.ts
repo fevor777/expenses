@@ -90,27 +90,19 @@ export class NotificationService {
       icon: '/favicon.ico',
       badge: '/favicon.ico',
       tag,
-      data: {
-        ...(options as any)?.data,
-        route: '/expenses/#/' // target route for click navigation (hash routing root)
-      },
       ...options,
     });
 
-    // Click handler: navigate to /expenses root (hash '/') and attempt to keep notification (browser may still auto-close)
-    notification.onclick = (event: Event) => {
+    // On click navigate to the deployed GitHub Pages root. Allow browser to close notification.
+    notification.onclick = () => {
       try {
-        // Bring window to front
         window.focus();
-        const target = '/expenses/#/';
-        // If already on /expenses path just adjust hash
-        if (!location.pathname.endsWith('/expenses/') || location.hash !== '#/') {
-          // Use direct location change to avoid needing Angular Router here
+        const target = 'https://fevor777.github.io/expenses/#/';
+        if (location.href !== target) {
           location.href = target;
         }
-        // Do NOT call notification.close(); we want to keep it if browser allows
-      } catch (err) {
-        console.warn('Notification click navigation failed', err);
+      } catch (e) {
+        console.warn('Notification click navigation failed', e);
       }
     };
 
