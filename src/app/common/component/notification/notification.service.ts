@@ -97,7 +97,7 @@ export class NotificationService {
     notification.onclick = () => {
       try {
         window.focus();
-        const target = 'https://fevor777.github.io/expenses/#/';
+        const target = '/expenses/#/br-notification-redirect';
         if (location.href !== target) {
           location.href = target;
         }

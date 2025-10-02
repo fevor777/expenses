@@ -25,6 +25,13 @@ const routes: Routes = [
       import('./details/details.component').then(m => m.DetailsComponent),
   },
   {
+    path: 'br-notification-redirect',
+    loadComponent: () =>
+      import('./br-notification-redirect/br-notification-redirect.component').then(
+        m => m.BrNotificationRedirectComponent
+      ),
+  },
+  {
     path: '',
     pathMatch: 'full',
     loadComponent: () =>
