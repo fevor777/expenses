@@ -62,14 +62,16 @@ export class ExpenseSummaryService {
   }
 
   /** Send browser notification given a prepared summary snapshot */
-  sendBrowserNotificationBySummary(result: SummaryBuildResult): Observable<void> {
+  sendBrowserNotificationBySummary(
+    result: SummaryBuildResult
+  ): Observable<void> {
     if (!result.summary) {
       const msg =
         result.error || ExpenseSummaryService.BUILD_ERROR_OUT_OF_FRAME;
       return this.notificationService.showBrowserNotification(
         'Сводка расходов',
         msg,
-        { icon: undefined as any }
+        { icon: undefined as any, tag: 'app-expenses-budget-summary' }
       );
     }
     return this.pushSummaryNotification(result.summary);
