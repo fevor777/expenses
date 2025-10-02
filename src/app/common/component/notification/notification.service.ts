@@ -84,27 +84,42 @@ export class NotificationService {
     const cleanMessage = message.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
     // Ensure a stable tag for replacement if caller did not provide one
     const tag = options?.tag || 'app-expenses-budget-summary';
-
-    const notification = new Notification(title, {
-      body: cleanMessage,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag,
-      ...options,
-    });
-
-    // On click navigate to the deployed GitHub Pages root. Allow browser to close notification.
-    notification.onclick = () => {
+    // Prefer Service Worker if active so click works when app closed
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       try {
-        window.focus();
-        const target = '/expenses/#/br-notification-redirect';
-        if (location.href !== target) {
-          location.href = target;
-        }
+        navigator.serviceWorker.controller.postMessage({
+          type: 'SHOW_BUDGET_NOTIFICATION',
+          payload: { title, body: cleanMessage, tag }
+        });
+        return of(undefined);
       } catch (e) {
-        console.warn('Notification click navigation failed', e);
+        console.warn('SW postMessage failed, falling back to window Notification', e);
       }
-    };
+    }
+
+    // Fallback: page-created notification (click only works while tab alive)
+    try {
+      const notification = new Notification(title, {
+        body: cleanMessage,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag,
+        ...options,
+      });
+      notification.onclick = () => {
+        try {
+          window.focus();
+          const target = '/expenses/#/br-notification-redirect';
+          if (location.href !== target) {
+            location.href = target;
+          }
+        } catch (e) {
+          console.warn('Notification click navigation failed', e);
+        }
+      };
+    } catch (e) {
+      console.warn('Window Notification failed', e);
+    }
 
     return of(undefined);
   }
