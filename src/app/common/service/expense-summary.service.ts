@@ -115,6 +115,7 @@ export class ExpenseSummaryService {
     return this.notificationService.showBrowserNotification(title, message, {
       icon,
       badge: icon,
+      tag: 'app-expenses-budget-summary',
     });
   }
 
