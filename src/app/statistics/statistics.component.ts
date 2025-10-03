@@ -233,14 +233,15 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  navigateToHistory(categoryId?: string): void {
+  navigateToHistory(categoryId?: string, dateFrame?: DateFrame): void {
+    console.log('dateFrame', dateFrame || this.currentFilter);
     if (categoryId) {
       this.dateFilterService.categories = [categoryId];
     } else {
       this.dateFilterService.categories = this.getRemainCategories();
     }
     this.dateFilterService.description = this.descriptionSearch;
-    this.dateFilterService.dateFilter = this.currentFilter;
+    this.dateFilterService.dateFilter = dateFrame || this.currentFilter;
     this.router.navigate(['/history']);
   }
 
@@ -353,7 +354,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     // Handle the left swipe action here
   }
   onSwipeRight() {
-    this.router.navigate(['/history']);
+    // this.router.navigate(['/history']);
+    this.navigateToHistory();
     // Handle the left swipe action here
   }
 

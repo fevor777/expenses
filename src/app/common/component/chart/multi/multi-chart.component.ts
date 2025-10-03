@@ -1,7 +1,8 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ElementRef, NgZone, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { Expense } from '../../../model/expense.model';
 import { DateFrame, Mode } from '../../filter/date/dateFrame.model';
+import { DateFilterService } from '../../filter/date/date-filter.service';
 import {
   SegmentedSwitchComponent,
   SegmentedOption,
@@ -14,9 +15,10 @@ import {
   standalone: true,
   imports: [BaseChartDirective, SegmentedSwitchComponent],
 })
-export class MultiChartComponent implements OnChanges {
+export class MultiChartComponent implements OnChanges, OnDestroy {
   @Input() expenses: Expense[] = [];
   @Input() filter?: DateFrame;
+  @Output() barClick = new EventEmitter<DateFrame>();
 
   chartType: 'bar' | 'line' = 'bar';
   chartTypeOptions: SegmentedOption[] = [
@@ -66,13 +68,35 @@ export class MultiChartComponent implements OnChanges {
           borderJoinStyle: 'round',
         },
       },
+      plugins: {
+        tooltip: {
+          enabled: false, // we will render custom external tooltip
+          external: (ctx: any) => this.externalTooltipHandler(ctx),
+          mode: 'index',
+          intersect: false,
+        },
+      },
     },
     legend: false,
   };
 
+  private tooltipEl?: HTMLDivElement;
+  private tooltipClickListener?: any;
+
+  constructor(private host: ElementRef<HTMLElement>, private zone: NgZone) {}
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses'] || changes['filter']) {
       this.calculateChartData(this.expenses, this.filter);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.tooltipEl && this.tooltipEl.parentNode) {
+      this.tooltipEl.parentNode.removeChild(this.tooltipEl);
+    }
+    if (this.tooltipClickListener) {
+      this.tooltipClickListener = null;
     }
   }
 
@@ -277,5 +301,162 @@ export class MultiChartComponent implements OnChanges {
     this.totalCount = this.expenses?.filter(
       (value: Expense) => value?.amount != null && value?.amount !== 0
     )?.length;
+  }
+
+  // ---- External tooltip logic ----
+  private externalTooltipHandler(context: any) {
+    const { chart, tooltip } = context;
+    // Create element on first render
+    if (!this.tooltipEl) {
+      const el = document.createElement('div');
+      el.className = 'multi-chart-tooltip';
+      el.style.position = 'absolute';
+      el.style.pointerEvents = 'auto';
+      el.style.opacity = '0';
+      el.innerHTML = '<div class="tooltip-body"></div>';
+      const parent = chart.canvas.parentNode as HTMLElement;
+      parent.style.position = parent.style.position || 'relative';
+      parent.appendChild(el);
+      // Attempt to copy Angular emulated encapsulation attribute so component-scoped styles apply
+      const hostEl = this.host.nativeElement;
+      const attr = Array.from(hostEl.attributes).find(a => a.name.startsWith('_ngcontent'));
+      if (attr) {
+        el.setAttribute(attr.name, '');
+      }
+      this.tooltipEl = el;
+      // Delegate click once (outside Angular to reduce change detection noise)
+      this.zone.runOutsideAngular(() => {
+        this.tooltipClickListener = (ev: Event) => {
+          const target = ev.target as HTMLElement;
+            const btn = target.closest('[data-history-index]') as HTMLElement | null;
+            if (btn) {
+              const idx = Number(btn.dataset['historyIndex']);
+              this.zone.run(() => this.emitBucketSelection(idx));
+            }
+        };
+        el.addEventListener('click', this.tooltipClickListener);
+      });
+    }
+    const el = this.tooltipEl!;
+    if (tooltip.opacity === 0) {
+      el.style.opacity = '0';
+      return;
+    }
+    const point = tooltip.dataPoints?.[0];
+    if (!point) {
+      el.style.opacity = '0';
+      return;
+    }
+    const idx: number = point.dataIndex;
+    const label = point.label;
+    const value = point.formattedValue;
+    const range = this.describeBucketRange(idx);
+    const body = el.querySelector('.tooltip-body') as HTMLElement;
+    body.innerHTML = `
+      <div class="tooltip-row">
+        <div class="tooltip-primary"><strong>${label}</strong>: ${value}</div>
+        <button type="button" class="tooltip-icon" aria-label="Перейти к истории" data-history-index="${idx}">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>
+      </div>
+      <div class="tooltip-range">${range}</div>
+    `;
+    const { offsetLeft, offsetTop } = chart.canvas;
+    // Position near caret X/Y
+    // raw position (will be adjusted by CSS transform translate(-50%, -100%))
+    el.style.left = offsetLeft + tooltip.caretX + 'px';
+    // add small vertical gap (6px) before arrow
+    el.style.top = offsetTop + tooltip.caretY - 8 + 'px';
+    el.style.opacity = '1';
+  }
+
+  private describeBucketRange(index: number): string {
+    if (!this.filter) return '';
+    const { mode, start } = this.filter;
+    if (!mode || !start) return '';
+    const s = start; // Luxon DateTime
+    try {
+      switch (mode) {
+        case Mode.DAY: {
+          const bucketStart = s.plus({ hours: index });
+          const bucketEnd = bucketStart.plus({ hours: 1 });
+          return `${bucketStart.toFormat('HH:00')} – ${bucketEnd.toFormat('HH:00')}`;
+        }
+        case Mode.WEEK: {
+          const bucketStart = s.plus({ days: index });
+          const bucketEnd = bucketStart.plus({ days: 1 });
+          return `${bucketStart.toFormat('ccc dd')} – ${bucketEnd.toFormat('ccc dd')}`;
+        }
+        case Mode.MONTH: {
+          const bucketStart = s.plus({ days: index });
+            return bucketStart.toFormat('dd LLL');
+        }
+        case Mode.YEAR: {
+          const bucketStart = s.plus({ months: index });
+          return bucketStart.toFormat('LLL yyyy');
+        }
+      }
+    } catch { /* noop */ }
+    return '';
+  }
+
+  private emitBucketSelection(index: number) {
+    if (!this.filter) return;
+  const { mode, start, finish } = this.filter;
+    if (!mode || !start) return;
+    const s = start;
+    let bucketStart = s;
+    let bucketEnd = s;
+    switch (mode) {
+      case Mode.DAY:
+        bucketStart = s.plus({ hours: index });
+        bucketEnd = bucketStart.plus({ hours: 1 });
+        break;
+      case Mode.WEEK:
+        bucketStart = s.plus({ days: index });
+        bucketEnd = bucketStart.plus({ days: 1 });
+        break;
+      case Mode.MONTH:
+        bucketStart = s.plus({ days: index });
+        bucketEnd = bucketStart.plus({ days: 1 });
+        break;
+      case Mode.YEAR:
+        bucketStart = s.plus({ months: index });
+        bucketEnd = bucketStart.plus({ months: 1 });
+        break;
+    }
+    // const category = this.deriveSingleCategoryForBucket(index, mode!);
+    let emitMode = mode;
+    if (mode === Mode.MONTH || mode === Mode.WEEK) {
+      emitMode = Mode.DAY;
+    }
+    if (mode === Mode.YEAR) {
+      emitMode = Mode.MONTH;
+    }
+    const display = this.buildDisplayLabel(bucketStart, bucketEnd, emitMode, mode);
+    this.barClick.emit({ start: bucketStart, finish: bucketEnd, mode: emitMode, display });
+  }
+
+  private buildDisplayLabel(start: any, finish: any, emitMode: Mode, sourceMode: Mode): string | undefined {
+    // start/finish are Luxon DateTime objects (inferred from DateFrame). We guard formatting accordingly.
+    try {
+      if (emitMode === Mode.DAY) {
+        const now = (start as any).isValid ? (start as any) : null;
+        if (now && now.hasSame(DateFilterService.prototype.getInitialDayValue().start, 'day')) {
+          return DateFilterService.initialDayFrameLabel;
+        }
+        return (start as any).toFormat?.('dd LLL') ?? undefined;
+      }
+      if (emitMode === Mode.WEEK) {
+        return (start as any).toFormat?.('dd LLL') + ' – ' + (finish as any).minus?.({ days: 1 }).toFormat?.('dd LLL');
+      }
+      if (emitMode === Mode.MONTH) {
+        return (start as any).toFormat?.('LLLL yyyy') ?? undefined;
+      }
+      if (emitMode === Mode.YEAR) {
+        return (start as any).toFormat?.('yyyy') ?? undefined;
+      }
+    } catch { /* noop */ }
+    return undefined;
   }
 }

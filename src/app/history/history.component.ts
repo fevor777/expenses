@@ -230,7 +230,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
       if (deltaX > GLOBAL_SWIPE_LENGTH) {
         this.navigateHome();
       } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
-        this.navigateToDefaultStatistics();
+        // this.navigateToDefaultStatistics();
+        this.navigateToStatistics();
       }
     }
   }
