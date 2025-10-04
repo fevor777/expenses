@@ -8,6 +8,7 @@ import {
   HammerGestureConfig,
   HammerModule,
 } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { firebaseConfig } from '../environments/environment';
@@ -27,6 +28,7 @@ export class HammerConfig extends HammerGestureConfig {
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+  BrowserAnimationsModule,
     AppRoutingModule,
     HammerModule,
     AngularFireModule.initializeApp(firebaseConfig),

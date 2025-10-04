@@ -1,1 +1,4 @@
-<router-outlet></router-outlet> <app-notification></app-notification>
+<div class="route-container" [@routeFadeSlide]="prepareRoute(outlet)" >
+	<router-outlet #outlet="outlet"></router-outlet>
+</div>
+<app-notification></app-notification>
