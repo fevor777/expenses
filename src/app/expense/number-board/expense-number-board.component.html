@@ -10,6 +10,7 @@
     ></i>
     <span
       class="expense-number-board-input"
+      [class.expense-number-board-input-active]="amount"
       (click)="openCalculatorEmit()"
       (keydown.enter)="openCalculatorEmit()"
       (keydown.space)="openCalculatorEmit()"
@@ -17,9 +18,9 @@
       tabindex="0"
       aria-label="Expense amount"
     >
-      {{ amount || 'ВВЕДИТЕ РАСХОД' }}
+      {{ amount || 'введите расход' }}
     </span>
-    <span (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
+    <span class="expense-number-board-currency" (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
   </div>
   <div
     class="expense-number-board-body"
