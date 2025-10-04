@@ -1,4 +1,7 @@
 /* Compact statistics styles (flattened to reduce size) */
+:host {
+  touch-action: pan-y;
+}
 .statistics {
   padding: 10px;
   min-height: 100dvh;
