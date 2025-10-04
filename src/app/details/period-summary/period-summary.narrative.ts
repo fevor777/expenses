@@ -34,7 +34,7 @@ function composeToday(
   const extraShare = pctShare(s.extraSum, s.total);
   const dominant = top && top.percent > cfg.singleCategoryDominantPct;
   return [
-    `Сегодня: ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек: ${money(s.avg)}. \n\n Крупнейшая: ${top ? top.name + ' — ' + money(top.amount) : '—'}.`,
+    `Проведено ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек: ${money(s.avg)}. \n\n Крупнейшая: ${top ? top.name + ' — ' + money(top.amount) : '—'}.`,
     `Структура:\n- Регулярные: ${money(s.regularSum)} (${s.regularCount}).\n- Нерегулярные: ${money(s.irregularSum)} (${s.irregularCount}).`,
     `Особые метки:\n- Extra: ${markBlock(s.extraCount, s.extraSum)}.\n- Ненужные: ${markBlock(s.unnecessaryCount, s.unnecessarySum)}.`,
     `Категории: активных ${s.categories.length}. Топ: ${top ? top.name + ' ' + percent(top.percent) : 'нет'}.`,
@@ -55,7 +55,7 @@ function composeYesterday(
   if (!s.count) return ['Вчера расходов не было.'];
   const top = s.categories[0];
   const paragraphs: string[] = [
-    `Вчера: ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек: ${money(s.avg)}. \n\n Крупнейшая: ${top ? top.name + ' — ' + money(top.amount) + ' (' + percent(top.percent) + ')' : '—'}.`,
+    `Проведено ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек: ${money(s.avg)}. \n\n Крупнейшая: ${top ? top.name + ' — ' + money(top.amount) + ' (' + percent(top.percent) + ')' : '—'}.`,
     `Структура:\n- Регулярные: ${money(s.regularSum)} (${s.regularCount}).\n- Нерегулярные: ${money(s.irregularSum)} (${s.irregularCount}).`,
     `Особые метки:\n- Extra: ${markBlock(s.extraCount, s.extraSum)}.\n- Ненужные: ${markBlock(s.unnecessaryCount, s.unnecessarySum)}.`,
   ];
@@ -115,7 +115,7 @@ function composeWeek(
       ? (s.activeDays / s.frame.elapsedDays) * 100
       : undefined;
   return [
-    `Неделя: ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек: ${money(s.avg)}.`,
+    `Проведено ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек: ${money(s.avg)}.`,
     `Структура:\n- Регулярные: ${money(s.regularSum)} (${s.regularCount}).\n- Нерегулярные: ${money(s.irregularSum)} (${s.irregularCount}).`,
     `Особые метки:\n- Extra: ${markBlock(s.extraCount, s.extraSum)}.\n- Ненужные: ${markBlock(s.unnecessaryCount, s.unnecessarySum)} (${percent(unnecessaryShare)}).`,
     `Категории: активных ${s.categories.length}. Топ-3: ${top3.map(c => `${c.name} ${percent(c.percent)}`).join(', ')}.`,
@@ -138,7 +138,7 @@ function composeMonth(
       ? (s.activeDays / s.frame.elapsedDays) * 100
       : undefined;
   return [
-    `Месяц: ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек ≈ ${money(s.avg)}.`,
+    `Проведено ${s.count} расход${plural(s.count)} на ${money(s.total)}. \n\n Средний чек ≈ ${money(s.avg)}.`,
     `Структура:\n- Регулярные: ${money(s.regularSum)} (${s.regularCount}).\n- Нерегулярные: ${money(s.irregularSum)} (${s.irregularCount}).`,
     `Особые метки:\n- Extra: ${markBlock(s.extraCount, s.extraSum)}.\n- Ненужные: ${markBlock(s.unnecessaryCount, s.unnecessarySum)} (${percent(unnecessaryShare)}).`,
     `Концентрация топ-2: ${s.top2Concentration != null ? top2 : '—'}. \n\n Дней с расходами: ${

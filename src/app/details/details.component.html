@@ -5,12 +5,19 @@
   </div>
 
   <div class="period-summaries" *ngIf="summaries$ | async as summaries">
-    <section *ngFor="let s of summaries" class="period-summary">
-      <h3>{{ s.title }}</h3>
-      <p *ngFor="let p of s.paragraphs" style="white-space:pre-line;">
-        {{ p }}
-      </p>
-      <hr />
-    </section>
+    <ng-container *ngFor="let s of summaries; let i = index">
+      <app-collapsed-panel
+        [style.margin.px]="5"
+        [title]="s.title"
+        [collapsed]="collapsed[s.key]"
+        (toggle)="onToggle(s.key)"
+      >
+        <div class="period-summary">
+          <p *ngFor="let p of s.paragraphs" style="white-space:pre-line; margin:0 0 .75rem;">
+            {{ p }}
+          </p>
+        </div>
+      </app-collapsed-panel>
+    </ng-container>
   </div>
 </div>
