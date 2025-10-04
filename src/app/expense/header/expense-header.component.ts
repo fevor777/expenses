@@ -14,6 +14,16 @@ export class ExpenseHeaderComponent implements OnInit {
   @Input() balance: number = 0;
   @Input() balanceDate: string = '';
 
+  // Current date for header display
+  today: Date = new Date();
+  // Russian formatted date: weekday, day, month (e.g., "суббота, 4 октября")
+  todayLabel: string = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    weekday: 'long',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+
   @Output() menuIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() historyIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() statisticsIconClick: EventEmitter<void> = new EventEmitter<void>();
