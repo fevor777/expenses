@@ -18,8 +18,8 @@ import { animate, group, query, style, transition, trigger } from '@angular/anim
             animate('200ms ease', style({ opacity: 0, transform: 'translateX(-12px)' })),
           ], { optional: true }),
           query(':enter', [
-            style({ opacity: 0, transform: 'translateX(12px)' }),
-            animate('260ms 60ms ease', style({ opacity: 1, transform: 'translateX(0)' })),
+            style({ opacity: 0 }),
+            animate('400ms 140ms ease', style({ opacity: 1 })),
           ], { optional: true }),
         ])
       ])
