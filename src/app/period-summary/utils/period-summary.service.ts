@@ -29,7 +29,8 @@ export class PeriodSummaryService {
      // Build all needed frames first
      const frameToday = buildFrame('today', now);
      const frameYesterday = buildFrame('yesterday', now);
-     const frameWeek = buildFrame('week', now); // week-to-date (may start in previous month!)
+  const frameWeek = buildFrame('week', now); // week-to-date (may start in previous month!)
+  const frameLastMonth = buildFrame('lastMonth', now); // full previous month
     const monthValue = this.dateFilterService.getInitialMonthValue(); // month start..month end (but we use today end for progression)
     const monthStart = monthValue.start.startOf('day');
     const todayEnd = now.endOf('day');
@@ -48,13 +49,15 @@ export class PeriodSummaryService {
      // IMPORTANT: Previous optimization fetched only month range. That truncates week values
      // when the week crosses into the previous month. Fix by expanding superset start to the
      // earliest needed frame start (week start vs month start).
-     const supersetStart = Math.min(frameWeek.start, frameMonth.start);
-     const supersetFrame = { start: supersetStart, finish: frameMonth.finish };
+  // Need superset covering last month start too for single fetch strategy
+  const supersetStart = Math.min(frameWeek.start, frameMonth.start, frameLastMonth.start);
+  const supersetFrame = { start: supersetStart, finish: frameMonth.finish };
 
      return this.fetch(supersetFrame).pipe(
       map(res => {
          const all = res.expenses || [];
          const monthExpenses = all.filter(e => e.date >= frameMonth.start && e.date <= frameMonth.finish);
+         const lastMonthExpenses = all.filter(e => e.date >= frameLastMonth.start && e.date <= frameLastMonth.finish);
          const weekExpenses = all.filter(e => e.date >= frameWeek.start && e.date <= frameWeek.finish);
          const todayExpenses = all.filter(e => e.date >= frameToday.start && e.date <= frameToday.finish);
          const yesterdayExpenses = all.filter(e => e.date >= frameYesterday.start && e.date <= frameYesterday.finish);
@@ -63,11 +66,13 @@ export class PeriodSummaryService {
          const yesterdaySnap = createPeriodSnapshot(frameYesterday, yesterdayExpenses);
          const weekSnap = createPeriodSnapshot(frameWeek, weekExpenses);
          const monthSnap = createPeriodSnapshot(frameMonth, monthExpenses);
+         const lastMonthSnap = createPeriodSnapshot(frameLastMonth, lastMonthExpenses);
 
         const todayNarr = composeNarrative(todaySnap);
         const yesterdayNarr = composeNarrative(yesterdaySnap, todaySnap);
         const weekNarr = composeNarrative(weekSnap);
-        const monthNarr = composeNarrative(monthSnap);
+  const monthNarr = composeNarrative(monthSnap);
+  const lastMonthNarr = composeNarrative(lastMonthSnap);
         const toDateFrame = (meta: { start: number; finish: number; title: string; mode: 'day'|'week'|'month' }): DateFrame => ({
           start: DateTime.fromMillis(meta.start),
           finish: DateTime.fromMillis(meta.finish),
@@ -80,6 +85,7 @@ export class PeriodSummaryService {
           { key: 'yesterday', title: yesterdaySnap.frame.title, frame: toDateFrame(yesterdaySnap.frame), paragraphs: yesterdayNarr.paragraphs },
           { key: 'week', title: weekSnap.frame.title, frame: toDateFrame(weekSnap.frame), paragraphs: weekNarr.paragraphs },
           { key: 'month', title: monthSnap.frame.title, frame: toDateFrame(monthSnap.frame), paragraphs: monthNarr.paragraphs },
+          { key: 'lastMonth', title: lastMonthSnap.frame.title, frame: toDateFrame(lastMonthSnap.frame), paragraphs: lastMonthNarr.paragraphs },
         ];
         return summaries;
       })

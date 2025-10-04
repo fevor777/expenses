@@ -22,7 +22,12 @@ export function composeNarrative(
       return { paragraphs: composeWeek(snapshot, cfg) };
     case 'month':
       return { paragraphs: composeMonth(snapshot, cfg) };
+    case 'lastMonth':
+      // Reuse month narrative; differentiate title already via frame
+      return { paragraphs: composeMonth(snapshot, cfg) };
   }
+  // Fallback (should not happen if keys exhaustive)
+  return { paragraphs: [] };
 }
 
 function composeToday(

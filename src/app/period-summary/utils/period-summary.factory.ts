@@ -68,6 +68,20 @@ export function buildFrame(
         elapsedDays,
       };
     }
+    case 'lastMonth': {
+      const lastMonthDate = now.minus({ months: 1 });
+      const start = lastMonthDate.startOf('month');
+      const finish = lastMonthDate.endOf('month');
+      const elapsedDays = finish.startOf('day').diff(start.startOf('day'), 'days').days + 1;
+      return {
+        key,
+        title: 'Прошлый месяц',
+        start: start.toMillis(),
+        finish: finish.toMillis(),
+        mode: 'month',
+        elapsedDays,
+      };
+    }
   }
 }
 

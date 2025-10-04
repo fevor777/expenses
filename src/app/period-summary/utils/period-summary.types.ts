@@ -1,13 +1,13 @@
 import { Expense } from '../../common/model/expense.model';
 
-export type PeriodFrameKey = 'today' | 'yesterday' | 'week' | 'month';
+export type PeriodFrameKey = 'today' | 'yesterday' | 'week' | 'month' | 'lastMonth';
 
 export interface PeriodFrameMeta {
   key: PeriodFrameKey;
   title: string;
   start: number; // ms
   finish: number; // ms inclusive
-  mode: 'day' | 'week' | 'month';
+  mode: 'day' | 'week' | 'month'; // (lastMonth shares 'month' mode)
   elapsedDays?: number; // for week/month (days passed incl. today)
 }
 
