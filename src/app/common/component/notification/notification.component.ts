@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { NotificationService } from './notification.service';
-import { ExpenseSummaryService } from '../../service/expense-summary.service';
+import { BudgetSummaryService } from '../../service/budget-summary.service';
 import { ExpenseService } from '../../service/expense.service';
 
 type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
@@ -37,7 +37,7 @@ export class NotificationComponent implements OnDestroy {
   constructor(
     private notificationService: NotificationService,
     private router: Router,
-    private expenseSummaryService: ExpenseSummaryService,
+    private expenseSummaryService: BudgetSummaryService,
     private expenseService: ExpenseService
   ) {
     this.notificationService.message$
@@ -154,7 +154,7 @@ export class NotificationComponent implements OnDestroy {
   onSendBrowserNotification() {
     if (this.notificationService.summaryBuildResultCache) {
       this.expenseSummaryService
-        .sendBrowserNotificationBySummary(
+        .sendBrowserNotificationByBudgetSummary(
           this.notificationService.summaryBuildResultCache
         )
         .pipe(takeUntil(this.destroySubject))

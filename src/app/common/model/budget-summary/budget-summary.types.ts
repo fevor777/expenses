@@ -68,7 +68,7 @@ export interface BehavioralMetrics {
   daysSinceNonEssential?: number;
 }
 
-export interface ExpenseSummarySnapshot {
+export interface BudgetSummarySnapshot {
   // Budget / progress
   percentUsed: number;
   percentLeft: number;
@@ -127,7 +127,7 @@ export interface ExpenseSummarySnapshot {
   };
 }
 
-export interface SummaryBuildConfig {
+export interface BudgetSummaryBuildConfig {
   spikeMultiplier: number;
   velocity: { warn: number; alert: number };
   energyWeights: { extraPct: number; velocityState: number; spike: number };

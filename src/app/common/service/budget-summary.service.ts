@@ -5,22 +5,19 @@ import { switchMap, first, map, tap } from 'rxjs/operators';
 import { BudgetDataService } from './budget-data.service';
 import { NotificationService } from '../component/notification/notification.service';
 // Removed direct expense scanning utilities; logic moved into model class.
-import {
-  ExpenseSummary,
-  ExpensesSummary,
-} from '../model/expense-summary/expense-summary.model';
-import { composeSummaryMessage } from '../model/expense-summary/expense-summary.br-notifi-formatter';
-import { composeAppBudgetInfoMessage } from '../model/expense-summary/expense-summary.app-notifi-formatter';
+import { BudgetSummary } from '../model/budget-summary/budget-summary.model';
+import { composeBudgetSummaryMessage } from '../model/budget-summary/budget-summary.br-notifi-formatter';
+import { composeAppBudgetInfoMessage } from '../model/budget-summary/budget-summary.app-notifi-formatter';
 
-export interface SummaryBuildResult {
-  summary: ExpenseSummary | null;
+export interface BudgetSummaryBuildResult {
+  summary: BudgetSummary | null;
   error: string | null; // 'Бюджет не установлен' | 'Обновите дату начала бюджета.' | other future codes
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class ExpenseSummaryService {
+export class BudgetSummaryService {
   constructor(
     private budgetDataService: BudgetDataService,
     private notificationService: NotificationService
@@ -36,15 +33,15 @@ export class ExpenseSummaryService {
     'Обновите дату начала бюджета.';
   public static readonly BUILD_ERROR_NO_BUDGET = 'Бюджет не установлен';
 
-  buildCurrentBudgetSummary(): Observable<SummaryBuildResult> {
+  buildCurrentBudgetSummary(): Observable<BudgetSummaryBuildResult> {
     return this.budgetDataService.getExpensesWithBudget().pipe(
       first(),
       map(rolling => {
         if (!rolling.budget) {
           return {
             summary: null,
-            error: ExpenseSummaryService.BUILD_ERROR_NO_BUDGET,
-          } as SummaryBuildResult;
+            error: BudgetSummaryService.BUILD_ERROR_NO_BUDGET,
+          } as BudgetSummaryBuildResult;
         }
         const frameStart = rolling.dateFrame.start.toMillis();
         const frameFinish = rolling.dateFrame.finish.toMillis();
@@ -52,33 +49,32 @@ export class ExpenseSummaryService {
         if (now < frameStart || now > frameFinish) {
           return {
             summary: null,
-            error: ExpenseSummaryService.BUILD_ERROR_OUT_OF_FRAME,
-          } as SummaryBuildResult;
+            error: BudgetSummaryService.BUILD_ERROR_OUT_OF_FRAME,
+          } as BudgetSummaryBuildResult;
         }
-        const summary = new ExpensesSummary(rolling, frameStart, frameFinish);
-        return { summary, error: null } as SummaryBuildResult;
+        const summary = new BudgetSummary(rolling, frameStart, frameFinish);
+        return { summary, error: null } as BudgetSummaryBuildResult;
       })
     );
   }
 
   /** Send browser notification given a prepared summary snapshot */
-  sendBrowserNotificationBySummary(
-    result: SummaryBuildResult
+  sendBrowserNotificationByBudgetSummary(
+    result: BudgetSummaryBuildResult
   ): Observable<void> {
     if (!result.summary) {
-      const msg =
-        result.error || ExpenseSummaryService.BUILD_ERROR_OUT_OF_FRAME;
+      const msg = result.error || BudgetSummaryService.BUILD_ERROR_OUT_OF_FRAME;
       return this.notificationService.showBrowserNotification(
         'Сводка расходов',
         msg,
         { icon: undefined as any, tag: 'app-expenses-budget-summary' }
       );
     }
-    return this.pushSummaryNotification(result.summary);
+    return this.pushBudgetSummaryNotification(result.summary);
   }
 
   /** Send in-app (toast) notification given a prepared summary snapshot */
-  sendAppNotificationBySummary(result: SummaryBuildResult): void {
+  sendAppNotificationByBudgetSummary(result: BudgetSummaryBuildResult): void {
     if (!result.summary) {
       this.notificationService.showMessage(
         result.error || 'Неизвестная ошибка',
@@ -98,19 +94,21 @@ export class ExpenseSummaryService {
   /** Backwards-compatible convenience wrappers (can be removed after migration) */
   sendBrowserNotificationWithBudgetSummary(): Observable<void> {
     return this.buildCurrentBudgetSummary().pipe(
-      switchMap(result => this.sendBrowserNotificationBySummary(result))
+      switchMap(result => this.sendBrowserNotificationByBudgetSummary(result))
     );
   }
 
-  showAppBudgetInfo(): Observable<SummaryBuildResult> {
+  showAppBudgetInfo(): Observable<BudgetSummaryBuildResult> {
     return this.buildCurrentBudgetSummary().pipe(
-      tap(result => this.sendAppNotificationBySummary(result))
+      tap(result => this.sendAppNotificationByBudgetSummary(result))
     );
   }
 
-  private pushSummaryNotification(summary: ExpenseSummary): Observable<void> {
+  private pushBudgetSummaryNotification(
+    summary: BudgetSummary
+  ): Observable<void> {
     const title = 'Сводка расходов';
-    const message = composeSummaryMessage(summary); // externalized formatter
+    const message = composeBudgetSummaryMessage(summary); // externalized formatter
     const icon = this.generateBudgetIcon(summary.percentUsed);
     return this.notificationService.showBrowserNotification(title, message, {
       icon,

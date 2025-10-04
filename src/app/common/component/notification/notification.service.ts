@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { SummaryBuildResult } from '../../service/expense-summary.service';
+import { BudgetSummaryBuildResult } from '../../service/budget-summary.service';
 
 export interface NotificationPayload {
   message: string;
@@ -26,7 +26,7 @@ export class NotificationService {
 
   private browserNotificationPermission: NotificationPermission = 'default';
   
-  summaryBuildResultCache: SummaryBuildResult;
+  summaryBuildResultCache: BudgetSummaryBuildResult;
 
   constructor() {
     this.checkNotificationPermission();

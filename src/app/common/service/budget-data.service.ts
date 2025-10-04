@@ -3,7 +3,6 @@ import { Observable, combineLatest, of } from 'rxjs';
 import { first, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 import { ExpenseService } from './expense.service';
-import { DateFilterService } from '../component/filter/date/date-filter.service';
 import { IrregularBudgetService } from './irregular-budget.service';
 import { Expense } from '../model/expense.model';
 import { DateFrame } from '../component/filter/date/dateFrame.model';
@@ -24,7 +23,6 @@ export interface BudgetPeriodData {
 export class BudgetDataService {
   constructor(
     private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService,
     private irregularBudgetService: IrregularBudgetService
   ) {}
 

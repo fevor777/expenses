@@ -1,11 +1,11 @@
-import { ExpenseSummarySnapshot } from './expense-summary.types';
+import { BudgetSummarySnapshot } from './budget-summary.types';
 
 export interface SummaryFormatterOptions {
   width?: number; // progress bar width
 }
 
-export function composeSummaryMessage(
-  summary: ExpenseSummarySnapshot,
+export function composeBudgetSummaryMessage(
+  summary: BudgetSummarySnapshot,
   opts: SummaryFormatterOptions = {}
 ) {
   const parts = [
@@ -38,14 +38,14 @@ const fmt = (n: number | undefined) => {
     : n.toFixed(1);
 };
 
-function lineHeader(s: ExpenseSummarySnapshot, opts: SummaryFormatterOptions) {
+function lineHeader(s: BudgetSummarySnapshot, opts: SummaryFormatterOptions) {
   if (s.percentUsed <= 0) return '';
   const width = opts.width || 7;
   const filled = Math.round((s.percentUsed / 100) * width);
   const bar = '='.repeat(filled) + '-'.repeat(width - filled);
   return `[${bar}] ${s.percentUsed.toFixed(0)}%`;
 }
-function lineToday(s: ExpenseSummarySnapshot) {
+function lineToday(s: BudgetSummarySnapshot) {
   const irr =
     s.todaysTotal !== s.todaysIrregular ? ` (${s.todaysIrregular}€)` : '';
   const icon =
@@ -59,12 +59,12 @@ function lineToday(s: ExpenseSummarySnapshot) {
     : '';
   return `• ☀️: ${s.todaysTotal}€ ${iconPart}${irr}${behavior}${todaysExpectation}`;
 }
-function lineMonthlyIrregular(s: ExpenseSummarySnapshot) {
+function lineMonthlyIrregular(s: BudgetSummarySnapshot) {
   const prog = s.progressPct !== undefined ? s.progressPct.toFixed(0) : '';
   const exhaustion = s.budgetExhaustion ? ' ' + s.budgetExhaustion : '';
   return `• Б: ${s.percentUsed.toFixed(0)}% П: ${prog}%${exhaustion}`;
 }
-function lineBudget(s: ExpenseSummarySnapshot) {
+function lineBudget(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const daysPassed = s.meta?.daysPassed;
   const frameDays = s.meta?.frameDays;
@@ -81,7 +81,7 @@ function lineBudget(s: ExpenseSummarySnapshot) {
     s.daysLeft !== undefined ? ' d' + s.daysLeft : ''
   } ${s.percentLeft.toFixed(0)}% P: ${s.periodIrregular}€ Б: ${s.budget}€`;
 }
-function lineDailyAverage(s: ExpenseSummarySnapshot) {
+function lineDailyAverage(s: BudgetSummarySnapshot) {
   const avgStr = fmt(s.dailyAverage);
   const plan =
     s.budgetPerDay && s.budgetPerDay > 0 ? `п${fmt(s.budgetPerDay)}` : '';
@@ -91,7 +91,7 @@ function lineDailyAverage(s: ExpenseSummarySnapshot) {
   const pace = extras ? `Темп: ${avgStr} (${extras})` : `Темп: ${avgStr}`;
   return `• ${pace}`;
 }
-function lineVelocity(s: ExpenseSummarySnapshot) {
+function lineVelocity(s: BudgetSummarySnapshot) {
   if (!s.budget || s.budget <= 0) return '• Скорость: ⚡ (нет бюджета)';
   const over = s.velocityOverrun ?? 0;
   const projectedTotal = s.velocityProjectedTotal ?? 0;
@@ -110,7 +110,7 @@ function lineVelocity(s: ExpenseSummarySnapshot) {
   }
   return `• Скорость: ${icon} ${overStr} (${projectedTotal.toFixed(0)}€)${energy}`;
 }
-function lineMonth(s: ExpenseSummarySnapshot) {
+function lineMonth(s: BudgetSummarySnapshot) {
   return `• Период: ${s.frameTotal}€`;
 }
 function percentLine(v?: number) {
@@ -119,9 +119,9 @@ function percentLine(v?: number) {
 function daysLine(v?: number) {
   return v !== undefined && v >= 0 ? ` d${v}` : '';
 }
-function lineExtra(s: ExpenseSummarySnapshot) {
+function lineExtra(s: BudgetSummarySnapshot) {
   return `• Экстра: ${s.extra}€${percentLine(s.extraPct)}${daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
 }
-function lineNonEssential(s: ExpenseSummarySnapshot) {
+function lineNonEssential(s: BudgetSummarySnapshot) {
   return `• Хотелки: ${s.nonEssential}€${percentLine(s.nonEssentialPct)}${daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
 }

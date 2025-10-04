@@ -27,7 +27,7 @@ import { ExpenseService } from '../common/service/expense.service';
 import { HistoryExpense } from './history-expense';
 import { HistoryItemComponent } from './item/history-item.component';
 import { GLOBAL_SWIPE_LENGTH } from '../constants';
-import { ExpenseSummaryService } from '../common/service/expense-summary.service';
+import { BudgetSummaryService } from '../common/service/budget-summary.service';
 
 @Component({
   selector: 'app-history',
@@ -70,7 +70,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private dateFilterService: DateFilterService,
-    private expenseSummaryService: ExpenseSummaryService
+    private expenseSummaryService: BudgetSummaryService
   ) {}
 
   @HostListener('touchstart', ['$event'])

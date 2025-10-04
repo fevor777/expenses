@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ExpenseSummaryService } from '../common/service/expense-summary.service';
+import { BudgetSummaryService } from '../common/service/budget-summary.service';
 import { Subject } from 'rxjs';
 
 /**
@@ -16,7 +16,7 @@ import { Subject } from 'rxjs';
   template: ``,
 })
 export class BrNotificationRedirectComponent implements OnInit, OnDestroy {
-  private readonly summary = inject(ExpenseSummaryService);
+  private readonly summary = inject(BudgetSummaryService);
   private readonly router = inject(Router);
 
   private readonly destroySubject: Subject<void> = new Subject();

@@ -3,8 +3,8 @@
 // The browser notification uses `composeSummaryMessage` (short form). Here we provide
 // readable labels and groupings. Can be extended for i18n later.
 
-import { ExpenseSummarySnapshot } from './expense-summary.types';
-import { trendIconByRatio } from './expense-summary.br-notifi-formatter';
+import { BudgetSummarySnapshot } from './budget-summary.types';
+import { trendIconByRatio } from './budget-summary.br-notifi-formatter';
 
 export interface AppBudgetMessageOptions {
   mode?: 'full' | 'basic'; // basic = condensed subset
@@ -39,14 +39,14 @@ function comparisonAnnotation(spentPct?: number, timePct?: number): string {
 }
 
 // Line builders --------------------------------------------------------------
-function lineHeader(s: ExpenseSummarySnapshot, opts: AppBudgetMessageOptions): string {
+function lineHeader(s: BudgetSummarySnapshot, opts: AppBudgetMessageOptions): string {
   const bw = opts.barWidth ?? 7;
   const bar = progressBar(s.percentUsed, bw);
   const left = s.percentLeft !== undefined ? fmtPct(s.percentLeft) : fmtPct(100 - s.percentUsed);
   return `${bar} ${fmtPct(s.percentUsed)} (ост ${left})`;
 }
 
-function lineToday(s: ExpenseSummarySnapshot): string {
+function lineToday(s: BudgetSummarySnapshot): string {
   const arrow = trendIconByRatio(s.todaysNeedRatio) || '';
   const total = fmtMoney(s.todaysTotal);
   const irrPart = s.todaysIrregular !== s.todaysTotal ? ` (${fmtMoney(s.todaysIrregular)}€)` : '';
@@ -55,18 +55,18 @@ function lineToday(s: ExpenseSummarySnapshot): string {
   return `<strong>•</strong> Сегодня: ${arrow ? arrow + ' ' : ''}${total}€${irrPart}${nonEss}${need}`;
 }
 
-function lineBudget(s: ExpenseSummarySnapshot): string {
+function lineBudget(s: BudgetSummarySnapshot): string {
   return `<strong>•</strong> Бюджет: Потрачено ${fmtMoney(s.periodIrregular)}€ / ${fmtMoney(s.budget)}€ (ост ${fmtMoney(s.remaining)}€, осталось дней: ${s.daysLeft ?? 0})`;
 }
 
-function linePace(s: ExpenseSummarySnapshot): string {
+function linePace(s: BudgetSummarySnapshot): string {
   const avg = fmtMoney(s.dailyAverage) + '€/д';
   const plan = s.budgetPerDay ? ` план ${fmtMoney(s.budgetPerDay)}€/д` : '';
   const need = s.needPerDay < s.budgetPerDay ? ` нужно ${fmtMoney(s.needPerDay)}€/д` : '';
   return `<strong>•</strong> Темп: ср ${avg}${plan}${need}`;
 }
 
-function lineVelocity(s: ExpenseSummarySnapshot): string {
+function lineVelocity(s: BudgetSummarySnapshot): string {
   const arrow = trendIconByRatio(s.velocityRatio) || '→';
   const proj = s.velocityProjectedTotal !== undefined ? fmtMoney(s.velocityProjectedTotal) + '€' : '—';
   const over = s.velocityOverrun !== undefined ? s.velocityOverrun : undefined;
@@ -78,25 +78,25 @@ function lineVelocity(s: ExpenseSummarySnapshot): string {
   return `<strong>•</strong> Скорость: ${arrow} ${proj} прогноз${overStr}${exhaustion}`;
 }
 
-function lineComparison(s: ExpenseSummarySnapshot, opts: AppBudgetMessageOptions): string {
+function lineComparison(s: BudgetSummarySnapshot, opts: AppBudgetMessageOptions): string {
   if (!opts.showComparison) return '';
   const ann = comparisonAnnotation(s.percentUsed, s.progressPct);
   return `<strong>•</strong> Сравнение: расход ${fmtPct(s.percentUsed)} vs время ${fmtPct(s.progressPct)} ${ann}`.trim();
 }
 
-function lineExtra(s: ExpenseSummarySnapshot): string {
+function lineExtra(s: BudgetSummarySnapshot): string {
   const days = s.daysSinceExtra !== undefined ? ` последняя ${s.daysSinceExtra}д назад` : '';
   const spike = s.extraSpike ? ' ⚠️' : '';
   return `<strong>•</strong> Экстра: ${fmtMoney(s.extra)}€ (${fmtPct(s.extraPct)})${days}${spike}`;
 }
 
-function lineNonEssential(s: ExpenseSummarySnapshot): string {
+function lineNonEssential(s: BudgetSummarySnapshot): string {
   const days = s.daysSinceNonEssential !== undefined ? ` последняя ${s.daysSinceNonEssential}д назад` : '';
   const spike = s.nonEssentialSpike ? ' ⚠️' : '';
   return `<strong>•</strong> Хотелки: ${fmtMoney(s.nonEssential)}€ (${fmtPct(s.nonEssentialPct)})${days}${spike}`;
 }
 
-function lineEnergy(s: ExpenseSummarySnapshot): string {
+function lineEnergy(s: BudgetSummarySnapshot): string {
   if (s.energyScore === undefined) return '';
   let emoji = '😇';
   const sc = s.energyScore;
@@ -107,14 +107,14 @@ function lineEnergy(s: ExpenseSummarySnapshot): string {
   return `<strong>•</strong> Риск: ${emoji}${sc.toFixed(1)}`;
 }
 
-function lineFrameTotal(s: ExpenseSummarySnapshot): string {
+function lineFrameTotal(s: BudgetSummarySnapshot): string {
   const passed = s.meta?.daysPassed ?? 0;
   const frameDays = s.meta?.frameDays ?? 0;
   return `<strong>•</strong> Всего (период): ${fmtMoney(s.frameTotal)}€ (${passed} / ${frameDays} дней)`;
 }
 
 // Basic mode (short subset similar to approved example header portion)
-function buildBasic(s: ExpenseSummarySnapshot, opts: AppBudgetMessageOptions): string {
+function buildBasic(s: BudgetSummarySnapshot, opts: AppBudgetMessageOptions): string {
   const lines: string[] = [];
   lines.push(lineHeader(s, opts));
   lines.push(lineToday(s));
@@ -125,7 +125,7 @@ function buildBasic(s: ExpenseSummarySnapshot, opts: AppBudgetMessageOptions): s
 }
 
 // Full mode – includes every line approved by user.
-function buildFull(s: ExpenseSummarySnapshot, opts: AppBudgetMessageOptions): string {
+function buildFull(s: BudgetSummarySnapshot, opts: AppBudgetMessageOptions): string {
   const lines: string[] = [];
   lines.push(lineHeader(s, opts));
   lines.push(lineToday(s));
@@ -143,7 +143,7 @@ function buildFull(s: ExpenseSummarySnapshot, opts: AppBudgetMessageOptions): st
 }
 
 // Public API -----------------------------------------------------------------
-export function composeAppBudgetInfoMessage(summary: ExpenseSummarySnapshot | undefined, options: AppBudgetMessageOptions = {}): string {
+export function composeAppBudgetInfoMessage(summary: BudgetSummarySnapshot | undefined, options: AppBudgetMessageOptions = {}): string {
   if (!summary) return '';
   const mode = options.mode || 'full';
   const merged: AppBudgetMessageOptions = { barWidth: 7, showComparison: true, ...options, mode };

@@ -1,6 +1,6 @@
 import { Expense } from '../expense.model';
 import { getCategoryById } from '../categories';
-import { ClassificationTotals } from './expense-summary.types';
+import { ClassificationTotals } from './budget-summary.types';
 
 export interface ClassificationContext {
   startOfToday: number;

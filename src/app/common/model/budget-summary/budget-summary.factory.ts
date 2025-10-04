@@ -1,43 +1,43 @@
-import { DEFAULT_SUMMARY_CONFIG } from './expense-summary.config';
+import { DEFAULT_BUDGET_SUMMARY_CONFIG } from './budget-summary.config';
 import {
   classifyExpenses,
   avgPerDay,
   daysSince,
   isSpike,
   roundUp,
-} from './expense-summary.classifier';
+} from './budget-summary.classifier';
 import {
   computePace,
   computeExhaustionLabel,
   computeNeedPerDay,
   computeExpectPerDay,
-} from './expense-summary.pace';
-import { computeEnergyScore } from './expense-summary.energy';
+} from './budget-summary.pace';
+import { computeEnergyScore } from './budget-summary.energy';
 import {
   RollingFrameBudget,
-  ExpenseSummarySnapshot,
+  BudgetSummarySnapshot,
   Clock,
-  SummaryBuildConfig,
+  BudgetSummaryBuildConfig,
   TimeFrameStats,
-} from './expense-summary.types';
+} from './budget-summary.types';
 
 const realClock: Clock = { now: () => new Date() };
 
 export interface BuildOptions {
   clock?: Clock;
-  config?: SummaryBuildConfig;
+  config?: BudgetSummaryBuildConfig;
 }
 
-export function createExpenseSummary(
+export function createBudgetSummary(
   rolling: RollingFrameBudget,
   frameStart: number,
   frameFinish: number,
   options: BuildOptions = {}
-): ExpenseSummarySnapshot {
+): BudgetSummarySnapshot {
   // TODO(cents-arithmetic): migrate all currency math to integer cents to avoid FP rounding issues.
   // Strategy: store raw amounts as integer number of cents in classification + pace modules, format only at presentation.
   const clock = options.clock || realClock;
-  const config = options.config || DEFAULT_SUMMARY_CONFIG;
+  const config = options.config || DEFAULT_BUDGET_SUMMARY_CONFIG;
   const now = clock.now();
   const frame = computeFrameStats(frameStart, frameFinish, now);
 
@@ -104,7 +104,7 @@ export function createExpenseSummary(
 
   const expectedPerDay = computeExpectPerDay(pace.dailyBudget, need.needPerDay);
 
-  const snapshot: ExpenseSummarySnapshot = {
+  const snapshot: BudgetSummarySnapshot = {
     percentUsed: pace.percentUsed,
     percentLeft: Math.max(0, 100 - pace.percentUsed),
     budget: budgetValue,

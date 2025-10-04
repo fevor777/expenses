@@ -36,9 +36,9 @@ import { ExpenseHeaderComponent } from './header/expense-header.component';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
 import { GLOBAL_LONG_PRESS_DURATION } from '../constants';
 import {
-  ExpenseSummaryService,
-  SummaryBuildResult,
-} from '../common/service/expense-summary.service';
+  BudgetSummaryService,
+  BudgetSummaryBuildResult,
+} from '../common/service/budget-summary.service';
 
 @Component({
   selector: 'app-expense',
@@ -65,7 +65,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   showNumberBoard: boolean = true;
   monthlyExpenses: Expense[] = [];
   todaysExpenses: Expense[] = [];
-  budgetSummary: SummaryBuildResult;
+  budgetSummary: BudgetSummaryBuildResult;
 
   currency: Currency;
   description: string = '';
@@ -86,7 +86,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
-    private expenseSummaryService: ExpenseSummaryService
+    private expenseSummaryService: BudgetSummaryService
   ) {}
 
   ngOnInit(): void {
@@ -150,7 +150,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
               of(addedExpense),
             ])
           ),
-          tap(([summary, addedExpense]: [SummaryBuildResult, Expense]) => {
+          tap(([summary, addedExpense]: [BudgetSummaryBuildResult, Expense]) => {
             this.notificationService.summaryBuildResultCache = summary;
             this.onShowNumberBoard();
             this.showNotification(
@@ -161,8 +161,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
               summary
             );
           }),
-          switchMap(([summary]: [SummaryBuildResult, Expense]) =>
-            this.expenseSummaryService.sendBrowserNotificationBySummary(summary)
+          switchMap(([summary]: [BudgetSummaryBuildResult, Expense]) =>
+            this.expenseSummaryService.sendBrowserNotificationByBudgetSummary(summary)
           ),
           takeUntil(this.unsubscribe)
         )
@@ -198,9 +198,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.expenseSummaryService
       .buildCurrentBudgetSummary()
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe((result: SummaryBuildResult) => {
+      .subscribe((result: BudgetSummaryBuildResult) => {
         this.notificationService.summaryBuildResultCache = result;
-        return this.expenseSummaryService.sendAppNotificationBySummary(result);
+        return this.expenseSummaryService.sendAppNotificationByBudgetSummary(result);
       });
   }
 
@@ -237,7 +237,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     amount,
     addedExpense?: Expense,
     originalDescription?: string,
-    summary?: SummaryBuildResult
+    summary?: BudgetSummaryBuildResult
   ): void {
     const todaysAmountByCategory = this.getTodaysAmount(categoryName);
     const monthlyAmountByCategory =

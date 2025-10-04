@@ -1,12 +1,12 @@
 // Lightweight backward-compatible wrapper around new factory-generated snapshot.
 // TODO: Remove this file after migrating all imports to use factory & types directly.
-import { createExpenseSummary, BuildOptions } from './expense-summary.factory';
+import { createBudgetSummary, BuildOptions } from './budget-summary.factory';
 import {
   RollingFrameBudget,
-  ExpenseSummarySnapshot,
-} from './expense-summary.types';
+  BudgetSummarySnapshot,
+} from './budget-summary.types';
 
-export class ExpenseSummary implements ExpenseSummarySnapshot {
+export class BudgetSummary implements BudgetSummarySnapshot {
   percentUsed: number;
   budget: number;
   percentLeft: number;
@@ -43,7 +43,7 @@ export class ExpenseSummary implements ExpenseSummarySnapshot {
     frameFinish: number,
     options?: BuildOptions
   ) {
-    const snap = createExpenseSummary(
+    const snap = createBudgetSummary(
       rolling,
       frameStart,
       frameFinish,
@@ -52,5 +52,3 @@ export class ExpenseSummary implements ExpenseSummarySnapshot {
     Object.assign(this, snap);
   }
 }
-
-export { ExpenseSummary as ExpensesSummary };

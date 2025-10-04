@@ -1,4 +1,4 @@
-import { PaceMetrics, TimeFrameStats } from './expense-summary.types';
+import { PaceMetrics, TimeFrameStats } from './budget-summary.types';
 
 export function computePace(
   spentIrregular: number,
