@@ -1,0 +1,48 @@
+<div class="calc-backdrop" (click)="onBackdrop()"></div>
+<div class="calc-wrapper" (click)="$event.stopPropagation()">
+  <div class="calc-header">
+    <span class="calc-title">Calculator</span>
+    <button type="button" class="close-btn" (click)="onBackdrop()" aria-label="Close calculator">×</button>
+  </div>
+  <div class="calc-display">
+    <input
+      #displayInput
+      class="calc-display-input"
+      [value]="expression"
+      (click)="updateCaret($event)"
+      (keyup)="updateCaret($event)"
+      (input)="onDirectInput($event)"
+      spellcheck="false"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+    />
+  </div>
+  <div class="calc-grid">
+    <button type="button" class="key" (click)="onKey('7')">7</button>
+    <button type="button" class="key" (click)="onKey('8')">8</button>
+    <button type="button" class="key" (click)="onKey('9')">9</button>
+    <button type="button" class="key op" (click)="onKey('/')">/</button>
+
+    <button type="button" class="key" (click)="onKey('4')">4</button>
+    <button type="button" class="key" (click)="onKey('5')">5</button>
+    <button type="button" class="key" (click)="onKey('6')">6</button>
+    <button type="button" class="key op" (click)="onKey('*')">*</button>
+
+    <button type="button" class="key" (click)="onKey('1')">1</button>
+    <button type="button" class="key" (click)="onKey('2')">2</button>
+    <button type="button" class="key" (click)="onKey('3')">3</button>
+    <button type="button" class="key op" (click)="onKey('-')">-</button>
+
+    <button type="button" class="key" (click)="onKey('0')">0</button>
+    <button type="button" class="key" (click)="onKey('.')">.</button>
+    <button type="button" class="key" (click)="onKey('(')">(</button>
+    <button type="button" class="key" (click)="onKey(')')">)</button>
+
+    <button type="button" class="key op" (click)="onKey('+')">+</button>
+    <button type="button" class="key func" (click)="onDelete()">DEL</button>
+    <button type="button" class="key func" (click)="onClean()">CLEAN</button>
+    <button type="button" class="key op" (click)="onEquals()">=</button>
+    <button type="button" class="key apply" (click)="onApply()">APPLY</button>
+  </div>
+</div>

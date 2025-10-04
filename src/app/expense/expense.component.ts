@@ -34,6 +34,7 @@ import { ExpenseService } from '../common/service/expense.service';
 import { SwipeDirective } from '../common/swipe.directive';
 import { ExpenseHeaderComponent } from './header/expense-header.component';
 import { ExpenseNumberBoardComponent } from './number-board/expense-number-board.component';
+import { CalculatorModalComponent } from '../common/component/calculator/calculator-modal.component';
 import { GLOBAL_LONG_PRESS_DURATION } from '../constants';
 import {
   BudgetSummaryService,
@@ -53,6 +54,7 @@ import {
     SwipeDirective,
     ExpenseNumberBoardComponent,
     ExpenseHeaderComponent,
+    CalculatorModalComponent,
   ],
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
@@ -69,6 +71,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   currency: Currency;
   description: string = '';
+  showCalculator = false;
 
   private unsubscribe: Subject<void> = new Subject();
 
@@ -216,6 +219,19 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     if (amount) {
       this.notificationService.hide();
     }
+  }
+
+  onOpenCalculator(): void {
+    this.showCalculator = true;
+  }
+
+  onCalculatorApply(val: string): void {
+    this.enteredAmount = val;
+    this.showCalculator = false;
+  }
+
+  onCalculatorCancel(): void {
+    this.showCalculator = false;
   }
 
   onCurrencyChange(currency: Currency): void {

@@ -35,12 +35,17 @@ export class ExpenseNumberBoardComponent {
   @Output() numberBoardSwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() numberBoardSwipeUp: EventEmitter<void> = new EventEmitter<void>();
   @Output() numberBoardLongPress: EventEmitter<void> = new EventEmitter<void>();
+  @Output() openCalculator: EventEmitter<void> = new EventEmitter<void>();
 
   private longPressTimeout: any;
   private longPressTriggered = false;
   private readonly LONG_PRESS_MOVE_TOLERANCE = 10;
   private lpStartX = 0;
   private lpStartY = 0;
+
+  openCalculatorEmit(): void {
+    this.openCalculator.emit();
+  }
 
   onDeleteClick(): void {
     if (this.amount.length > 0) {

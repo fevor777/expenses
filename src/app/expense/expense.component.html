@@ -1,4 +1,4 @@
-<div class="expense-container">
+<div class="expense-container" [class.dimmed]="showCalculator">
   <app-expense-header
     [currentAmount]="currentAmount"
     [currentBalanceAmount]="currentBalanceAmount"
@@ -51,6 +51,14 @@
     (numberBoardSwipeLeft)="navigateToHistory()"
     (numberBoardSwipeRight)="navigateToStatistics()"
     (numberBoardLongPress)="navigateToHistory()"
+    (openCalculator)="onOpenCalculator()"
   >
   </app-expense-number-board>
 </div>
+
+<app-calculator-modal
+  *ngIf="showCalculator"
+  [initialValue]="enteredAmount"
+  (apply)="onCalculatorApply($event)"
+  (cancel)="onCalculatorCancel()"
+></app-calculator-modal>

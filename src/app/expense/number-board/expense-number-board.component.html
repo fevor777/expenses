@@ -15,6 +15,7 @@
       name="input"
       class="expense-number-board-input"
       placeholder="ВВЕДИТЕ РАСХОД"
+      (click)="openCalculatorEmit()"
     />
     <span (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
   </div>

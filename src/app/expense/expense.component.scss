@@ -3,4 +3,9 @@
   grid-template-rows: auto 1fr auto;
   height: 100dvh;
   user-select: none;
+  transition: filter 120ms ease, opacity 120ms ease;
+}
+
+.expense-container.dimmed {
+  filter: brightness(0.55) saturate(70%);
 }
