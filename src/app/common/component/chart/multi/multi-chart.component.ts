@@ -49,6 +49,7 @@ export class MultiChartComponent implements OnChanges {
   // Selected bar info (date range + value)
   selectedBarLabel?: string;
   selectedBarValue?: number | null;
+  showBarIcons = false;
   private selectedBarIndex: number | null = null;
 
   // Template bridge for stricter typing
@@ -97,6 +98,7 @@ export class MultiChartComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses'] || changes['filter']) {
       this.selectedBarLabel = '';
+      this.showBarIcons = this.filter?.mode !== Mode.DAY;
       this.calculateChartData(this.expenses, this.filter);
     }
   }

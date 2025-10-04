@@ -24,8 +24,8 @@
     </span>
     <span class="app-multi-chart-label" *ngIf="selectedBarLabel">
       {{ selectedBarLabel }}: {{ selectedBarValue ?? 0 }}€
-      <i class="fa-solid fa-list app-multi-chart-label-icons" (click)="onHistoryIconClick()"></i>
-      <i class="fa-solid fa-filter app-multi-chart-label-icons" (click)="onFilterIconClick()"></i>
+      <i *ngIf="showBarIcons" class="fa-solid fa-list app-multi-chart-label-icons" (click)="onHistoryIconClick()"></i>
+      <i *ngIf="showBarIcons" class="fa-solid fa-filter app-multi-chart-label-icons" (click)="onFilterIconClick()"></i>
     </span>
   </div>
 </div>
