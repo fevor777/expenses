@@ -8,15 +8,17 @@
       class="expense-description-icon fa-regular fa-pen-to-square"
       (click)="addDescription()"
     ></i>
-    <input
-      type="text"
-      [ngModel]="amount"
-      (ngModelChange)="onAmountChange($event)"
-      name="input"
+    <span
       class="expense-number-board-input"
-      placeholder="ВВЕДИТЕ РАСХОД"
       (click)="openCalculatorEmit()"
-    />
+      (keydown.enter)="openCalculatorEmit()"
+      (keydown.space)="openCalculatorEmit()"
+      role="button"
+      tabindex="0"
+      aria-label="Expense amount"
+    >
+      {{ amount || 'ВВЕДИТЕ РАСХОД' }}
+    </span>
     <span (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
   </div>
   <div
