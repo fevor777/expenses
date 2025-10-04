@@ -234,7 +234,6 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   navigateToHistory(categoryId?: string, dateFrame?: DateFrame): void {
-    console.log('dateFrame', dateFrame || this.currentFilter);
     if (categoryId) {
       this.dateFilterService.categories = [categoryId];
     } else {

@@ -128,7 +128,8 @@
     <app-multi-chart
       [filter]="currentFilter"
       [expenses]="filteredExpenses"
-      (barClick)="navigateToHistory(null, $event)"
+      (historyIconClick)="navigateToHistory(null, $event)"
+      (filterIconClick)="onFilterChange($event)"
     ></app-multi-chart>
   </app-collapsed-panel>
   <!-- Composition charts now accessible via segmented switch above -->
