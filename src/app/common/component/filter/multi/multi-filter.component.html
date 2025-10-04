@@ -1,5 +1,5 @@
 <div class="app-multi-filter">
-  <div class="mf-bar">
+  <div class="mf-bar" (click)="toggleExpandFilters($event)">
     <div
       class="mf-groups"
       *ngIf="
@@ -15,7 +15,7 @@
         <button
           type="button"
           class="mf-icon-btn mf-icon-btn--refresh"
-          (click)="clearFilters()"
+          (click)="clearFilters($event)"
           aria-label="Сбросить фильтры"
         >
           <i class="fas fa-redo-alt"></i>
@@ -79,7 +79,7 @@
       <button
         class="mf-toggle"
         [class.mf-toggle--active]="expandFilters"
-        (click)="toggleExpandFilters()"
+        (click)="toggleExpandFilters($event)"
         aria-label="Показать/Скрыть фильтры"
       >
         <i class="fas fa-filter"></i>
@@ -88,11 +88,22 @@
         <button
           type="button"
           class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
-          (click)="navigateToStatistics()"
+          (click)="navigateToStatistics($event)"
           title="Перейти к статистике"
           aria-label="Перейти к статистике"
         >
           <i class="fas fa-chart-line"></i>
+        </button>
+      </div>
+      <div>
+        <button
+          type="button"
+          class="mf-icon-btn mf-icon-btn--nav mf-icon-btn--stats"
+          (click)="navigateToPeriodSummary($event)"
+          title="Перейти к period summary"
+          aria-label="Перейти к period summary"
+        >
+         <app-period-summary-icon></app-period-summary-icon>
         </button>
       </div>
     </div>

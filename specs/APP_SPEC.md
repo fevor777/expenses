@@ -71,7 +71,7 @@ Migration: `exportFirebase(uid)` in `ExportComponent` pushes local JSON expenses
    - Bars listing categories with dynamic color keyed to relative percentage (green → red gradient) + hide capability (exclusion list logic).
    - Checkboxes to toggle Regular vs Irregular groups (applies category exclusion sets).
    - Composition Treemap.
-4. Details / Analytics (`/details`): consolidated advanced analytics
+4. Details / Analytics (`/period-summary`): consolidated advanced analytics
    - Filter panel identical to History (multi filter + date).
    - Irregular Budget Gauge (circular SVG; stroke-dash array %).
    - Irregular Cumulative Line (custom SVG polyline vs budget dashed line; supports DAY/WEEK/MONTH/YEAR bucketization; shows pace).

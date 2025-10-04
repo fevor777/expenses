@@ -19,6 +19,7 @@ import { CategoryFilterComponent } from '../category/category-filter.component';
 import { Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { DateFilterService } from '../date/date-filter.service';
+import { PeriodSummaryIconComponent } from "../../period-summary-icon/period-summary-icon.component";
 
 export type MultiFilter = {
   categories: string[];
@@ -36,7 +37,8 @@ export type MultiFilter = {
     FormsModule,
     DateFilterComponent,
     CategoryFilterComponent,
-  ],
+    PeriodSummaryIconComponent
+],
 })
 export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
   @Input() value: MultiFilter;
@@ -80,7 +82,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     return this.selectedCategories.map(getCategoryNameById).join(', ');
   }
 
-  clearFilters(): void {
+  clearFilters(event: MouseEvent): void {
+    event.stopPropagation();
     this.dateFilter = this.defaultDateValue;
     this.predefineCategories = [];
     this.selectedCategories = [];
@@ -118,7 +121,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     });
   }
 
-  toggleExpandFilters(): void {
+  toggleExpandFilters(event: MouseEvent): void {
+    event.stopPropagation();
     this.expandFilters = !this.expandFilters;
     this.predefineCategories = [...this.selectedCategories];
   }
@@ -133,20 +137,9 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     );
   }
 
-  navigateToDetails(): void {
-    // Match history navigation pattern: store filter state in DateFilterService
-    if (this.dateFilter) {
-      this.dateFilterService.dateFilter = this.dateFilter;
-    }
-    if (this.selectedCategories?.length) {
-      this.dateFilterService.categories = [...this.selectedCategories];
-    }
-    if (this.descriptionFilter?.trim()) {
-      this.dateFilterService.description = this.descriptionFilter.trim();
-    }
-    this.router.navigate(['/details'], {
-      queryParams: { 'back-url': '/history' },
-    });
+  navigateToPeriodSummary(event: MouseEvent): void {
+    event.stopPropagation();
+    this.router.navigate(['/period-summary']);
   }
 
   navigateToHistory(): void {
@@ -163,7 +156,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy {
     this.router.navigate(['/history']);
   }
 
-  navigateToStatistics(): void {
+  navigateToStatistics(event: MouseEvent): void {
+    event.stopPropagation();
     this.navigateToStatisticsIconClick.emit();
   }
 

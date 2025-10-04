@@ -132,7 +132,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   navigateToChart(categoryId: string): void {
     this.dateFilterService.categories = [categoryId];
     this.dateFilterService.dateFilter = this.currentFilter?.date;
-    this.router.navigate(['/details'], {
+    this.router.navigate(['/period-summary'], {
       queryParams: { 'back-url': '/history' },
     });
   }

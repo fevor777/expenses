@@ -1,0 +1,36 @@
+.period-summaries {
+  height: 100dvh;
+  margin: 8px 10px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Montserrat', sans-serif;
+
+  .period-summary-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+  }
+  .period-summary-home-link {
+    font-weight: 400;
+  }
+
+  .period-summary-link {
+    font-weight: 400;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    display: block;
+    padding-bottom: 5px; ;
+  }
+
+  .period-summaries-container {
+    margin-top: 7px;
+
+    .period-summaries-item {
+      padding: 3px 0;
+    }
+  }
+}

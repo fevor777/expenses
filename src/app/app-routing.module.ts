@@ -20,9 +20,9 @@ const routes: Routes = [
       import('./export/export.component').then(m => m.ExportComponent),
   },
   {
-    path: 'details',
+    path: 'period-summary',
     loadComponent: () =>
-      import('./details/details.component').then(m => m.DetailsComponent),
+      import('./period-summary/period-summary.component').then(m => m.PeriodSummaryComponent),
   },
   {
     path: 'br-notification-redirect',

@@ -191,7 +191,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   }
 
   navigateToDetails(): void {
-    this.router.navigate(['/details']);
+    this.router.navigate(['/period-summary']);
   }
 
   onHeaderBudgetInfoClick(): void {

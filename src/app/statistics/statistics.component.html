@@ -20,15 +20,19 @@
     (changeFilter)="onFilterChange($event)"
   >
     <i
-      class="fa-solid fa-list stats-action-icon"
-      title="Перейти в детализацию"
-      (click)="navigateToHistory()"
-    ></i>
-    <i
       (click)="onRefresh(); $event.stopPropagation()"
       class="fas fa-trash stats-action-icon"
       title="Сбросить фильтры"
     ></i>
+    <i
+      class="fa-solid fa-list stats-action-icon"
+      title="Перейти в детализацию"
+      (click)="navigateToHistory()"
+    ></i>
+    <app-period-summary-icon
+      class="stats-action-icon"
+      (click)="navigateToPeriodSummary()"
+    ></app-period-summary-icon>
   </app-date-filter>
 
   <div class="stats-section stats-section--donut">
@@ -87,7 +91,6 @@
         [percentage]="categoryTotal.percentage"
         (categoryLabelClick)="filterByCategory($event)"
         (detailsIconClick)="navigateToHistory($event)"
-        (chartIconClick)="navigateToChart($event)"
         (close)="onBarClose($event)"
       ></app-statistics-bar>
     </div>

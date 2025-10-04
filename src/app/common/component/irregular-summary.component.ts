@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Expense } from '../../common/model/expense.model';
 import { BudgetDataService } from '../../common/service/budget-data.service';
-import { IrregularBudgetGaugeComponent } from '../../details/irregular/irregular-budget-gauge.component';
-import { IrregularCumulativeComponent } from '../../details/irregular/irregular-cumulative.component';
+import { IrregularBudgetGaugeComponent } from '../../period-summary/irregular/irregular-budget-gauge.component';
+import { IrregularCumulativeComponent } from '../../period-summary/irregular/irregular-cumulative.component';
 import { DateFrame } from './filter/date/dateFrame.model';
 
 // This component combines gauge and cumulative irregular charts.

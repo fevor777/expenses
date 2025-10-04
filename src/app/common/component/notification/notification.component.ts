@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { BudgetSummaryService } from '../../service/budget-summary.service';
 import { ExpenseService } from '../../service/expense.service';
+import { PeriodSummaryIconComponent } from "../period-summary-icon/period-summary-icon.component";
 
 type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
 
@@ -15,7 +16,7 @@ type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PeriodSummaryIconComponent],
 })
 export class NotificationComponent implements OnDestroy {
   message = '';
@@ -147,7 +148,7 @@ export class NotificationComponent implements OnDestroy {
   }
 
   onNavigateDetails() {
-    this.router.navigate(['/details']);
+    this.router.navigate(['/period-summary']);
     this.startHide();
   }
 

@@ -3,6 +3,7 @@ import { map, Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { PeriodSummary } from './period-summary.model';
+import { DateFrame, Mode } from '../../common/component/filter/date/dateFrame.model';
 import { ExpenseService } from '../../common/service/expense.service';
 import { createPeriodSnapshot, buildFrame } from './period-summary.factory';
 import { composeNarrative } from './period-summary.narrative';
@@ -67,12 +68,20 @@ export class PeriodSummaryService {
         const yesterdayNarr = composeNarrative(yesterdaySnap, todaySnap);
         const weekNarr = composeNarrative(weekSnap);
         const monthNarr = composeNarrative(monthSnap);
-        return [
-          { key: 'today', title: todaySnap.frame.title, paragraphs: todayNarr.paragraphs },
-          { key: 'yesterday', title: yesterdaySnap.frame.title, paragraphs: yesterdayNarr.paragraphs },
-          { key: 'week', title: weekSnap.frame.title, paragraphs: weekNarr.paragraphs },
-          { key: 'month', title: monthSnap.frame.title, paragraphs: monthNarr.paragraphs },
-        ] as PeriodSummary[];
+        const toDateFrame = (meta: { start: number; finish: number; title: string; mode: 'day'|'week'|'month' }): DateFrame => ({
+          start: DateTime.fromMillis(meta.start),
+          finish: DateTime.fromMillis(meta.finish),
+          display: meta.title,
+          mode: meta.mode as Mode
+        });
+
+        const summaries: PeriodSummary[] = [
+          { key: 'today', title: todaySnap.frame.title, frame: toDateFrame(todaySnap.frame), paragraphs: todayNarr.paragraphs },
+          { key: 'yesterday', title: yesterdaySnap.frame.title, frame: toDateFrame(yesterdaySnap.frame), paragraphs: yesterdayNarr.paragraphs },
+          { key: 'week', title: weekSnap.frame.title, frame: toDateFrame(weekSnap.frame), paragraphs: weekNarr.paragraphs },
+          { key: 'month', title: monthSnap.frame.title, frame: toDateFrame(monthSnap.frame), paragraphs: monthNarr.paragraphs },
+        ];
+        return summaries;
       })
     );
   }

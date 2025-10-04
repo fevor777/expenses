@@ -1,0 +1,29 @@
+<div class="period-summaries">
+  <div class="period-summary-nav">
+    <span class="app-link period-summary-home-link" [routerLink]="'/'"> < Home</span>
+    <span class="app-link period-summary-home-link" [routerLink]="'/'">Home ></span>
+  </div>
+
+  <div class="period-summaries-container" *ngIf="summaries$ | async as summaries">
+    <ng-container *ngFor="let s of summaries; let i = index">
+      <div class="period-summaries-item">
+        <app-collapsed-panel
+          [title]="s.title"
+          [collapsed]="collapsed[s.key]"
+          (toggle)="onToggle(s.key)"
+        >
+          <div class="period-summary">
+            <p
+              *ngFor="let p of s.paragraphs"
+              style="white-space: pre-line; margin: 0 0 0.75rem"
+            >
+              {{ p }}
+            </p>
+          </div>
+           <div class="app-link period-summary-link" (click)="navigateToStatistics(s.frame)">Статистика</div>
+          <div class="app-link period-summary-link" (click)="navigateToHistory(s.frame)">История</div>
+        </app-collapsed-panel>
+      </div>
+    </ng-container>
+  </div>
+</div>

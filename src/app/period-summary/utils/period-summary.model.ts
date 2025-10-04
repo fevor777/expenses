@@ -7,6 +7,6 @@ import { DateFrame } from '../../common/component/filter/date/dateFrame.model';
 export interface PeriodSummary {
   key: 'today' | 'yesterday' | 'week' | 'month';
   title: string; // Display heading (e.g. 'Сегодня')
-  frame?: DateFrame; // Optional timeframe descriptor for dynamic usage later
+  frame?: DateFrame; // Optional timeframe descriptor for navigation to other pages
   paragraphs: string[]; // Narrative paragraphs in display order
 }

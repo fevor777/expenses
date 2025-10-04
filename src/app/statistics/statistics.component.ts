@@ -27,10 +27,11 @@ import { CollapsedPanelComponent } from '../common/component/collapsed-panel';
 import { SearchInputComponent } from '../common/component/search-input';
 import { IrregularSummaryComponent } from '../common/component/irregular-summary.component';
 import { SegmentedSwitchComponent } from '../common/component/segmented/segmented-switch.component';
-import { MicroVisualsComponent } from '../details/micro/micro-visuals.component';
+import { MicroVisualsComponent } from '../period-summary/micro/micro-visuals.component';
 import { CategoryTypeFiltersComponent } from './category-type-filters/category-type-filters.component';
 import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
 import { GLOBAL_SWIPE_LENGTH } from '../constants';
+import { PeriodSummaryIconComponent } from "../common/component/period-summary-icon/period-summary-icon.component";
 
 @Component({
   selector: 'app-statistics',
@@ -54,7 +55,8 @@ import { GLOBAL_SWIPE_LENGTH } from '../constants';
     MicroVisualsComponent,
     CategoryTypeFiltersComponent,
     CategoryFilterComponent,
-  ],
+    PeriodSummaryIconComponent
+],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
   categoryTotals: {
@@ -244,12 +246,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.router.navigate(['/history']);
   }
 
-  navigateToChart(categoryId: string): void {
-    this.dateFilterService.categories = [categoryId];
-    this.dateFilterService.dateFilter = this.currentFilter;
-    this.router.navigate(['/details'], {
-      queryParams: { 'back-url': '/statistics' },
-    });
+  navigateToPeriodSummary(): void {
+    this.router.navigate(['/period-summary']);
   }
 
   calculateCategoryTotals(
