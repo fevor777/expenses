@@ -156,6 +156,7 @@ export class AnalyticsSwitchComponent
     aggs = aggs.sort((a, b) => b.total - a.total);
     const total = aggs.reduce((s, a) => s + a.total, 0);
     this.donutChart.setOption({
+      animation: false, // disable global animation for this update
       tooltip: { trigger: 'item', formatter: '{b}: {c}€ ({d}%)' },
       series: [
         {
@@ -163,6 +164,8 @@ export class AnalyticsSwitchComponent
           name: 'Категория',
           radius: ['50%', '70%'],
           avoidLabelOverlap: true,
+          animation: false, // ensure series has no enter animation
+          hoverAnimation: false, // disable slice scale on hover for stability
           label: { show: true, position: 'outside', formatter: '{b}' },
           labelLine: { show: true },
           data: aggs.map(a => ({ value: a.total, name: a.name })),
