@@ -36,7 +36,6 @@ export class AppComponent {
     window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   prepareRoute(outlet: RouterOutlet) {
-    console.log('prepareRoute', outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation']);
     // Skip animation on first load or when user prefers reduced motion
     if (this.firstLoad) {
       this.firstLoad = false;
