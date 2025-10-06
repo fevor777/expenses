@@ -20,6 +20,10 @@ export class CalculatorModalComponent {
 
   ngOnInit() {
     this.expression = this.initialValue && this.initialValue.trim() !== '' ? this.initialValue : '0';
+    // Ensure caret starts at the end of the initial expression so operators append correctly
+    this.caretPos = this.expression.length;
+    // Defer setting the actual DOM caret
+    this.deferSetCaret();
   }
 
   onKey(key: string) {
@@ -68,6 +72,8 @@ export class CalculatorModalComponent {
 
   onClean() {
     this.expression = '0';
+    this.caretPos = this.expression.length; // reset caret to end
+    this.deferSetCaret();
   }
 
   onDelete() {

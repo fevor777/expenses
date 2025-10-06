@@ -1,0 +1,6 @@
+/* Ensure the router animation has a stable containing block */
+.route-container {
+	position: relative;
+	min-height: 100%;
+	display: block;
+}
