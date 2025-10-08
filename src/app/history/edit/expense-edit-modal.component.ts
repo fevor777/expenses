@@ -26,6 +26,8 @@ export class ExpenseEditModalComponent {
   amount: number; // stored as number
   description: string = '';
   category: string = '';
+  // HTML datetime-local formatted string (yyyy-MM-ddTHH:mm)
+  dateLocal: string = '';
 
   readonly categories: Category[] = Categories;
 
@@ -34,6 +36,19 @@ export class ExpenseEditModalComponent {
       this.amount = this.expense.amount;
       this.description = this.expense.description || '';
       this.category = this.expense.category;
+      // Convert epoch ms to local ISO string without seconds for datetime-local
+      try {
+        const d = new Date(this.expense.date);
+        const pad = (v: number) => v.toString().padStart(2, '0');
+        const year = d.getFullYear();
+        const month = pad(d.getMonth() + 1);
+        const day = pad(d.getDate());
+        const hour = pad(d.getHours());
+        const minute = pad(d.getMinutes());
+        this.dateLocal = `${year}-${month}-${day}T${hour}:${minute}`;
+      } catch {
+        this.dateLocal = '';
+      }
     }
   }
 
@@ -51,8 +66,16 @@ export class ExpenseEditModalComponent {
       amount: +(+this.amount || 0).toFixed(2),
       description: this.description?.trim(),
       category: this.category,
+      date: this.parseDateLocalToEpoch(this.dateLocal, this.expense.date)
     };
     this.apply.emit(updated);
+  }
+
+  private parseDateLocalToEpoch(value: string, fallback: number): number {
+    if (!value) return fallback;
+    const date = new Date(value);
+    const t = date.getTime();
+    return isNaN(t) ? fallback : t;
   }
 
   @HostListener('document:keydown', ['$event'])

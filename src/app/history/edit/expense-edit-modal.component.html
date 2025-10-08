@@ -38,6 +38,15 @@
       </select>
     </label>
     <label class="eem-field">
+      <span class="eem-label">Date & Time</span>
+      <input
+        type="datetime-local"
+        [(ngModel)]="dateLocal"
+        name="dateLocal"
+        required
+      />
+    </label>
+    <label class="eem-field">
       <span class="eem-label">Description</span>
       <textarea
         [(ngModel)]="description"
