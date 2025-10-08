@@ -28,6 +28,7 @@ import { HistoryExpense } from './history-expense';
 import { HistoryItemComponent } from './item/history-item.component';
 import { GLOBAL_SWIPE_LENGTH } from '../constants';
 import { BudgetSummaryService } from '../common/service/budget-summary.service';
+import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
 
 @Component({
   selector: 'app-history',
@@ -41,6 +42,7 @@ import { BudgetSummaryService } from '../common/service/budget-summary.service';
     FontAwesomeModule,
     MultiFilterComponent,
     HistoryItemComponent,
+    ExpenseEditModalComponent,
   ],
 })
 export class HistoryComponent implements OnInit, OnDestroy {
@@ -64,6 +66,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
   private temporaryDate: number = 0;
 
   private readonly destroySubject: Subject<void> = new Subject();
+
+  // Edit modal state
+  editingExpense: Expense | null = null;
+  showEditModal: boolean = false;
 
   constructor(
     private router: Router,
@@ -97,44 +103,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
       const oldDescription = expense.description ? expense.description : '';
       newDescription = newDescription ? newDescription?.trim() : '';
       if (oldDescription !== newDescription) {
-        this.updateExpense({ ...expense, description: newDescription });
+        this.persistExpense({ ...expense, description: newDescription });
       }
     }
-  }
-
-  changeAmount(expense: Expense): void {
-    const newAmountAsString = prompt(
-      'Change amount',
-      expense?.amount?.toString()
-    );
-    const newAmount = Number(newAmountAsString);
-    if (newAmount && newAmount !== expense?.amount) {
-      const oldAmount = expense.amount;
-      this.expenseService
-        .updateExpense({ ...expense, amount: Number(newAmount) })
-        .pipe(
-          switchMap(() => this.balanceService.getBalance()),
-          first(),
-          switchMap(balance => {
-            const newBalance =
-              Math.round((balance + oldAmount - newAmount) * 100) / 100;
-            return this.balanceService.addBalance(newBalance);
-          }),
-          switchMap(() =>
-            this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
-          ),
-          takeUntil(this.destroySubject)
-        )
-        .subscribe();
-    }
-  }
-
-  navigateToChart(categoryId: string): void {
-    this.dateFilterService.categories = [categoryId];
-    this.dateFilterService.dateFilter = this.currentFilter?.date;
-    this.router.navigate(['/period-summary'], {
-      queryParams: { 'back-url': '/history' },
-    });
   }
 
   updateFilterAndLoadExpenses(filter?: MultiFilter): void {
@@ -245,6 +216,38 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.dateFilterService.description = this.currentFilter?.description;
     this.dateFilterService.dateFilter = this.currentFilter?.date;
     this.router.navigate(['/statistics']);
+  }
+
+  updateExpense(expense: Expense): void {
+    // Open modal for editing
+    this.editingExpense = { ...expense };
+    this.showEditModal = true;
+  }
+
+  persistExpense(expense: Expense): void {
+    this.expenseService
+      .updateExpense(expense)
+      .pipe(
+        first(),
+        takeUntil(this.destroySubject),
+        switchMap(() =>
+          this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
+        )
+      )
+      .subscribe(() => {
+        this.closeEditModal();
+        // Reload list to reflect updated values (optimistic store should update, but ensure totals recompute)
+        this.updateFilterAndLoadExpenses(this.currentFilter);
+      });
+  }
+
+  onApplyEdit(expense: Expense): void {
+    this.persistExpense(expense);
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.editingExpense = null;
   }
 
   private navigateHome(): void {
@@ -442,19 +445,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.currentFilter = {
       ...this.defaultFilter,
     };
-  }
-
-  private updateExpense(expense: Expense): void {
-    this.expenseService
-      .updateExpense(expense)
-      .pipe(
-        first(),
-        takeUntil(this.destroySubject),
-        switchMap(() =>
-          this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
-        )
-      )
-      .subscribe();
   }
 
   private roundUp(value: number): number {

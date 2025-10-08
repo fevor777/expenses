@@ -34,10 +34,8 @@
       *ngFor="let item of expenses"
       [item]="item"
       [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
-      (editAmountIconClick)="changeAmount($event)"
+      (editIconClick)="updateExpense($event)"
       (filterByCategory)="filterByCategory($event)"
-      (chartIconClick)="navigateToChart($event)"
-      (editDescriptionIconClick)="changeDescription($event)"
       (deleteLabelClick)="onDelete($event)"
       (deleteFromBalanceLabelClick)="onDeleteFromBalance($event)"
     ></app-history-item
@@ -48,4 +46,11 @@
       <span>Для этих категорий и периода трат нет</span>
     </div>
   </ng-template>
+
+  <app-expense-edit-modal
+    *ngIf="showEditModal"
+    [expense]="editingExpense"
+    (apply)="onApplyEdit($event)"
+    (cancel)="closeEditModal()"
+  ></app-expense-edit-modal>
 </div>

@@ -12,18 +12,10 @@
           <button
             type="button"
             class="h-btn"
-            (click)="onEditAmountIconClick(item)"
+            (click)="onEditIconClick(item)"
             aria-label="Edit amount"
           >
             <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button
-            type="button"
-            class="h-btn"
-            (click)="onChartIconClick(item.category)"
-            aria-label="Show chart"
-          >
-            <i class="fas fa-chart-bar"></i>
           </button>
         </div>
       </div>
@@ -51,14 +43,6 @@
             >(none)</span
           ></ng-template
         >
-        <button
-          type="button"
-          class="h-btn h-btn--inline h-btn-text"
-          (click)="onEditDescriptionIconClick(item)"
-        >
-          <i class="fas fa-pencil-alt"></i>
-          <span>{{ item.description ? 'Edit' : 'Add' }}</span>
-        </button>
       </div>
       <div class="h-row h-ops">
         <button

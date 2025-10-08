@@ -1,0 +1,56 @@
+<div class="eem-backdrop" (click)="onBackdrop()"></div>
+<div
+  class="eem-wrapper"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Edit expense dialog"
+>
+  <div class="eem-header">
+    <span class="eem-title">Edit Expense</span>
+    <button
+      type="button"
+      class="eem-close"
+      (click)="onBackdrop()"
+      aria-label="Close"
+    >
+      ×
+    </button>
+  </div>
+  <form (ngSubmit)="onApply()" class="eem-form">
+    <label class="eem-field">
+      <span class="eem-label">Amount (€)</span>
+      <input
+        type="number"
+        step="0.01"
+        min="0"
+        [(ngModel)]="amount"
+        name="amount"
+        required
+      />
+    </label>
+    <label class="eem-field">
+      <span class="eem-label">Category</span>
+      <select [(ngModel)]="category" name="category" required>
+        <option *ngFor="let c of categories" [value]="c.id">
+          {{ c.name }}
+        </option>
+      </select>
+    </label>
+    <label class="eem-field">
+      <span class="eem-label">Description</span>
+      <textarea
+        [(ngModel)]="description"
+        name="description"
+        rows="2"
+        placeholder="Optional"
+      ></textarea>
+    </label>
+    <div class="eem-actions">
+      <button type="button" class="eem-btn" (click)="onBackdrop()">
+        Cancel
+      </button>
+      <button type="submit" class="eem-btn eem-btn--primary">Save</button>
+    </div>
+  </form>
+</div>

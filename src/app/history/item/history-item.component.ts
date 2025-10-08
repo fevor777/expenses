@@ -19,12 +19,9 @@ export class HistoryItemComponent {
   @Input() item: HistoryExpense;
   @Input() totalAmountPerDays: number;
 
-  @Output() editAmountIconClick: EventEmitter<HistoryExpense> =
+  @Output() editIconClick: EventEmitter<HistoryExpense> =
     new EventEmitter();
   @Output() filterByCategory: EventEmitter<string> = new EventEmitter();
-  @Output() chartIconClick: EventEmitter<string> = new EventEmitter();
-  @Output() editDescriptionIconClick: EventEmitter<HistoryExpense> =
-    new EventEmitter();
   @Output() deleteLabelClick: EventEmitter<HistoryExpense> = new EventEmitter();
   @Output() deleteFromBalanceLabelClick: EventEmitter<HistoryExpense> =
     new EventEmitter();
@@ -32,20 +29,12 @@ export class HistoryItemComponent {
   readonly getCategoryNameByIdFunc = getCategoryNameById;
   readonly getCategoryByIdFunc = getCategoryById;
 
-  onEditAmountIconClick(expense: HistoryExpense): void {
-    this.editAmountIconClick.emit(expense);
+  onEditIconClick(expense: HistoryExpense): void {
+    this.editIconClick.emit(expense);
   }
 
   onFilterByCategory(categoryId: string): void {
     this.filterByCategory.emit(categoryId);
-  }
-
-  onChartIconClick(categoryId: string): void {
-    this.chartIconClick.emit(categoryId);
-  }
-
-  onEditDescriptionIconClick(expense: HistoryExpense): void {
-    this.editDescriptionIconClick.emit(expense);
   }
 
   onDeleteLabelClick(expense: HistoryExpense): void {
