@@ -155,4 +155,51 @@ export class NotificationService {
   showBudgetNotification(title: string, htmlMessage: string) {
     return this.showBrowserNotification(title, htmlMessage, { tag: 'app-expenses-budget-summary' });
   }
+
+  /** Clear existing notifications (optionally by tag) via Service Worker. */
+  clearNotifications(tag?: string) {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      try {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CLEAR_NOTIFICATIONS',
+          payload: { tag }
+        });
+      } catch (e) {
+        console.warn('[NotificationService] CLEAR_NOTIFICATIONS postMessage failed', e);
+      }
+    }
+  }
+
+  /** Convenience: clear existing budget summary notification then show a fresh one. */
+  showBudgetNotificationFresh(title: string, htmlMessage: string) {
+    this.clearNotifications('app-expenses-budget-summary');
+    return this.showBudgetNotification(title, htmlMessage);
+  }
+
+  /** Atomically replace existing budget notification via single SW message. */
+  showReplacingBudgetNotification(title: string, htmlMessage: string) {
+    const tag = 'app-expenses-budget-summary';
+    const cleanMessage = htmlMessage.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
+    if ('serviceWorker' in navigator) {
+      const send = () => {
+        try {
+          navigator.serviceWorker.controller?.postMessage({
+            type: 'SHOW_REPLACING_NOTIFICATION',
+            payload: { title, body: cleanMessage, tag }
+          });
+        } catch (e) {
+          console.warn('[NotificationService] SHOW_REPLACING_NOTIFICATION failed', e);
+          // Fallback: clear then show using existing flow
+          this.showBudgetNotificationFresh(title, htmlMessage);
+        }
+      };
+      if (navigator.serviceWorker.controller) {
+        send();
+        return of(undefined);
+      }
+      navigator.serviceWorker.addEventListener('controllerchange', () => send(), { once: true });
+      return of(undefined);
+    }
+    return this.showBudgetNotificationFresh(title, htmlMessage);
+  }
 }

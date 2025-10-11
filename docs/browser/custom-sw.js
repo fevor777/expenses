@@ -58,6 +58,16 @@ self.addEventListener('message', async (event) => {
     } catch (e) {
       // ignore
     }
+  } else if (data.type === 'CLEAR_NOTIFICATIONS') {
+    const { tag } = data.payload || {};
+    try {
+      const notifications = await self.registration.getNotifications(tag ? { tag } : undefined);
+      for (const n of notifications) {
+        n.close();
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 });
 

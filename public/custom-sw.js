@@ -58,6 +58,32 @@ self.addEventListener('message', async (event) => {
     } catch (e) {
       // ignore
     }
+  } else if (data.type === 'CLEAR_NOTIFICATIONS') {
+    const { tag } = data.payload || {};
+    try {
+      const notifications = await self.registration.getNotifications(tag ? { tag } : undefined);
+      for (const n of notifications) {
+        n.close();
+      }
+    } catch (e) {
+      // ignore
+    }
+  } else if (data.type === 'SHOW_REPLACING_NOTIFICATION') {
+    const { title, body, tag } = data.payload || {};
+    const finalTag = tag || 'app-expenses-budget-summary';
+    try {
+      const existing = await self.registration.getNotifications({ tag: finalTag });
+      for (const n of existing) n.close();
+    } catch {}
+    try {
+      await self.registration.showNotification(title || 'Сводка расходов', {
+        body: body || '',
+        tag: finalTag,
+        icon: 'favicon2.ico',
+        badge: 'favicon2.ico',
+        data: { route: '#/br-notification-redirect' }
+      });
+    } catch {}
   }
 });
 
