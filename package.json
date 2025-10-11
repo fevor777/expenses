@@ -15,7 +15,7 @@
     "android:prepare": "bash android-webview/copy-web.sh",
     "android:apk": "npm run android:build-web && npm run android:prepare && (cd android-webview && ./gradlew assembleDebug)",
     "android:install": "(cd android-webview && ./gradlew installDebug)",
-  "pwa:preview:prod": "ng build && if [ -d docs/browser ]; then mv docs/browser/* docs && rmdir docs/browser; fi && node -e 'const f=\"docs/index.html\";const fs=require(\"fs\");let c=fs.readFileSync(f,\"utf8\");c=c.replace(<base href=\"/expenses/\">,<base href=\"./\">);fs.writeFileSync(f,c);' && node scripts/pwa-preview-prod.cjs",
+    "pwa:preview:prod": "ng build && if [ -d docs/browser ]; then mv docs/browser/* docs && rmdir docs/browser; fi && node scripts/adjust-base.js && node scripts/pwa-preview-prod.cjs",
     "pwa:preview:local": "ng build --configuration android && if [ -d docs/browser ]; then mv docs/browser/* docs && rmdir docs/browser; fi && npx http-server docs -c-1 --port 5173 --fallback index.html"
   },
   "private": true,
