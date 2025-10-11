@@ -67,7 +67,11 @@ export class BudgetSummaryService {
       return this.notificationService.showBrowserNotification(
         'Сводка расходов',
         msg,
-        { icon: undefined as any, tag: 'app-expenses-budget-summary' }
+        {
+          icon: undefined as any,
+          tag: 'app-expenses-budget-summary',
+          renotify: true,
+        } as any
       );
     }
     return this.pushBudgetSummaryNotification(result.summary);
@@ -114,7 +118,8 @@ export class BudgetSummaryService {
       icon,
       badge: icon,
       tag: 'app-expenses-budget-summary',
-    });
+      renotify: true,
+    } as any);
   }
 
   private generateBudgetIcon(percentUsed: number): string {
