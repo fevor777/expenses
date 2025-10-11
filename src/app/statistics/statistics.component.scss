@@ -1,6 +1,6 @@
 /* Compact statistics styles (flattened to reduce size) */
 .statistics {
-  padding: 10px;
+  padding: 0 10px 10px;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -14,11 +14,27 @@
     margin-top: 20px;
     margin-bottom: 10px;
   }
+  .statistics-content {
+    width: 100%; /* margin-top applied dynamically in TS */
+  }
+}
+.statistics-fixed-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
 }
 .statistics-nav {
   display: flex;
   gap: 10px;
   justify-content: space-between;
+  padding: 8px 12px 4px;
+  background: var(--color-bg);
 }
 .statistics-history-link {
   margin: 2px 0 4px;
@@ -40,9 +56,10 @@
   margin-bottom: 10px;
 }
 .statistics-filter {
-  padding-bottom: 4px;
+  padding: 6px 4px 12px;
   display: flex;
   justify-content: center;
+  background: var(--color-bg);
 }
 .statistic-category-label {
   margin: 4px 0;

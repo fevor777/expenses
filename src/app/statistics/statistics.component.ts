@@ -3,6 +3,8 @@ import {
   Component,
   HostListener,
   OnDestroy,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -146,6 +148,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     if (v === 'bars' || v === 'micro' || v === 'filter') {
       this.categoryView = v;
     }
+    // Category view change can alter filter height via injected content
+    this.scheduleLayoutStabilization();
   }
 
   onMicroCategorySelected(id: string) {
@@ -220,10 +224,14 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   ngAfterViewInit(): void {
     // Initial totals still required for other statistics sections
     this.calculateCategoryTotals();
+    // Initialize dynamic layout once view children exist
+    queueMicrotask(() => this.initDynamicLayout());
   }
 
   toggle(section: 'categoryFilters' | 'multiChart' | 'irregularSummary'): void {
     this.collapsed[section] = !this.collapsed[section];
+    // Toggling panels may move content; schedule stabilization
+    this.scheduleLayoutStabilization();
   }
 
   // initPieChart removed; donut now lives in AnalyticsSwitchComponent
@@ -233,6 +241,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       this.currentFilter = frame;
       this.calculateCategoryTotals();
     }
+    // Filter UI may change wrapper height: recalc layout
+    this.scheduleLayoutStabilization();
   }
 
   navigateToHistory(categoryId?: string, dateFrame?: DateFrame): void {
@@ -505,5 +515,55 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.destroySubject.next();
     this.destroySubject.complete();
+    this.teardownDynamicLayout();
+  }
+
+  // -------- Fixed wrapper height -> content offset --------
+  @ViewChild('fixedWrapper') private fixedWrapperRef?: ElementRef<HTMLElement>;
+  @ViewChild('statsContent') private statsContentRef?: ElementRef<HTMLElement>;
+
+  private wrapperObserver?: ResizeObserver;
+  private mutationObserver?: MutationObserver;
+  private resizeHandler = () => this.applyContentOffset();
+  private lastHeight = -1;
+
+  private initDynamicLayout(): void {
+    const wrapperEl = this.fixedWrapperRef?.nativeElement;
+    if (!wrapperEl) { return; }
+    this.wrapperObserver = new ResizeObserver(() => this.applyContentOffset());
+    this.wrapperObserver.observe(wrapperEl);
+    this.mutationObserver = new MutationObserver(() => this.applyContentOffset());
+    this.mutationObserver.observe(wrapperEl, { childList: true, subtree: true, characterData: true });
+    window.addEventListener('resize', this.resizeHandler, { passive: true });
+    this.applyContentOffset();
+  }
+
+  private teardownDynamicLayout(): void {
+    if (this.wrapperObserver && this.fixedWrapperRef?.nativeElement) {
+      this.wrapperObserver.unobserve(this.fixedWrapperRef.nativeElement);
+      this.wrapperObserver.disconnect();
+    }
+    this.mutationObserver?.disconnect();
+    window.removeEventListener('resize', this.resizeHandler);
+  }
+
+  private applyContentOffset(): void {
+    requestAnimationFrame(() => {
+      const height = this.fixedWrapperRef?.nativeElement?.offsetHeight || 0;
+      if (height === this.lastHeight) { return; }
+      this.lastHeight = height;
+      if (this.statsContentRef?.nativeElement) {
+        this.statsContentRef.nativeElement.style.marginTop = height + 'px';
+      }
+    });
+  }
+
+  private scheduleLayoutStabilization(iterations: number = 3, intervalMs: number = 40): void {
+    let count = 0;
+    const run = () => {
+      this.applyContentOffset();
+      if (++count < iterations) { setTimeout(run, intervalMs); }
+    };
+    run();
   }
 }

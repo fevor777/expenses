@@ -1,5 +1,6 @@
-<div class="statistics">
-  <div class="statistics-nav">
+<div class="statistics" #statsRoot>
+  <div class="statistics-fixed-wrapper" #fixedWrapper>
+    <div class="statistics-nav">
     <span class="app-link statistics-history-link" routerLink="/history"
       >< History</span
     >
@@ -11,14 +12,15 @@
       clear-button-aria-label="Очистить поиск"
     ></app-search-input>
     <span class="app-link statistics-home-link" routerLink="/">Home ></span>
-  </div>
-  <app-date-filter
-    class="statistics-filter"
+    </div>
+    <app-date-filter
+      class="statistics-filter"
+      #statsFilter
     [value]="currentFilter"
     [isHowSuggestionButton]="isHowSuggestionDateButton"
     [defaultValue]="initialFilterValue"
     (changeFilter)="onFilterChange($event)"
-  >
+    >
     <i
       (click)="onRefresh(); $event.stopPropagation()"
       class="fas fa-trash stats-action-icon"
@@ -33,7 +35,10 @@
       class="stats-action-icon"
       (click)="navigateToPeriodSummary()"
     ></app-period-summary-icon>
-  </app-date-filter>
+    </app-date-filter>
+  </div>
+
+  <div class="statistics-content" #statsContent>
 
   <div class="stats-section stats-section--donut">
     <app-analytics-switch [expenses]="filteredExpenses"></app-analytics-switch>
@@ -146,4 +151,5 @@
     </div>
     <app-irregular-summary></app-irregular-summary>
   </app-collapsed-panel>
+  </div>
 </div>
