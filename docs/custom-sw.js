@@ -46,6 +46,7 @@ self.addEventListener('message', async (event) => {
   const data = event.data;
   if (!data || !data.type) return;
   if (data.type === 'SHOW_BUDGET_NOTIFICATION') {
+    console.log('[SW] SHOW_BUDGET_NOTIFICATION received');
     const { title, body, tag } = data.payload || {};
     try {
       await self.registration.showNotification(title || 'Сводка расходов', {
@@ -59,6 +60,7 @@ self.addEventListener('message', async (event) => {
       // ignore
     }
   } else if (data.type === 'CLEAR_NOTIFICATIONS') {
+    console.log('[SW] CLEAR_NOTIFICATIONS received');
     const { tag } = data.payload || {};
     try {
       const notifications = await self.registration.getNotifications(tag ? { tag } : undefined);
@@ -69,6 +71,7 @@ self.addEventListener('message', async (event) => {
       // ignore
     }
   } else if (data.type === 'SHOW_REPLACING_NOTIFICATION') {
+    console.log('[SW] SHOW_REPLACING_NOTIFICATION received');
     const { title, body, tag } = data.payload || {};
     const finalTag = tag || 'app-expenses-budget-summary';
     try {

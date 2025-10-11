@@ -172,34 +172,45 @@ export class NotificationService {
 
   /** Convenience: clear existing budget summary notification then show a fresh one. */
   showBudgetNotificationFresh(title: string, htmlMessage: string) {
-    this.clearNotifications('app-expenses-budget-summary');
-    return this.showBudgetNotification(title, htmlMessage);
+    return this.showReplacingBudgetNotification(title, htmlMessage);
   }
 
   /** Atomically replace existing budget notification via single SW message. */
   showReplacingBudgetNotification(title: string, htmlMessage: string) {
     const tag = 'app-expenses-budget-summary';
     const cleanMessage = htmlMessage.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
-    if ('serviceWorker' in navigator) {
-      const send = () => {
-        try {
-          navigator.serviceWorker.controller?.postMessage({
-            type: 'SHOW_REPLACING_NOTIFICATION',
-            payload: { title, body: cleanMessage, tag }
-          });
-        } catch (e) {
-          console.warn('[NotificationService] SHOW_REPLACING_NOTIFICATION failed', e);
-          // Fallback: clear then show using existing flow
-          this.showBudgetNotificationFresh(title, htmlMessage);
-        }
-      };
-      if (navigator.serviceWorker.controller) {
-        send();
-        return of(undefined);
-      }
-      navigator.serviceWorker.addEventListener('controllerchange', () => send(), { once: true });
-      return of(undefined);
+    if (!('serviceWorker' in navigator)) {
+      return this.showBudgetNotification(title, htmlMessage);
     }
-    return this.showBudgetNotificationFresh(title, htmlMessage);
+    const post = () => {
+      try {
+        if (!navigator.serviceWorker.controller) {
+          console.warn('[NotificationService] No SW controller; cannot post yet');
+          return false;
+        }
+        navigator.serviceWorker.controller.postMessage({
+          type: 'SHOW_REPLACING_NOTIFICATION',
+          payload: { title, body: cleanMessage, tag }
+        });
+        return true;
+      } catch (e) {
+        console.warn('[NotificationService] postMessage failed', e);
+        return false;
+      }
+    };
+    if (post()) return of(undefined);
+    // Retry after short delay and on controllerchange
+    let attempts = 0;
+    const maxAttempts = 3;
+    const retryDelay = 300;
+    const retry = () => {
+      if (post()) return;
+      attempts++;
+      if (attempts < maxAttempts) setTimeout(retry, retryDelay);
+      else this.showBudgetNotification(title, htmlMessage); // fallback
+    };
+    navigator.serviceWorker.addEventListener('controllerchange', retry, { once: true });
+    setTimeout(retry, retryDelay);
+    return of(undefined);
   }
 }
