@@ -2,11 +2,17 @@
    when a category briefly changed size/triggered reflow). Use flex-start + gap so rows
    stay pinned to top. Added scrollbar-gutter to avoid width/height shifts when overflow. */
 .categories-general-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
   .categories-container {
     display: flex;
     height: 100%;
     width: 100%;
     overflow: hidden;
+    flex: 1 1 auto;
   }
   .categories {
     display: flex;
@@ -14,13 +20,13 @@
     width: 100%;
     opacity: 0.92;
     touch-action: manipulation;
-    padding: 4px 0;
-    justify-content: center; /* center the category icons horizontally */
-    gap: 8px 6px;
+    justify-content: space-evenly;
+    align-items: center;
   }
 
   .categories-expanded {
     align-content: flex-end;
+    padding-bottom: 25px;
   }
   .category {
     display: flex;
@@ -91,7 +97,7 @@
   }
   /* Removed align-self flex-end to avoid content jump (class retained in template but no styling needed) */
   .categories-with-show-more {
-    height: calc(100% - 40px);
+    height: calc(100% - 25px);
   }
   .categories-with-scroll {
     overflow: scroll;
@@ -102,13 +108,26 @@
     justify-content: center;
   }
   .categories-more {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     color: var(--color-text-secondary);
-    background: transparent;
-    font-size: 12px;
+    background: linear-gradient(
+      to top,
+      var(--color-bg-alt) 0%,
+      rgba(0, 0, 0, 0) 95%
+    );
+    font-size: 22px;
     letter-spacing: 0.5px;
-    padding: 8px 0;
-    border-radius: 10px;
+    border-radius: 0;
+    pointer-events: auto;
+    z-index: 2;
   }
   .disabled-categories-more {
     color: var(--color-border-strong, var(--color-border));

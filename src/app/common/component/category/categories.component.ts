@@ -116,7 +116,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     // Derive actual category block height and vertical gap using first category element
     const firstCategory: HTMLElement | null = el.querySelector('.category');
     let blockHeight = 96; // fallback approximation
-    let rowGap = 8; // fallback gap
+    let rowGap = 0; // fallback gap
     if (firstCategory) {
       const catStyles = getComputedStyle(firstCategory);
       const h = firstCategory.clientHeight; // includes padding

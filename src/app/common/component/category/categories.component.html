@@ -1,4 +1,4 @@
-<span class="categories-general-container">
+<div class="categories-general-container">
   <div
     class="categories-container"
     [ngClass]="{
@@ -43,8 +43,7 @@
     *ngIf="showMore || isContentDown"
     (click)="onClickMore()"
   >
-    <div>{{ isContentDown ? 'Меньше' : 'Еще' }}</div>
     <i *ngIf="isContentDown" class="fa-solid fa-chevron-up"></i>
     <i *ngIf="!isContentDown" class="fa-solid fa-chevron-down"></i>
   </div>
-</span>
+</div>
