@@ -7,6 +7,9 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
+  ViewChild,
+  ElementRef,
+  NgZone,
 } from '@angular/core';
 import { Categories, Category } from '../../model/categories';
 import { CommonModule } from '@angular/common';
@@ -35,11 +38,11 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   showMore: boolean = false;
 
-  // Adjusted to match real rendered dimensions (90px width + padding) to keep slice stable
-  private categoryWidth = 114;
-  private categoryHeight = 88; // 64px height + 24px vertical padding
+  // Base dimensions used for computing columns; width includes icon + padding space
+  private readonly categoryWidth = 114;
   private containerWidth = 0;
-  private containerHeight = 0;
+  // Template ref for precise measurement
+  @ViewChild('categoriesEl') categoriesEl?: ElementRef<HTMLDivElement>;
 
   private touchStartX: number = 0;
   private touchStartY: number = 0;
@@ -47,9 +50,19 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   private touchEndY: number = 0;
   private isDown: boolean = false;
 
+  private collapsedVisibleCount: number = 0; // remembers how many categories fit when collapsed
+  private pendingRafMeasure = false; // guard to avoid duplicate RAF chains
+  private resizeTimeout: any;
+  constructor(private ngZone: NgZone) {}
+
   @HostListener('window:resize', ['$event'])
   onResize(_event: any): void {
-    this.updateVisibleCategories();
+    if (this.isContentDown) return; // only matters for collapsed state
+    clearTimeout(this.resizeTimeout);
+    this.resizeTimeout = setTimeout(() => {
+      // Recompute after small debounce to avoid thrash on continuous resize/orientation change
+      this.scheduleCollapsedMeasurement(true);
+    }, 120);
   }
 
   @HostListener('touchstart', ['$event'])
@@ -68,17 +81,21 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
+        // Expanded state: show full list
         this.categories = [...Categories];
-        // Ensure the toggle bar shows immediately when expanded
         this.showMore = true;
+        this.pendingRafMeasure = false; // reset
       } else {
-        this.updateVisibleCategories();
+        // Collapsing: schedule deterministic measurement after layout settles
+        this.scheduleCollapsedMeasurement();
       }
     }
   }
 
   ngAfterViewInit(): void {
-    this.updateVisibleCategories();
+    if (!this.isContentDown) {
+      this.scheduleCollapsedMeasurement();
+    }
   }
 
   onCategoryClick(category: string): void {
@@ -86,39 +103,76 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   onClickMore(): void {
-    // When currently expanded (isContentDown true), clicking means collapse (false), else expand (true)
     this.clickMore.emit(!this.isContentDown);
   }
 
-  private updateVisibleCategories(): void {
-    this.categories = [];
-    const containerElement = document.querySelector('.categories');
-    if (containerElement) {
-      this.containerWidth = containerElement.clientWidth;
-      this.containerHeight = containerElement.clientHeight;
-
-      let maxVisibleCategories = this.calculateRows(
-        this.containerWidth,
-        this.containerHeight
-      );
-      this.showMore = Categories.length > maxVisibleCategories;
-      if (this.showMore) {
-        maxVisibleCategories = this.calculateRows(
-          this.containerWidth,
-          this.containerHeight - 40
-        );
+  private updateVisibleCategories(forceRecalculateCollapsed: boolean = false): void {
+    if (this.isContentDown) return; // expanded uses full list
+    const el = this.categoriesEl?.nativeElement;
+    if (!el) return;
+    this.containerWidth = el.clientWidth;
+    const containerHeight = el.clientHeight;
+    const maxColumns = Math.max(1, Math.floor(this.containerWidth / this.categoryWidth));
+    // Derive actual category block height and vertical gap using first category element
+    const firstCategory: HTMLElement | null = el.querySelector('.category');
+    let blockHeight = 96; // fallback approximation
+    let rowGap = 8; // fallback gap
+    if (firstCategory) {
+      const catStyles = getComputedStyle(firstCategory);
+      const h = firstCategory.clientHeight; // includes padding
+      blockHeight = h || blockHeight;
+      // Get row gap from parent flex container (.categories) if available
+      const parentStyles = getComputedStyle(el);
+      const gapVal = parentStyles.rowGap || parentStyles.gap;
+      if (gapVal) {
+        // parse px value
+        const parsed = parseFloat(gapVal.toString());
+        if (!isNaN(parsed)) rowGap = parsed;
       }
-      this.categories = [...Categories].slice(0, maxVisibleCategories);
     }
+    const effectiveRowHeight = blockHeight + rowGap;
+    let dynamicRows = Math.floor(containerHeight / Math.max(1, effectiveRowHeight));
+    if (dynamicRows < 1) dynamicRows = 1; // ensure at least one row
+    const collapsedCount = maxColumns * dynamicRows;
+    if (forceRecalculateCollapsed || !this.collapsedVisibleCount) {
+      this.collapsedVisibleCount = collapsedCount;
+    }
+    this.showMore = Categories.length > this.collapsedVisibleCount;
+    this.categories = [...Categories].slice(0, this.collapsedVisibleCount);
+  }
+
+  private scheduleCollapsedMeasurement(force: boolean = false): void {
+    if (this.isContentDown || this.pendingRafMeasure) {
+      if (force && !this.isContentDown) {
+        // If already measuring, allow a fresh measurement after current chain
+        this.pendingRafMeasure = false;
+      } else {
+        return;
+      }
+    }
+    this.pendingRafMeasure = true;
+    // Run outside Angular to avoid triggering CD for intermediate frames
+    this.ngZone.runOutsideAngular(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Now layout should be stable; re-enter Angular and measure
+          this.ngZone.run(() => {
+            this.pendingRafMeasure = false;
+            this.updateVisibleCategories(true);
+          });
+        });
+      });
+    });
   }
 
   private calculateRows(
     containerWidth: number,
     containerHeight: number
   ): number {
+    // Deprecated: height-based calculation removed. Preserve signature for backward compatibility if referenced elsewhere.
     const maxColumns = Math.floor(containerWidth / this.categoryWidth);
-    const maxRows = Math.floor(containerHeight / this.categoryHeight);
-    return maxColumns * maxRows;
+    const assumedRows = 3; // fallback
+    return maxColumns * assumedRows;
   }
 
   private handleSwipeGesture(): void {

@@ -7,10 +7,10 @@
     }"
   >
     <div
+      #categoriesEl
       class="categories"
       [ngClass]="{
-        'categories-scrollable-content-down': isContentDown && !showMore,
-        'categories-center-aligned': !isContentDown,
+        'categories-expanded': isContentDown,
       }"
     >
       <div

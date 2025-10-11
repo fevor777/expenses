@@ -16,8 +16,11 @@
     touch-action: manipulation;
     padding: 4px 0;
     justify-content: center; /* center the category icons horizontally */
-    align-content: flex-start;
     gap: 8px 6px;
+  }
+
+  .categories-expanded {
+    align-content: flex-end;
   }
   .category {
     display: flex;
