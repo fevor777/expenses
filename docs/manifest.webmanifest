@@ -1,0 +1,14 @@
+{
+  "name": "Expenses Tracker",
+  "short_name": "Expenses",
+  "description": "Track and analyze your expenses offline with sync when online.",
+  "start_url": "/expenses/",
+  "scope": "/expenses/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e293b",
+  "lang": "en",
+  "icons": [
+    { "src": "favicon2.ico", "sizes": "64x64 32x32 16x16", "type": "image/x-icon" }
+  ]
+}
