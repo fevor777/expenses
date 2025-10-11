@@ -85,15 +85,36 @@ export class NotificationService {
     // Ensure a stable tag for replacement if caller did not provide one
     const tag = options?.tag || 'app-expenses-budget-summary';
     // Prefer Service Worker if active so click works when app closed
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      try {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'SHOW_BUDGET_NOTIFICATION',
-          payload: { title, body: cleanMessage, tag }
-        });
+    if ('serviceWorker' in navigator) {
+      const controller = navigator.serviceWorker.controller;
+      if (controller) {
+        try {
+          controller.postMessage({
+            type: 'SHOW_BUDGET_NOTIFICATION',
+            payload: { title, body: cleanMessage, tag }
+          });
+          return of(undefined);
+        } catch (e) {
+          console.warn('[NotificationService] SW postMessage failed, fallback to window Notification', e);
+        }
+      } else {
+        // Wait for controller (first load after registration) then send
+        const sendLater = () => {
+          const c = navigator.serviceWorker.controller;
+            if (c) {
+              try {
+                c.postMessage({
+                  type: 'SHOW_BUDGET_NOTIFICATION',
+                  payload: { title, body: cleanMessage, tag }
+                });
+              } catch (e) {
+                console.warn('[NotificationService] delayed SW postMessage failed', e);
+              }
+            }
+        };
+        navigator.serviceWorker.addEventListener('controllerchange', sendLater, { once: true });
+        // We still return; no immediate notification until controller takes control.
         return of(undefined);
-      } catch (e) {
-        console.warn('SW postMessage failed, falling back to window Notification', e);
       }
     }
 
@@ -101,8 +122,8 @@ export class NotificationService {
     try {
       const notification = new Notification(title, {
         body: cleanMessage,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
+        icon: 'favicon2.ico', // relative so works under /expenses/ and local preview
+        badge: 'favicon2.ico',
         tag,
         ...options,
       });
@@ -128,5 +149,10 @@ export class NotificationService {
     if ('Notification' in window) {
       this.browserNotificationPermission = Notification.permission;
     }
+  }
+
+  /** Convenience wrapper for budget summary notifications ensuring permission and SW delivery. */
+  showBudgetNotification(title: string, htmlMessage: string) {
+    return this.showBrowserNotification(title, htmlMessage, { tag: 'app-expenses-budget-summary' });
   }
 }
