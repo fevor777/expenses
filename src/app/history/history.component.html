@@ -1,5 +1,6 @@
-<div class="history-container">
-  <div class="history-nav">
+<div class="history-container" #historyRoot>
+  <div class="history-fixed-wrapper" #historyFixed>
+    <div class="history-nav">
     <span id="back" class="app-link history-back-link" [routerLink]="'/'"
       >< Home</span
     >
@@ -9,20 +10,24 @@
       [routerLink]="'/statistics'"
       >Statistics ></span
     >
+    </div>
+    <div class="history-filter-wrapper">
+      <app-multi-filter
+        [value]="defaultFilter"
+        [totalAmount]="totalAmount"
+        [defaultDateValue]="defaultDateValue"
+        [showDetailsIcon]="true"
+        [activeBucketCount]="activeBucketCount"
+        [totalBucketCount]="totalBucketCount"
+        [expenseEntryCount]="expenseEntryCount"
+        [enableCompactOnScroll]="true"
+        (selectedFilters)="updateFilterAndLoadExpenses($event)"
+        (navigateToStatisticsIconClick)="navigateToStatistics()"
+        (expandStateChange)="onMultiFilterExpandChange($event)"
+      ></app-multi-filter>
+    </div>
   </div>
-  <div [style.marginLeft.px]="15" [style.marginRight.px]="15">
-    <app-multi-filter
-      [value]="defaultFilter"
-      [totalAmount]="totalAmount"
-      [defaultDateValue]="defaultDateValue"
-      [showDetailsIcon]="true"
-      [activeBucketCount]="activeBucketCount"
-      [totalBucketCount]="totalBucketCount"
-      [expenseEntryCount]="expenseEntryCount"
-      (selectedFilters)="updateFilterAndLoadExpenses($event)"
-      (navigateToStatisticsIconClick)="navigateToStatistics()"
-    ></app-multi-filter>
-  </div>
+  <div class="history-content" #historyContent>
   <ng-container
     *ngIf="
       (expenses$ | async)?.length > 0 && (expenses$ | async);
@@ -53,4 +58,5 @@
     (apply)="onApplyEdit($event)"
     (cancel)="closeEditModal()"
   ></app-expense-edit-modal>
+  </div>
 </div>

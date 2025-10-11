@@ -1,5 +1,10 @@
 <div class="statistics-period">
-  <app-date-filter-drop-down
+  <!-- Compact summary shown when showCompact true -->
+  <div class="statistics-period-compact" *ngIf="showCompact" (click)="onCompactClick()">
+    <span class="statistics-period-compact-title">{{ compactLabel }}</span>
+  </div>
+  <!-- Full dropdowns hidden when compact -->
+  <app-date-filter-drop-down *ngIf="!showCompact"
     [options]="optionsForDaysSelect"
     [name]="Mode.DAY"
     [isHowSuggestionButton]="isHowSuggestionButton"
@@ -10,7 +15,7 @@
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
-  <app-date-filter-drop-down
+  <app-date-filter-drop-down *ngIf="!showCompact"
     [options]="optionsForWeeksSelect"
     [name]="Mode.WEEK"
     [isHowSuggestionButton]="isHowSuggestionButton"
@@ -21,7 +26,7 @@
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
-  <app-date-filter-drop-down
+  <app-date-filter-drop-down *ngIf="!showCompact"
     [options]="optionsForMonthsSelect"
     [name]="Mode.MONTH"
     [isHowSuggestionButton]="isHowSuggestionButton"
@@ -32,7 +37,7 @@
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
 
-  <app-date-filter-drop-down
+  <app-date-filter-drop-down *ngIf="!showCompact"
     [options]="optionsForYearsSelect"
     [name]="Mode.YEAR"
     [isHowSuggestionButton]="isHowSuggestionButton"
@@ -42,10 +47,10 @@
     (select)="onDateSelect($event)"
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
-  <i
-    *ngIf="currentFilter?.display != defaultLabel"
+  <i *ngIf="currentFilter?.display != defaultLabel"
     (click)="onRefresh()"
     class="fas fa-redo-alt statistics-refresh-button"
+    title="Сбросить дату"
   ></i>
 
   <ng-content></ng-content>

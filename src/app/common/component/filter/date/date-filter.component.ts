@@ -7,6 +7,8 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  NgZone,
+  AfterViewInit,
 } from '@angular/core';
 import { DateTime } from 'luxon';
 
@@ -25,11 +27,13 @@ import { DateFilterService } from './date-filter.service';
   standalone: true,
   imports: [CommonModule, DateFilterDropDownComponent],
 })
-export class DateFilterComponent implements OnInit, OnChanges {
+export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() value: DateFrame;
   @Input() isHowSuggestionButton: boolean = false;
   @Input() defaultValue: DateFrame;
   @Output() changeFilter: EventEmitter<DateFrame> = new EventEmitter();
+  // Enable compact on scroll (statistics page only)
+  @Input() enableCompactOnScroll: boolean = false;
 
   readonly Mode = Mode;
 
@@ -44,8 +48,15 @@ export class DateFilterComponent implements OnInit, OnChanges {
   defaultLabel: string;
 
   firstDayOption: SelectOption<DateFrame>;
+  showCompact: boolean = false; // toggled by scroll
+  private scrollThreshold = 10; // px before compact view activates
+  private onScrollHandler = () => this.evaluateScrollPosition();
+  compactLabel: string = '';
 
-  constructor(private dateFilterService: DateFilterService) {}
+  constructor(
+    private dateFilterService: DateFilterService,
+    private ngZone: NgZone
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['value']) {
@@ -60,21 +71,45 @@ export class DateFilterComponent implements OnInit, OnChanges {
     };
     this.initOptions();
     this.defaultLabel = this.defaultValue?.display;
+    this.buildCompactLabel();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.enableCompactOnScroll) {
+      this.ngZone.runOutsideAngular(() => {
+        window.addEventListener('scroll', this.onScrollHandler, {
+          passive: true,
+        });
+      });
+      // Initial evaluation
+      this.evaluateScrollPosition();
+    }
   }
 
   onRefresh(): void {
     this.setCurrentState(this.defaultValue);
     this.changeFilter.emit(this.currentFilter?.value);
+    this.buildCompactLabel();
+    this.evaluateScrollPosition();
   }
 
   onDateSelect(selectedValue: DateFilterDropDownChange<DateFrame, Mode>): void {
     this.clickedMode = selectedValue.name;
     this.setCurrentState(selectedValue.value);
     this.changeFilter.emit(this.currentFilter?.value);
+    this.buildCompactLabel();
+    this.evaluateScrollPosition();
   }
 
   onDropdownToggleClick(mode: Mode): void {
     this.clickedMode = mode;
+  }
+
+  onCompactClick(): void {
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
+    //   const topEl = document.getElementById('back');
+    //   if (topEl) { topEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    this.showCompact = false;
   }
 
   private setCurrentState(value: DateFrame): void {
@@ -84,9 +119,11 @@ export class DateFilterComponent implements OnInit, OnChanges {
           value,
           display: value.display,
         };
+        this.buildCompactLabel();
       }
     } else {
       this.currentFilter = undefined;
+      this.buildCompactLabel();
     }
   }
 
@@ -95,6 +132,26 @@ export class DateFilterComponent implements OnInit, OnChanges {
     this.initWeekOptions();
     this.initMonthOptions();
     this.initYearOptions();
+  }
+
+  private buildCompactLabel(): void {
+    const display = this.currentFilter?.display || this.defaultLabel || '—';
+    this.compactLabel = `Date Filter: ${display}`;
+  }
+
+  private evaluateScrollPosition(): void {
+    if (!this.enableCompactOnScroll) {
+      return;
+    }
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    const shouldShow = y > this.scrollThreshold;
+    if (shouldShow !== this.showCompact) {
+      this.ngZone.run(() => (this.showCompact = shouldShow));
+    }
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('scroll', this.onScrollHandler);
   }
 
   private initDayOptions(): void {

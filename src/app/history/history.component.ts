@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -79,6 +79,15 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private expenseSummaryService: BudgetSummaryService
   ) {}
 
+  // Fixed wrapper dynamic offset
+  @ViewChild('historyFixed') private historyFixedRef?: ElementRef<HTMLElement>;
+  @ViewChild('historyContent') private historyContentRef?: ElementRef<HTMLElement>;
+  private fixedResizeObserver?: ResizeObserver;
+  private fixedMutationObserver?: MutationObserver;
+  private lastHeight = -1;
+  private resizeHandler = () => this.applyContentOffset();
+  private isMultiFilterExpanded = false;
+
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
     this.touchStartX = event.changedTouches[0].screenX;
@@ -95,6 +104,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initFilter();
     this.updateFilterAndLoadExpenses();
+    // Delay init until view children rendered
+    queueMicrotask(() => this.initDynamicLayout());
   }
 
   changeDescription(expense: Expense): void {
@@ -155,6 +166,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroySubject.next();
     this.destroySubject.complete();
+    this.teardownDynamicLayout();
   }
 
   private updateBalance(
@@ -445,6 +457,70 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.currentFilter = {
       ...this.defaultFilter,
     };
+  }
+
+  // ---- Dynamic layout methods ----
+  private initDynamicLayout(): void {
+    const el = this.historyFixedRef?.nativeElement;
+    if (!el) { return; }
+    this.fixedResizeObserver = new ResizeObserver(() => this.scheduleStabilization());
+    this.fixedResizeObserver.observe(el);
+    this.fixedMutationObserver = new MutationObserver(() => this.scheduleStabilization());
+    this.fixedMutationObserver.observe(el, { childList: true, subtree: true, characterData: true });
+    window.addEventListener('resize', this.resizeHandler, { passive: true });
+    this.scheduleStabilization();
+  }
+
+  private teardownDynamicLayout(): void {
+    if (this.fixedResizeObserver && this.historyFixedRef?.nativeElement) {
+      this.fixedResizeObserver.unobserve(this.historyFixedRef.nativeElement);
+      this.fixedResizeObserver.disconnect();
+    }
+    this.fixedMutationObserver?.disconnect();
+    window.removeEventListener('resize', this.resizeHandler);
+  }
+
+  private applyContentOffset(): void {
+    requestAnimationFrame(() => {
+      const wrapperEl = this.historyFixedRef?.nativeElement;
+      const contentEl = this.historyContentRef?.nativeElement;
+      if (!wrapperEl || !contentEl) { return; }
+      const h = wrapperEl.offsetHeight || 0;
+      // Use explicit expansion state from multi filter output
+      const shouldBeFixed = !this.isMultiFilterExpanded;
+      const hasClass = wrapperEl.classList.contains('is-fixed');
+      if (shouldBeFixed && !hasClass) {
+        wrapperEl.classList.add('is-fixed');
+      } else if (!shouldBeFixed && hasClass) {
+        wrapperEl.classList.remove('is-fixed');
+      }
+      const effectiveHeight = shouldBeFixed ? h : 0;
+      if (effectiveHeight === this.lastHeight) { return; }
+      this.lastHeight = effectiveHeight;
+      contentEl.style.marginTop = effectiveHeight + 'px';
+    });
+  }
+
+  private scheduleStabilization(iterations: number = 3, intervalMs: number = 40): void {
+    let i = 0;
+    const run = () => {
+      this.applyContentOffset();
+      if (++i < iterations) { setTimeout(run, intervalMs); }
+    };
+    run();
+  }
+
+  onMultiFilterExpandChange(isExpanded: boolean): void {
+    this.isMultiFilterExpanded = isExpanded;
+    // When expanding filter, ensure user sees the full expanded panel at top.
+    if (isExpanded) {
+      // Use both window scroll and optional element scrollIntoView as fallback
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      const topEl = document.getElementById('back');
+      if (topEl) { topEl.scrollIntoView({ behavior: 'auto', block: 'start' }); }
+    }
+    // After state change, recalc offset
+    this.scheduleStabilization();
   }
 
   private roundUp(value: number): number {

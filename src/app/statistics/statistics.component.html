@@ -1,7 +1,7 @@
 <div class="statistics" #statsRoot>
   <div class="statistics-fixed-wrapper" #fixedWrapper>
     <div class="statistics-nav">
-    <span class="app-link statistics-history-link" routerLink="/history"
+    <span class="app-link statistics-history-link" (click)="navigateToHistory()"
       >< History</span
     >
     <app-search-input
@@ -19,6 +19,7 @@
     [value]="currentFilter"
     [isHowSuggestionButton]="isHowSuggestionDateButton"
     [defaultValue]="initialFilterValue"
+    [enableCompactOnScroll]="true"
     (changeFilter)="onFilterChange($event)"
     >
     <i

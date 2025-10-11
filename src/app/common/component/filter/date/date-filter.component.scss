@@ -24,3 +24,25 @@
     transform: scale(0.9);
   }
 }
+
+.statistics-period-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 4px 8px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  .statistics-period-compact-title {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 65vw;
+  }
+  .statistics-refresh-button {
+    margin-left: 4px;
+  }
+}

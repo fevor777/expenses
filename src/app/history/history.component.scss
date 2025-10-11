@@ -1,7 +1,6 @@
 /* History page themed similar to expenses page */
 .history-container {
-  height: 100dvh;
-  overflow-y: auto;
+  min-height: 100dvh;
   background: var(--color-bg);
   color: var(--color-text);
   display: flex;
@@ -9,18 +8,43 @@
   padding-bottom: 24px;
   touch-action: pan-y;
 
+  .history-fixed-wrapper {
+    /* Default: not fixed (when filter expanded) */
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    &.is-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+  }
+
   .history-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 4px 4px 0;
+  }
+
+  .history-filter-wrapper {
+    padding: 0 7px 4px;
+  }
+
+  .history-content {
+    /* margin-top set dynamically by TS only when wrapper is fixed */
+    padding: 0 8px;
   }
 
   .history-back-link {
-    margin: 10px;
+    margin: 5px;
     margin-bottom: 0;
   }
   .history-stats-link {
-    margin: 10px;
+    margin: 5px;
     margin-bottom: 0;
     font-weight: 400;
   }
