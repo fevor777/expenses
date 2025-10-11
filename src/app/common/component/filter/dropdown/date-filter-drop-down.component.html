@@ -1,12 +1,5 @@
 <div class="date-filter-drop-down" (click)="onClick($event)">
   <button
-    class="date-filter-drop-down-button date-filter-drop-down-button-suggestion"
-    (click)="onSuggestionButtonClick()"
-    *ngIf="_isHowSuggestionButton"
-  >
-    {{ suggestionButtonTitle }}
-  </button>
-  <button
     class="date-filter-drop-down-button"
     (click)="onDisplayValueClick()"
     [ngClass]="{ 'date-filter-drop-down-button-active': isActivated }"
@@ -19,6 +12,13 @@
     (click)="toggleDropdown()"
   >
     v
+  </button>
+  <button
+    class="date-filter-drop-down-button date-filter-drop-down-button-suggestion"
+    (click)="onSuggestionButtonClick()"
+    *ngIf="_isHowSuggestionButton"
+  >
+    {{ suggestionButtonTitle }}
   </button>
   <ul *ngIf="dropdownOpen" class="date-filter-drop-down-list">
     @for (option of options; track option.value) {

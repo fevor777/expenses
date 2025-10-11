@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -16,7 +16,7 @@ import { GLOBAL_SWIPE_LENGTH } from '../constants';
   standalone: true,
   imports: [CommonModule, RouterModule, CollapsedPanelComponent],
 })
-export class PeriodSummaryComponent implements OnInit {
+export class PeriodSummaryComponent implements OnInit, OnDestroy {
   summaries$: Observable<PeriodSummary[]>;
   // collapse state keyed by summary key (today, yesterday, week, month)
   collapsed: Record<string, boolean> = {};
@@ -27,9 +27,35 @@ export class PeriodSummaryComponent implements OnInit {
     private dateFilterService: DateFilterService
   ) {}
 
+  @ViewChild('psNav') private navRef?: ElementRef<HTMLElement>;
+  @ViewChild('psContent') private contentRef?: ElementRef<HTMLElement>;
+  private resizeObserver?: ResizeObserver;
+  private lastHeight = -1;
+
+  private applyOffset(): void {
+    requestAnimationFrame(() => {
+      const nav = this.navRef?.nativeElement;
+      const content = this.contentRef?.nativeElement;
+      if (!nav || !content) { return; }
+      const h = nav.offsetHeight || 0;
+      if (h === this.lastHeight) { return; }
+      this.lastHeight = h;
+      content.style.marginTop = h + 'px';
+    });
+  }
+
   ngOnInit(): void {
     // Retrieve snapshot of period narratives. Architecture mirrors pattern of summary services.
     this.summaries$ = this.periodSummaryService.getCurrentSummaries();
+    queueMicrotask(() => {
+      const nav = this.navRef?.nativeElement;
+      if (nav) {
+        this.resizeObserver = new ResizeObserver(() => this.applyOffset());
+        this.resizeObserver.observe(nav);
+        this.applyOffset();
+      }
+      window.addEventListener('resize', this.applyOffset, { passive: true });
+    });
   }
 
   onToggle(key: string): void {
@@ -85,5 +111,13 @@ export class PeriodSummaryComponent implements OnInit {
   private onSwipeRight() {
     // Navigate home on right swipe (symmetric behavior requested)
     this.router.navigate(['/']);
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeObserver && this.navRef?.nativeElement) {
+      this.resizeObserver.unobserve(this.navRef.nativeElement);
+      this.resizeObserver.disconnect();
+    }
+    window.removeEventListener('resize', this.applyOffset as any);
   }
 }

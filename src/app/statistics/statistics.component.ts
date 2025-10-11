@@ -222,6 +222,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     // Initial totals still required for other statistics sections
     this.calculateCategoryTotals();
     // Initialize dynamic layout once view children exist

@@ -136,7 +136,7 @@ export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
 
   private buildCompactLabel(): void {
     const display = this.currentFilter?.display || this.defaultLabel || '—';
-    this.compactLabel = `Date Filter: ${display}`;
+    this.compactLabel = `${display}`;
   }
 
   private evaluateScrollPosition(): void {

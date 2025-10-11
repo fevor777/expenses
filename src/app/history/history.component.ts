@@ -106,6 +106,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.updateFilterAndLoadExpenses();
     // Delay init until view children rendered
     queueMicrotask(() => this.initDynamicLayout());
+    // Reset scroll on navigation to history page to avoid preserving previous route scroll
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
   changeDescription(expense: Expense): void {

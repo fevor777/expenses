@@ -1,10 +1,9 @@
-<div class="period-summaries">
-  <div class="period-summary-nav">
+<div class="period-summaries" #psRoot>
+  <div class="period-summary-nav" #psNav>
     <span class="app-link period-summary-home-link" [routerLink]="'/'"> < Home</span>
     <span class="app-link period-summary-home-link" [routerLink]="'/'">Home ></span>
   </div>
-
-  <div class="period-summaries-container" *ngIf="summaries$ | async as summaries">
+  <div class="period-summaries-container" #psContent *ngIf="summaries$ | async as summaries">
     <ng-container *ngFor="let s of summaries; let i = index">
       <div class="period-summaries-item">
         <app-collapsed-panel

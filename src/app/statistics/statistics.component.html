@@ -1,156 +1,162 @@
 <div class="statistics" #statsRoot>
   <div class="statistics-fixed-wrapper" #fixedWrapper>
     <div class="statistics-nav">
-    <span class="app-link statistics-history-link" (click)="navigateToHistory()"
-      >< History</span
-    >
-    <app-search-input
-      placeholder="Поиск описания..."
-      [(ngModel)]="descriptionSearch"
-      (searchChange)="onDescriptionSearchChange($event)"
-      aria-label="Поиск по описанию"
-      clear-button-aria-label="Очистить поиск"
-    ></app-search-input>
-    <span class="app-link statistics-home-link" routerLink="/">Home ></span>
+      <span
+        class="app-link statistics-history-link"
+        (click)="navigateToHistory()"
+        >< History</span
+      >
+      <app-search-input
+        placeholder="Поиск описания..."
+        [(ngModel)]="descriptionSearch"
+        (searchChange)="onDescriptionSearchChange($event)"
+        aria-label="Поиск по описанию"
+        clear-button-aria-label="Очистить поиск"
+      ></app-search-input>
+      <span class="app-link statistics-home-link" routerLink="/">Home ></span>
     </div>
     <app-date-filter
       class="statistics-filter"
       #statsFilter
-    [value]="currentFilter"
-    [isHowSuggestionButton]="isHowSuggestionDateButton"
-    [defaultValue]="initialFilterValue"
-    [enableCompactOnScroll]="true"
-    (changeFilter)="onFilterChange($event)"
+      [value]="currentFilter"
+      [isHowSuggestionButton]="isHowSuggestionDateButton"
+      [defaultValue]="initialFilterValue"
+      [enableCompactOnScroll]="true"
+      (changeFilter)="onFilterChange($event)"
     >
-    <i
-      (click)="onRefresh(); $event.stopPropagation()"
-      class="fas fa-trash stats-action-icon"
-      title="Сбросить фильтры"
-    ></i>
-    <i
-      class="fa-solid fa-list stats-action-icon"
-      title="Перейти в детализацию"
-      (click)="navigateToHistory()"
-    ></i>
-    <app-period-summary-icon
-      class="stats-action-icon"
-      (click)="navigateToPeriodSummary()"
-    ></app-period-summary-icon>
+      <ng-container app-date-filter-icons>
+        <i
+          (click)="onRefresh(); $event.stopPropagation()"
+          class="fas fa-trash stats-action-icon"
+          title="Сбросить фильтры"
+        ></i>
+        <i
+          class="fa-solid fa-list stats-action-icon"
+          title="Перейти в детализацию"
+          (click)="navigateToHistory()"
+        ></i>
+        <app-period-summary-icon
+          class="stats-action-icon"
+          (click)="navigateToPeriodSummary()"
+        ></app-period-summary-icon>
+      </ng-container>
+      <ng-container app-date-filter-total> {{ totalAmount }}€</ng-container>
     </app-date-filter>
   </div>
 
   <div class="statistics-content" #statsContent>
-
-  <div class="stats-section stats-section--donut">
-    <app-analytics-switch [expenses]="filteredExpenses"></app-analytics-switch>
-  </div>
-
-  <app-collapsed-panel
-    [collapsed]="collapsed.categoryFilters"
-    (toggle)="toggle('categoryFilters')"
-  >
-    <div slot="header" class="statistic-category-label">
-      Категории:
-      <span
-        *ngIf="excludedCategories?.length > 0"
-        class="statistic-excluded-wrapper"
-      >
-        (За исключением
-        <span class="statistic-excluded-category">{{
-          excludedCategories | categoryListName
-        }}</span
-        >)
-
-        <i
-          (click)="onCategoriesRefresh(); $event.stopPropagation()"
-          class="fas fa-redo-alt statistic-refresh-button"
-          title="Сбросить фильтры"
-        ></i>
-      </span>
-    </div>
-
-    <div
-      class="stats-section stats-section--category-switch"
-      style="margin: 6px 0 4px; display: flex; gap: 12px; align-items: center"
-    >
-      <app-segmented-switch
-        [options]="categoryViewOptions"
-        [active]="categoryView"
-        ariaLabel="Переключатель вида категорий"
-        (select)="onCategoryViewSelect($event)"
-      ></app-segmented-switch>
-    </div>
-
-    <div class="stats-bars" *ngIf="categoryView === 'bars'">
-      <app-category-type-filters
-        [regularAmount]="regularAmount"
-        [irregularAmount]="irregularAmount"
-        [regularValue]="regularCategoriesCheckboxValue"
-        [irregularValue]="irregularCategoriesCheckboxValue"
-        (regularChange)="onRegularCategoriesCheckboxClick($event)"
-        (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
-      ></app-category-type-filters>
-      <app-statistics-bar
-        *ngFor="let categoryTotal of categoryTotals"
-        [amount]="categoryTotal.amount"
-        [category]="categoryTotal.category"
-        [percentage]="categoryTotal.percentage"
-        (categoryLabelClick)="filterByCategory($event)"
-        (detailsIconClick)="navigateToHistory($event)"
-        (close)="onBarClose($event)"
-      ></app-statistics-bar>
-    </div>
-    <div *ngIf="categoryView === 'micro'" class="stats-micro">
-      <app-category-type-filters
-        [regularAmount]="regularAmount"
-        [irregularAmount]="irregularAmount"
-        [regularValue]="regularCategoriesCheckboxValue"
-        [irregularValue]="irregularCategoriesCheckboxValue"
-        (regularChange)="onRegularCategoriesCheckboxClick($event)"
-        (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
-      ></app-category-type-filters>
-      <app-micro-visuals
+    <div class="stats-section stats-section--donut">
+      <app-analytics-switch
         [expenses]="filteredExpenses"
-        [dateFrame]="currentFilter"
-        [selectedCategories]="getActiveCategories()"
-        (categorySelected)="onMicroCategorySelected($event)"
-        (categoryRemoved)="onMicroCategoryRemoved($event)"
-      ></app-micro-visuals>
+      ></app-analytics-switch>
     </div>
-    <div *ngIf="categoryView === 'filter'" class="stats-filter">
-      <app-category-filter
-        [value]="categoryFilterValues"
-        [hideCategoryTitle]="true"
-        [hideReset]="true"
-        (selectedCategories)="onCategoryFilterSelected($event)"
-      ></app-category-filter>
-    </div>
-  </app-collapsed-panel>
-  <app-collapsed-panel
-    [style.marginTop]="'7px'"
-    [collapsed]="collapsed.multiChart"
-    (toggle)="toggle('multiChart')"
-  >
-    <div slot="header" class="stats-section-header">
-      <span class="stats-section-title">Расходы по периодам</span>
-    </div>
-    <app-multi-chart
-      [filter]="currentFilter"
-      [expenses]="filteredExpenses"
-      (historyIconClick)="navigateToHistory(null, $event)"
-      (filterIconClick)="onFilterChange($event)"
-    ></app-multi-chart>
-  </app-collapsed-panel>
-  <!-- Composition charts now accessible via segmented switch above -->
-  <app-collapsed-panel
-    [style.marginTop]="'7px'"
-    [collapsed]="collapsed.irregularSummary"
-    (toggle)="toggle('irregularSummary')"
-  >
-    <div slot="header" class="stats-section-header">
-      <span class="stats-section-title">Бюджет</span>
-    </div>
-    <app-irregular-summary></app-irregular-summary>
-  </app-collapsed-panel>
+
+    <app-collapsed-panel
+      [collapsed]="collapsed.categoryFilters"
+      (toggle)="toggle('categoryFilters')"
+    >
+      <div slot="header" class="statistic-category-label">
+        Категории:
+        <span
+          *ngIf="excludedCategories?.length > 0"
+          class="statistic-excluded-wrapper"
+        >
+          (За исключением
+          <span class="statistic-excluded-category">{{
+            excludedCategories | categoryListName
+          }}</span
+          >)
+
+          <i
+            (click)="onCategoriesRefresh(); $event.stopPropagation()"
+            class="fas fa-redo-alt statistic-refresh-button"
+            title="Сбросить фильтры"
+          ></i>
+        </span>
+      </div>
+
+      <div
+        class="stats-section stats-section--category-switch"
+        style="margin: 6px 0 4px; display: flex; gap: 12px; align-items: center"
+      >
+        <app-segmented-switch
+          [options]="categoryViewOptions"
+          [active]="categoryView"
+          ariaLabel="Переключатель вида категорий"
+          (select)="onCategoryViewSelect($event)"
+        ></app-segmented-switch>
+      </div>
+
+      <div class="stats-bars" *ngIf="categoryView === 'bars'">
+        <app-category-type-filters
+          [regularAmount]="regularAmount"
+          [irregularAmount]="irregularAmount"
+          [regularValue]="regularCategoriesCheckboxValue"
+          [irregularValue]="irregularCategoriesCheckboxValue"
+          (regularChange)="onRegularCategoriesCheckboxClick($event)"
+          (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
+        ></app-category-type-filters>
+        <app-statistics-bar
+          *ngFor="let categoryTotal of categoryTotals"
+          [amount]="categoryTotal.amount"
+          [category]="categoryTotal.category"
+          [percentage]="categoryTotal.percentage"
+          (categoryLabelClick)="filterByCategory($event)"
+          (detailsIconClick)="navigateToHistory($event)"
+          (close)="onBarClose($event)"
+        ></app-statistics-bar>
+      </div>
+      <div *ngIf="categoryView === 'micro'" class="stats-micro">
+        <app-category-type-filters
+          [regularAmount]="regularAmount"
+          [irregularAmount]="irregularAmount"
+          [regularValue]="regularCategoriesCheckboxValue"
+          [irregularValue]="irregularCategoriesCheckboxValue"
+          (regularChange)="onRegularCategoriesCheckboxClick($event)"
+          (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
+        ></app-category-type-filters>
+        <app-micro-visuals
+          [expenses]="filteredExpenses"
+          [dateFrame]="currentFilter"
+          [selectedCategories]="getActiveCategories()"
+          (categorySelected)="onMicroCategorySelected($event)"
+          (categoryRemoved)="onMicroCategoryRemoved($event)"
+        ></app-micro-visuals>
+      </div>
+      <div *ngIf="categoryView === 'filter'" class="stats-filter">
+        <app-category-filter
+          [value]="categoryFilterValues"
+          [hideCategoryTitle]="true"
+          [hideReset]="true"
+          (selectedCategories)="onCategoryFilterSelected($event)"
+        ></app-category-filter>
+      </div>
+    </app-collapsed-panel>
+    <app-collapsed-panel
+      [style.marginTop]="'7px'"
+      [collapsed]="collapsed.multiChart"
+      (toggle)="toggle('multiChart')"
+    >
+      <div slot="header" class="stats-section-header">
+        <span class="stats-section-title">Расходы по периодам</span>
+      </div>
+      <app-multi-chart
+        [filter]="currentFilter"
+        [expenses]="filteredExpenses"
+        (historyIconClick)="navigateToHistory(null, $event)"
+        (filterIconClick)="onFilterChange($event)"
+      ></app-multi-chart>
+    </app-collapsed-panel>
+    <!-- Composition charts now accessible via segmented switch above -->
+    <app-collapsed-panel
+      [style.marginTop]="'7px'"
+      [collapsed]="collapsed.irregularSummary"
+      (toggle)="toggle('irregularSummary')"
+    >
+      <div slot="header" class="stats-section-header">
+        <span class="stats-section-title">Бюджет</span>
+      </div>
+      <app-irregular-summary></app-irregular-summary>
+    </app-collapsed-panel>
   </div>
 </div>
