@@ -14,6 +14,8 @@
   margin: 5px 0px 3px;
   box-shadow: none;
   position: relative;
+  /* Smooth height/child transitions when switching compact/full */
+  transition: padding 320ms ease, background-color 320ms ease;
 }
 
 /* Compact summary mode */
@@ -23,6 +25,14 @@
   gap: 4px;
   flex: 1 1 auto;
   padding: 2px 0 0;
+  opacity: 0.01; /* slight >0 so element paints pre-animation */
+  transform: translateY(-10px);
+  transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1), transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.mf-compact-active {
+  opacity: 1;
+  transform: translateY(0);
 }
 .mf-compact-line1 {
   display: flex;
@@ -48,6 +58,14 @@
   flex-direction: column;
   gap: 8px;
   flex: 1 1 auto;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 480ms cubic-bezier(0.4,0,0.2,1), transform 480ms cubic-bezier(0.4,0,0.2,1);
+}
+
+.mf-groups.is-hidden { /* optional state if later applied */
+  opacity: 0;
+  transform: translateY(6px);
 }
 
 .mf-group {
@@ -258,6 +276,11 @@
   .mf-toggle,
   .mf-icon-btn,
   .mf-input {
+    transition: none;
+  }
+  .mf-compact,
+  .mf-groups,
+  .mf-bar {
     transition: none;
   }
 }

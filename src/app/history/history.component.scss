@@ -37,6 +37,9 @@
   .history-content {
     /* margin-top set dynamically by TS only when wrapper is fixed */
     padding: 0 8px;
+    /* Smoothly animate vertical shift when filter collapses/expands (slower for compact view) */
+    transition: margin-top 420ms cubic-bezier(0.33, 1, 0.68, 1);
+    will-change: margin-top;
   }
 
   .history-back-link {
@@ -63,5 +66,8 @@
 @media (prefers-reduced-motion: reduce) {
   .history-container {
     scroll-behavior: auto;
+  }
+  .history-content {
+    transition: none;
   }
 }

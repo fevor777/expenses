@@ -521,8 +521,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
       const topEl = document.getElementById('back');
       if (topEl) { topEl.scrollIntoView({ behavior: 'auto', block: 'start' }); }
     }
-    // After state change, recalc offset
-    this.scheduleStabilization();
+    // After state change, recalc offset (single pass to allow CSS transition to handle smooth movement)
+    this.scheduleStabilization(1);
   }
 
   private roundUp(value: number): number {
