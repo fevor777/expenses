@@ -1,6 +1,6 @@
 <div class="statistics-period">
   <!-- Compact summary shown when showCompact true -->
-  <div class="statistics-period-compact" *ngIf="showCompact" (click)="onCompactClick()">
+  <div class="statistics-period-compact statistics-period-compact-active" *ngIf="showCompact" (click)="onCompactClick()">
     <ng-content select="[app-date-filter-total]"></ng-content>
     <span class="statistics-period-compact-title">{{ compactLabel }}</span>
   </div>

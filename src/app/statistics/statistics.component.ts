@@ -148,8 +148,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     if (v === 'bars' || v === 'micro' || v === 'filter') {
       this.categoryView = v;
     }
-    // Category view change can alter filter height via injected content
-    this.scheduleLayoutStabilization();
+    // Category view change can alter filter height via injected content (single pass for smooth CSS transition)
+    this.scheduleLayoutStabilization(1);
   }
 
   onMicroCategorySelected(id: string) {
@@ -231,8 +231,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   toggle(section: 'categoryFilters' | 'multiChart' | 'irregularSummary'): void {
     this.collapsed[section] = !this.collapsed[section];
-    // Toggling panels may move content; schedule stabilization
-    this.scheduleLayoutStabilization();
+    // Toggling panels may move content; single pass stabilization for smoother animation
+    this.scheduleLayoutStabilization(1);
   }
 
   // initPieChart removed; donut now lives in AnalyticsSwitchComponent
@@ -242,8 +242,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       this.currentFilter = frame;
       this.calculateCategoryTotals();
     }
-    // Filter UI may change wrapper height: recalc layout
-    this.scheduleLayoutStabilization();
+    // Filter UI may change wrapper height: recalc layout (single pass)
+    this.scheduleLayoutStabilization(1);
   }
 
   navigateToHistory(categoryId?: string, dateFrame?: DateFrame): void {
