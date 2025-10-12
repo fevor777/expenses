@@ -4,7 +4,7 @@
   border-radius: 12px;
   padding: 10px 12px 14px;
   width: 320px; // fixed width
-  height: 320px; // fixed height for consistent layout
+  height: 357px; // fixed height for consistent layout
   box-shadow: var(--shadow-medium);
   font-size: 14px;
   user-select: none;
@@ -96,6 +96,12 @@
     box-shadow var(--transition-fast);
 }
 .day.outside { opacity: 0.4; }
+.day.weekend:not(.selected) {
+  // background: rgba(255, 180, 0, 0.18); // warm tint
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255,180,0,0.35);
+}
 .day.today:not(.selected) {
   outline: 2px solid var(--color-primary);
   outline-offset: -2px;

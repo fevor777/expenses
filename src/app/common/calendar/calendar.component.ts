@@ -6,6 +6,7 @@ interface CalendarDay {
   inMonth: boolean;
   isToday: boolean;
   isSelected: boolean;
+  isWeekend: boolean;
 }
 
 @Component({
@@ -87,7 +88,8 @@ export class CalendarComponent {
         date,
         inMonth: false,
         isToday: this.isSameDate(date, today),
-        isSelected: this.isSameDate(date, this.selectedDate)
+        isSelected: this.isSameDate(date, this.selectedDate),
+        isWeekend: this.isWeekend(date)
       });
     }
 
@@ -101,7 +103,8 @@ export class CalendarComponent {
         date,
         inMonth: true,
         isToday: this.isSameDate(date, today),
-        isSelected: this.isSameDate(date, this.selectedDate)
+        isSelected: this.isSameDate(date, this.selectedDate),
+        isWeekend: this.isWeekend(date)
       });
       currentDayCounter++;
     }
@@ -114,7 +117,8 @@ export class CalendarComponent {
         date,
         inMonth: false,
         isToday: this.isSameDate(date, today),
-        isSelected: this.isSameDate(date, this.selectedDate)
+        isSelected: this.isSameDate(date, this.selectedDate),
+        isWeekend: this.isWeekend(date)
       });
       nextMonthDay++;
     }
@@ -129,7 +133,8 @@ export class CalendarComponent {
           date,
           inMonth: false,
           isToday: this.isSameDate(date, today),
-          isSelected: this.isSameDate(date, this.selectedDate)
+          isSelected: this.isSameDate(date, this.selectedDate),
+          isWeekend: this.isWeekend(date)
         });
         nextMonthDay++;
       }
@@ -141,6 +146,12 @@ export class CalendarComponent {
 
   private isSameDate(a: Date, b: Date): boolean {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  private isWeekend(date: Date): boolean {
+    const day = date.getDay();
+    // Saturday (6) or Sunday (0)
+    return day === 6 || day === 0;
   }
 
   get monthLabel(): string {

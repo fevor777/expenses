@@ -23,6 +23,7 @@
         [class.outside]="!d.inMonth"
         [class.today]="d.isToday"
         [class.selected]="d.isSelected"
+        [class.weekend]="d.isWeekend"
         [attr.aria-selected]="d.isSelected"
         [attr.data-date]="d.date.toISOString()"
         >
