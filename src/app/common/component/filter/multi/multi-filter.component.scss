@@ -1,26 +1,130 @@
-/* Multi Filter */
-/* Minified Multi Filter styles to fit bundle budget */
-/* Duplicate block removed */
-.mf-group--total,
-/* Multi Filter minimal styles (refactored to meet bundle budget) */
-.mf-bar{display:flex;align-items:flex-start;gap:4px;padding:8px 10px;background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:8px;margin:4px 0 2px}
-.mf-groups{display:flex;flex-direction:column;gap:6px}
-.mf-group{display:flex;align-items:center;gap:6px;font-size:14px}
-.mf-group--title .mf-label{font-weight:600}
-.mf-total{font-weight:600;color:var(--color-highlight)}
-.mf-meta{margin-left:6px;font-size:11px;opacity:.7}
-.mf-compact{display:flex;flex-direction:column;gap:2px;opacity:.01;transform:translateY(-8px);transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
-.mf-compact-active{opacity:1;transform:translateY(0)}
-.mf-compact-line1{display:flex;align-items:center;gap:8px;font-size:13px}
-.mf-compact-line2{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
-.mf-toggle{cursor:pointer;background:transparent;border:1px solid var(--color-border);border-radius:6px;padding:6px 10px;font-size:14px}
-.mf-toggle--active{color:var(--color-primary);border-color:var(--color-primary)}
-.mf-icon-btn{background:transparent;border:1px solid var(--color-border);padding:5px 7px;font-size:13px;border-radius:6px;cursor:pointer}
-.mf-icon-btn--refresh{margin-left:10px}
-.mf-icon-btn--nav{margin-left:8px}
-.mf-expanded{margin:0 0 10px}
-.mf-expanded-inner{border:1px solid var(--color-border);border-radius:8px;padding:12px 14px 14px;display:flex;flex-direction:column;gap:14px}
-.mf-field--description{max-width:240px}
-.mf-input{width:100%;padding:8px 10px;border:1px solid var(--color-border);border-radius:6px;font-size:14px;background:var(--color-bg);color:var(--color-text)}
-@media (max-width:640px){.mf-field--description{max-width:100%}}
-@media (prefers-reduced-motion:reduce){.mf-compact{transition:none}}
+.mf-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  margin: 4px 0 2px;
+}
+.mf-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.mf-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+.mf-group--title .mf-label {
+  font-weight: 600;
+}
+.mf-total {
+  font-weight: 600;
+  color: var(--color-highlight);
+}
+.mf-meta {
+  margin-left: 6px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+.mf-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0.01;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mf-compact-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.mf-compact-line1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.mf-compact-line2 {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+}
+.mf-toggle {
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+.mf-toggle--active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.mf-icon-btn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  padding: 5px 7px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.mf-icon-btn--refresh {
+  margin-left: 10px;
+}
+.mf-icon-btn--nav {
+  margin-left: 8px;
+}
+.mf-expanded {
+  margin: 0 0 10px;
+}
+.mf-expanded-inner {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.mf-field--description {
+  max-width: 240px;
+}
+.mf-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+@media (max-width: 640px) {
+  .mf-field--description {
+    max-width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mf-compact {
+    transition: none;
+  }
+}
+
+.mf-icon-btn--stats {
+  background: transparent;
+  border-color: var(--color-border);
+  margin-top: 12px;
+}
+
+.mf-group--total {
+  padding-top: 7px;
+}
