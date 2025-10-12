@@ -47,13 +47,13 @@ self.addEventListener('message', async (event) => {
   if (!data || !data.type) return;
   if (data.type === 'SHOW_BUDGET_NOTIFICATION') {
     console.log('[SW] SHOW_BUDGET_NOTIFICATION received');
-    const { title, body, tag } = data.payload || {};
+    const { title, body, tag, icon, badge } = data.payload || {};
     try {
       await self.registration.showNotification(title || 'Сводка расходов', {
         body: body || '',
         tag: tag || 'app-expenses-budget-summary',
-        icon: 'favicon2.ico', // relative path works in GH Pages /expenses/ and preview
-        badge: 'favicon2.ico',
+        icon: icon || 'favicon2.ico', // relative path works in GH Pages /expenses/ and preview
+        badge: badge || icon || 'favicon2.ico',
         data: { route: '#/br-notification-redirect' }
       });
     } catch (e) {
@@ -72,7 +72,7 @@ self.addEventListener('message', async (event) => {
     }
   } else if (data.type === 'SHOW_REPLACING_NOTIFICATION') {
     console.log('[SW] SHOW_REPLACING_NOTIFICATION received');
-    const { title, body, tag } = data.payload || {};
+    const { title, body, tag, icon, badge } = data.payload || {};
     const finalTag = tag || 'app-expenses-budget-summary';
     try {
       const existing = await self.registration.getNotifications({ tag: finalTag });
@@ -82,8 +82,8 @@ self.addEventListener('message', async (event) => {
       await self.registration.showNotification(title || 'Сводка расходов', {
         body: body || '',
         tag: finalTag,
-        icon: 'favicon2.ico',
-        badge: 'favicon2.ico',
+        icon: icon || 'favicon2.ico',
+        badge: badge || icon || 'favicon2.ico',
         data: { route: '#/br-notification-redirect' }
       });
     } catch {}

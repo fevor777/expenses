@@ -84,6 +84,8 @@ export class NotificationService {
     const cleanMessage = message.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
     // Ensure a stable tag for replacement if caller did not provide one
     const tag = options?.tag || 'app-expenses-budget-summary';
+    const icon = (options as any)?.icon;
+    const badge = (options as any)?.badge;
     // Prefer Service Worker if active so click works when app closed
     if ('serviceWorker' in navigator) {
       const controller = navigator.serviceWorker.controller;
@@ -91,7 +93,7 @@ export class NotificationService {
         try {
           controller.postMessage({
             type: 'SHOW_BUDGET_NOTIFICATION',
-            payload: { title, body: cleanMessage, tag }
+            payload: { title, body: cleanMessage, tag, icon, badge }
           });
           return of(undefined);
         } catch (e) {
@@ -103,9 +105,9 @@ export class NotificationService {
           const c = navigator.serviceWorker.controller;
             if (c) {
               try {
-                c.postMessage({
-                  type: 'SHOW_BUDGET_NOTIFICATION',
-                  payload: { title, body: cleanMessage, tag }
+              c.postMessage({
+                type: 'SHOW_BUDGET_NOTIFICATION',
+                payload: { title, body: cleanMessage, tag, icon, badge }
                 });
               } catch (e) {
                 console.warn('[NotificationService] delayed SW postMessage failed', e);
@@ -173,9 +175,12 @@ export class NotificationService {
   }
 
   /** Atomically replace existing budget notification via single SW message. */
-  showReplacingBudgetNotification(title: string, htmlMessage: string) {
+  showReplacingBudgetNotification(title: string, htmlMessage: string, options?: NotificationOptions) {
     const tag = 'app-expenses-budget-summary';
     const cleanMessage = htmlMessage.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
+    // Determine icon & badge via provided options with safe fallbacks.
+    const icon = (options as any)?.icon || 'favicon2.ico';
+    const badge = (options as any)?.badge || icon;
     if (!('serviceWorker' in navigator)) {
       return this.showBudgetNotification(title, htmlMessage);
     }
@@ -187,7 +192,15 @@ export class NotificationService {
         }
         navigator.serviceWorker.controller.postMessage({
           type: 'SHOW_REPLACING_NOTIFICATION',
-          payload: { title, body: cleanMessage, tag }
+          payload: {
+            title,
+            body: cleanMessage,
+            tag,
+            icon,
+            badge,
+            requireInteraction: (options as any)?.requireInteraction || false,
+            silent: (options as any)?.silent || false
+          }
         });
         return true;
       } catch (e) {
