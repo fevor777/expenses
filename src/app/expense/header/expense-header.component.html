@@ -60,6 +60,12 @@
     </div>
   </div>
   <div class="expense-header-bottom">
-  <span class="expense-header-today">{{ todayLabel }}</span>
+    <span class="expense-header-today" (click)="onHeaderBottomClick()" title="Выбрать дату">{{ todayLabel }}</span>
+  </div>
+  <div class="calendar-overlay" *ngIf="showCalendar">
+    <app-calendar
+      [selectedDate]="selectedDate"
+      (close)="onCalendarClose()"
+    ></app-calendar>
   </div>
 </div>

@@ -104,6 +104,7 @@
   gap: 5px;
   line-height: 1.1;
 }
+.expense-header-today { cursor: pointer; }
 .expense-header-bottom-balance {
   font-weight: 400;
   font-size: 13px;
@@ -135,4 +136,31 @@
   .expense-header-details-icon {
     transition: none;
   }
+}
+
+// Calendar overlay placed beneath header bar
+.calendar-overlay {
+  position: absolute;
+  top: 72px; // below main header bar height
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.15) 0%,
+    rgba(0,0,0,0.08) 18%,
+    rgba(0,0,0,0) 100%
+  );
+  z-index: 20;
+}
+
+.calendar-overlay app-calendar {
+  animation: fadeSlide .18s ease;
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }

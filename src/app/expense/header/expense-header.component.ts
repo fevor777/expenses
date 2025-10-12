@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CalendarComponent } from '../../common/calendar/calendar.component';
 
 @Component({
   selector: 'app-expense-header',
   templateUrl: './expense-header.component.html',
   styleUrls: ['./expense-header.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CalendarComponent],
 })
 export class ExpenseHeaderComponent implements OnInit {
   @Input() currentAmount: number = 0;
@@ -23,6 +24,11 @@ export class ExpenseHeaderComponent implements OnInit {
     month: 'long',
     year: 'numeric',
   }).format(new Date());
+
+  // Calendar state
+  showCalendar: boolean = false;
+  selectedDate: Date = new Date();
+  // Clicking the date label toggles an inline calendar overlay (auto closes on selection)
 
   @Output() menuIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() historyIconClick: EventEmitter<void> = new EventEmitter<void>();
@@ -69,5 +75,13 @@ export class ExpenseHeaderComponent implements OnInit {
     if (Number(newBalance)) {
       this.balanceChange.emit(Number(newBalance));
     }
+  }
+
+  onHeaderBottomClick(): void {
+    this.showCalendar = !this.showCalendar;
+  }
+
+  onCalendarClose(): void {
+    this.showCalendar = false;
   }
 }
