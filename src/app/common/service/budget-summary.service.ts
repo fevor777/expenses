@@ -64,6 +64,8 @@ export class BudgetSummaryService {
   ): Observable<void> {
     if (!result.summary) {
       const msg = result.error || BudgetSummaryService.BUILD_ERROR_OUT_OF_FRAME;
+      // Ensure previous budget notifications are cleared before showing the new (error) state.
+      this.notificationService.clearNotifications('app-expenses-budget-summary');
       return this.notificationService.showBrowserNotification(
         'Сводка расходов',
         msg,
@@ -114,6 +116,8 @@ export class BudgetSummaryService {
     const title = 'Сводка расходов';
     const message = composeBudgetSummaryMessage(summary); // externalized formatter
     const icon = this.generateBudgetIcon(summary.percentUsed);
+    // Clear existing budget summary notifications prior to sending updated snapshot.
+    this.notificationService.clearNotifications('app-expenses-budget-summary');
     return this.notificationService.showBrowserNotification(title, message, {
       icon,
       badge: icon,
