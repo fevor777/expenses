@@ -153,6 +153,8 @@ export class NotificationService {
 
   /** Convenience wrapper for budget summary notifications ensuring permission and SW delivery. */
   showBudgetNotification(title: string, htmlMessage: string) {
+    // Explicitly clear existing budget summary notification before showing new one.
+    this.clearNotifications('app-expenses-budget-summary');
     return this.showBrowserNotification(title, htmlMessage, { tag: 'app-expenses-budget-summary' });
   }
 
@@ -168,11 +170,6 @@ export class NotificationService {
         console.warn('[NotificationService] CLEAR_NOTIFICATIONS postMessage failed', e);
       }
     }
-  }
-
-  /** Convenience: clear existing budget summary notification then show a fresh one. */
-  showBudgetNotificationFresh(title: string, htmlMessage: string) {
-    return this.showReplacingBudgetNotification(title, htmlMessage);
   }
 
   /** Atomically replace existing budget notification via single SW message. */
