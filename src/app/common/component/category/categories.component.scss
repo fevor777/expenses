@@ -43,8 +43,8 @@
     color: var(--color-text-secondary);
     opacity: 0;
     transform: scale(.92) translateY(4px);
-    animation: categoryIn .38s cubic-bezier(.25,.6,.25,1) forwards;
-    animation-delay: calc(var(--cat-index, 0) * 35ms);
+  animation: categoryIn .20s cubic-bezier(.25,.6,.25,1) forwards;
+    animation-delay: calc(var(--cat-index, 0) * 28ms);
   }
   .category:active {
     background: var(--color-bg-alt);
