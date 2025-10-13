@@ -17,6 +17,7 @@
         *ngFor="let category of categories; let i = index"
         class="category"
         (click)="onCategoryClick(category.id)"
+        [style.--cat-index]="i"
       >
         <i
           class="category-icon"
