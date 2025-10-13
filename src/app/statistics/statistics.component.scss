@@ -17,7 +17,7 @@
   .statistics-content {
     width: 100%; /* margin-top applied dynamically in TS */
     /* Smooth vertical shift when fixed wrapper height changes */
-  transition: margin-top 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: margin-top 240ms cubic-bezier(0.25, 0.8, 0.25, 1); /* was 560ms for slower shift */
     will-change: margin-top;
   }
 }

@@ -25,19 +25,18 @@
       title="Toggle amount"
       aria-label="Toggle amount view"
     >
-      <ng-container *ngIf="isShowCurrentBalanceAmount; else elseBlock">
+      <div *ngIf="isShowCurrentBalanceAmount; else elseBlock" [@amountSwap]>
         <div class="expense-header-irregular-title">нерегул.</div>
-        <span class="expense-header-total-title"
-          >{{ currentBalanceAmount
-          }}<span class="expense-header-total-title-currency">€</span></span
-        >
-      </ng-container>
-
+        <span class="expense-header-total-title" [@amountValueChange] [@amountFlash]>
+          {{ currentBalanceAmount }}<span class="expense-header-total-title-currency">€</span>
+        </span>
+      </div>
       <ng-template #elseBlock>
-        <span class="expense-header-total-title"
-          >{{ currentAmount
-          }}<span class="expense-header-total-title-currency">€</span></span
-        >
+        <div [@amountSwap]>
+          <span class="expense-header-total-title" [@amountValueChange] [@amountFlash]>
+            {{ currentAmount }}<span class="expense-header-total-title-currency">€</span>
+          </span>
+        </div>
       </ng-template>
     </div>
     <div class="expense-header-icons-group">

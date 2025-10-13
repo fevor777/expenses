@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { trigger, transition, style, animate, group, state } from '@angular/animations';
 import { CalendarComponent } from '../../common/calendar/calendar.component';
 
 @Component({
@@ -8,6 +9,36 @@ import { CalendarComponent } from '../../common/calendar/calendar.component';
   styleUrls: ['./expense-header.component.scss'],
   standalone: true,
   imports: [CommonModule, CalendarComponent],
+  animations: [
+    trigger('amountSwap', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(6px) scale(.94)' }),
+        animate('130ms ease-out', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+      ]),
+      transition(':leave', [
+        group([
+          animate('100ms ease-out', style({ opacity: 0, transform: 'translateY(-4px) scale(.94)' }))
+        ])
+      ])
+    ])
+    ,
+    trigger('amountValueChange', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(.92)' }),
+        animate('120ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      ]),
+      transition(':leave', [
+        animate('80ms ease-in', style({ opacity: 0, transform: 'scale(.92)' }))
+      ])
+    ])
+    ,
+    trigger('amountFlash', [
+      transition(':enter', [
+        style({ filter: 'brightness(1.25)', opacity: 0.85 }),
+        animate('260ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
+      ])
+    ])
+  ]
 })
 export class ExpenseHeaderComponent implements OnInit {
   @Input() currentAmount: number = 0;

@@ -38,6 +38,7 @@
   </div>
   <div
     class="categories-more"
+    [style.padding.px]="isContentDown ? 15 : 0"
     [ngClass]="{
       'disabled-categories-more': !enteredAmount || enteredAmount.length === 0,
     }"
