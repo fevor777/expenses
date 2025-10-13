@@ -41,13 +41,8 @@
     border-radius: 14px;
     position: relative;
     color: var(--color-text-secondary);
-    opacity: 0;
-    transform: scale(.92) translateY(4px);
-  animation: categoryIn .20s cubic-bezier(.25,.6,.25,1) forwards;
-    animation-delay: calc(var(--cat-index, 0) * 28ms);
-  }
-  .category:active {
-    background: var(--color-bg-alt);
+    opacity: 1;
+    transform: none;
   }
   .category-icon {
     font-size: 30px;
@@ -137,26 +132,5 @@
     color: var(--color-border-strong, var(--color-border));
     opacity: 0.3;
   }
-  /* Prevent hover pop for disabled state (icon gets disabled class externally) */
-  /* hover removed for disabled category elements */
 }
 
-@keyframes categoryIn {
-  0% { opacity: 0; transform: scale(.92) translateY(6px); filter: blur(1px); }
-  60% { opacity: .85; transform: scale(1.015) translateY(0); filter: blur(0); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .category {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .category {
-    transition: none;
-  }
-}
