@@ -327,6 +327,11 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       });
   }
 
+  trackByCategoryTotal(index: number, item: { category: string; amount: number; percentage: number; color: string }) {
+    // Category id is stable; using it prevents re-rendering unchanged bars.
+    return item.category;
+  }
+
   touchStartX: number = 0;
   touchStartY: number = 0;
   touchEndX: number = 0;

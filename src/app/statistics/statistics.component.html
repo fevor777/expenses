@@ -110,15 +110,15 @@
             (regularChange)="onRegularCategoriesCheckboxClick($event)"
             (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
           ></app-category-type-filters>
-          <!-- <app-statistics-bar
-            *ngFor="let categoryTotal of categoryTotals"
+          <app-statistics-bar
+            *ngFor="let categoryTotal of categoryTotals; trackBy: trackByCategoryTotal"
             [amount]="categoryTotal.amount"
             [category]="categoryTotal.category"
             [percentage]="categoryTotal.percentage"
             (categoryLabelClick)="filterByCategory($event)"
             (detailsIconClick)="navigateToHistory($event)"
             (close)="onBarClose($event)"
-          ></app-statistics-bar> -->
+          ></app-statistics-bar>
         </div>
         <div *ngIf="categoryView === 'micro'" class="stats-micro">
           <app-category-type-filters
