@@ -6,6 +6,7 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Expense } from '../../common/model/expense.model';
 import { DateFrame } from '../../common/component/filter/date/dateFrame.model';
@@ -27,6 +28,7 @@ interface CategoryStat {
   selector: 'app-micro-visuals',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="micro-wrapper" *ngIf="stats.length; else noDataTpl">
       <table class="micro-table">
@@ -230,8 +232,15 @@ export class MicroVisualsComponent implements OnChanges {
   stats: CategoryStat[] = [];
   // Exposed to template for active coverage calculations
   dateKeys: string[] = [];
+  private lastExpensesRef: Expense[] | null = null;
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses']) {
+      // Skip recompute if same reference and length unchanged (basic shallow guard)
+      if (this.lastExpensesRef === this.expenses && this.stats.length) {
+        return;
+      }
+      this.lastExpensesRef = this.expenses;
       this.recompute();
     }
   }
@@ -331,13 +340,18 @@ export class MicroVisualsComponent implements OnChanges {
     const max = s.max || 1;
     const width = this.getSparkWidth(len);
     const denom = len - 1 || 1;
-    return s.series
-      .map((v, i) => {
-        const x = (i / denom) * width;
-        const y = 18 - (v / max) * 16; // padding top 2px bottom 2px (height 20)
-        return `${x.toFixed(2)},${y.toFixed(2)}`;
-      })
-      .join(' ');
+    const points: string[] = new Array(len);
+    for (let i = 0; i < len; i++) {
+      const v = s.series[i];
+      const x = (i / denom) * width;
+      const y = 18 - (v / max) * 16; // padding top 2px bottom 2px (height 20)
+      points[i] = `${x.toFixed(2)},${y.toFixed(2)}`;
+    }
+    return points.join(' ');
+  }
+
+  trackByStat(index: number, item: CategoryStat) {
+    return item.id;
   }
 
   selectCategory(id: string) {

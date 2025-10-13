@@ -1,4 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Expense } from '../../common/model/expense.model';
@@ -12,7 +17,11 @@ import { DateFrame } from './filter/date/dateFrame.model';
 @Component({
   selector: 'app-irregular-summary',
   standalone: true,
-  imports: [CommonModule, IrregularBudgetGaugeComponent, IrregularCumulativeComponent],
+  imports: [
+    CommonModule,
+    IrregularBudgetGaugeComponent,
+    IrregularCumulativeComponent,
+  ],
   template: `
     <div class="irregular-summary" *ngIf="loaded; else loadingTpl">
       <div class="irregular-block">
@@ -48,9 +57,17 @@ import { DateFrame } from './filter/date/dateFrame.model';
         justify-content: center; /* center children horizontally */
         text-align: center;
       }
-      .ib-chart { flex: 0 0 auto; margin: 0 auto; }
-      .ib-chart.wide { flex: 1 1 260px; }
-      .placeholder-msg.small { font-size: 12px; color: #777; }
+      .ib-chart {
+        flex: 0 0 auto;
+        margin: 0 auto;
+      }
+      .ib-chart.wide {
+        flex: 1 1 260px;
+      }
+      .placeholder-msg.small {
+        font-size: 12px;
+        color: #777;
+      }
     `,
   ],
 })
@@ -61,6 +78,8 @@ export class IrregularSummaryComponent implements OnInit, OnDestroy {
   loaded = false;
   private destroy$ = new Subject<void>();
 
+  // Avoid triggering extra change detection cycles by batching assignment
+
   constructor(private budgetDataService: BudgetDataService) {}
 
   ngOnInit(): void {
@@ -69,12 +88,15 @@ export class IrregularSummaryComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: data => {
+          // Single mutation block
           this.expenses = data.expenses || [];
           this.budget = data.budget?.value || 0;
           this.monthFrame = data.dateFrame;
           this.loaded = true;
         },
-        error: () => (this.loaded = true),
+        error: () => {
+          this.loaded = true;
+        },
       });
   }
 

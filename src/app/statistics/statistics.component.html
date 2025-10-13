@@ -111,7 +111,10 @@
             (irregularChange)="onIrregularCategoriesCheckboxClick($event)"
           ></app-category-type-filters>
           <app-statistics-bar
-            *ngFor="let categoryTotal of categoryTotals; trackBy: trackByCategoryTotal"
+            *ngFor="
+              let categoryTotal of categoryTotals;
+              trackBy: trackByCategoryTotal
+            "
             [amount]="categoryTotal.amount"
             [category]="categoryTotal.category"
             [percentage]="categoryTotal.percentage"
@@ -155,6 +158,7 @@
           <span class="stats-section-title">Расходы по периодам</span>
         </div>
         <app-multi-chart
+          *ngIf="!collapsed.multiChart"
           [filter]="currentFilter"
           [expenses]="filteredExpenses"
           (historyIconClick)="navigateToHistory(null, $event)"
@@ -170,7 +174,9 @@
         <div slot="header" class="stats-section-header">
           <span class="stats-section-title">Бюджет</span>
         </div>
-        <app-irregular-summary></app-irregular-summary>
+        <app-irregular-summary
+          *ngIf="!collapsed.irregularSummary"
+        ></app-irregular-summary>
       </app-collapsed-panel>
     </div>
   </div>
