@@ -41,7 +41,7 @@ const routes: Routes = [
     pathMatch: 'full',
     loadComponent: () =>
       import('./expense/expense.component').then(m => m.ExpenseComponent),
-    data: { animation: 'home' },
+    data: { animation: 'no-animation' },
   },
 ];
 
