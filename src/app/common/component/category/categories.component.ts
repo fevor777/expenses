@@ -53,6 +53,10 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   private collapsedVisibleCount: number = 0; // remembers how many categories fit when collapsed
   private pendingRafMeasure = false; // guard to avoid duplicate RAF chains
   private resizeTimeout: any;
+  private lastMeasuredWidth: number = 0;
+  private lastBlockHeight: number = 0;
+  private lastRowGap: number = 0;
+  private readonly widthChangeThreshold = 12; // px threshold to remeasure
   constructor(private ngZone: NgZone) {}
 
   @HostListener('window:resize', ['$event'])
@@ -112,22 +116,32 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     if (!el) return;
     this.containerWidth = el.clientWidth;
     const containerHeight = el.clientHeight;
+    if (!forceRecalculateCollapsed && Math.abs(this.containerWidth - this.lastMeasuredWidth) < this.widthChangeThreshold) {
+      return; // skip trivial width changes
+    }
+    this.lastMeasuredWidth = this.containerWidth;
     const maxColumns = Math.max(1, Math.floor(this.containerWidth / this.categoryWidth));
     // Derive actual category block height and vertical gap using first category element
     const firstCategory: HTMLElement | null = el.querySelector('.category');
-    let blockHeight = 96; // fallback approximation
-    let rowGap = 0; // fallback gap
+    let blockHeight = this.lastBlockHeight || 96; // fallback approximation
+    let rowGap = this.lastRowGap || 0; // fallback gap
     if (firstCategory) {
       const catStyles = getComputedStyle(firstCategory);
       const h = firstCategory.clientHeight; // includes padding
-      blockHeight = h || blockHeight;
+      if (h && h !== this.lastBlockHeight) {
+        blockHeight = h;
+        this.lastBlockHeight = h;
+      }
       // Get row gap from parent flex container (.categories) if available
       const parentStyles = getComputedStyle(el);
       const gapVal = parentStyles.rowGap || parentStyles.gap;
       if (gapVal) {
         // parse px value
         const parsed = parseFloat(gapVal.toString());
-        if (!isNaN(parsed)) rowGap = parsed;
+        if (!isNaN(parsed) && parsed !== this.lastRowGap) {
+          rowGap = parsed;
+          this.lastRowGap = parsed;
+        }
       }
     }
     const effectiveRowHeight = blockHeight + rowGap;
@@ -138,7 +152,11 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       this.collapsedVisibleCount = collapsedCount;
     }
     this.showMore = Categories.length > this.collapsedVisibleCount;
-    this.categories = [...Categories].slice(0, this.collapsedVisibleCount);
+    const newSlice = [...Categories].slice(0, this.collapsedVisibleCount);
+    // Avoid unnecessary array replacement if slice identical length and same last id
+    if (this.categories.length !== newSlice.length || this.categories[this.categories.length - 1]?.id !== newSlice[newSlice.length - 1]?.id) {
+      this.categories = newSlice;
+    }
   }
 
   private scheduleCollapsedMeasurement(force: boolean = false): void {
@@ -154,16 +172,16 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     // Run outside Angular to avoid triggering CD for intermediate frames
     this.ngZone.runOutsideAngular(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          // Now layout should be stable; re-enter Angular and measure
-          this.ngZone.run(() => {
-            this.pendingRafMeasure = false;
-            this.updateVisibleCategories(true);
-          });
+        // Single RAF should be sufficient post style/layout flush
+        this.ngZone.run(() => {
+          this.pendingRafMeasure = false;
+          this.updateVisibleCategories(true);
         });
       });
     });
   }
+
+  trackByCategory = (_: number, item: Category) => item.id;
 
   private calculateRows(
     containerWidth: number,
