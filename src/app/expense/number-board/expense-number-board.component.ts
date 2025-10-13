@@ -9,7 +9,6 @@ import {
 import { FormsModule } from '@angular/forms';
 
 import { Currency } from '../../common/model/currency';
-import { GLOBAL_LONG_PRESS_DURATION } from '../../constants';
 
 @Component({
   selector: 'app-expense-number-board',
@@ -34,14 +33,10 @@ export class ExpenseNumberBoardComponent {
     new EventEmitter<void>();
   @Output() numberBoardSwipeDown: EventEmitter<void> = new EventEmitter<void>();
   @Output() numberBoardSwipeUp: EventEmitter<void> = new EventEmitter<void>();
-  @Output() numberBoardLongPress: EventEmitter<void> = new EventEmitter<void>();
+  // Long press removed
   @Output() openCalculator: EventEmitter<void> = new EventEmitter<void>();
 
-  private longPressTimeout: any;
-  private longPressTriggered = false;
-  private readonly LONG_PRESS_MOVE_TOLERANCE = 10;
-  private lpStartX = 0;
-  private lpStartY = 0;
+  // Long press logic removed
 
   openCalculatorEmit(): void {
     this.openCalculator.emit();
@@ -116,35 +111,5 @@ export class ExpenseNumberBoardComponent {
     this.numberBoardSwipeUp.emit();
   }
 
-  @HostListener('touchstart', ['$event'])
-  onNbTouchStart(e: TouchEvent) {
-    if (!e.changedTouches.length) return;
-    const t = e.changedTouches[0];
-    this.lpStartX = t.screenX;
-    this.lpStartY = t.screenY;
-    this.longPressTriggered = false;
-    clearTimeout(this.longPressTimeout);
-    this.longPressTimeout = setTimeout(() => {
-      this.longPressTriggered = true;
-      this.numberBoardLongPress.emit();
-    }, GLOBAL_LONG_PRESS_DURATION);
-  }
-
-  @HostListener('touchmove', ['$event'])
-  onNbTouchMove(e: TouchEvent) {
-    if (this.longPressTriggered) return;
-    if (!e.changedTouches.length) return;
-    const t = e.changedTouches[0];
-    if (
-      Math.abs(t.screenX - this.lpStartX) > this.LONG_PRESS_MOVE_TOLERANCE ||
-      Math.abs(t.screenY - this.lpStartY) > this.LONG_PRESS_MOVE_TOLERANCE
-    ) {
-      clearTimeout(this.longPressTimeout);
-    }
-  }
-
-  @HostListener('touchend')
-  onNbTouchEnd() {
-    clearTimeout(this.longPressTimeout);
-  }
+  // Touch listeners for long press removed
 }
