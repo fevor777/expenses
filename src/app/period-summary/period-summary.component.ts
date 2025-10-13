@@ -7,7 +7,7 @@ import { PeriodSummary } from './utils/period-summary.model';
 import { CollapsedPanelComponent } from '../common/component/collapsed-panel';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
-import { GLOBAL_SWIPE_LENGTH } from '../constants';
+import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 
 @Component({
   selector: 'app-period-summary',
@@ -21,10 +21,12 @@ export class PeriodSummaryComponent implements OnInit, OnDestroy {
   // collapse state keyed by summary key (today, yesterday, week, month)
   collapsed: Record<string, boolean> = {};
 
+  private globalSwipeLength = 70;
   constructor(
     private periodSummaryService: PeriodSummaryService,
     private router: Router,
-    private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService,
+    private swipeLengthStore: GlobalSwipeLengthStoreService
   ) {}
 
   @ViewChild('psNav') private navRef?: ElementRef<HTMLElement>;
@@ -45,6 +47,7 @@ export class PeriodSummaryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
     // Retrieve snapshot of period narratives. Architecture mirrors pattern of summary services.
     this.summaries$ = this.periodSummaryService.getCurrentSummaries();
     queueMicrotask(() => {
@@ -95,9 +98,9 @@ export class PeriodSummaryComponent implements OnInit, OnDestroy {
     const deltaX = this.touchEndX - this.touchStartX;
     const deltaY = this.touchEndY - this.touchStartY;
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > GLOBAL_SWIPE_LENGTH) {
+      if (deltaX > this.globalSwipeLength) {
         this.onSwipeRight();
-      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
+      } else if (deltaX < -this.globalSwipeLength) {
         this.onSwipeLeft();
       }
     }

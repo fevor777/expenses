@@ -89,4 +89,23 @@
       </ng-template>
     </div>
   </app-tab>
+  <app-tab key="swipe" label="Swipe">
+    <div style="margin-top:12px">
+      <div class="budget-start-row">
+        <label for="swipeLengthInput" class="bsd-label">Global Swipe Length:</label>
+        <input
+          id="swipeLengthInput"
+          type="number"
+          min="1"
+          [(ngModel)]="swipeLengthInput"
+          class="bsd-input"
+        />
+      </div>
+      <div class="budget-start-row">
+        <span class="bsd-label">Current Value:</span>
+        <span class="bsd-value">{{ swipeLengthValue }}</span>
+      </div>
+      <button type="button" (click)="onSaveSwipeLength()" class="btn btn-primary bsd-save">Save</button>
+    </div>
+  </app-tab>
 </app-tabs-container>

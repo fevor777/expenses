@@ -32,7 +32,8 @@ import { SegmentedSwitchComponent } from '../common/component/segmented/segmente
 import { MicroVisualsComponent } from '../period-summary/micro/micro-visuals.component';
 import { CategoryTypeFiltersComponent } from './category-type-filters/category-type-filters.component';
 import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
-import { GLOBAL_SWIPE_LENGTH } from '../constants';
+// Dynamic swipe length from store (fallback constant inside service defaults)
+import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 import { PeriodSummaryIconComponent } from "../common/component/period-summary-icon/period-summary-icon.component";
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 
@@ -137,10 +138,13 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     MicroVisualsComponent,
   ];
 
+  private globalSwipeLength = 70; // default until store emits
+
   constructor(
     private router: Router,
     private expenseService: ExpenseService,
-    private dateFilterService: DateFilterService
+    private dateFilterService: DateFilterService,
+    private swipeLengthStore: GlobalSwipeLengthStoreService
   ) {
     this.initialFilterValue = this.dateFilterService.getInitialDayValue();
     this.initFilter();
@@ -224,6 +228,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    // Load dynamic swipe threshold synchronously
+    this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
     window.scrollTo({ top: 0, behavior: 'auto' });
     // Initial totals still required for other statistics sections
     this.calculateCategoryTotals();
@@ -356,9 +362,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > GLOBAL_SWIPE_LENGTH) {
+      if (deltaX > this.globalSwipeLength) {
         this.onSwipeRight();
-      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
+      } else if (deltaX < -this.globalSwipeLength) {
         this.onSwipeLeft();
       }
     }

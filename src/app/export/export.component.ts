@@ -15,6 +15,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { BalanceDateService } from '../common/service/balance-date.service';
 import { Budget } from '../common/model/budget.model';
 import { FormsModule } from '@angular/forms';
+import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 
 @Component({
   selector: 'app-export',
@@ -40,6 +41,10 @@ export class ExportComponent implements OnDestroy {
   // New timestamp-based start (ms). When set, overrides legacy day-of-month logic.
   budgetStartTs?: number;
 
+  // Swipe length configuration
+  swipeLengthValue: number = 0;
+  swipeLengthInput: number = 0;
+
   // Display-only derived label for current period preview (e.g., "September 5 - October 8")
   get budgetPeriodLabel(): string {
     const periodDays = Math.floor(this.budgetPeriodDuration);
@@ -61,7 +66,8 @@ export class ExportComponent implements OnDestroy {
     private authService: AuthService,
     private irregularBudgetService: IrregularBudgetService,
     private savingService: SavingService,
-    private afAuth: AngularFireAuth
+    private afAuth: AngularFireAuth,
+    private swipeLengthStore: GlobalSwipeLengthStoreService
   ) {
     this.irregularBudgetService
       .getValue()
@@ -77,6 +83,9 @@ export class ExportComponent implements OnDestroy {
       .subscribe(v => (this.savingsValue = v || 0));
     this.user$ = this.afAuth.user;
     // Load stored budget start day (balance date). Expecting format like 'YYYY-MM-DD' or empty.
+    // Initialize swipe length values
+    this.swipeLengthValue = this.swipeLengthStore.getSwipeLength();
+    this.swipeLengthInput = this.swipeLengthValue;
   }
 
   // Method to trigger Google Sign-in
@@ -222,4 +231,13 @@ export class ExportComponent implements OnDestroy {
   }
 
   // Legacy derivation removed – periodStartTs is now the single source of truth.
+
+  onSaveSwipeLength(): void {
+    if (Number.isFinite(this.swipeLengthInput) && this.swipeLengthInput > 0) {
+      this.swipeLengthValue = this.swipeLengthStore.saveSwipeLength(this.swipeLengthInput);
+    } else {
+      // Reset input to current valid value if invalid provided
+      this.swipeLengthInput = this.swipeLengthValue;
+    }
+  }
 }

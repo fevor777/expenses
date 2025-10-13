@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { Categories, Category } from '../../model/categories';
 import { CommonModule } from '@angular/common';
-import { GLOBAL_SWIPE_LENGTH } from '../../../constants';
+import { GlobalSwipeLengthStoreService } from '../../service/global-swipe-length-store.service';
 
 @Component({
   selector: 'app-categories',
@@ -57,7 +57,11 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   private lastBlockHeight: number = 0;
   private lastRowGap: number = 0;
   private readonly widthChangeThreshold = 12; // px threshold to remeasure
-  constructor(private ngZone: NgZone) {}
+  private globalSwipeLength = 70;
+  constructor(
+    private ngZone: NgZone,
+    private swipeLengthStore: GlobalSwipeLengthStoreService
+  ) {}
 
   @HostListener('window:resize', ['$event'])
   onResize(_event: any): void {
@@ -97,6 +101,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit(): void {
+    this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
     if (!this.isContentDown) {
       this.scheduleCollapsedMeasurement();
     }
@@ -110,17 +115,26 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     this.clickMore.emit(!this.isContentDown);
   }
 
-  private updateVisibleCategories(forceRecalculateCollapsed: boolean = false): void {
+  private updateVisibleCategories(
+    forceRecalculateCollapsed: boolean = false
+  ): void {
     if (this.isContentDown) return; // expanded uses full list
     const el = this.categoriesEl?.nativeElement;
     if (!el) return;
     this.containerWidth = el.clientWidth;
     const containerHeight = el.clientHeight;
-    if (!forceRecalculateCollapsed && Math.abs(this.containerWidth - this.lastMeasuredWidth) < this.widthChangeThreshold) {
+    if (
+      !forceRecalculateCollapsed &&
+      Math.abs(this.containerWidth - this.lastMeasuredWidth) <
+        this.widthChangeThreshold
+    ) {
       return; // skip trivial width changes
     }
     this.lastMeasuredWidth = this.containerWidth;
-    const maxColumns = Math.max(1, Math.floor(this.containerWidth / this.categoryWidth));
+    const maxColumns = Math.max(
+      1,
+      Math.floor(this.containerWidth / this.categoryWidth)
+    );
     // Derive actual category block height and vertical gap using first category element
     const firstCategory: HTMLElement | null = el.querySelector('.category');
     let blockHeight = this.lastBlockHeight || 96; // fallback approximation
@@ -145,7 +159,9 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
       }
     }
     const effectiveRowHeight = blockHeight + rowGap;
-    let dynamicRows = Math.floor(containerHeight / Math.max(1, effectiveRowHeight));
+    let dynamicRows = Math.floor(
+      containerHeight / Math.max(1, effectiveRowHeight)
+    );
     if (dynamicRows < 1) dynamicRows = 1; // ensure at least one row
     const collapsedCount = maxColumns * dynamicRows;
     if (forceRecalculateCollapsed || !this.collapsedVisibleCount) {
@@ -154,7 +170,11 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     this.showMore = Categories.length > this.collapsedVisibleCount;
     const newSlice = [...Categories].slice(0, this.collapsedVisibleCount);
     // Avoid unnecessary array replacement if slice identical length and same last id
-    if (this.categories.length !== newSlice.length || this.categories[this.categories.length - 1]?.id !== newSlice[newSlice.length - 1]?.id) {
+    if (
+      this.categories.length !== newSlice.length ||
+      this.categories[this.categories.length - 1]?.id !==
+        newSlice[newSlice.length - 1]?.id
+    ) {
       this.categories = newSlice;
     }
   }
@@ -199,16 +219,16 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > GLOBAL_SWIPE_LENGTH) {
+      if (deltaX > this.globalSwipeLength) {
         this.onSwipeRight();
-      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
+      } else if (deltaX < -this.globalSwipeLength) {
         this.onSwipeLeft();
       }
     } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
-      if (deltaY < -GLOBAL_SWIPE_LENGTH) {
+      if (deltaY < -this.globalSwipeLength) {
         // Swiping up decreases Y coordinate
         this.onSwipeUp();
-      } else if (deltaY > GLOBAL_SWIPE_LENGTH) {
+      } else if (deltaY > this.globalSwipeLength) {
         // Swiping down increases Y coordinate
         this.onSwipeDown();
       }

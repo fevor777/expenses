@@ -28,7 +28,7 @@ import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
 import { HistoryExpense } from './history-expense';
 import { HistoryItemComponent } from './item/history-item.component';
-import { GLOBAL_SWIPE_LENGTH } from '../constants';
+import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 import { BudgetSummaryService } from '../common/service/budget-summary.service';
 import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
@@ -79,12 +79,14 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   error: any;
 
+  private globalSwipeLength = 70;
   constructor(
     private router: Router,
     private expenseService: ExpenseService,
     private balanceService: BalanceService,
     private dateFilterService: DateFilterService,
-    private expenseSummaryService: BudgetSummaryService
+    private expenseSummaryService: BudgetSummaryService,
+    private swipeLengthStore: GlobalSwipeLengthStoreService
   ) {}
 
   // Fixed wrapper dynamic offset
@@ -110,6 +112,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
     this.initFilter();
     this.updateFilterAndLoadExpenses();
     // Delay init until view children rendered
@@ -234,9 +237,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
     // Detect horizontal swipe only if it is more significant than vertical swipe
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > GLOBAL_SWIPE_LENGTH) {
+      if (deltaX > this.globalSwipeLength) {
         this.navigateHome();
-      } else if (deltaX < -GLOBAL_SWIPE_LENGTH) {
+      } else if (deltaX < -this.globalSwipeLength) {
         // this.navigateToDefaultStatistics();
         this.navigateToStatistics();
       }
