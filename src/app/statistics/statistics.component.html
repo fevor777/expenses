@@ -45,6 +45,11 @@
   </div>
 
   <div class="statistics-content" #statsContent>
+    <!-- Simple loading spinner shown only during first load when data not yet processed -->
+    <div class="statistics-loading" *ngIf="isFirstLoad">
+      <app-spinner [size]="52" color="var(--color-spinner)" [started]="isFirstLoad"></app-spinner>
+    </div>
+    <div *ngIf="!isFirstLoad">
     <div class="stats-section stats-section--donut">
       <app-analytics-switch
         [expenses]="filteredExpenses"
@@ -158,5 +163,6 @@
       </div>
       <app-irregular-summary></app-irregular-summary>
     </app-collapsed-panel>
+  </div>
   </div>
 </div>

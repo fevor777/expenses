@@ -20,6 +20,13 @@
   transition: margin-top 240ms cubic-bezier(0.25, 0.8, 0.25, 1); /* was 560ms for slower shift */
     will-change: margin-top;
   }
+  .statistics-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 24px 0;
+  }
 }
 .statistics-fixed-wrapper {
   position: fixed;

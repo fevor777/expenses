@@ -25,17 +25,24 @@
       title="Toggle amount"
       aria-label="Toggle amount view"
     >
-      <div *ngIf="isShowCurrentBalanceAmount; else elseBlock" [@amountSwap]>
-        <div class="expense-header-irregular-title">нерегул.</div>
-        <span class="expense-header-total-title" [@amountValueChange] [@amountFlash]>
-          {{ currentBalanceAmount }}<span class="expense-header-total-title-currency">€</span>
-        </span>
-      </div>
-      <ng-template #elseBlock>
-        <div [@amountSwap]>
+      <ng-container *ngIf="!amountLoading; else amountLoadingTpl">
+        <div *ngIf="isShowCurrentBalanceAmount; else elseBlock" [@amountSwap]>
+          <div class="expense-header-irregular-title">нерегул.</div>
           <span class="expense-header-total-title" [@amountValueChange] [@amountFlash]>
-            {{ currentAmount }}<span class="expense-header-total-title-currency">€</span>
+            {{ currentBalanceAmount }}<span class="expense-header-total-title-currency">€</span>
           </span>
+        </div>
+        <ng-template #elseBlock>
+          <div [@amountSwap]>
+            <span class="expense-header-total-title" [@amountValueChange] [@amountFlash]>
+              {{ currentAmount }}<span class="expense-header-total-title-currency">€</span>
+            </span>
+          </div>
+        </ng-template>
+      </ng-container>
+      <ng-template #amountLoadingTpl>
+        <div class="expense-header-amount-loading" aria-label="Loading amount" role="status">
+          <app-spinner [size]="26" color="var(--color-spinner)" [started]="amountLoading"></app-spinner>
         </div>
       </ng-template>
     </div>

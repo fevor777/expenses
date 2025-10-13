@@ -68,6 +68,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   monthlyExpenses: Expense[] = [];
   todaysExpenses: Expense[] = [];
   budgetSummary: BudgetSummaryBuildResult;
+  // Loading flag for header amount spinner
+  isAmountsLoading: boolean = false;
 
   currency: Currency;
   description: string = '';
@@ -93,11 +95,13 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.isAmountsLoading = true;
     this.expenseService
       .getExpenses(this.dateFilterService.getInitialMonthValue())
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(expenses => {
         this.calculateAmounts(expenses);
+        this.isAmountsLoading = false;
       });
 
     this.balanceDate$ = this.balanceDateService.getBalanceDate();
@@ -341,6 +345,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       });
     this.currentAmount = newAmount;
     this.currentBalanceAmount = newBalanceAmount;
+    // Could be reused for subsequent refresh flows if implemented
   }
 
   private roundUp(value: number): number {

@@ -30,14 +30,7 @@
   <div class="history-content" #historyContent>
     <!-- Loading spinner overlay (kept lightweight; accessible text for screen readers) -->
     <div class="history-loading" *ngIf="isLoading">
-      <div
-        class="spinner"
-        role="status"
-        aria-live="polite"
-        aria-label="Loading expenses"
-      >
-        <div class="spinner-circle"></div>
-      </div>
+      <app-spinner [size]="52" color="#ffcd85" [started]="isLoading"></app-spinner>
     </div>
     <div *ngIf="error">{{ error }}</div>
     <ng-container

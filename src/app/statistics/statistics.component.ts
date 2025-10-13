@@ -34,6 +34,7 @@ import { CategoryTypeFiltersComponent } from './category-type-filters/category-t
 import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
 import { GLOBAL_SWIPE_LENGTH } from '../constants';
 import { PeriodSummaryIconComponent } from "../common/component/period-summary-icon/period-summary-icon.component";
+import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 
 @Component({
   selector: 'app-statistics',
@@ -57,7 +58,8 @@ import { PeriodSummaryIconComponent } from "../common/component/period-summary-i
     MicroVisualsComponent,
     CategoryTypeFiltersComponent,
     CategoryFilterComponent,
-    PeriodSummaryIconComponent
+  PeriodSummaryIconComponent,
+  SpinnerComponent
 ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {

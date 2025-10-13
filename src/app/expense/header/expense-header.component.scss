@@ -126,6 +126,13 @@
   letter-spacing: 0.3px;
   transition: color var(--transition-fast);
 }
+.expense-header-amount-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  height: 34px;
+}
 .expense-header-bottom-balance {
   display: inline-flex;
   align-items: baseline;

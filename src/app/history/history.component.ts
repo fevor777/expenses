@@ -31,6 +31,7 @@ import { HistoryItemComponent } from './item/history-item.component';
 import { GLOBAL_SWIPE_LENGTH } from '../constants';
 import { BudgetSummaryService } from '../common/service/budget-summary.service';
 import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
+import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 
 @Component({
   selector: 'app-history',
@@ -45,6 +46,7 @@ import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
     MultiFilterComponent,
     HistoryItemComponent,
     ExpenseEditModalComponent,
+    SpinnerComponent,
   ],
 })
 export class HistoryComponent implements OnInit, OnDestroy {

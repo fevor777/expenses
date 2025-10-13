@@ -2,13 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { trigger, transition, style, animate, group, state } from '@angular/animations';
 import { CalendarComponent } from '../../common/calendar/calendar.component';
+import { SpinnerComponent } from '../../common/component/spinner/spinner.component';
 
 @Component({
   selector: 'app-expense-header',
   templateUrl: './expense-header.component.html',
   styleUrls: ['./expense-header.component.scss'],
   standalone: true,
-  imports: [CommonModule, CalendarComponent],
+  imports: [CommonModule, CalendarComponent, SpinnerComponent],
   animations: [
     trigger('amountSwap', [
       transition(':enter', [
@@ -45,6 +46,8 @@ export class ExpenseHeaderComponent implements OnInit {
   @Input() currentBalanceAmount: number = 0;
   @Input() balance: number = 0;
   @Input() balanceDate: string = '';
+  // External loading flag (parent controls) for amount area spinner
+  @Input() amountLoading: boolean = false;
 
   // Current date for header display
   today: Date = new Date();
