@@ -1,15 +1,15 @@
 <div class="history-container" #historyRoot>
   <div class="history-fixed-wrapper" #historyFixed>
     <div class="history-nav">
-    <span id="back" class="app-link history-back-link" [routerLink]="'/'"
-      >< Home</span
-    >
-    <span
-      id="stats"
-      class="app-link history-stats-link"
-      [routerLink]="'/statistics'"
-      >Statistics ></span
-    >
+      <span id="back" class="app-link history-back-link" [routerLink]="'/'"
+        >< Home</span
+      >
+      <span
+        id="stats"
+        class="app-link history-stats-link"
+        [routerLink]="'/statistics'"
+        >Statistics ></span
+      >
     </div>
     <div class="history-filter-wrapper">
       <app-multi-filter
@@ -28,35 +28,49 @@
     </div>
   </div>
   <div class="history-content" #historyContent>
-  <ng-container
-    *ngIf="
-      (expenses$ | async)?.length > 0 && (expenses$ | async);
-      let expenses;
-      else: elseBlock
-    "
-  >
-    <app-history-item
-      *ngFor="let item of expenses"
-      [item]="item"
-      [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
-      (editIconClick)="updateExpense($event)"
-      (filterByCategory)="filterByCategory($event)"
-      (deleteLabelClick)="onDelete($event)"
-      (deleteFromBalanceLabelClick)="onDeleteFromBalance($event)"
-    ></app-history-item
-  ></ng-container>
-
-  <ng-template #elseBlock>
-    <div class="history-empty">
-      <span>Для этих категорий и периода трат нет</span>
+    <!-- Loading spinner overlay (kept lightweight; accessible text for screen readers) -->
+    <div class="history-loading" *ngIf="isLoading">
+      <div
+        class="spinner"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading expenses"
+      >
+        <div class="spinner-circle"></div>
+      </div>
     </div>
-  </ng-template>
+    <div *ngIf="error">{{ error }}</div>
+    <ng-container
+      *ngIf="
+        (expenses$ | async)?.length > 0 && (expenses$ | async);
+        let expenses;
+        else: elseBlock
+      "
+    >
+      <div *ngIf="!isLoading">
+        <app-history-item
+          *ngFor="let item of expenses"
+          [item]="item"
+          [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
+          (editIconClick)="updateExpense($event)"
+          (filterByCategory)="filterByCategory($event)"
+          (deleteLabelClick)="onDelete($event)"
+          (deleteFromBalanceLabelClick)="onDeleteFromBalance($event)"
+        ></app-history-item>
+      </div>
+    </ng-container>
 
-  <app-expense-edit-modal
-    *ngIf="showEditModal"
-    [expense]="editingExpense"
-    (apply)="onApplyEdit($event)"
-    (cancel)="closeEditModal()"
-  ></app-expense-edit-modal>
+    <ng-template #elseBlock>
+      <div class="history-empty" *ngIf="!isLoading">
+        <span>Для этих категорий и периода трат нет</span>
+      </div>
+    </ng-template>
+
+    <app-expense-edit-modal
+      *ngIf="showEditModal"
+      [expense]="editingExpense"
+      (apply)="onApplyEdit($event)"
+      (cancel)="closeEditModal()"
+    ></app-expense-edit-modal>
   </div>
 </div>

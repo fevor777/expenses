@@ -4,9 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  catchError,
   first,
   map,
   Observable,
+  of,
   Subject,
   switchMap,
   takeUntil,
@@ -47,6 +49,8 @@ import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
 })
 export class HistoryComponent implements OnInit, OnDestroy {
   expenses$: Observable<HistoryExpense[]>;
+  // Loading spinner state for expenses retrieval (covers remote + local fallback)
+  isLoading: boolean = false;
   totalAmount: number = 0;
   totalAmountPerDays: Map<number, number> = new Map();
   // Coverage metrics for multi-filter summary (active buckets / total buckets • expense entries)
@@ -70,6 +74,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   // Edit modal state
   editingExpense: Expense | null = null;
   showEditModal: boolean = false;
+
+  error: any;
 
   constructor(
     private router: Router,
@@ -131,7 +137,21 @@ export class HistoryComponent implements OnInit, OnDestroy {
         }),
       };
     }
-    this.expenses$ = this.loadExpenses().pipe(takeUntil(this.destroySubject));
+    // Toggle loading state; postpone emission until subscription side effects complete
+    this.isLoading = true;
+    this.expenses$ = this.loadExpenses().pipe(
+      catchError(err => {
+        this.error = err;
+        console.error('Error loading expenses:', err);
+        // Return an empty array to keep the observable stream alive
+        return of([] as HistoryExpense[]);
+      }),
+      tap(() => {
+        // Computation done inside loadExpenses mapping; keep spinner until first emission
+        this.isLoading = false;
+      }),
+      takeUntil(this.destroySubject)
+    );
   }
 
   filterByCategory(category: string): void {

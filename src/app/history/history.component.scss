@@ -40,6 +40,7 @@
     /* Smoothly animate vertical shift when filter collapses/expands (slower for compact view) */
     transition: margin-top 420ms cubic-bezier(0.33, 1, 0.68, 1);
     will-change: margin-top;
+    position: relative;
   }
 
   .history-back-link {
@@ -60,6 +61,31 @@
     font-family: 'Montserrat', sans-serif;
     color: var(--color-text-secondary);
     letter-spacing: 0.5px;
+  }
+
+  .history-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 0 24px;
+  }
+
+  .spinner {
+    width: 42px;
+    height: 42px;
+    position: relative;
+  }
+  .spinner-circle {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border: 4px solid rgba(var(--color-text-rgb, 255,255,255), 0.15);
+    border-top-color: var(--color-accent, #4caf50);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 }
 
