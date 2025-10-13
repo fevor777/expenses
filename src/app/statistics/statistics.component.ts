@@ -97,8 +97,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     boolean
   > = {
     categoryFilters: false,
-    multiChart: false,
-    irregularSummary: false,
+    multiChart: true,
+    irregularSummary: true,
   };
 
   // Category view switch state (bars | micro | filter)
