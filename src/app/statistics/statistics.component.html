@@ -54,11 +54,19 @@
       ></app-spinner>
     </div>
     <div *ngIf="!isFirstLoad">
-      <div class="stats-section stats-section--donut">
-        <app-analytics-switch
-          [expenses]="filteredExpenses"
-        ></app-analytics-switch>
-      </div>
+      <app-collapsed-panel
+        [collapsed]="collapsed.analytics"
+        (toggle)="toggle('analytics')"
+      >
+        <div slot="header" class="stats-section-header">
+          <span class="stats-section-title">Аналитика</span>
+        </div>
+        <div class="stats-section stats-section--donut" *ngIf="!collapsed.analytics">
+          <app-analytics-switch
+            [expenses]="filteredExpenses"
+          ></app-analytics-switch>
+        </div>
+      </app-collapsed-panel>
 
       <app-collapsed-panel
         [collapsed]="collapsed.categoryFilters"

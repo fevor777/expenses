@@ -96,12 +96,14 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   // collapse state for category filters and bars
   collapsed: Record<
-    'categoryFilters' | 'multiChart' | 'irregularSummary',
+    'categoryFilters' | 'multiChart' | 'irregularSummary' | 'analytics',
     boolean
   > = {
-    categoryFilters: false,
+    // Only this panel expanded by default; others collapsed
+    categoryFilters: true,
     multiChart: true,
     irregularSummary: true,
+    analytics: false,
   };
 
   // Category view switch state (bars | micro | filter)
@@ -237,9 +239,22 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     queueMicrotask(() => this.initDynamicLayout());
   }
 
-  toggle(section: 'categoryFilters' | 'multiChart' | 'irregularSummary'): void {
-    this.collapsed[section] = !this.collapsed[section];
-    // Toggling panels may move content; single pass stabilization for smoother animation
+  toggle(section: 'categoryFilters' | 'multiChart' | 'irregularSummary' | 'analytics'): void {
+    const currentlyCollapsed = this.collapsed[section];
+    // Collapse all panels first (exclusive expansion behavior)
+    Object.keys(this.collapsed).forEach(key => {
+      this.collapsed[key as keyof typeof this.collapsed] = true; // set all to collapsed
+    });
+    // If the target panel was collapsed, expand it; if it was expanded, keep all collapsed
+    this.collapsed[section] = currentlyCollapsed; // currentlyCollapsed true means panel was collapsed; we want to invert after exclusive reset
+    if (currentlyCollapsed) {
+      // expand only the requested panel
+      this.collapsed[section] = false;
+    } else {
+      // leave it collapsed (all collapsed state)
+      this.collapsed[section] = true;
+    }
+    // Layout stabilization after height change
     this.scheduleLayoutStabilization(1);
   }
 
