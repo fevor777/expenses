@@ -78,9 +78,9 @@
 }
 .expense-header-total-title {
   font-size: 40px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: var(--color-primary);
+  font-weight: 400;
+  letter-spacing: 1.2px;
+  color: var(--color-amount);
   line-height: 1.05;
   display: flex;
   align-items: baseline;
@@ -90,8 +90,16 @@
   &::after {
     content: '';
     position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
-    background: linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 45%, rgba(255,255,255,0) 60%);
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 45%,
+      rgba(255, 255, 255, 0) 60%
+    );
     opacity: 0;
     pointer-events: none;
     transform: translateX(-20%);
@@ -100,7 +108,7 @@
 }
 .expense-header-total-title-currency {
   font-size: 1em;
-  color: var(--color-primary);
+  color: var(--color-amount);
   font-weight: 400;
   margin-left: 4px;
   line-height: 1;
@@ -115,7 +123,9 @@
   gap: 5px;
   line-height: 1.1;
 }
-.expense-header-today { cursor: pointer; }
+.expense-header-today {
+  cursor: pointer;
+}
 .expense-header-bottom-balance {
   font-weight: 400;
   font-size: 13px;
@@ -167,29 +177,49 @@
   padding: 8px 0 12px;
   background: linear-gradient(
     180deg,
-    rgba(0,0,0,0.15) 0%,
-    rgba(0,0,0,0.08) 18%,
-    rgba(0,0,0,0) 100%
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.08) 18%,
+    rgba(0, 0, 0, 0) 100%
   );
   z-index: 20;
 }
 
 .calendar-overlay app-calendar {
-  animation: fadeSlide .18s ease;
+  animation: fadeSlide 0.18s ease;
 }
 
 @keyframes fadeSlide {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes shimmerFlash {
-  0% { opacity: 0; transform: translateX(-35%); }
-  25% { opacity: 0.55; }
-  60% { opacity: 0.25; transform: translateX(55%); }
-  100% { opacity: 0; transform: translateX(75%); }
+  0% {
+    opacity: 0;
+    transform: translateX(-35%);
+  }
+  25% {
+    opacity: 0.55;
+  }
+  60% {
+    opacity: 0.25;
+    transform: translateX(55%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(75%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .expense-header-total-title::after { animation: none; opacity: 0; }
+  .expense-header-total-title::after {
+    animation: none;
+    opacity: 0;
+  }
 }
