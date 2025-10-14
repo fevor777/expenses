@@ -52,6 +52,17 @@
   }
 }
 
+.date-filter-count {
+  //   padding: 4px 8px;
+  // background: var(--color-bg);
+  // border: 1px solid var(--color-border);
+  // border-radius: 6px;
+  font-weight: 550;
+  letter-spacing: 1px;
+  margin-left: 10px;
+  color: green;
+}
+
 .statistics-period-compact-active { opacity:1; transform:translateY(0); }
 
 @media (prefers-reduced-motion: reduce) {

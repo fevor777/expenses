@@ -22,6 +22,11 @@ interface CategoryStat {
   trendDelta: number; // now represents count of expenses for the category (sorting metric for trend column)
   activeCount: number; // number of days with spending > 0
   entryCount: number; // number of expense entries contributing (non-zero amounts)
+  // Performance optimizations - cached computed values
+  cachedSparkPoints?: string; // cached SVG points string
+  cachedSparkWidth?: number; // cached width
+  formattedTotal?: string; // cached formatted total
+  activeCountDisplay?: string; // cached display string
 }
 
 @Component({
@@ -57,7 +62,7 @@ interface CategoryStat {
         </thead>
         <tbody>
           <tr
-            *ngFor="let s of stats"
+            *ngFor="let s of visibleStats; trackBy: trackByStat"
             class="cat-row"
             [class.active]="
               selectedCategories?.length === 1 && selectedCategories[0] === s.id
@@ -73,34 +78,38 @@ interface CategoryStat {
             </td>
             <td class="share-col">
               <div style="font-size:11px; text-align:center; line-height:1.2;">
-                <span>{{ s.activeCount }}/{{ dateKeys.length }}</span>
-                <span style="color:#888;"> • {{ s.entryCount }}</span>
+                {{ s.activeCountDisplay }}
               </div>
             </td>
             <td class="trend-col">
               <svg
-                *ngIf="s.series.length > 1"
+                *ngIf="s.cachedSparkPoints"
                 class="spark"
                 preserveAspectRatio="none"
-                [attr.viewBox]="'0 0 ' + getSparkWidth(s.series.length) + ' 20'"
+                [attr.viewBox]="'0 0 ' + s.cachedSparkWidth + ' 20'"
               >
                 <polyline
-                  [attr.points]="buildSparkPoints(s)"
+                  [attr.points]="s.cachedSparkPoints"
                   fill="none"
                   stroke="#3366cc"
                   stroke-width="0.5"
                 />
               </svg>
-              <div *ngIf="s.series.length <= 1" class="spark-placeholder">
+              <div *ngIf="!s.cachedSparkPoints" class="spark-placeholder">
                 •
               </div>
             </td>
             <td class="sum-col sum-col-value" style="text-align:right">
-              {{ s.total | number: '1.2-2' }}
+              {{ s.formattedTotal }}
             </td>
           </tr>
         </tbody>
       </table>
+      <div *ngIf="hasMoreRows" class="show-more-container">
+        <button class="show-more-btn" (click)="toggleShowAll()">
+          {{ showAllRows ? 'Показать меньше' : 'Показать все (' + stats.length + ')' }}
+        </button>
+      </div>
     </div>
     <ng-template #noDataTpl>
       <div class="micro-empty">Нет данных</div>
@@ -215,6 +224,25 @@ interface CategoryStat {
         text-align: center;
         color: #aaa;
       }
+      .show-more-container {
+        text-align: center;
+        padding: 8px 0;
+        border-top: 1px solid #eee;
+        margin-top: 4px;
+      }
+      .show-more-btn {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-size: 12px;
+        color: #666;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .show-more-btn:hover {
+        background: #e9ecef;
+      }
     `,
   ],
 })
@@ -233,15 +261,28 @@ export class MicroVisualsComponent implements OnChanges {
   // Exposed to template for active coverage calculations
   dateKeys: string[] = [];
   private lastExpensesRef: Expense[] | null = null;
+  private lastExpensesLength = 0;
+  private lastDateFrameRef: DateFrame | undefined = undefined;
+  
+  // Performance optimization: limit visible rows and implement virtual scrolling
+  maxVisibleRows = 50;
+  showAllRows = false;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['expenses']) {
-      // Skip recompute if same reference and length unchanged (basic shallow guard)
-      if (this.lastExpensesRef === this.expenses && this.stats.length) {
-        return;
+    if (changes['expenses'] || changes['dateFrame']) {
+      // More aggressive optimization - check if meaningful changes occurred
+      const expensesChanged = changes['expenses'] && 
+        (this.lastExpensesRef !== this.expenses || 
+         this.lastExpensesLength !== this.expenses?.length);
+      const dateFrameChanged = changes['dateFrame'] && 
+        this.lastDateFrameRef !== this.dateFrame;
+        
+      if (expensesChanged || dateFrameChanged) {
+        this.lastExpensesRef = this.expenses;
+        this.lastExpensesLength = this.expenses?.length || 0;
+        this.lastDateFrameRef = this.dateFrame;
+        this.recompute();
       }
-      this.lastExpensesRef = this.expenses;
-      this.recompute();
     }
   }
 
@@ -322,11 +363,63 @@ export class MicroVisualsComponent implements OnChanges {
         const activeCount = series.reduce((c, v) => c + (v > 0 ? 1 : 0), 0);
         const entryCount = entryCounts.get(id) || 0;
         const trendDelta = activeCount; // keep current meaning similar to before conceptually
-        return { id, name, total, percent, series, max, trendDelta, activeCount, entryCount };
+        
+        // Cache computed display values for better template performance
+        const formattedTotal = total.toLocaleString('en-US', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
+        const activeCountDisplay = `${activeCount}/${this.dateKeys.length} • ${entryCount}`;
+        
+        return { 
+          id, name, total, percent, series, max, trendDelta, activeCount, entryCount,
+          formattedTotal, activeCountDisplay
+        };
       }
     );
     this.stats = stats;
+    this.cacheSparklineData();
     this.applySort();
+  }
+
+  // Cache expensive sparkline calculations
+  private cacheSparklineData(): void {
+    for (const stat of this.stats) {
+      const len = stat.series.length;
+      if (len <= 1) {
+        stat.cachedSparkWidth = 0;
+        stat.cachedSparkPoints = '';
+        continue;
+      }
+      
+      const width = Math.min(len - 1, this.maxSparkSpan);
+      stat.cachedSparkWidth = width;
+      
+      const max = stat.max || 1;
+      const denom = len - 1 || 1;
+      const points: string[] = new Array(len);
+      
+      for (let i = 0; i < len; i++) {
+        const v = stat.series[i];
+        const x = (i / denom) * width;
+        const y = 18 - (v / max) * 16;
+        points[i] = `${x.toFixed(2)},${y.toFixed(2)}`;
+      }
+      
+      stat.cachedSparkPoints = points.join(' ');
+    }
+  }
+
+  // Performance optimization: only render visible rows
+  get visibleStats(): CategoryStat[] {
+    if (this.showAllRows || this.stats.length <= this.maxVisibleRows) {
+      return this.stats;
+    }
+    return this.stats.slice(0, this.maxVisibleRows);
+  }
+
+  get hasMoreRows(): boolean {
+    return !this.showAllRows && this.stats.length > this.maxVisibleRows;
   }
 
   getSparkWidth(len: number): number {
@@ -348,10 +441,6 @@ export class MicroVisualsComponent implements OnChanges {
       points[i] = `${x.toFixed(2)},${y.toFixed(2)}`;
     }
     return points.join(' ');
-  }
-
-  trackByStat(index: number, item: CategoryStat) {
-    return item.id;
   }
 
   selectCategory(id: string) {
@@ -387,5 +476,19 @@ export class MicroVisualsComponent implements OnChanges {
       if (av === bv) return 0;
       return av > bv ? dir : -dir;
     });
+  }
+
+  /**
+   * TrackBy function for *ngFor optimization
+   */
+  trackByStat(index: number, stat: CategoryStat): string {
+    return stat.id;
+  }
+
+  /**
+   * Toggle between showing limited and all rows
+   */
+  toggleShowAll(): void {
+    this.showAllRows = !this.showAllRows;
   }
 }
