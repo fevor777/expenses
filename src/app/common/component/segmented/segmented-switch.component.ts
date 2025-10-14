@@ -38,6 +38,13 @@ export class SegmentedSwitchComponent implements OnChanges, AfterViewInit {
       this._active = v;
       if (this.viewInited) {
         queueMicrotask(() => this.safeUpdateBg());
+      } else {
+        // If view not initialized yet, defer until after view init
+        Promise.resolve().then(() => {
+          if (this.viewInited) {
+            this.safeUpdateBg();
+          }
+        });
       }
     }
   }
@@ -82,6 +89,8 @@ export class SegmentedSwitchComponent implements OnChanges, AfterViewInit {
     // Defer to next microtask to ensure initial layout is stable
     Promise.resolve().then(() => {
       this.safeUpdateBg();
+      // Additional fallback for cases where component is created in collapsed state
+      setTimeout(() => this.safeUpdateBg(), 100);
     });
   }
 
@@ -99,16 +108,28 @@ export class SegmentedSwitchComponent implements OnChanges, AfterViewInit {
     if (!this.buttons || !this.host?.nativeElement) return;
     const btns = this.buttons.toArray();
     if (!btns.length) return;
+    
     const idx = this.activeIndex;
     const activeEl = btns[idx]?.nativeElement;
     if (!activeEl) return;
+    
     const container = this.host.nativeElement.querySelector('.segmented') as HTMLElement;
     if (!container) return;
+    
+    // Check if elements are properly rendered with dimensions
     const containerRect = container.getBoundingClientRect();
     const activeRect = activeEl.getBoundingClientRect();
+    
+    if (containerRect.width === 0 || activeRect.width === 0) {
+      // Elements not ready yet, retry in next frame
+      requestAnimationFrame(() => this.updateBg());
+      return;
+    }
+    
     const padLeft = parseFloat(getComputedStyle(container).paddingLeft) || 0;
     let left = activeRect.left - containerRect.left - padLeft;
     if (left < 0) left = 0; // safety
+    
     const width = activeRect.width;
     this.bgStyle = {
       width: width + 'px',
