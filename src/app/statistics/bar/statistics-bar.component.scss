@@ -1,4 +1,7 @@
 .category-summary {
+  // Use contain for better layout performance
+  contain: layout style;
+  
   .category-header {
     display: flex;
     justify-content: space-between;
@@ -14,6 +17,8 @@
       padding-left: 25px;
       font-size: 15px;
       color: grey;
+      // Optimize icon rendering
+      will-change: auto;
     }
 
     .category-details-amount {
@@ -30,6 +35,8 @@
       overflow: hidden;
       width: calc(100% - 40px);
       height: 25px;
+      // Optimize for transforms
+      transform: translateZ(0);
 
       .progress-bar {
         background-color: #4caf50;
@@ -38,6 +45,8 @@
         color: white;
         text-align: center;
         border-radius: 5px;
+        // Use transform instead of width changes for better performance
+        transition: transform 0.2s ease-out;
       }
     }
 
@@ -45,6 +54,8 @@
       padding: 4px;
       padding-right: 20px;
       cursor: pointer;
+      // Prevent layout shifts
+      flex-shrink: 0;
     }
   }
 }

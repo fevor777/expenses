@@ -93,6 +93,8 @@ export class AnalyticsSwitchComponent
   ];
 
   private donutChart: echarts.ECharts | null = null;
+  private resizeObserver?: ResizeObserver;
+  private isInitialized = false;
 
   constructor(private analytics: CategoryAnalyticsService) {}
 
@@ -100,16 +102,15 @@ export class AnalyticsSwitchComponent
     if (v === 'donut' || v === 'composition') {
       this.activeView = v;
       if (v === 'donut') {
-        // Container persisted; ensure chart exists & refresh AFTER it becomes visible
-        requestAnimationFrame(() => {
+        // Try to initialize if not done yet, or refresh if already initialized
+        if (!this.isInitialized) {
           this.ensureChartAndRender();
-          // Second frame to guarantee layout settled before final resize & rerender
+        } else if (this.donutChart) {
           requestAnimationFrame(() => {
             this.donutChart?.resize();
-            // Re-render after resize to recompute center text positioning
-            this.renderDonut();
+            requestAnimationFrame(() => this.renderDonut());
           });
-        });
+        }
       } else if (v === 'composition') {
         // Ensure treemap resizes after becoming visible
         requestAnimationFrame(() => {
@@ -120,14 +121,14 @@ export class AnalyticsSwitchComponent
     }
   }
   ngAfterViewInit(): void {
-    if (this.activeView === 'donut') {
-      this.ensureChartAndRender();
-    }
+    this.setupResizeObserver();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses'] && !changes['expenses'].firstChange) {
-      if (this.activeView === 'donut') this.renderDonut();
+      if (this.activeView === 'donut' && this.isInitialized && this.donutChart) {
+        this.renderDonut();
+      }
     }
   }
 
@@ -136,6 +137,9 @@ export class AnalyticsSwitchComponent
       this.donutChart.dispose();
       this.donutChart = null;
     }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   @HostListener('window:resize') onResize() {
@@ -143,10 +147,52 @@ export class AnalyticsSwitchComponent
   }
 
   private ensureChartAndRender(): void {
-    if (!this.donutChart && this.donutContainer?.nativeElement) {
-      this.donutChart = echarts.init(this.donutContainer.nativeElement);
+    if (!this.donutContainer?.nativeElement) return;
+    
+    const container = this.donutContainer.nativeElement;
+    const rect = container.getBoundingClientRect();
+    
+    // Only initialize if container has actual dimensions
+    if (rect.width > 0 && rect.height > 0) {
+      if (!this.donutChart) {
+        this.donutChart = echarts.init(container);
+        this.isInitialized = true;
+      }
+      this.renderDonut();
     }
-    this.renderDonut();
+  }
+
+  private setupResizeObserver(): void {
+    if (!this.donutContainer?.nativeElement) return;
+    
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width > 0 && height > 0 && this.activeView === 'donut') {
+          if (!this.isInitialized) {
+            this.ensureChartAndRender();
+          } else if (this.donutChart) {
+            this.donutChart.resize();
+          }
+        }
+      }
+    });
+    
+    this.resizeObserver.observe(this.donutContainer.nativeElement);
+  }
+
+  /** Public API for external refresh when panel becomes visible */
+  public forceRefresh(): void {
+    if (this.activeView === 'donut') {
+      if (!this.isInitialized) {
+        this.ensureChartAndRender();
+      } else if (this.donutChart) {
+        requestAnimationFrame(() => {
+          this.donutChart?.resize();
+          requestAnimationFrame(() => this.renderDonut());
+        });
+      }
+    }
   }
 
   private renderDonut(): void {

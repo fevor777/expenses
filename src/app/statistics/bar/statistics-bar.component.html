@@ -4,7 +4,7 @@
       <span
         class="app-link category-label"
         (click)="onCategoryLabelClick(category)"
-        >{{ getCategoryNameByIdFunc(category) }}</span
+        >{{ categoryName }}</span
       >
       <i
         class="fa-solid fa-list category-details-icon"
@@ -22,7 +22,7 @@
         [style.width.%]="percentage"
         [style.backgroundColor]="color"
       >
-        {{ percentage.toFixed(2) }}%
+        {{ formattedPercentage }}
       </div>
     </div>
   </div>
