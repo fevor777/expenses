@@ -201,6 +201,45 @@ export class AnalyticsSwitchComponent
     // Sort by total descending (same ordering as original statistics page donut)
     aggs = aggs.sort((a, b) => b.total - a.total);
     const total = aggs.reduce((s, a) => s + a.total, 0);
+    // Soft pastel palette (light mode). These intentionally keep saturation low.
+    const softPaletteLight = [
+      '#b3cde0','#ccebc5','#decbe4','#fed9a6','#ffe9af',
+      '#fbb4ae','#e1d5e7','#cbd5e1','#d7e3fc','#f2c6de'
+    ];
+    // Dark mode variants (slightly deeper tones for contrast)
+    const softPaletteDark = [
+      '#5b7080','#4f6b5a','#5d4f67','#7a6040','#7a6a3f',
+      '#784f4b','#5a5364','#4a5864','#4b5b7a','#6a4c5a'
+    ];
+    const isDark = document.documentElement.classList.contains('dark') || document.documentElement.getAttribute('data-theme') === 'dark';
+    const palette = isDark ? softPaletteDark : softPaletteLight;
+    // Map each aggregate to a color (fallback to category-defined color if available and looks soft enough)
+    const colorizedData = aggs.map((a, idx) => {
+      let color = palette[idx % palette.length];
+      if (a.color) {
+        // If provided color is already light/pastel (high L in HSL), allow it
+        try {
+          const test = a.color.trim();
+          if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(test)) {
+            // simple luminance check
+            const hex = test.length === 4 ? '#' + test[1]+test[1]+test[2]+test[2]+test[3]+test[3] : test;
+            const r = parseInt(hex.substring(1,3),16);
+            const g = parseInt(hex.substring(3,5),16);
+            const b = parseInt(hex.substring(5,7),16);
+            const lum = (0.299*r + 0.587*g + 0.114*b)/255;
+            if (lum > 0.6) color = test; // keep light category color
+          } else if (test.startsWith('rgb')) {
+            // crude parse
+            const nums = test.match(/\d+/g)?.map(n=>+n) || [];
+            if (nums.length >=3) {
+              const lum = (0.299*nums[0] + 0.587*nums[1] + 0.114*nums[2]) / 255;
+              if (lum > 0.6) color = test;
+            }
+          }
+        } catch {}
+      }
+      return { value: a.total, name: a.name, itemStyle: { color } };
+    });
     this.donutChart.setOption({
       // Enable faster, snappier animations (defaults are ~1000ms; we reduce to 300ms)
       animation: false,
@@ -222,7 +261,7 @@ export class AnalyticsSwitchComponent
           hoverAnimation: false, // keep subtle hover feedback
           label: { show: true, position: 'outside', formatter: '{b}' },
           labelLine: { show: true },
-          data: aggs.map(a => ({ value: a.total, name: a.name })),
+          data: colorizedData,
         },
       ],
       graphic: {
