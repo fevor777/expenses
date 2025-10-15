@@ -1,4 +1,4 @@
-<div class="section">
+<div class="section" [class.section--no-anim]="disableAnimation">
   <div class="section-header" (click)="onToggle()">
     <div class="section-title">
       <ng-content select="[slot=header]"></ng-content>
@@ -12,7 +12,7 @@
       {{ collapsed ? '▼' : '▲' }}
     </button>
   </div>
-  <div class="section-body" *ngIf="!collapsed">
+  <div class="section-body" *ngIf="!collapsed" [class.section-body--no-anim]="disableAnimation">
     <ng-content></ng-content>
   </div>
 </div>

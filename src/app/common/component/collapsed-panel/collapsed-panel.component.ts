@@ -12,6 +12,8 @@ export class CollapsedPanelComponent {
   @Input() title: string = '';
   @Input() collapsed: boolean = false;
   @Input() showCollapseButton: boolean = true;
+  // When true, turns off panel open animation & interactive transitions
+  @Input() disableAnimation: boolean = false;
   @Output() toggle = new EventEmitter<void>();
 
   onToggle(): void {

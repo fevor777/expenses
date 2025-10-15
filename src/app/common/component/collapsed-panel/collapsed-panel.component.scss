@@ -84,6 +84,21 @@
   animation: slideDown 0.25s ease-out;
 }
 
+/* Disable animation mode */
+.section--no-anim {
+  transition: none !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.section--no-anim .section-header {
+  transition: none !important;
+}
+.section--no-anim .collapse-btn {
+  transition: none !important;
+}
+.section-body--no-anim {
+  animation: none !important;
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;

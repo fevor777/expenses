@@ -6,9 +6,9 @@
   flex-wrap: wrap;
   gap: 8px;
   font-size: 14px;
-  transition:
-    padding 240ms cubic-bezier(0.25, 0.8, 0.25, 1),
-    margin 240ms cubic-bezier(0.25, 0.8, 0.25, 1); /* was 560ms */
+  // transition:
+  //   padding 240ms cubic-bezier(0.25, 0.8, 0.25, 1),
+  //   margin 240ms cubic-bezier(0.25, 0.8, 0.25, 1); /* was 560ms */
 
   /* Refresh icon flattened & subtle */
   .statistics-refresh-button {
@@ -18,13 +18,13 @@
     line-height: 1;
     cursor: pointer;
     color: var(--color-text-secondary);
-    transition:
-      color var(--transition-fast),
-      transform var(--transition-fast);
+    // transition:
+    //   color var(--transition-fast),
+    //   transform var(--transition-fast);
   }
   /* hover style removed */
   .statistics-refresh-button:active {
-    transform: scale(0.9);
+    // transform: scale(0.9);
   }
 }
 
@@ -38,10 +38,10 @@
   border: 1px solid var(--color-border);
   border-radius: 6px;
   opacity: 0.01;
-  transform: translateY(-8px);
-  transition:
-    opacity 200ms cubic-bezier(0.25, 0.8, 0.25, 1),
-    transform 200ms cubic-bezier(0.25, 0.8, 0.25, 1); /* was 560ms */
+  // transform: translateY(-8px);
+  // transition:
+  //   opacity 200ms cubic-bezier(0.25, 0.8, 0.25, 1),
+  //   transform 200ms cubic-bezier(0.25, 0.8, 0.25, 1); /* was 560ms */
   will-change: opacity, transform;
   .statistics-period-compact-title {
     font-weight: 600;

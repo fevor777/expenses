@@ -72,22 +72,14 @@ import { SpinnerComponent } from '../common/component/spinner/spinner.component'
   animations: [
     trigger('amountValueChange', [
       transition('* => *', [
-        style({
-          opacity: 0,
-          transform: 'translateY(14px) scale(.92)',
-          filter: 'blur(2px)'
-        }),
-        animate('20ms cubic-bezier(.22,.61,.36,1)', style({
-          opacity: 1,
-          transform: 'translateY(0) scale(1)',
-          filter: 'blur(0)'
-        }))
+        style({ opacity: 0, transform: 'translateY(-8px) scale(.9)' }),
+        animate('1200ms cubic-bezier(.22,.61,.36,1)', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
       ])
     ]),
     trigger('amountFlash', [
       transition('* => *', [
         style({ filter: 'brightness(1.35)', opacity: 0.9 }),
-        animate('260ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
+        animate('1200ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
       ])
     ])
   ],
@@ -266,6 +258,13 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.calculateCategoryTotals();
     // Initialize dynamic layout once view children exist
     queueMicrotask(() => this.initDynamicLayout());
+    // Defer fade-in of content so transition triggers (opacity start 0 in template)
+    requestAnimationFrame(() => {
+      const content = this.statsContentRef?.nativeElement;
+      if (content) {
+        content.style.opacity = '1';
+      }
+    });
   }
 
   toggle(
