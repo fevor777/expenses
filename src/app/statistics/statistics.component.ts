@@ -73,13 +73,13 @@ import { SpinnerComponent } from '../common/component/spinner/spinner.component'
     trigger('amountValueChange', [
       transition('* => *', [
         style({ opacity: 0, transform: 'translateY(-8px) scale(.9)' }),
-        animate('1200ms cubic-bezier(.22,.61,.36,1)', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+        animate('390ms cubic-bezier(.22,.61,.36,1)', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
       ])
     ]),
     trigger('amountFlash', [
       transition('* => *', [
         style({ filter: 'brightness(1.35)', opacity: 0.9 }),
-        animate('1200ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
+        animate('290ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
       ])
     ])
   ],

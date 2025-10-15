@@ -17,9 +17,9 @@
   .statistics-content {
     width: 100%; /* margin-top applied dynamically in TS */
     /* Opacity-only animation (replacing previous margin-top transition) */
-    transition: opacity 750ms, margin-top 1500ms cubic-bezier(0.3, 0.8, 0.3, 1); /* was 560ms for slower shift */
+    transition: opacity 390ms, margin-top 390ms cubic-bezier(0.3, 0.8, 0.3, 1); /* was 560ms for slower shift */
     will-change: opacity, margin-top;
-    opacity: 0; /* start hidden, then fade in on init */
+    opacity: 0.6; /* start hidden, then fade in on init */
   }
   .statistics-loading {
     display: flex;
