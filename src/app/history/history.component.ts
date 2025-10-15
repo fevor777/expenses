@@ -524,7 +524,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
       const effectiveHeight = shouldBeFixed ? h : 0;
       if (effectiveHeight === this.lastHeight) { return; }
       this.lastHeight = effectiveHeight;
-      contentEl.style.marginTop = effectiveHeight + 'px';
+      contentEl.style.marginTop = effectiveHeight - 5 + 'px';
     });
   }
 
