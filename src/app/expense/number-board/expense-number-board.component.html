@@ -8,6 +8,14 @@
       class="expense-description-icon fa-regular fa-pen-to-square"
       (click)="addDescription()"
     ></i>
+    <i
+      *ngIf="amount"
+      class="expense-clear-icon fas fa-times"
+      (click)="clearAmount($event)"
+      aria-label="Clear amount"
+      role="button"
+      tabindex="0"
+    ></i>
     <span
       class="expense-number-board-input"
       [class.expense-number-board-input-active]="amount"
@@ -20,6 +28,7 @@
     >
       {{ amount || 'введите расход' }}
     </span>
+
     <span class="expense-number-board-currency" (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
   </div>
   <div

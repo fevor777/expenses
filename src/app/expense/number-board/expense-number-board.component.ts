@@ -114,6 +114,14 @@ export class ExpenseNumberBoardComponent {
   // Touch listeners for long press removed
   showDescriptionModal = false;
 
+  clearAmount(event?: Event) {
+    // Prevent triggering parent click (like open calculator or swipe)
+    event?.stopPropagation();
+    if (this.amount) {
+      this.amountChange.emit('');
+    }
+  }
+
   onDescriptionApply(description: string) {
     this.showDescriptionModal = false;
     this.descriptionChange.emit(description);
