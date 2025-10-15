@@ -7,6 +7,7 @@ import {
   Output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DescriptionEditModalComponent } from './description-edit-modal.component';
 
 import { Currency } from '../../common/model/currency';
 
@@ -15,7 +16,7 @@ import { Currency } from '../../common/model/currency';
   templateUrl: './expense-number-board.component.html',
   styleUrls: ['./expense-number-board.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DescriptionEditModalComponent],
 })
 export class ExpenseNumberBoardComponent {
   @Input() currency: Currency;
@@ -54,8 +55,7 @@ export class ExpenseNumberBoardComponent {
   }
 
   addDescription(): void {
-    const description = prompt('Enter description', this.description);
-    this.descriptionChange.emit(description);
+    this.showDescriptionModal = true;
   }
 
   onCurrencyClick(): void {
@@ -112,4 +112,14 @@ export class ExpenseNumberBoardComponent {
   }
 
   // Touch listeners for long press removed
+  showDescriptionModal = false;
+
+  onDescriptionApply(description: string) {
+    this.showDescriptionModal = false;
+    this.descriptionChange.emit(description);
+  }
+
+  onDescriptionCancel() {
+    this.showDescriptionModal = false;
+  }
 }

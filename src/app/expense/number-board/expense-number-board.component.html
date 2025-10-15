@@ -55,3 +55,10 @@
     </div>
   </div>
 </div>
+
+<app-description-edit-modal
+  *ngIf="showDescriptionModal"
+  [description]="description"
+  (apply)="onDescriptionApply($event)"
+  (cancel)="onDescriptionCancel()"
+></app-description-edit-modal>
