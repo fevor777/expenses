@@ -15,7 +15,7 @@ export class StatisticsBarComponent implements OnInit, OnChanges {
   @Input() category: string;
   @Input() amount: number;
   @Input() percentage: number;
-  @Input() color: string = '#28C600';
+  @Input() color: string = '#66b166';
 
   @Output() close: EventEmitter<string> = new EventEmitter<string>();
   @Output() categoryLabelClick: EventEmitter<string> =

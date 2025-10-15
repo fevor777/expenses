@@ -271,9 +271,9 @@ export class AnalyticsSwitchComponent
         style: {
           text: total ? total.toLocaleString() + '€' : '0€',
           textAlign: 'center',
-          fill: '#000',
+          fill: '#000000',
           fontSize: 18,
-          fontWeight: 'bold',
+          fontWeight: 500,
         },
       },
     });
