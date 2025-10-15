@@ -1,7 +1,11 @@
 .category-summary {
   // Use contain for better layout performance
   contain: layout style;
-  
+  user-select: none;
+  -webkit-user-select: none; /* for Safari */
+  -moz-user-select: none; /* for Firefox */
+  -ms-user-select: none;
+
   .category-header {
     display: flex;
     justify-content: space-between;
