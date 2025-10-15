@@ -40,7 +40,11 @@
           (click)="navigateToPeriodSummary()"
         ></app-period-summary-icon>
       </ng-container>
-      <ng-container app-date-filter-total> {{ totalAmount }}€</ng-container>
+      <ng-container app-date-filter-total>
+        <span *ngIf="!isFirstLoad" [@amountFlash]="totalAmount">
+          {{ totalAmount }}€
+        </span>
+      </ng-container>
     </app-date-filter>
   </div>
 

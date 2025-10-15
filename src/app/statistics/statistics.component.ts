@@ -34,7 +34,14 @@ import { CategoryTypeFiltersComponent } from './category-type-filters/category-t
 import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
 // Dynamic swipe length from store (fallback constant inside service defaults)
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
-import { PeriodSummaryIconComponent } from "../common/component/period-summary-icon/period-summary-icon.component";
+import { PeriodSummaryIconComponent } from '../common/component/period-summary-icon/period-summary-icon.component';
+import {
+  trigger,
+  transition,
+  style,
+  animate,
+  group,
+} from '@angular/animations';
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 
 @Component({
@@ -59,9 +66,31 @@ import { SpinnerComponent } from '../common/component/spinner/spinner.component'
     MicroVisualsComponent,
     CategoryTypeFiltersComponent,
     CategoryFilterComponent,
-  PeriodSummaryIconComponent,
-  SpinnerComponent
-],
+    PeriodSummaryIconComponent,
+    SpinnerComponent,
+  ],
+  animations: [
+    trigger('amountValueChange', [
+      transition('* => *', [
+        style({
+          opacity: 0,
+          transform: 'translateY(14px) scale(.92)',
+          filter: 'blur(2px)'
+        }),
+        animate('20ms cubic-bezier(.22,.61,.36,1)', style({
+          opacity: 1,
+          transform: 'translateY(0) scale(1)',
+          filter: 'blur(0)'
+        }))
+      ])
+    ]),
+    trigger('amountFlash', [
+      transition('* => *', [
+        style({ filter: 'brightness(1.35)', opacity: 0.9 }),
+        animate('260ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
+      ])
+    ])
+  ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
   categoryTotals: {
@@ -239,7 +268,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     queueMicrotask(() => this.initDynamicLayout());
   }
 
-  toggle(section: 'categoryFilters' | 'multiChart' | 'irregularSummary' | 'analytics'): void {
+  toggle(
+    section: 'categoryFilters' | 'multiChart' | 'irregularSummary' | 'analytics'
+  ): void {
     const currentlyCollapsed = this.collapsed[section];
     // Collapse all panels first (exclusive expansion behavior)
     Object.keys(this.collapsed).forEach(key => {
@@ -348,7 +379,15 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       });
   }
 
-  trackByCategoryTotal(index: number, item: { category: string; amount: number; percentage: number; color: string }) {
+  trackByCategoryTotal(
+    index: number,
+    item: {
+      category: string;
+      amount: number;
+      percentage: number;
+      color: string;
+    }
+  ) {
     // Category id is stable; using it prevents re-rendering unchanged bars.
     return item.category;
   }
@@ -558,11 +597,19 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   private initDynamicLayout(): void {
     const wrapperEl = this.fixedWrapperRef?.nativeElement;
-    if (!wrapperEl) { return; }
+    if (!wrapperEl) {
+      return;
+    }
     this.wrapperObserver = new ResizeObserver(() => this.applyContentOffset());
     this.wrapperObserver.observe(wrapperEl);
-    this.mutationObserver = new MutationObserver(() => this.applyContentOffset());
-    this.mutationObserver.observe(wrapperEl, { childList: true, subtree: true, characterData: true });
+    this.mutationObserver = new MutationObserver(() =>
+      this.applyContentOffset()
+    );
+    this.mutationObserver.observe(wrapperEl, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
     window.addEventListener('resize', this.resizeHandler, { passive: true });
     this.applyContentOffset();
   }
@@ -579,7 +626,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   private applyContentOffset(): void {
     requestAnimationFrame(() => {
       const height = this.fixedWrapperRef?.nativeElement?.offsetHeight || 0;
-      if (height === this.lastHeight) { return; }
+      if (height === this.lastHeight) {
+        return;
+      }
       this.lastHeight = height;
       if (this.statsContentRef?.nativeElement) {
         this.statsContentRef.nativeElement.style.marginTop = height + 'px';
@@ -587,11 +636,16 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     });
   }
 
-  private scheduleLayoutStabilization(iterations: number = 3, intervalMs: number = 40): void {
+  private scheduleLayoutStabilization(
+    iterations: number = 3,
+    intervalMs: number = 40
+  ): void {
     let count = 0;
     const run = () => {
       this.applyContentOffset();
-      if (++count < iterations) { setTimeout(run, intervalMs); }
+      if (++count < iterations) {
+        setTimeout(run, intervalMs);
+      }
     };
     run();
   }
