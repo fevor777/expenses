@@ -56,14 +56,19 @@
       ></textarea>
     </label>
     <div class="eem-actions">
-      <button type="button" class="eem-btn eem-btn--danger" (click)="onDelete()" aria-label="Delete expense">
-        Delete
-      </button>
-      <span class="eem-actions-spacer"></span>
+      <button type="submit" class="eem-btn eem-btn--primary">Save</button>
       <button type="button" class="eem-btn" (click)="onBackdrop()">
         Cancel
       </button>
-      <button type="submit" class="eem-btn eem-btn--primary">Save</button>
+      <span class="eem-actions-spacer"></span>
+      <button
+        type="button"
+        class="eem-btn eem-btn--danger"
+        (click)="onDelete()"
+        aria-label="Delete expense"
+      >
+        Delete
+      </button>
     </div>
   </form>
 </div>
