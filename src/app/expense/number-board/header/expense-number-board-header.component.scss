@@ -1,0 +1,70 @@
+.expense-number-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 22px;
+  padding: 6px 17px;
+  position: relative;
+  border-bottom: 1px solid var(--color-border);
+  gap: 10px;
+}
+.expense-number-board-icons-left,
+.expense-number-board-icons-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.expense-number-board-input {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  border: none;
+  background: none;
+  outline: none;
+  letter-spacing: 1px;
+  color: var(--color-muted);
+  max-width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.expense-number-board-input-active {
+  font-weight: 600;
+  color: var(--color-text);
+  opacity: 0.7;
+  min-width: 200px;
+}
+.expense-description-icon,
+.expense-edit-latest-icon,
+.expense-clear-icon,
+.expense-calculator-icon {
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.5;
+  padding-left: 8px;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.expense-clear-icon {
+  font-size: 16px;
+  padding: 4px 20px;
+  opacity: 0.55;
+}
+.expense-calculator-icon {
+  padding-left: 10px;
+}
+.expense-edit-latest-icon:active,
+.expense-description-icon:active,
+.expense-calculator-icon:active {
+  transform: scale(0.9);
+}
+.expense-clear-icon:active {
+  transform: scale(0.85);
+}
+.expense-number-board-currency {
+  font-size: 20px;
+  opacity: 0.5;
+}

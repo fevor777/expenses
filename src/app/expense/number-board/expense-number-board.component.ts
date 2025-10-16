@@ -11,13 +11,20 @@ import { DescriptionEditModalComponent } from './description-edit-modal.componen
 import { Currency } from '../../common/model/currency';
 import { Expense } from '../../common/model/expense.model';
 import { ExpenseEditModalComponent } from '../../history/edit/expense-edit-modal.component';
+import { ExpenseNumberBoardHeaderComponent } from './header/expense-number-board-header.component';
 
 @Component({
   selector: 'app-expense-number-board',
   templateUrl: './expense-number-board.component.html',
   styleUrls: ['./expense-number-board.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, DescriptionEditModalComponent, ExpenseEditModalComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    DescriptionEditModalComponent,
+    ExpenseEditModalComponent,
+    ExpenseNumberBoardHeaderComponent,
+  ],
 })
 export class ExpenseNumberBoardComponent {
   @Input() currency: Currency;
@@ -39,8 +46,10 @@ export class ExpenseNumberBoardComponent {
   @Output() numberBoardSwipeUp: EventEmitter<void> = new EventEmitter<void>();
   // Long press removed
   @Output() openCalculator: EventEmitter<void> = new EventEmitter<void>();
-  @Output() latestExpenseUpdated: EventEmitter<Expense> = new EventEmitter<Expense>();
-  @Output() latestExpenseDeleted: EventEmitter<Expense> = new EventEmitter<Expense>();
+  @Output() latestExpenseUpdated: EventEmitter<Expense> =
+    new EventEmitter<Expense>();
+  @Output() latestExpenseDeleted: EventEmitter<Expense> =
+    new EventEmitter<Expense>();
 
   // Long press logic removed
 

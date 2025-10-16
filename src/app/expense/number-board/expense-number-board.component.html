@@ -1,59 +1,15 @@
 <div class="expense-number-board">
-  <div
-    class="expense-number-board-header"
-    (swipeleft)="onDeleteClick()"
-    (swiperight)="onDeleteClick()"
-  >
-    <div class="expense-number-board-icons-left">
-      <i
-        *ngIf="amount"
-        class="expense-description-icon fa-regular fa-pen-to-square"
-        (click)="addDescription()"
-      ></i>
-      <i
-        *ngIf="!amount && latestExpense"
-        class="expense-edit-latest-icon fas fa-clock-rotate-left"
-        (click)="openEditLatest($event)"
-        aria-label="Edit latest expense"
-        role="button"
-        tabindex="0"
-      ></i>
-      <i
-        *ngIf="amount"
-        class="expense-clear-icon fas fa-times"
-        (click)="clearAmount($event)"
-        aria-label="Clear amount"
-        role="button"
-        tabindex="0"
-      ></i>
-    </div>
-    <span
-      class="expense-number-board-input"
-      [class.expense-number-board-input-active]="amount"
-      (click)="openCalculatorEmit()"
-      (keydown.enter)="openCalculatorEmit()"
-      (keydown.space)="openCalculatorEmit()"
-      role="button"
-      tabindex="0"
-      aria-label="Expense amount"
-    >
-      {{ amount || 'введите расход' }}
-    </span>
-
-    <div class="expense-number-board-icons-right">
-      <span class="expense-number-board-currency" (click)="onCurrencyClick()">{{
-        getCurrencySymbol()
-      }}</span>
-      <i
-        *ngIf="amount"
-        class="expense-calculator-icon fas fa-calculator"
-        (click)="openCalculatorEmit()"
-        aria-label="Open calculator"
-        role="button"
-        tabindex="0"
-      ></i>
-    </div>
-  </div>
+  <app-expense-number-board-header
+    [amount]="amount"
+    [latestExpense]="latestExpense"
+    [currencyCode]="getCurrencySymbol()"
+    (addDescription)="addDescription()"
+    (clearAmount)="clearAmount($event)"
+    (openCalculator)="openCalculatorEmit()"
+    (openEditLatest)="openEditLatest($event)"
+    (currencyClick)="onCurrencyClick()"
+    (deleteClick)="onDeleteClick()"
+  ></app-expense-number-board-header>
   <div
     class="expense-number-board-body"
     (swipedown)="onSwipeDown($event)"

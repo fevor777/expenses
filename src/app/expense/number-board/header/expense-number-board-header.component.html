@@ -1,0 +1,54 @@
+<div
+  class="expense-number-board-header"
+  (swipeleft)="onDeleteClick()"
+  (swiperight)="onDeleteClick()"
+>
+  <div class="expense-number-board-icons-left">
+    <i
+      *ngIf="amount"
+      class="expense-description-icon fa-regular fa-pen-to-square"
+      (click)="onAddDescription()"
+    ></i>
+    <i
+      *ngIf="!amount && latestExpense"
+      class="expense-edit-latest-icon fas fa-clock-rotate-left"
+      (click)="onOpenEditLatest($event)"
+      aria-label="Edit latest expense"
+      role="button"
+      tabindex="0"
+    ></i>
+    <i
+      *ngIf="amount"
+      class="expense-clear-icon fas fa-times"
+      (click)="onClearAmount($event)"
+      aria-label="Clear amount"
+      role="button"
+      tabindex="0"
+    ></i>
+  </div>
+  <span
+    class="expense-number-board-input"
+    [class.expense-number-board-input-active]="amount"
+    (click)="onOpenCalculator()"
+    (keydown.enter)="onOpenCalculator()"
+    (keydown.space)="onOpenCalculator()"
+    role="button"
+    tabindex="0"
+    aria-label="Expense amount"
+  >
+    {{ amount || 'введите расход' }}
+  </span>
+  <div class="expense-number-board-icons-right">
+    <span class="expense-number-board-currency" (click)="onCurrencyClick()">{{
+      currencyCode
+    }}</span>
+    <i
+      *ngIf="amount"
+      class="expense-calculator-icon fas fa-calculator"
+      (click)="onOpenCalculator()"
+      aria-label="Open calculator"
+      role="button"
+      tabindex="0"
+    ></i>
+  </div>
+</div>

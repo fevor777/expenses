@@ -91,7 +91,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Initialize latestExpense stream early (will emit undefined until user id resolved/offline store) 
+    // Initialize latestExpense stream early (will emit undefined until user id resolved/offline store)
     this.latestExpense$ = this.expenseService.getLatestExpense();
     this.isAmountsLoading = true;
     this.expenseService
@@ -367,10 +367,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     if (!expense?.id) {
       return;
     }
-    this.expenseService
-      .deleteExpense(expense.id)
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe();
+    if (confirm('Delete?')) {
+      this.expenseService
+        .deleteExpense(expense.id)
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe();
+    }
   }
 
   // Global touch listeners for long press removed
