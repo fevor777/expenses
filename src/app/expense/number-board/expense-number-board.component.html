@@ -4,18 +4,29 @@
     (swipeleft)="onDeleteClick()"
     (swiperight)="onDeleteClick()"
   >
-    <i
-      class="expense-description-icon fa-regular fa-pen-to-square"
-      (click)="addDescription()"
-    ></i>
-    <i
-      *ngIf="amount"
-      class="expense-clear-icon fas fa-times"
-      (click)="clearAmount($event)"
-      aria-label="Clear amount"
-      role="button"
-      tabindex="0"
-    ></i>
+    <div class="expense-number-board-icons-left">
+      <i
+        *ngIf="amount"
+        class="expense-description-icon fa-regular fa-pen-to-square"
+        (click)="addDescription()"
+      ></i>
+      <i
+        *ngIf="!amount && latestExpense"
+        class="expense-edit-latest-icon fas fa-clock-rotate-left"
+        (click)="openEditLatest($event)"
+        aria-label="Edit latest expense"
+        role="button"
+        tabindex="0"
+      ></i>
+      <i
+        *ngIf="amount"
+        class="expense-clear-icon fas fa-times"
+        (click)="clearAmount($event)"
+        aria-label="Clear amount"
+        role="button"
+        tabindex="0"
+      ></i>
+    </div>
     <span
       class="expense-number-board-input"
       [class.expense-number-board-input-active]="amount"
@@ -29,7 +40,19 @@
       {{ amount || 'введите расход' }}
     </span>
 
-    <span class="expense-number-board-currency" (click)="onCurrencyClick()">{{ getCurrencySymbol() }}</span>
+    <div class="expense-number-board-icons-right">
+      <span class="expense-number-board-currency" (click)="onCurrencyClick()">{{
+        getCurrencySymbol()
+      }}</span>
+      <i
+        *ngIf="amount"
+        class="expense-calculator-icon fas fa-calculator"
+        (click)="openCalculatorEmit()"
+        aria-label="Open calculator"
+        role="button"
+        tabindex="0"
+      ></i>
+    </div>
   </div>
   <div
     class="expense-number-board-body"
@@ -71,3 +94,11 @@
   (apply)="onDescriptionApply($event)"
   (cancel)="onDescriptionCancel()"
 ></app-description-edit-modal>
+
+<app-expense-edit-modal
+  *ngIf="showEditLatestModal"
+  [expense]="editingLatestExpense"
+  (apply)="onApplyEditLatest($event)"
+  (cancel)="onCancelEditLatest()"
+  (delete)="onDeleteLatest($event)"
+></app-expense-edit-modal>

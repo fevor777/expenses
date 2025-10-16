@@ -45,6 +45,7 @@
     [amount]="enteredAmount"
     [currency]="currency"
     [description]="description"
+    [latestExpense]="latestExpense$ | async"
     (amountChange)="onAmountChange($event)"
     (currencyChange)="onCurrencyChange($event)"
     (descriptionChange)="onDescriptionChange($event)"
@@ -52,6 +53,8 @@
     (numberBoardSwipeLeft)="navigateToHistory()"
     (numberBoardSwipeRight)="navigateToStatistics()"
     (openCalculator)="onOpenCalculator()"
+    (latestExpenseUpdated)="onLatestExpenseUpdated($event)"
+    (latestExpenseDeleted)="onLatestExpenseDeleted($event)"
   >
   </app-expense-number-board>
 </div>

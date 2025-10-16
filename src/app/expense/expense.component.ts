@@ -69,6 +69,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   budgetSummary: BudgetSummaryBuildResult;
   // Loading flag for header amount spinner
   isAmountsLoading: boolean = false;
+  // Stream of latest expense (service level); we still fallback in template if not yet available
+  latestExpense$: Observable<Expense | undefined>;
 
   currency: Currency;
   description: string = '';
@@ -89,6 +91,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Initialize latestExpense stream early (will emit undefined until user id resolved/offline store) 
+    this.latestExpense$ = this.expenseService.getLatestExpense();
     this.isAmountsLoading = true;
     this.expenseService
       .getExpenses(this.dateFilterService.getInitialMonthValue())
@@ -151,19 +155,23 @@ export class ExpenseComponent implements OnInit, OnDestroy {
               of(addedExpense),
             ])
           ),
-          tap(([summary, addedExpense]: [BudgetSummaryBuildResult, Expense]) => {
-            this.notificationService.summaryBuildResultCache = summary;
-            this.onShowNumberBoard();
-            this.showNotification(
-              categoryName,
-              amount,
-              addedExpense,
-              originalDescription,
-              summary
-            );
-          }),
+          tap(
+            ([summary, addedExpense]: [BudgetSummaryBuildResult, Expense]) => {
+              this.notificationService.summaryBuildResultCache = summary;
+              this.onShowNumberBoard();
+              this.showNotification(
+                categoryName,
+                amount,
+                addedExpense,
+                originalDescription,
+                summary
+              );
+            }
+          ),
           switchMap(([summary]: [BudgetSummaryBuildResult, Expense]) =>
-            this.expenseSummaryService.sendBrowserNotificationByBudgetSummary(summary)
+            this.expenseSummaryService.sendBrowserNotificationByBudgetSummary(
+              summary
+            )
           ),
           takeUntil(this.unsubscribe)
         )
@@ -201,7 +209,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((result: BudgetSummaryBuildResult) => {
         this.notificationService.summaryBuildResultCache = result;
-        return this.expenseSummaryService.sendAppNotificationByBudgetSummary(result);
+        return this.expenseSummaryService.sendAppNotificationByBudgetSummary(
+          result
+        );
       });
   }
 
@@ -344,6 +354,23 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   private roundUp(value: number): number {
     return Math.round(value * 100) / 100;
+  }
+
+  onLatestExpenseUpdated(updated: Expense): void {
+    this.expenseService
+      .updateExpense(updated)
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe();
+  }
+
+  onLatestExpenseDeleted(expense: Expense): void {
+    if (!expense?.id) {
+      return;
+    }
+    this.expenseService
+      .deleteExpense(expense.id)
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe();
   }
 
   // Global touch listeners for long press removed

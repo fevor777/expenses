@@ -37,7 +37,7 @@ export class ExpenseService {
     dateFilter?: DateFrame,
     category?: string[],
     descriptionFilter?: string,
-    useCache = true,
+    useCache = true
   ): Observable<Expense[]> {
     const desc = (descriptionFilter || '').trim().toLowerCase();
     const applyDescriptionFilter = (expenses: Expense[]) => {
@@ -73,11 +73,47 @@ export class ExpenseService {
     return withUserId(this.afAuth, request, fallback, fallback);
   }
 
+  /**
+   * Get the latest (most recent by date) expense. Uses Firestore query limited to 1.
+   * Offline / unauthenticated fallback returns the newest locally stored expense.
+   * @param useCache whether to allow serving cached snapshot (true by default)
+   */
+  getLatestExpense(useCache = true): Observable<Expense | undefined> {
+    const fallback = () =>
+      new Observable<Expense | undefined>(subscriber => {
+        subscriber.next(this.expenseStoreService.getLatestExpense());
+        subscriber.complete();
+      });
+
+    const request = (userId: string) =>
+      this.fireStore
+        .collection<Expense>('expenses', ref =>
+          ref.where('uid', '==', userId).orderBy('date', 'desc').limit(1)
+        )
+        .snapshotChanges()
+        .pipe(
+          filter(
+            c =>
+              useCache ||
+              c.every(a => a.payload.doc.metadata.fromCache === false)
+          ),
+          map(actions => {
+            if (!actions.length) return undefined;
+            const a = actions[0];
+            const data = a.payload.doc.data();
+            const id = a.payload.doc.id;
+            return { id, ...data } as Expense;
+          })
+        );
+
+    return withUserId(this.afAuth, request, fallback, fallback);
+  }
+
   private getExpensesFromFirebase(
     dateFilter?: DateFrame,
     category?: string[],
     userId?: string,
-    useCache = true,
+    useCache = true
   ): Observable<Expense[]> {
     return this.fireStore
       .collection<Expense>('expenses', ref => {
@@ -99,7 +135,10 @@ export class ExpenseService {
       })
       .snapshotChanges()
       .pipe(
-        filter((c) => useCache || c.every(a => a.payload.doc.metadata.fromCache === false)),
+        filter(
+          c =>
+            useCache || c.every(a => a.payload.doc.metadata.fromCache === false)
+        ),
         map(actions =>
           actions.map(a => {
             const data = a.payload.doc.data();

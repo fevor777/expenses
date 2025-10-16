@@ -8,20 +8,23 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DescriptionEditModalComponent } from './description-edit-modal.component';
-
 import { Currency } from '../../common/model/currency';
+import { Expense } from '../../common/model/expense.model';
+import { ExpenseEditModalComponent } from '../../history/edit/expense-edit-modal.component';
 
 @Component({
   selector: 'app-expense-number-board',
   templateUrl: './expense-number-board.component.html',
   styleUrls: ['./expense-number-board.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, DescriptionEditModalComponent],
+  imports: [CommonModule, FormsModule, DescriptionEditModalComponent, ExpenseEditModalComponent],
 })
 export class ExpenseNumberBoardComponent {
   @Input() currency: Currency;
   @Input() amount: string;
   @Input() description: string;
+  // Provide latest expense from parent (optional). If not supplied we may fetch first from store later.
+  @Input() latestExpense: Expense | null = null;
 
   @Output() amountChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() currencyChange: EventEmitter<Currency> =
@@ -36,6 +39,8 @@ export class ExpenseNumberBoardComponent {
   @Output() numberBoardSwipeUp: EventEmitter<void> = new EventEmitter<void>();
   // Long press removed
   @Output() openCalculator: EventEmitter<void> = new EventEmitter<void>();
+  @Output() latestExpenseUpdated: EventEmitter<Expense> = new EventEmitter<Expense>();
+  @Output() latestExpenseDeleted: EventEmitter<Expense> = new EventEmitter<Expense>();
 
   // Long press logic removed
 
@@ -113,12 +118,15 @@ export class ExpenseNumberBoardComponent {
 
   // Touch listeners for long press removed
   showDescriptionModal = false;
+  showEditLatestModal = false;
+  editingLatestExpense: Expense | null = null;
 
   clearAmount(event?: Event) {
     // Prevent triggering parent click (like open calculator or swipe)
     event?.stopPropagation();
     if (this.amount) {
       this.amountChange.emit('');
+      this.descriptionChange.emit('');
     }
   }
 
@@ -129,5 +137,37 @@ export class ExpenseNumberBoardComponent {
 
   onDescriptionCancel() {
     this.showDescriptionModal = false;
+  }
+
+  constructor() {}
+
+  openEditLatest(event?: Event): void {
+    event?.stopPropagation();
+    if (!this.latestExpense) {
+      return;
+    }
+    this.editingLatestExpense = { ...this.latestExpense };
+    this.showEditLatestModal = true;
+  }
+
+  onApplyEditLatest(expense: Expense): void {
+    // Delegate persistence to parent to maintain single source of update (balance recalculation, caches etc.)
+    this.latestExpenseUpdated.emit(expense);
+    this.closeEditLatest();
+  }
+
+  onCancelEditLatest(): void {
+    this.closeEditLatest();
+  }
+
+  onDeleteLatest(expense: Expense): void {
+    // propagate deletion upward; parent responsible for persistence
+    this.latestExpenseDeleted.emit(expense);
+    this.closeEditLatest();
+  }
+
+  private closeEditLatest() {
+    this.showEditLatestModal = false;
+    this.editingLatestExpense = null;
   }
 }

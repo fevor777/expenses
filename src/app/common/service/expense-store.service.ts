@@ -47,6 +47,17 @@ export class ExpenseStoreService {
     this.expenseSubject.next(expenses);
   }
 
+  /**
+   * Returns the newest expense (by date descending) from the currently cached list.
+   * Assumes expenses already stored are in any order; we sort defensively.
+   */
+  getLatestExpense(): Expense | undefined {
+    const list = this.expenseSubject.value;
+    if (!Array.isArray(list) || list.length === 0) return undefined;
+    // Items are usually unshifted (newest first) but ensure correctness.
+    return [...list].sort((a, b) => b.date - a.date)[0];
+  }
+
   addExpense(expense: Expense): Observable<Expense> {
     const jsonInLocalStorage = localStorage.getItem('expenses');
     let expenseList = jsonInLocalStorage ? JSON.parse(jsonInLocalStorage) : [];

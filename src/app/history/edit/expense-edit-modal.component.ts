@@ -21,6 +21,7 @@ export class ExpenseEditModalComponent {
   @Input() expense: Expense;
   @Output() apply: EventEmitter<Expense> = new EventEmitter<Expense>();
   @Output() cancel: EventEmitter<void> = new EventEmitter<void>();
+  @Output() delete: EventEmitter<Expense> = new EventEmitter<Expense>();
 
   // Local mutable copies for editing
   amount: number; // stored as number
@@ -69,6 +70,14 @@ export class ExpenseEditModalComponent {
       date: this.parseDateLocalToEpoch(this.dateLocal, this.expense.date)
     };
     this.apply.emit(updated);
+  }
+
+  onDelete(): void {
+    if (!this.expense) {
+      this.cancel.emit();
+      return;
+    }
+    this.delete.emit(this.expense);
   }
 
   private parseDateLocalToEpoch(value: string, fallback: number): number {

@@ -47,6 +47,19 @@
   gap: 10px;
 }
 
+.expense-number-board-icons-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* Keep group anchored left */
+}
+
+.expense-number-board-icons-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .expense-number-board-input-active {
   font-weight: 600;
   color: var(--color-text);
@@ -57,6 +70,7 @@
   cursor: pointer;
   font-size: 18px;
   opacity: 0.5;
+  padding-left: 8px;
   transition:
     color var(--transition-fast),
     transform var(--transition-fast);
@@ -74,9 +88,38 @@
 .expense-clear-icon:active {
   transform: scale(0.85);
 }
+
+.expense-edit-latest-icon {
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.4;
+  padding-left: 7px;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.expense-edit-latest-icon:active {
+  transform: scale(0.9);
+}
+.expense-calculator-icon {
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.4;
+  padding-left: 8px;
+  padding-right: 8px;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.expense-calculator-icon:active {
+  transform: scale(0.9);
+}
 .expense-number-board-header span {
   color: var(--color-muted);
   letter-spacing: 0.5px;
+  height: 25px;
   cursor: pointer;
   transition: color var(--transition-fast);
 }
@@ -85,7 +128,10 @@
   transform: scale(0.9);
 }
 .expense-number-board-input {
-  flex: 1;
+  /* Center the amount text absolutely in the header regardless of side icon widths */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
   border: none;
   background: none;
@@ -93,6 +139,11 @@
   letter-spacing: 1px;
   color: var(--color-muted);
   caret-color: var(--color-muted);
+  /* Prevent overlap issues by constraining width; allow wrapping ellipsis if very long */
+  max-width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .expense-number-board-input::placeholder {
   color: var(--color-muted);
@@ -102,7 +153,8 @@
 }
 
 .expense-number-board-currency {
-  font-size: 17px;
+  font-size: 20px;
+  opacity: 0.5;
 }
 
 .expense-number-board-body {

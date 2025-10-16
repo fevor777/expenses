@@ -284,6 +284,12 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.persistExpense(expense);
   }
 
+  onDeleteEdit(expense: Expense): void {
+    this.showEditModal = false;
+    this.editingExpense = null;
+    this.onDelete(expense as HistoryExpense);
+  }
+
   closeEditModal(): void {
     this.showEditModal = false;
     this.editingExpense = null;

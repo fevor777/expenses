@@ -90,6 +90,18 @@
   gap: 10px;
   margin-top: 4px;
 }
+
+.eem-actions-spacer {
+  flex: 1;
+}
+
+.eem-btn.eem-btn--danger {
+  background: var(--color-danger, #c0392b);
+  color: #fff;
+}
+.eem-btn.eem-btn--danger:active {
+  transform: scale(.96);
+}
 .eem-btn {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
