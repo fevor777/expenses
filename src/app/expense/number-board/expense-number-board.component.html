@@ -32,7 +32,16 @@
     >
       .
     </div>
-    <div (click)="onNumberClick('0')" class="expense-number-board-item">0</div>
+    <div
+      (click)="onNumberClick('0')"
+      (pointerdown)="onZeroPointerDown($event)"
+      (pointerup)="onZeroPointerUp($event)"
+      (pointerleave)="onZeroPointerLeave()"
+      class="expense-number-board-item"
+      aria-label="0 (hold for special action)"
+    >
+      0
+    </div>
     <div
       (click)="onDeleteClick()"
       class="expense-number-board-item key-delete"

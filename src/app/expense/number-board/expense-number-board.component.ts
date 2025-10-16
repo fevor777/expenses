@@ -49,6 +49,8 @@ export class ExpenseNumberBoardComponent {
     new EventEmitter<Expense>();
   @Output() latestExpenseDeleted: EventEmitter<Expense> =
     new EventEmitter<Expense>();
+  // Long press on '0' key
+  @Output() zeroLongPress: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private notificationService: NotificationService) { }
 
@@ -109,6 +111,34 @@ export class ExpenseNumberBoardComponent {
       newAmount = this.amount + numberValue;
     }
     this.amountChange.emit(newAmount);
+  }
+
+  // Long press state
+  private longPressTimer: any;
+  private longPressThreshold = 500; // ms
+  private zeroPressed = false;
+
+  onZeroPointerDown(event: PointerEvent): void {
+    // prevent text selection / duplication of events
+    event.stopPropagation();
+    this.zeroPressed = true;
+    clearTimeout(this.longPressTimer);
+    this.longPressTimer = setTimeout(() => {
+      if (this.zeroPressed) {
+        this.zeroLongPress.emit();
+      }
+    }, this.longPressThreshold);
+  }
+
+  onZeroPointerUp(event: PointerEvent): void {
+    event.stopPropagation();
+    this.zeroPressed = false;
+    clearTimeout(this.longPressTimer);
+  }
+
+  onZeroPointerLeave(): void {
+    this.zeroPressed = false;
+    clearTimeout(this.longPressTimer);
   }
 
   onSwipeLeft(): void {
