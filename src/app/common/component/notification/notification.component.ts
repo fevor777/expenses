@@ -80,6 +80,7 @@ export class NotificationComponent implements OnDestroy {
     this.icon = this.resolveIcon(variant);
     this.hiding = false;
     this.show = true;
+    this.notificationService.isShown = true;
     this.hideTimeout = setTimeout(() => this.startHide(), this.autoCloseMs);
   }
 
@@ -139,6 +140,7 @@ export class NotificationComponent implements OnDestroy {
     // allow animation to finish
     setTimeout(() => {
       this.show = false;
+      this.notificationService.isShown = false;
       this.hiding = false;
     }, 250);
   }

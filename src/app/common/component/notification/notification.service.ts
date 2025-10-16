@@ -28,6 +28,8 @@ export class NotificationService {
   
   summaryBuildResultCache: BudgetSummaryBuildResult;
 
+  isShown: boolean = false;
+
   constructor() {
     this.checkNotificationPermission();
   }

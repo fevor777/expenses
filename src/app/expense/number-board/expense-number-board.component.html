@@ -27,8 +27,11 @@
     <div (click)="onNumberClick('9')" class="expense-number-board-item">9</div>
     <div
       (click)="onNumberClick('.')"
+      (pointerdown)="onDecimalPointerDown($event)"
+      (pointerup)="onDecimalPointerUp($event)"
+      (pointerleave)="onDecimalPointerLeave()"
       class="expense-number-board-item key-func"
-      aria-label="Decimal point"
+      aria-label="Decimal point (hold)"
     >
       .
     </div>

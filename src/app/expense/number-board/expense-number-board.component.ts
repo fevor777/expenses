@@ -51,6 +51,8 @@ export class ExpenseNumberBoardComponent {
     new EventEmitter<Expense>();
   // Long press on '0' key
   @Output() zeroLongPress: EventEmitter<void> = new EventEmitter<void>();
+  // Long press on '.' key
+  @Output() decimalLongPress: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private notificationService: NotificationService) { }
 
@@ -114,16 +116,18 @@ export class ExpenseNumberBoardComponent {
   }
 
   // Long press state
-  private longPressTimer: any;
   private longPressThreshold = 500; // ms
   private zeroPressed = false;
+  private decimalPressed = false;
+  private zeroTimer: any;
+  private decimalTimer: any;
 
   onZeroPointerDown(event: PointerEvent): void {
     // prevent text selection / duplication of events
     event.stopPropagation();
     this.zeroPressed = true;
-    clearTimeout(this.longPressTimer);
-    this.longPressTimer = setTimeout(() => {
+    clearTimeout(this.zeroTimer);
+    this.zeroTimer = setTimeout(() => {
       if (this.zeroPressed) {
         this.zeroLongPress.emit();
       }
@@ -133,12 +137,34 @@ export class ExpenseNumberBoardComponent {
   onZeroPointerUp(event: PointerEvent): void {
     event.stopPropagation();
     this.zeroPressed = false;
-    clearTimeout(this.longPressTimer);
+    clearTimeout(this.zeroTimer);
   }
 
   onZeroPointerLeave(): void {
     this.zeroPressed = false;
-    clearTimeout(this.longPressTimer);
+    clearTimeout(this.zeroTimer);
+  }
+
+  onDecimalPointerDown(event: PointerEvent): void {
+    event.stopPropagation();
+    this.decimalPressed = true;
+    clearTimeout(this.decimalTimer);
+    this.decimalTimer = setTimeout(() => {
+      if (this.decimalPressed) {
+        this.decimalLongPress.emit();
+      }
+    }, this.longPressThreshold);
+  }
+
+  onDecimalPointerUp(event: PointerEvent): void {
+    event.stopPropagation();
+    this.decimalPressed = false;
+    clearTimeout(this.decimalTimer);
+  }
+
+  onDecimalPointerLeave(): void {
+    this.decimalPressed = false;
+    clearTimeout(this.decimalTimer);
   }
 
   onSwipeLeft(): void {
