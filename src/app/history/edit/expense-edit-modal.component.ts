@@ -9,19 +9,26 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Categories, Category } from '../../common/model/categories';
 import { Expense } from '../../common/model/expense.model';
+import { ExpenseService } from '../../common/service/expense.service';
+import { first, Subject, Subscription, takeUntil } from 'rxjs';
+import { SpinnerComponent } from '../../common/component/spinner/spinner.component';
 
 @Component({
   selector: 'app-expense-edit-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SpinnerComponent],
   templateUrl: './expense-edit-modal.component.html',
   styleUrls: ['./expense-edit-modal.component.scss'],
 })
 export class ExpenseEditModalComponent {
   @Input() expense: Expense;
+  // When true, load (or reload) the latest stored expense ignoring provided input expense.
+  // Name uses plural per original request (isLoadLatestExpenses) even though it results in a single latest item.
+  @Input() isLoadLatestExpenses: boolean = false;
   @Output() apply: EventEmitter<Expense> = new EventEmitter<Expense>();
   @Output() cancel: EventEmitter<void> = new EventEmitter<void>();
   @Output() delete: EventEmitter<Expense> = new EventEmitter<Expense>();
+  private unsubscribe: Subject<void> = new Subject();
 
   // Local mutable copies for editing
   amount: number; // stored as number
@@ -32,24 +39,56 @@ export class ExpenseEditModalComponent {
 
   readonly categories: Category[] = Categories;
 
+  private latestSub?: Subscription;
+  isLoadingLatest = false; // controls spinner when loading the latest expense
+
+  constructor(private expenseService: ExpenseService) {}
+
   ngOnInit(): void {
-    if (this.expense) {
-      this.amount = this.expense.amount;
-      this.description = this.expense.description || '';
-      this.category = this.expense.category;
-      // Convert epoch ms to local ISO string without seconds for datetime-local
-      try {
-        const d = new Date(this.expense.date);
-        const pad = (v: number) => v.toString().padStart(2, '0');
-        const year = d.getFullYear();
-        const month = pad(d.getMonth() + 1);
-        const day = pad(d.getDate());
-        const hour = pad(d.getHours());
-        const minute = pad(d.getMinutes());
-        this.dateLocal = `${year}-${month}-${day}T${hour}:${minute}`;
-      } catch {
-        this.dateLocal = '';
-      }
+    if (this.isLoadLatestExpenses) {
+      this.isLoadingLatest = true;
+      // Subscribe once to get the latest expense (uses cache first by default)
+      this.latestSub = this.expenseService
+        .getLatestExpense()
+        .pipe(takeUntil(this.unsubscribe), first())
+        .subscribe({
+          next: latest => {
+            if (latest) {
+              this.expense = latest;
+              this.populateLocalFieldsFromExpense();
+            } else if (this.expense) {
+              // Fallback to provided input expense if service yielded nothing
+              this.populateLocalFieldsFromExpense();
+            }
+          },
+          error: () => (this.isLoadingLatest = false),
+          complete: () => (this.isLoadingLatest = false),
+        });
+    } else if (this.expense) {
+      this.populateLocalFieldsFromExpense();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.latestSub?.unsubscribe();
+  }
+
+  private populateLocalFieldsFromExpense(): void {
+    if (!this.expense) return;
+    this.amount = this.expense.amount;
+    this.description = this.expense.description || '';
+    this.category = this.expense.category;
+    try {
+      const d = new Date(this.expense.date);
+      const pad = (v: number) => v.toString().padStart(2, '0');
+      const year = d.getFullYear();
+      const month = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      const hour = pad(d.getHours());
+      const minute = pad(d.getMinutes());
+      this.dateLocal = `${year}-${month}-${day}T${hour}:${minute}`;
+    } catch {
+      this.dateLocal = '';
     }
   }
 
@@ -67,7 +106,7 @@ export class ExpenseEditModalComponent {
       amount: +(+this.amount || 0).toFixed(2),
       description: this.description?.trim(),
       category: this.category,
-      date: this.parseDateLocalToEpoch(this.dateLocal, this.expense.date)
+      date: this.parseDateLocalToEpoch(this.dateLocal, this.expense.date),
     };
     this.apply.emit(updated);
   }

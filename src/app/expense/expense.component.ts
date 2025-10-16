@@ -69,8 +69,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   budgetSummary: BudgetSummaryBuildResult;
   // Loading flag for header amount spinner
   isAmountsLoading: boolean = false;
-  // Stream of latest expense (service level); we still fallback in template if not yet available
-  latestExpense$: Observable<Expense | undefined>;
 
   currency: Currency;
   description: string = '';
@@ -91,8 +89,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Initialize latestExpense stream early (will emit undefined until user id resolved/offline store)
-    this.latestExpense$ = this.expenseService.getLatestExpense();
     this.isAmountsLoading = true;
     this.expenseService
       .getExpenses(this.dateFilterService.getInitialMonthValue())
@@ -180,6 +176,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   }
 
   onHideNumberBoard(): void {
+    this.notificationService.hide();
     this.showNumberBoard = false;
   }
 
@@ -188,18 +185,22 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   }
 
   navigateToHistory(): void {
+    this.notificationService.hide();
     this.router.navigate(['/history']);
   }
 
   navigateToStatistics(): void {
+    this.notificationService.hide();
     this.router.navigate(['/statistics']);
   }
 
   navigateToExport(): void {
+    this.notificationService.hide();
     this.router.navigate(['/export']);
   }
 
   navigateToDetails(): void {
+    this.notificationService.hide();
     this.router.navigate(['/period-summary']);
   }
 

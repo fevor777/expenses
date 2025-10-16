@@ -12,6 +12,7 @@ import { Currency } from '../../common/model/currency';
 import { Expense } from '../../common/model/expense.model';
 import { ExpenseEditModalComponent } from '../../history/edit/expense-edit-modal.component';
 import { ExpenseNumberBoardHeaderComponent } from './header/expense-number-board-header.component';
+import { NotificationService } from '../../common/component/notification/notification.service';
 
 @Component({
   selector: 'app-expense-number-board',
@@ -30,8 +31,6 @@ export class ExpenseNumberBoardComponent {
   @Input() currency: Currency;
   @Input() amount: string;
   @Input() description: string;
-  // Provide latest expense from parent (optional). If not supplied we may fetch first from store later.
-  @Input() latestExpense: Expense | null = null;
 
   @Output() amountChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() currencyChange: EventEmitter<Currency> =
@@ -51,9 +50,11 @@ export class ExpenseNumberBoardComponent {
   @Output() latestExpenseDeleted: EventEmitter<Expense> =
     new EventEmitter<Expense>();
 
-  // Long press logic removed
+  constructor(private notificationService: NotificationService) { }
+
 
   openCalculatorEmit(): void {
+    this.notificationService.hide();
     this.openCalculator.emit();
   }
 
@@ -69,10 +70,12 @@ export class ExpenseNumberBoardComponent {
   }
 
   addDescription(): void {
+    this.notificationService.hide();
     this.showDescriptionModal = true;
   }
 
   onCurrencyClick(): void {
+    this.notificationService.hide();
     const newCurrency = prompt('Enter new currency', this.currency.code);
     if (newCurrency) {
       let newExchangeRate = '1';
@@ -128,7 +131,6 @@ export class ExpenseNumberBoardComponent {
   // Touch listeners for long press removed
   showDescriptionModal = false;
   showEditLatestModal = false;
-  editingLatestExpense: Expense | null = null;
 
   clearAmount(event?: Event) {
     // Prevent triggering parent click (like open calculator or swipe)
@@ -148,14 +150,10 @@ export class ExpenseNumberBoardComponent {
     this.showDescriptionModal = false;
   }
 
-  constructor() {}
 
   openEditLatest(event?: Event): void {
     event?.stopPropagation();
-    if (!this.latestExpense) {
-      return;
-    }
-    this.editingLatestExpense = { ...this.latestExpense };
+    this.notificationService.hide();
     this.showEditLatestModal = true;
   }
 
@@ -177,6 +175,5 @@ export class ExpenseNumberBoardComponent {
 
   private closeEditLatest() {
     this.showEditLatestModal = false;
-    this.editingLatestExpense = null;
   }
 }

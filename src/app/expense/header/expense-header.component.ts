@@ -1,8 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { trigger, transition, style, animate, group, state } from '@angular/animations';
+import {
+  trigger,
+  transition,
+  style,
+  animate,
+  group,
+  state,
+} from '@angular/animations';
 import { CalendarComponent } from '../../common/calendar/calendar.component';
 import { SpinnerComponent } from '../../common/component/spinner/spinner.component';
+import { NotificationService } from '../../common/component/notification/notification.service';
 
 @Component({
   selector: 'app-expense-header',
@@ -14,32 +22,39 @@ import { SpinnerComponent } from '../../common/component/spinner/spinner.compone
     trigger('amountSwap', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(6px) scale(.94)' }),
-        animate('130ms ease-out', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+        animate(
+          '130ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        ),
       ]),
       transition(':leave', [
         group([
-          animate('100ms ease-out', style({ opacity: 0, transform: 'translateY(-4px) scale(.94)' }))
-        ])
-      ])
-    ])
-    ,
+          animate(
+            '100ms ease-out',
+            style({ opacity: 0, transform: 'translateY(-4px) scale(.94)' })
+          ),
+        ]),
+      ]),
+    ]),
     trigger('amountValueChange', [
       transition(':enter', [
         style({ opacity: 0, transform: 'scale(.92)' }),
-        animate('120ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+        animate('120ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
       ]),
       transition(':leave', [
-        animate('80ms ease-in', style({ opacity: 0, transform: 'scale(.92)' }))
-      ])
-    ])
-    ,
+        animate('80ms ease-in', style({ opacity: 0, transform: 'scale(.92)' })),
+      ]),
+    ]),
     trigger('amountFlash', [
       transition(':enter', [
         style({ filter: 'brightness(1.25)', opacity: 0.85 }),
-        animate('260ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
-      ])
-    ])
-  ]
+        animate(
+          '260ms ease-out',
+          style({ filter: 'brightness(1)', opacity: 1 })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class ExpenseHeaderComponent implements OnInit {
   @Input() currentAmount: number = 0;
@@ -71,6 +86,8 @@ export class ExpenseHeaderComponent implements OnInit {
   @Output() balanceChange: EventEmitter<number> = new EventEmitter<number>();
 
   isShowCurrentBalanceAmount: boolean = false;
+
+  constructor(private notificationService: NotificationService) {}
 
   ngOnInit(): void {
     const localStorageIsShowCurrentBalanceAmount =
@@ -112,6 +129,7 @@ export class ExpenseHeaderComponent implements OnInit {
   }
 
   onHeaderBottomClick(): void {
+    this.notificationService.hide();
     this.showCalendar = !this.showCalendar;
   }
 

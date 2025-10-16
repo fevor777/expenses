@@ -12,7 +12,6 @@ import { Expense } from '../../../common/model/expense.model';
 })
 export class ExpenseNumberBoardHeaderComponent {
   @Input() amount: string;
-  @Input() latestExpense: Expense | null = null;
   @Input() currencyCode: string;
   @Output() addDescription = new EventEmitter<void>();
   @Output() clearAmount = new EventEmitter<Event>();

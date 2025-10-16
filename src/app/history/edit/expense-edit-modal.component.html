@@ -6,6 +6,9 @@
   aria-modal="true"
   aria-label="Edit expense dialog"
 >
+  <div class="eem-loading-latest" *ngIf="isLoadingLatest" aria-live="polite" aria-label="Loading latest expense">
+    <app-spinner [size]="44" [started]="true" [delay]="0"></app-spinner>
+  </div>
   <div class="eem-header">
     <span class="eem-title">Edit Expense</span>
     <button

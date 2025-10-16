@@ -1,7 +1,6 @@
 <div class="expense-number-board">
   <app-expense-number-board-header
     [amount]="amount"
-    [latestExpense]="latestExpense"
     [currencyCode]="getCurrencySymbol()"
     (addDescription)="addDescription()"
     (clearAmount)="clearAmount($event)"
@@ -53,7 +52,7 @@
 
 <app-expense-edit-modal
   *ngIf="showEditLatestModal"
-  [expense]="editingLatestExpense"
+  [isLoadLatestExpenses]="true"
   (apply)="onApplyEditLatest($event)"
   (cancel)="onCancelEditLatest()"
   (delete)="onDeleteLatest($event)"
