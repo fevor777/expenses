@@ -306,6 +306,23 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     });
   }
 
+  onSendBrowserNotification() {
+    if (this.notificationService.summaryBuildResultCache) {
+      this.expenseSummaryService
+        .sendBrowserNotificationByBudgetSummary(
+          this.notificationService.summaryBuildResultCache
+        )
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe();
+      this.notificationService.summaryBuildResultCache = null;
+    } else {
+      this.expenseSummaryService
+        .sendBrowserNotificationWithBudgetSummary()
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe();
+    }
+  }
+
   private getTodaysAmount(categoryName: string): number {
     return this.todaysExpenses
       .filter(expense => expense.category === categoryName)

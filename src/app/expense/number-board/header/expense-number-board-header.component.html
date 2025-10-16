@@ -5,18 +5,84 @@
 >
   <div class="expense-number-board-icons-left">
     <i
-      *ngIf="amount"
-      class="expense-description-icon fa-regular fa-pen-to-square"
-      (click)="onAddDescription()"
+      *ngIf="!isLeftIconListVisible && !amount"
+      (click)="changeVisibilityOfLeftIconList()"
+      class="expense-number-board-expand-icons fa-solid fa-angle-right"
+      aria-hidden="true"
     ></i>
     <i
-      *ngIf="!amount"
+      *ngIf="isLeftIconListVisible && !amount"
+      (click)="changeVisibilityOfLeftIconList()"
+      class="expense-number-board-expand-icons expense-number-board-collapes-icons fa-solid fa-angle-left"
+      aria-hidden="true"
+    ></i>
+    <i
+      *ngIf="isLeftIconListVisible && !amount"
+      (click)="onBudgetInfoIconClick()"
+      class="expense-edit-latest-icon expense-edit-budget-icon fas fa-circle-info"
+      [class.animate-from-left]="animateIconsIn"
+      aria-label="budget-info"
+      role="button"
+      tabindex="0"
+    ></i>
+    <span
+      class="expense-edit-budget-separator"
+      *ngIf="isLeftIconListVisible && !amount"
+      >|</span
+      >
+    <i
+      *ngIf="isLeftIconListVisible && !amount"
+      class="expense-edit-latest-icon expense-edit-budget-icon fa-solid fa-receipt"
+      aria-label="perion-budget"
+      (click)="onPeriodSummaryIconClick()"
+      role="button"
+      tabindex="0"
+      [class.animate-from-left]="animateIconsIn"
+    ></i>
+    <span
+      class="expense-edit-budget-separator"
+      *ngIf="isLeftIconListVisible && !amount"
+      >|</span
+    >
+    <i
+      *ngIf="isLeftIconListVisible && !amount"
       class="expense-edit-latest-icon fas fa-clock-rotate-left"
       (click)="onOpenEditLatest($event)"
       aria-label="Edit latest expense"
       role="button"
       tabindex="0"
+      [class.animate-from-left]="animateIconsIn"
     ></i>
+    <span
+      class="expense-edit-budget-separator"
+      *ngIf="isLeftIconListVisible && !amount"
+      >|</span>
+
+    <i
+      *ngIf="isLeftIconListVisible && !amount"
+      (click)="onBrNotificationIconClick()"
+      class="expense-edit-latest-icon expense-edit-budget-icon fas fa-bell"
+      aria-label="br-notification-icon"
+      role="button"
+      tabindex="0"
+      [class.animate-from-left]="animateIconsIn"
+    ></i>
+    <i
+      *ngIf="amount"
+      class="expense-number-board-expand-icons expense-number-board-header-calc fas fa-calculator"
+      (click)="onOpenCalculator()"
+      aria-label="Open calculator"
+      role="button"
+      tabindex="0"
+    ></i>
+    <span class="expense-edit-budget-separator" *ngIf="amount">|</span>
+    <i
+      *ngIf="amount"
+      class="expense-description-icon fa-regular fa-pen-to-square"
+      (click)="onAddDescription()"
+    ></i>
+    <span class="expense-edit-budget-separator" *ngIf="amount">|</span>
+
     <i
       *ngIf="amount"
       class="expense-clear-icon fas fa-times"
@@ -27,6 +93,7 @@
     ></i>
   </div>
   <span
+    *ngIf="!isLeftIconListVisible || amount"
     class="expense-number-board-input"
     [class.expense-number-board-input-active]="amount"
     (click)="onOpenCalculator()"
@@ -39,16 +106,11 @@
     {{ amount || 'введите расход' }}
   </span>
   <div class="expense-number-board-icons-right">
-    <span class="expense-number-board-currency" (click)="onCurrencyClick()">{{
-      currencyCode
-    }}</span>
-    <i
-      *ngIf="amount"
-      class="expense-calculator-icon fas fa-calculator"
-      (click)="onOpenCalculator()"
-      aria-label="Open calculator"
-      role="button"
-      tabindex="0"
-    ></i>
+    <span
+      *ngIf="!isLeftIconListVisible || amount"
+      class="expense-number-board-currency"
+      (click)="onCurrencyClick()"
+      >{{ currencyCode }}</span
+    >
   </div>
 </div>

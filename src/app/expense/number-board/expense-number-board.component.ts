@@ -53,9 +53,11 @@ export class ExpenseNumberBoardComponent {
   @Output() zeroLongPress: EventEmitter<void> = new EventEmitter<void>();
   // Long press on '.' key
   @Output() decimalLongPress: EventEmitter<void> = new EventEmitter<void>();
-
-  constructor(private notificationService: NotificationService) { }
-
+  @Output() budgetInfoIconClick = new EventEmitter<void>();
+  @Output() periodSummaryIconClick = new EventEmitter<void>();
+  @Output() brNotificationIconClick = new EventEmitter<void>();
+  
+  constructor(private notificationService: NotificationService) {}
 
   openCalculatorEmit(): void {
     this.notificationService.hide();
@@ -206,7 +208,6 @@ export class ExpenseNumberBoardComponent {
     this.showDescriptionModal = false;
   }
 
-
   openEditLatest(event?: Event): void {
     event?.stopPropagation();
     this.notificationService.hide();
@@ -227,6 +228,18 @@ export class ExpenseNumberBoardComponent {
     // propagate deletion upward; parent responsible for persistence
     this.latestExpenseDeleted.emit(expense);
     this.closeEditLatest();
+  }
+
+  onBudgetInfoIconClick(): void {
+    this.budgetInfoIconClick.emit();
+  }
+
+  onPeriodSummaryIconClick(): void {
+    this.periodSummaryIconClick.emit();
+  }
+
+  onBrNotificationIconClick(): void {
+    this.brNotificationIconClick.emit();
   }
 
   private closeEditLatest() {
