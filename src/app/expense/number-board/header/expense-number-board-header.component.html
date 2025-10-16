@@ -10,7 +10,7 @@
       (click)="onAddDescription()"
     ></i>
     <i
-      *ngIf="!amount && latestExpense"
+      *ngIf="!amount"
       class="expense-edit-latest-icon fas fa-clock-rotate-left"
       (click)="onOpenEditLatest($event)"
       aria-label="Edit latest expense"
