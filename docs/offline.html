@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Offline - Expenses</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: Montserrat, Arial, sans-serif; margin: 2rem; color: #1e293b; background:#ffffff; }
+      .wrap { max-width: 560px; margin: auto; }
+      h1 { font-size: 1.6rem; margin-bottom: .75rem; }
+      p { line-height: 1.4; }
+      .hint { margin-top: 1.5rem; font-size: .85rem; color:#475569; }
+      button { background:#1e293b; color:#fff; border:0; padding:.6rem 1rem; border-radius:6px; cursor:pointer; font-size: .95rem; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>You're offline</h1>
+      <p>The Expenses app can't load this page right now. Your previously viewed data may still be available when you return online.</p>
+      <button onclick="location.reload()">Retry</button>
+      <p class="hint">Tip: Keep the app open while connected so new data is cached for offline use.</p>
+    </div>
+  </body>
+</html>
