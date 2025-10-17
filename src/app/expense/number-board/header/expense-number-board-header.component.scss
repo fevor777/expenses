@@ -39,7 +39,7 @@
   opacity: 0.7;
 }
 .expense-description-icon,
-.expense-edit-latest-icon,
+.expense-hidden-icon,
 .expense-clear-icon,
 .expense-calculator-icon {
   color: var(--color-muted);
@@ -56,10 +56,8 @@
   font-size: 16px;
   opacity: 0.55;
 }
-.expense-calculator-icon {
-  padding-left: 10px;
-}
-.expense-edit-latest-icon:active,
+
+.expense-hidden-icon:active,
 .expense-description-icon:active,
 .expense-calculator-icon:active {
   transform: scale(0.9);
@@ -72,18 +70,49 @@
   opacity: 0.5;
 }
 
-.expense-number-board-expand-icons {
-  color: var(--color-muted);
+.expense-hidden-icon {
+  font-size: 27px;
+}
+
+.expense-number-board-header-calc {
+    color: var(--color-muted);
   cursor: pointer;
   padding-bottom: 6px;
   padding-top: 6px;
   padding-left: 20px;
   padding-right: 10px;
-  font-size: 19px;
+  font-size: 18px;
   opacity: 0.5;
   transition:
     color var(--transition-fast),
     transform var(--transition-fast);
+}
+.expense-number-board-expand-icons,
+.expense-hidden-icon {
+  color: var(--color-muted);
+  cursor: pointer;
+  padding-bottom: 6px;
+  padding-top: 6px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 27px;
+  opacity: 0.5;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.expense-number-board-expand-icons {
+  opacity: 0.3;
+  padding-left: 20px;
+}
+
+.expense-number-board-open-edit-latest {
+  opacity: 0.3;
+}
+
+.expense-number-board-calculator {
+  font-size: 18px;
 }
 
 .expense-edit-budget-icon {
@@ -121,7 +150,7 @@
 }
 
 /* Apply animation when icons list becomes visible */
-.expense-number-board-icons-left > .expense-edit-latest-icon,
+.expense-number-board-icons-left > .expense-hidden-icon,
 .expense-number-board-icons-left > .expense-edit-budget-icon,
 .expense-number-board-icons-left > .expense-edit-budget-separator,
 .expense-number-board-icons-left > .expense-number-board-expand-icons {

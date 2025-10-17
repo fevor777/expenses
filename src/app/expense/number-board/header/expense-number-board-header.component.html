@@ -19,7 +19,7 @@
     <i
       *ngIf="isLeftIconListVisible && !amount"
       (click)="onBudgetInfoIconClick()"
-      class="expense-edit-latest-icon expense-edit-budget-icon fas fa-circle-info"
+      class="expense-hidden-icon expense-edit-budget-icon fas fa-circle-info"
       [class.animate-from-left]="animateIconsIn"
       aria-label="budget-info"
       role="button"
@@ -32,7 +32,7 @@
     >
     <i
       *ngIf="isLeftIconListVisible && !amount"
-      class="expense-edit-latest-icon expense-edit-budget-icon fa-solid fa-receipt"
+      class="expense-hidden-icon expense-edit-budget-icon fa-solid fa-receipt"
       aria-label="perion-budget"
       (click)="onPeriodSummaryIconClick()"
       role="button"
@@ -47,7 +47,7 @@
     <i
       *ngIf="isLeftIconListVisible && !amount"
       (click)="onCalendarIconClick()"
-      class="expense-edit-latest-icon expense-edit-budget-icon fas fa-calendar-day"
+      class="expense-hidden-icon expense-edit-budget-icon fas fa-calendar-day"
       aria-label="open-calendar"
       role="button"
       tabindex="0"
@@ -63,7 +63,7 @@
     <i
       *ngIf="isLeftIconListVisible && !amount"
       (click)="onBrNotificationIconClick()"
-      class="expense-edit-latest-icon expense-edit-budget-icon fas fa-bell"
+      class="expense-hidden-icon expense-edit-budget-icon fas fa-bell"
       aria-label="br-notification-icon"
       role="button"
       tabindex="0"
@@ -77,7 +77,7 @@
 
     <i
       *ngIf="isLeftIconListVisible && !amount"
-      class="expense-edit-latest-icon fas fa-clock-rotate-left"
+      class="expense-hidden-icon expense-number-board-open-edit-latest fas fa-clock-rotate-left"
       (click)="onOpenEditLatest($event)"
       aria-label="Edit latest expense"
       role="button"
@@ -92,7 +92,7 @@
     >
     <i
       *ngIf="amount"
-      class="expense-number-board-expand-icons expense-number-board-header-calc fas fa-calculator"
+      class="expense-number-board-header-calc fas fa-calculator"
       (click)="onOpenCalculator()"
       aria-label="Open calculator"
       role="button"
