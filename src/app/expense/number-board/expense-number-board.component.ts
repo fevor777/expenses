@@ -56,6 +56,7 @@ export class ExpenseNumberBoardComponent {
   @Output() budgetInfoIconClick = new EventEmitter<void>();
   @Output() periodSummaryIconClick = new EventEmitter<void>();
   @Output() brNotificationIconClick = new EventEmitter<void>();
+  @Output() calendarIconClick = new EventEmitter<void>();
   
   constructor(private notificationService: NotificationService) {}
 
@@ -240,6 +241,10 @@ export class ExpenseNumberBoardComponent {
 
   onBrNotificationIconClick(): void {
     this.brNotificationIconClick.emit();
+  }
+
+  onCalendarIconClick(): void {
+    this.calendarIconClick.emit();
   }
 
   private closeEditLatest() {

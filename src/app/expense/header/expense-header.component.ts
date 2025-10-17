@@ -8,7 +8,6 @@ import {
   group,
   state,
 } from '@angular/animations';
-import { CalendarComponent } from '../../common/calendar/calendar.component';
 import { SpinnerComponent } from '../../common/component/spinner/spinner.component';
 import { NotificationService } from '../../common/component/notification/notification.service';
 
@@ -17,7 +16,7 @@ import { NotificationService } from '../../common/component/notification/notific
   templateUrl: './expense-header.component.html',
   styleUrls: ['./expense-header.component.scss'],
   standalone: true,
-  imports: [CommonModule, CalendarComponent, SpinnerComponent],
+  imports: [CommonModule, SpinnerComponent],
   animations: [
     trigger('amountSwap', [
       transition(':enter', [
@@ -74,10 +73,7 @@ export class ExpenseHeaderComponent implements OnInit {
     year: 'numeric',
   }).format(new Date());
 
-  // Calendar state
-  showCalendar: boolean = false;
-  selectedDate: Date = new Date();
-  // Clicking the date label toggles an inline calendar overlay (auto closes on selection)
+  @Output() calendarOpen: EventEmitter<void> = new EventEmitter<void>();
 
   @Output() menuIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() historyIconClick: EventEmitter<void> = new EventEmitter<void>();
@@ -128,12 +124,8 @@ export class ExpenseHeaderComponent implements OnInit {
     }
   }
 
-  onHeaderBottomClick(): void {
+  onCalendarOpen(): void {
     this.notificationService.hide();
-    this.showCalendar = !this.showCalendar;
-  }
-
-  onCalendarClose(): void {
-    this.showCalendar = false;
+    this.calendarOpen.emit();
   }
 }

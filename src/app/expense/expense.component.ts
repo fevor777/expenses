@@ -39,6 +39,7 @@ import {
   BudgetSummaryService,
   BudgetSummaryBuildResult,
 } from '../common/service/budget-summary.service';
+import { CalendarComponent } from '../common/calendar/calendar.component';
 
 @Component({
   selector: 'app-expense',
@@ -54,6 +55,7 @@ import {
     ExpenseNumberBoardComponent,
     ExpenseHeaderComponent,
     CalculatorModalComponent,
+    CalendarComponent,
   ],
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
@@ -73,6 +75,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   currency: Currency;
   description: string = '';
   showCalculator = false;
+  showCalendar = false;
+  calendarSelectedDate: Date = new Date();
 
   private unsubscribe: Subject<void> = new Subject();
 
@@ -232,6 +236,15 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   onOpenCalculator(): void {
     this.showCalculator = true;
+  }
+
+  onOpenCalendar(): void {
+    this.calendarSelectedDate = new Date();
+    this.showCalendar = true;
+  }
+
+  onCloseCalendar(): void {
+    this.showCalendar = false;
   }
 
   onCalculatorApply(val: string): void {

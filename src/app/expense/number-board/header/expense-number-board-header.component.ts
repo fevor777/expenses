@@ -27,6 +27,7 @@ export class ExpenseNumberBoardHeaderComponent implements OnChanges {
   @Output() budgetInfoIconClick = new EventEmitter<void>();
   @Output() periodSummaryIconClick = new EventEmitter<void>();
   @Output() brNotificationIconClick = new EventEmitter<void>();
+  @Output() calendarIconClick = new EventEmitter<void>();
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['amount'] && this.amount) {
@@ -72,6 +73,10 @@ export class ExpenseNumberBoardHeaderComponent implements OnChanges {
 
   onBrNotificationIconClick(): void {
     this.brNotificationIconClick.emit();
+  }
+
+  onCalendarIconClick(): void {
+    this.calendarIconClick.emit();
   }
 
   // animation flags removed

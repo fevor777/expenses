@@ -10,6 +10,7 @@
     (statisticsIconClick)="navigateToStatistics()"
     (detailsIconClick)="onHeaderBudgetInfoClick()"
     (balanceChange)="onBalanceChange($event)"
+    (calendarOpen)="onOpenCalendar()"
   >
   </app-expense-header>
 
@@ -59,6 +60,7 @@
     (budgetInfoIconClick)="onHeaderBudgetInfoClick()"
     (periodSummaryIconClick)="navigateToDetails()"
     (brNotificationIconClick)="onSendBrowserNotification()"
+    (calendarIconClick)="onOpenCalendar()"
   >
   </app-expense-number-board>
 </div>
@@ -69,3 +71,11 @@
   (apply)="onCalculatorApply($event)"
   (cancel)="onCalculatorCancel()"
 ></app-calculator-modal>
+
+<div class="calendar-overlay" *ngIf="showCalendar">
+  <app-calendar
+    [selectedDate]="calendarSelectedDate"
+    (close)="onCloseCalendar()"
+    (dateChange)="onCloseCalendar()"
+  ></app-calendar>
+</div>

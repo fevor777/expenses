@@ -8,9 +8,9 @@
     </div>
   </div>
   <div class="calendar-header">
-    <button class="nav-btn" (click)="prevMonth()" aria-label="Previous month">‹</button>
+    <button class="nav-btn" (click)="prevMonth()" aria-label="Previous month" [disabled]="mode === 'period'">‹</button>
     <div class="month-label">{{ monthLabel }}</div>
-    <button class="nav-btn" (click)="nextMonth()" aria-label="Next month">›</button>
+    <button class="nav-btn" (click)="nextMonth()" aria-label="Next month" [disabled]="mode === 'period'">›</button>
   </div>
   <div class="week-labels">
     <div class="week-label" *ngFor="let wd of weekDayLabels">{{ wd }}</div>
@@ -24,11 +24,21 @@
         [class.today]="d.isToday"
         [class.selected]="d.isSelected"
         [class.weekend]="d.isWeekend"
+        [class.period-core]="mode === 'period' && isInBudgetCore(d.date)"
+        [class.period-buffer]="mode === 'period' && !isInBudgetCore(d.date) && isInBudgetBuffer(d.date)"
         [attr.aria-selected]="d.isSelected"
         [attr.data-date]="d.date.toISOString()"
         >
         <span class="day-number">{{ d.date.getDate() }}</span>
       </div>
     </div>
+  </div>
+  <div class="calendar-mode-switch">
+    <app-segmented-switch
+      [options]="calendarModes"
+      [active]="mode"
+      ariaLabel="Переключатель режима календаря"
+      (select)="onModeSelect($event)"
+    ></app-segmented-switch>
   </div>
 </div>

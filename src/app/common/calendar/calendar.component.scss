@@ -4,7 +4,6 @@
   border-radius: 12px;
   padding: 10px 12px 14px;
   width: 320px; // fixed width
-  height: 357px; // fixed height for consistent layout
   box-shadow: var(--shadow-medium);
   font-size: 14px;
   user-select: none;
@@ -66,6 +65,10 @@
   justify-content: center;
   transition: background var(--transition-fast);
 }
+.nav-btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 .nav-btn:active { transform: scale(.9); }
 .nav-btn:hover { background: var(--color-bg-hover); }
 .week-labels, .week {
@@ -111,6 +114,19 @@
   color: #fff;
   box-shadow: 0 2px 4px rgba(0,0,0,.25);
 }
+.day.period-core:not(.selected) {
+  background: rgba(60, 160, 90, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(60,160,90,0.5);
+}
+.day.period-buffer:not(.selected):not(.period-core) {
+  background: rgba(60, 160, 90, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(60,160,90,0.25);
+  opacity: 0.85;
+}
 .day:active { transform: scale(.92); }
 .day-number { font-size: 14px; }
 // Fixed size calendar removes responsive shrink behavior; adjust below if future responsiveness needed.
+
+.calendar-mode-switch {
+  margin-top: 15px;
+}
