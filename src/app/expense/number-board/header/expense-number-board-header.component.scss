@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 22px;
+  font-size: 20px;
   padding-right: 17px;
   padding-top: 6px;
   padding-bottom: 6px;
@@ -22,6 +22,7 @@
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
+  text-transform: uppercase;
   border: none;
   background: none;
   outline: none;
@@ -74,9 +75,11 @@
 .expense-number-board-expand-icons {
   color: var(--color-muted);
   cursor: pointer;
-
-  padding: 6px 20px;
-  font-size: 18px;
+  padding-bottom: 6px;
+  padding-top: 6px;
+  padding-left: 20px;
+  padding-right: 10px;
+  font-size: 19px;
   opacity: 0.5;
   transition:
     color var(--transition-fast),
