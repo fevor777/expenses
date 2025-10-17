@@ -1,23 +1,31 @@
 <div class="calendar">
-  <div class="calendar-top">
-    <div class="calendar-top-left">
-      <button class="tool-btn" (click)="goToday()" aria-label="Go to today" title="Сегодня"><i class="fas fa-dot-circle"></i></button>
-    </div>
-    <div class="calendar-top-right">
-      <button class="tool-btn" (click)="onClose()" aria-label="Close calendar" title="Закрыть"><i class="fas fa-times"></i></button>
-    </div>
-  </div>
-  <div class="calendar-header">
-    <button class="nav-btn" (click)="prevMonth()" aria-label="Previous month" [disabled]="mode === 'period'">‹</button>
-    <div class="month-label">{{ monthLabel }}</div>
-    <button class="nav-btn" (click)="nextMonth()" aria-label="Next month" [disabled]="mode === 'period'">›</button>
+  <div class="calendar-header" [@dayAppear]>
+    <button
+      class="nav-btn"
+      (click)="prevMonth()"
+      aria-label="Previous month"
+      [disabled]="mode === 'period'"
+    >
+      ‹
+    </button>
+    <div class="month-label" (click)="goToday()">{{ monthLabel }}</div>
+    <button
+      class="nav-btn"
+      (click)="nextMonth()"
+      aria-label="Next month"
+      [disabled]="mode === 'period'"
+    >
+      ›
+    </button>
   </div>
   <div class="week-labels">
     <div class="week-label" *ngFor="let wd of weekDayLabels">{{ wd }}</div>
   </div>
   <div class="weeks">
     <div class="week" *ngFor="let w of weeks">
-      <div class="day"
+      <div
+        class="day"
+        [@dayAppear]
         *ngFor="let d of w"
         (click)="selectDay(d)"
         [class.outside]="!d.inMonth"
@@ -25,15 +33,21 @@
         [class.selected]="d.isSelected"
         [class.weekend]="d.isWeekend"
         [class.period-core]="mode === 'period' && isInBudgetCore(d.date)"
-        [class.period-buffer]="mode === 'period' && !isInBudgetCore(d.date) && isInBudgetBuffer(d.date)"
+        [class.period-buffer]="
+          mode === 'period' &&
+          !isInBudgetCore(d.date) &&
+          isInBudgetBuffer(d.date)
+        "
+        [class.period-past]="mode === 'period' && isBudgetCorePast(d.date)"
         [attr.aria-selected]="d.isSelected"
         [attr.data-date]="d.date.toISOString()"
-        >
+      >
         <span class="day-number">{{ d.date.getDate() }}</span>
       </div>
     </div>
   </div>
   <div class="calendar-mode-switch">
+    <i (click)="onClose()" class="calendar-close-icon fas fa-times"></i>
     <app-segmented-switch
       [options]="calendarModes"
       [active]="mode"

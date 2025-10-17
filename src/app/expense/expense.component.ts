@@ -240,7 +240,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   onOpenCalendar(): void {
     this.calendarSelectedDate = new Date();
-    this.showCalendar = true;
+    this.showCalendar = !this.showCalendar;
   }
 
   onCloseCalendar(): void {

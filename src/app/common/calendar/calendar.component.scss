@@ -36,17 +36,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
-.tool-btn:hover { background: var(--color-bg-hover); color: var(--color-primary); }
-.tool-btn:active { transform: scale(.9); }
+.tool-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-primary);
+}
+.tool-btn:active {
+  transform: scale(0.9);
+}
 .calendar-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
 }
-.calendar-top-left, .calendar-top-right { display: flex; gap: 6px; }
+.calendar-top-left,
+.calendar-top-right {
+  display: flex;
+  gap: 6px;
+}
 .month-label {
   text-transform: capitalize;
 }
@@ -69,9 +80,14 @@
   opacity: 0.35;
   cursor: not-allowed;
 }
-.nav-btn:active { transform: scale(.9); }
-.nav-btn:hover { background: var(--color-bg-hover); }
-.week-labels, .week {
+.nav-btn:active {
+  transform: scale(0.9);
+}
+.nav-btn:hover {
+  background: var(--color-bg-hover);
+}
+.week-labels,
+.week {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 }
@@ -79,9 +95,11 @@
   margin-bottom: 4px;
   font-size: 12px;
   color: var(--color-text-secondary);
-  letter-spacing: .5px;
+  letter-spacing: 0.5px;
 }
-.week-label { text-align: center; }
+.week-label {
+  text-align: center;
+}
 .day {
   position: relative;
   height: 38px;
@@ -98,12 +116,14 @@
     color var(--transition-fast),
     box-shadow var(--transition-fast);
 }
-.day.outside { opacity: 0.4; }
+.day.outside {
+  color: rgb(160, 160, 160);
+}
 .day.weekend:not(.selected) {
   // background: rgba(255, 180, 0, 0.18); // warm tint
   color: var(--color-primary);
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(255,180,0,0.35);
+  box-shadow: inset 0 0 0 1px rgba(255, 180, 0, 0.35);
 }
 .day.today:not(.selected) {
   outline: 2px solid var(--color-primary);
@@ -112,21 +132,48 @@
 .day.selected {
   background: var(--color-primary);
   color: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,.25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 .day.period-core:not(.selected) {
   background: rgba(60, 160, 90, 0.25);
-  box-shadow: inset 0 0 0 1px rgba(60,160,90,0.5);
+  box-shadow: inset 0 0 0 1px rgba(60, 160, 90, 0.5);
+}
+.day.period-core.period-past:not(.selected) {
+  // background: rgba(60, 160, 90, 0.18);
+  // box-shadow: inset 0 0 0 1px rgba(60,160,90,0.35);
+  opacity: 0.6;
+  position: relative;
+}
+.day.period-core.period-past:not(.selected)::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(60, 160, 90, 0.9);
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6);
 }
 .day.period-buffer:not(.selected):not(.period-core) {
-  background: rgba(60, 160, 90, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(60,160,90,0.25);
+  // background: rgba(60, 160, 90, 0.08);
+  // box-shadow: inset 0 0 0 1px rgba(60,160,90,0.25);
   opacity: 0.85;
 }
-.day:active { transform: scale(.92); }
-.day-number { font-size: 14px; }
+.day:active {
+  transform: scale(0.92);
+}
+.day-number {
+  font-size: 14px;
+}
 // Fixed size calendar removes responsive shrink behavior; adjust below if future responsiveness needed.
 
 .calendar-mode-switch {
   margin-top: 15px;
+}
+
+.calendar-close-icon {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-right: 20px;
 }

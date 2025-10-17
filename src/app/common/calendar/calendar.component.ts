@@ -10,6 +10,7 @@ import {
   SegmentedSwitchComponent,
   SegmentedOption,
 } from '../component/segmented/segmented-switch.component';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { IrregularBudgetService } from '../service/irregular-budget.service';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { Budget } from '../model/budget.model';
@@ -28,6 +29,14 @@ interface CalendarDay {
   imports: [CommonModule, SegmentedSwitchComponent],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
+  animations: [
+    trigger('dayAppear', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(.92)' }),
+        animate('100ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
+      ]),
+    ]),
+  ],
 })
 export class CalendarComponent implements OnDestroy {
   @Input() selectedDate: Date = new Date();
@@ -252,10 +261,10 @@ export class CalendarComponent implements OnDestroy {
   }
 
   selectDay(day: CalendarDay) {
-    if (!day.inMonth) return;
-    this.selectedDate = day.date;
-    this.dateChange.emit(day.date);
-    this.generate();
+    // if (!day.inMonth) return;
+    // this.selectedDate = day.date;
+    // this.dateChange.emit(day.date);
+    // this.generate();
   }
 
   private generate() {
@@ -363,11 +372,10 @@ export class CalendarComponent implements OnDestroy {
       });
       const start = fmtShort.format(this.budgetStart);
       const end = fmtShort.format(this.budgetEnd);
-      const days =
-        Math.ceil(
-          (this.budgetEnd.getTime() - this.budgetStart.getTime()) /
-            (1000 * 60 * 60 * 24)
-        );
+      const days = Math.ceil(
+        (this.budgetEnd.getTime() - this.budgetStart.getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
       return `${start} – ${end} (${days - 1}д)`;
     }
     return new Intl.DateTimeFormat('ru-RU', {
@@ -392,6 +400,17 @@ export class CalendarComponent implements OnDestroy {
     const bufferEnd = this.budgetEnd.getTime() + 7 * 24 * 60 * 60 * 1000;
     const time = d.getTime();
     return time >= bufferStart && time <= bufferEnd;
+  }
+
+  isBudgetCorePast(d: Date): boolean {
+    if (!this.isInBudgetCore(d)) return false;
+    const today = new Date();
+    const startOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ).getTime();
+    return d.getTime() < startOfToday;
   }
 
   ngOnDestroy(): void {
