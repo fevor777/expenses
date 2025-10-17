@@ -29,7 +29,7 @@
       class="expense-edit-budget-separator"
       *ngIf="isLeftIconListVisible && !amount"
       >|</span
-      >
+    >
     <i
       *ngIf="isLeftIconListVisible && !amount"
       class="expense-edit-latest-icon expense-edit-budget-icon fa-solid fa-receipt"
@@ -46,17 +46,19 @@
     >
     <i
       *ngIf="isLeftIconListVisible && !amount"
-      class="expense-edit-latest-icon fas fa-clock-rotate-left"
-      (click)="onOpenEditLatest($event)"
-      aria-label="Edit latest expense"
+      (click)="onCalendarIconClick()"
+      class="expense-edit-latest-icon expense-edit-budget-icon fas fa-calendar-day"
+      aria-label="open-calendar"
       role="button"
       tabindex="0"
       [class.animate-from-left]="animateIconsIn"
     ></i>
+
     <span
       class="expense-edit-budget-separator"
       *ngIf="isLeftIconListVisible && !amount"
-      >|</span>
+      >|</span
+    >
 
     <i
       *ngIf="isLeftIconListVisible && !amount"
@@ -67,23 +69,27 @@
       tabindex="0"
       [class.animate-from-left]="animateIconsIn"
     ></i>
-        <span
+    <span
       class="expense-edit-budget-separator"
       *ngIf="isLeftIconListVisible && !amount"
-      >|</span>
+      >|</span
+    >
+
     <i
       *ngIf="isLeftIconListVisible && !amount"
-      (click)="onCalendarIconClick()"
-      class="expense-edit-latest-icon expense-edit-budget-icon fas fa-calendar-day"
-      aria-label="open-calendar"
+      class="expense-edit-latest-icon fas fa-clock-rotate-left"
+      (click)="onOpenEditLatest($event)"
+      aria-label="Edit latest expense"
       role="button"
       tabindex="0"
       [class.animate-from-left]="animateIconsIn"
     ></i>
+
     <span
       class="expense-edit-budget-separator"
       *ngIf="isLeftIconListVisible && !amount"
-      >|</span>
+      >|</span
+    >
     <i
       *ngIf="amount"
       class="expense-number-board-expand-icons expense-number-board-header-calc fas fa-calculator"

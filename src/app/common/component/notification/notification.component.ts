@@ -146,6 +146,7 @@ export class NotificationComponent implements OnDestroy {
   }
 
   onCloseNotification() {
+    this.notificationService.updateCloseeNotificationSubj();
     this.startHide();
   }
 

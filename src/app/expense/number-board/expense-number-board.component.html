@@ -58,18 +58,3 @@
     </div>
   </div>
 </div>
-
-<app-description-edit-modal
-  *ngIf="showDescriptionModal"
-  [description]="description"
-  (apply)="onDescriptionApply($event)"
-  (cancel)="onDescriptionCancel()"
-></app-description-edit-modal>
-
-<app-expense-edit-modal
-  *ngIf="showEditLatestModal"
-  [isLoadLatestExpenses]="true"
-  (apply)="onApplyEditLatest($event)"
-  (cancel)="onCancelEditLatest()"
-  (delete)="onDeleteLatest($event)"
-></app-expense-edit-modal>

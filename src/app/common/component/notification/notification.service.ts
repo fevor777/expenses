@@ -21,11 +21,14 @@ export class NotificationService {
     new Subject();
   readonly message$ = this.messageSubject.asObservable();
 
+  private readonly closeNotificationSubject: Subject<void> = new Subject();
+  readonly closeBudget$ = this.closeNotificationSubject.asObservable();
+
   private readonly hideSubject: Subject<void> = new Subject();
   readonly hide$ = this.hideSubject.asObservable();
 
   private browserNotificationPermission: NotificationPermission = 'default';
-  
+
   summaryBuildResultCache: BudgetSummaryBuildResult;
 
   isShown: boolean = false;
@@ -55,7 +58,15 @@ export class NotificationService {
     this.hideSubject.next();
   }
 
-  showBrowserNotification(title: string, message: string, options?: NotificationOptions): Observable<void> {
+  updateCloseeNotificationSubj() {
+    this.closeNotificationSubject.next();
+  }
+
+  showBrowserNotification(
+    title: string,
+    message: string,
+    options?: NotificationOptions
+  ): Observable<void> {
     if (!('Notification' in window)) {
       console.warn('This browser does not support notifications');
       return of(undefined);
@@ -81,9 +92,15 @@ export class NotificationService {
     return of(undefined);
   }
 
-  private createNotification(title: string, message: string, options?: NotificationOptions): Observable<void> {
+  private createNotification(
+    title: string,
+    message: string,
+    options?: NotificationOptions
+  ): Observable<void> {
     // Strip HTML tags from message for browser notification
-    const cleanMessage = message.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
+    const cleanMessage = message
+      .replace(/<[^>]*>/g, '')
+      .replace(/&[^;]+;/g, ' ');
     // Ensure a stable tag for replacement if caller did not provide one
     const tag = options?.tag || 'app-expenses-budget-summary';
     const icon = (options as any)?.icon;
@@ -95,28 +112,38 @@ export class NotificationService {
         try {
           controller.postMessage({
             type: 'SHOW_BUDGET_NOTIFICATION',
-            payload: { title, body: cleanMessage, tag, icon, badge }
+            payload: { title, body: cleanMessage, tag, icon, badge },
           });
           return of(undefined);
         } catch (e) {
-          console.warn('[NotificationService] SW postMessage failed, fallback to window Notification', e);
+          console.warn(
+            '[NotificationService] SW postMessage failed, fallback to window Notification',
+            e
+          );
         }
       } else {
         // Wait for controller (first load after registration) then send
         const sendLater = () => {
           const c = navigator.serviceWorker.controller;
-            if (c) {
-              try {
+          if (c) {
+            try {
               c.postMessage({
                 type: 'SHOW_BUDGET_NOTIFICATION',
-                payload: { title, body: cleanMessage, tag, icon, badge }
-                });
-              } catch (e) {
-                console.warn('[NotificationService] delayed SW postMessage failed', e);
-              }
+                payload: { title, body: cleanMessage, tag, icon, badge },
+              });
+            } catch (e) {
+              console.warn(
+                '[NotificationService] delayed SW postMessage failed',
+                e
+              );
             }
+          }
         };
-        navigator.serviceWorker.addEventListener('controllerchange', sendLater, { once: true });
+        navigator.serviceWorker.addEventListener(
+          'controllerchange',
+          sendLater,
+          { once: true }
+        );
         // We still return; no immediate notification until controller takes control.
         return of(undefined);
       }
@@ -159,7 +186,9 @@ export class NotificationService {
   showBudgetNotification(title: string, htmlMessage: string) {
     // Explicitly clear existing budget summary notification before showing new one.
     this.clearNotifications('app-expenses-budget-summary');
-    return this.showBrowserNotification(title, htmlMessage, { tag: 'app-expenses-budget-summary' });
+    return this.showBrowserNotification(title, htmlMessage, {
+      tag: 'app-expenses-budget-summary',
+    });
   }
 
   /** Clear existing notifications (optionally by tag) via Service Worker. */
@@ -168,18 +197,27 @@ export class NotificationService {
       try {
         navigator.serviceWorker.controller.postMessage({
           type: 'CLEAR_NOTIFICATIONS',
-          payload: { tag }
+          payload: { tag },
         });
       } catch (e) {
-        console.warn('[NotificationService] CLEAR_NOTIFICATIONS postMessage failed', e);
+        console.warn(
+          '[NotificationService] CLEAR_NOTIFICATIONS postMessage failed',
+          e
+        );
       }
     }
   }
 
   /** Atomically replace existing budget notification via single SW message. */
-  showReplacingBudgetNotification(title: string, htmlMessage: string, options?: NotificationOptions) {
+  showReplacingBudgetNotification(
+    title: string,
+    htmlMessage: string,
+    options?: NotificationOptions
+  ) {
     const tag = 'app-expenses-budget-summary';
-    const cleanMessage = htmlMessage.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
+    const cleanMessage = htmlMessage
+      .replace(/<[^>]*>/g, '')
+      .replace(/&[^;]+;/g, ' ');
     // Determine icon & badge via provided options with safe fallbacks.
     const icon = (options as any)?.icon || 'favicon2.ico';
     const badge = (options as any)?.badge || icon;
@@ -189,7 +227,9 @@ export class NotificationService {
     const post = () => {
       try {
         if (!navigator.serviceWorker.controller) {
-          console.warn('[NotificationService] No SW controller; cannot post yet');
+          console.warn(
+            '[NotificationService] No SW controller; cannot post yet'
+          );
           return false;
         }
         navigator.serviceWorker.controller.postMessage({
@@ -201,8 +241,8 @@ export class NotificationService {
             icon,
             badge,
             requireInteraction: (options as any)?.requireInteraction || false,
-            silent: (options as any)?.silent || false
-          }
+            silent: (options as any)?.silent || false,
+          },
         });
         return true;
       } catch (e) {
@@ -221,7 +261,9 @@ export class NotificationService {
       if (attempts < maxAttempts) setTimeout(retry, retryDelay);
       else this.showBudgetNotification(title, htmlMessage); // fallback
     };
-    navigator.serviceWorker.addEventListener('controllerchange', retry, { once: true });
+    navigator.serviceWorker.addEventListener('controllerchange', retry, {
+      once: true,
+    });
     setTimeout(retry, retryDelay);
     return of(undefined);
   }

@@ -52,10 +52,10 @@ export class CalendarComponent implements OnDestroy {
 
   // mode switching between standard calendar month and irregular budget period
   calendarModes: SegmentedOption[] = [
-    { value: 'month', label: 'Месяц' },
     { value: 'period', label: 'Бюджет' },
+    { value: 'month', label: 'Месяц' },
   ];
-  mode: 'month' | 'period' = 'month';
+  mode: 'month' | 'period' = 'period';
   @Output() modeChange = new EventEmitter<'month' | 'period'>();
 
   // irregular budget period boundaries (computed from Budget.periodStartTs + period days)

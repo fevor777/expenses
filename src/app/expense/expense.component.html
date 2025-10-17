@@ -8,7 +8,7 @@
     (menuIconClick)="navigateToExport()"
     (historyIconClick)="navigateToHistory()"
     (statisticsIconClick)="navigateToStatistics()"
-    (detailsIconClick)="onHeaderBudgetInfoClick()"
+    (periodBudgetClick)="onHeaderBudgetInfoClick()"
     (balanceChange)="onBalanceChange($event)"
     (calendarOpen)="onOpenCalendar()"
   >
@@ -61,9 +61,26 @@
     (periodSummaryIconClick)="navigateToDetails()"
     (brNotificationIconClick)="onSendBrowserNotification()"
     (calendarIconClick)="onOpenCalendar()"
+    (addDescriptionRequest)="onOpenDescription()"
+    (openEditLatestRequest)="onOpenEditLatest()"
   >
   </app-expense-number-board>
 </div>
+
+<app-description-edit-modal
+  *ngIf="showDescriptionModal"
+  [description]="description"
+  (apply)="onDescriptionApply($event)"
+  (cancel)="onDescriptionCancel()"
+></app-description-edit-modal>
+
+<app-expense-edit-modal
+  *ngIf="showEditLatestModal"
+  [isLoadLatestExpenses]="true"
+  (apply)="onApplyEditLatest($event)"
+  (cancel)="onCancelEditLatest()"
+  (delete)="onDeleteLatest($event)"
+></app-expense-edit-modal>
 
 <app-calculator-modal
   *ngIf="showCalculator"

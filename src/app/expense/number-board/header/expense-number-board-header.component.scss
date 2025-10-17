@@ -3,7 +3,9 @@
   justify-content: space-between;
   align-items: center;
   font-size: 22px;
-  padding: 6px 17px;
+  padding-right: 17px;
+  padding-top: 6px;
+  padding-bottom: 6px;
   position: relative;
   border-bottom: 1px solid var(--color-border);
   gap: 10px;
@@ -72,6 +74,8 @@
 .expense-number-board-expand-icons {
   color: var(--color-muted);
   cursor: pointer;
+
+  padding: 6px 20px;
   font-size: 18px;
   opacity: 0.5;
   transition:
@@ -96,7 +100,6 @@
 
 .expense-number-board-collapes-icons {
   opacity: 0.2;
-  padding-right: 10px;
 }
 
 /* Slide-in from left animation */

@@ -7,10 +7,8 @@ import {
   Output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DescriptionEditModalComponent } from './description-edit-modal.component';
 import { Currency } from '../../common/model/currency';
 import { Expense } from '../../common/model/expense.model';
-import { ExpenseEditModalComponent } from '../../history/edit/expense-edit-modal.component';
 import { ExpenseNumberBoardHeaderComponent } from './header/expense-number-board-header.component';
 import { NotificationService } from '../../common/component/notification/notification.service';
 
@@ -19,13 +17,7 @@ import { NotificationService } from '../../common/component/notification/notific
   templateUrl: './expense-number-board.component.html',
   styleUrls: ['./expense-number-board.component.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    DescriptionEditModalComponent,
-    ExpenseEditModalComponent,
-    ExpenseNumberBoardHeaderComponent,
-  ],
+  imports: [CommonModule, FormsModule, ExpenseNumberBoardHeaderComponent],
 })
 export class ExpenseNumberBoardComponent {
   @Input() currency: Currency;
@@ -57,6 +49,9 @@ export class ExpenseNumberBoardComponent {
   @Output() periodSummaryIconClick = new EventEmitter<void>();
   @Output() brNotificationIconClick = new EventEmitter<void>();
   @Output() calendarIconClick = new EventEmitter<void>();
+  // Upward modal requests (parent hosts modals now)
+  @Output() addDescriptionRequest = new EventEmitter<void>();
+  @Output() openEditLatestRequest = new EventEmitter<void>();
   
   constructor(private notificationService: NotificationService) {}
 
@@ -78,7 +73,7 @@ export class ExpenseNumberBoardComponent {
 
   addDescription(): void {
     this.notificationService.hide();
-    this.showDescriptionModal = true;
+    this.addDescriptionRequest.emit();
   }
 
   onCurrencyClick(): void {
@@ -212,7 +207,7 @@ export class ExpenseNumberBoardComponent {
   openEditLatest(event?: Event): void {
     event?.stopPropagation();
     this.notificationService.hide();
-    this.showEditLatestModal = true;
+    this.openEditLatestRequest.emit();
   }
 
   onApplyEditLatest(expense: Expense): void {

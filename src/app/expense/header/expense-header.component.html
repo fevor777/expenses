@@ -2,20 +2,20 @@
   <div class="expense-header-main">
     <div class="expense-header-left-group">
       <div
-        class="expense-header-menu-icon"
-        (click)="onMenuIconClick()"
-        title="Export / Settings"
-        aria-label="Export and settings"
-      >
-        <i class="fas fa-bars"></i>
-      </div>
-      <div
         class="expense-header-stats-icon"
         (click)="onStatisticsIconClick()"
         title="Statistics"
         aria-label="Statistics"
       >
         <i class="fas fa-chart-pie"></i>
+      </div>
+      <div
+        class="expense-header-menu-icon"
+        (click)="onMenuIconClick()"
+        title="Export / Settings"
+        aria-label="Export and settings"
+      >
+        <i class="fas fa-bars"></i>
       </div>
     </div>
 
@@ -28,28 +28,46 @@
       <ng-container *ngIf="!amountLoading; else amountLoadingTpl">
         <div *ngIf="isShowCurrentBalanceAmount; else elseBlock" [@amountSwap]>
           <div class="expense-header-irregular-title">нерегул.</div>
-          <span class="expense-header-total-title" [@amountValueChange] [@amountFlash]>
-            {{ currentBalanceAmount }}<span class="expense-header-total-title-currency">€</span>
+          <span
+            class="expense-header-total-title"
+            [@amountValueChange]
+            [@amountFlash]
+          >
+            {{ currentBalanceAmount
+            }}<span class="expense-header-total-title-currency">€</span>
           </span>
         </div>
         <ng-template #elseBlock>
           <div [@amountSwap]>
-            <span class="expense-header-total-title" [@amountValueChange] [@amountFlash]>
-              {{ currentAmount }}<span class="expense-header-total-title-currency">€</span>
+            <span
+              class="expense-header-total-title"
+              [@amountValueChange]
+              [@amountFlash]
+            >
+              {{ currentAmount
+              }}<span class="expense-header-total-title-currency">€</span>
             </span>
           </div>
         </ng-template>
       </ng-container>
       <ng-template #amountLoadingTpl>
-        <div class="expense-header-amount-loading" aria-label="Loading amount" role="status">
-          <app-spinner [size]="26" color="var(--color-spinner)" [started]="amountLoading"></app-spinner>
+        <div
+          class="expense-header-amount-loading"
+          aria-label="Loading amount"
+          role="status"
+        >
+          <app-spinner
+            [size]="26"
+            color="var(--color-spinner)"
+            [started]="amountLoading"
+          ></app-spinner>
         </div>
       </ng-template>
     </div>
     <div class="expense-header-icons-group">
       <div
         class="expense-header-details-icon"
-        (click)="onDetailsIconClick()"
+        (click)="onPeriodBudgetClick()"
         title="Budget info"
         aria-label="Budget info"
       >
@@ -66,6 +84,11 @@
     </div>
   </div>
   <div class="expense-header-bottom">
-    <span class="expense-header-today" (click)="onCalendarOpen()" title="Выбрать дату">{{ todayLabel }}</span>
+    <span
+      class="expense-header-today"
+      (click)="onCalendarOpen()"
+      title="Выбрать дату"
+      >{{ todayLabel }}</span
+    >
   </div>
 </div>

@@ -78,7 +78,7 @@ export class ExpenseHeaderComponent implements OnInit {
   @Output() menuIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() historyIconClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() statisticsIconClick: EventEmitter<void> = new EventEmitter<void>();
-  @Output() detailsIconClick: EventEmitter<void> = new EventEmitter<void>();
+  @Output() periodBudgetClick: EventEmitter<void> = new EventEmitter<void>();
   @Output() balanceChange: EventEmitter<number> = new EventEmitter<number>();
 
   isShowCurrentBalanceAmount: boolean = false;
@@ -105,8 +105,8 @@ export class ExpenseHeaderComponent implements OnInit {
     this.statisticsIconClick.emit();
   }
 
-  onDetailsIconClick(): void {
-    this.detailsIconClick.emit();
+  onPeriodBudgetClick(): void {
+    this.periodBudgetClick.emit();
   }
 
   onCurrentAmountClick(): void {

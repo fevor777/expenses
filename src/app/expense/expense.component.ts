@@ -40,6 +40,8 @@ import {
   BudgetSummaryBuildResult,
 } from '../common/service/budget-summary.service';
 import { CalendarComponent } from '../common/calendar/calendar.component';
+import { DescriptionEditModalComponent } from './number-board/description-edit-modal.component';
+import { ExpenseEditModalComponent } from '../history/edit/expense-edit-modal.component';
 
 @Component({
   selector: 'app-expense',
@@ -56,6 +58,8 @@ import { CalendarComponent } from '../common/calendar/calendar.component';
     ExpenseHeaderComponent,
     CalculatorModalComponent,
     CalendarComponent,
+    DescriptionEditModalComponent,
+    ExpenseEditModalComponent,
   ],
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
@@ -65,7 +69,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   currentBalance: number = 0;
   balance$: Observable<number>;
   balanceDate$: Observable<string>;
-  showNumberBoard: boolean = true;
   monthlyExpenses: Expense[] = [];
   todaysExpenses: Expense[] = [];
   budgetSummary: BudgetSummaryBuildResult;
@@ -74,9 +77,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   currency: Currency;
   description: string = '';
+  calendarSelectedDate: Date = new Date();
+
   showCalculator = false;
   showCalendar = false;
-  calendarSelectedDate: Date = new Date();
+  showNumberBoard: boolean = true;
+  showBudgetNotification: boolean = false;
+  showDescriptionModal: boolean = false;
+  showEditLatestModal: boolean = false;
 
   private unsubscribe: Subject<void> = new Subject();
 
@@ -117,6 +125,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       };
       localStorage.setItem('currency', JSON.stringify(this.currency));
     }
+
+    this.notificationService.closeBudget$
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(() => {
+        this.showBudgetNotification = false;
+      });
   }
 
   onCategoryClick(categoryName: string) {
@@ -181,10 +195,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   onHideNumberBoard(): void {
     this.notificationService.hide();
+    this.showBudgetNotification = false;
+    this.showCalendar = false;
     this.showNumberBoard = false;
   }
 
   onShowNumberBoard(): void {
+    this.notificationService.hide();
+    this.showBudgetNotification = false;
     this.showNumberBoard = true;
   }
 
@@ -209,6 +227,17 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   }
 
   onHeaderBudgetInfoClick(): void {
+    if (!this.showBudgetNotification) {
+      this.showBudgetNotification = true;
+      this.showCalendar = false;
+      this.openPeriodBudgetNotification();
+    } else {
+      this.showBudgetNotification = false;
+      this.notificationService.hide();
+    }
+  }
+
+  private openPeriodBudgetNotification(): void {
     this.expenseSummaryService
       .buildCurrentBudgetSummary()
       .pipe(takeUntil(this.unsubscribe))
@@ -231,16 +260,27 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.enteredAmount = amount;
     if (amount) {
       this.notificationService.hide();
+      this.showBudgetNotification = false;
+      this.showCalendar = false;
     }
   }
 
   onOpenCalculator(): void {
     this.showCalculator = true;
+    this.showCalendar = false;
+    this.showBudgetNotification = false;
+    this.notificationService.hide();
   }
 
   onOpenCalendar(): void {
-    this.calendarSelectedDate = new Date();
-    this.showCalendar = !this.showCalendar;
+    if (!this.showCalendar) {
+      this.calendarSelectedDate = new Date();
+      this.showCalendar = true;
+      this.showBudgetNotification = false;
+      this.notificationService.hide();
+    } else {
+      this.showCalendar = false;
+    }
   }
 
   onCloseCalendar(): void {
@@ -263,6 +303,43 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   onDescriptionChange(description: string): void {
     this.description = description;
+  }
+
+  onOpenDescription(): void {
+    this.notificationService.hide();
+    this.showDescriptionModal = true;
+    this.showBudgetNotification = false;
+    this.showCalendar = false;
+  }
+
+  onDescriptionApply(description: string): void {
+    this.description = description;
+    this.showDescriptionModal = false;
+  }
+
+  onDescriptionCancel(): void {
+    this.showDescriptionModal = false;
+  }
+
+  onOpenEditLatest(): void {
+    this.notificationService.hide();
+    this.showBudgetNotification = false;
+    this.showEditLatestModal = true;
+    this.showCalendar = false;
+  }
+
+  onApplyEditLatest(expense: Expense): void {
+    this.onLatestExpenseUpdated(expense);
+    this.showEditLatestModal = false;
+  }
+
+  onCancelEditLatest(): void {
+    this.showEditLatestModal = false;
+  }
+
+  onDeleteLatest(expense: Expense): void {
+    this.onLatestExpenseDeleted(expense);
+    this.showEditLatestModal = false;
   }
 
   ngOnDestroy(): void {
