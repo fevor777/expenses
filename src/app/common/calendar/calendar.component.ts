@@ -10,9 +10,8 @@ import {
   SegmentedSwitchComponent,
   SegmentedOption,
 } from '../component/segmented/segmented-switch.component';
-import { trigger, transition, style, animate } from '@angular/animations';
 import { IrregularBudgetService } from '../service/irregular-budget.service';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { first, Subject, Subscription, takeUntil } from 'rxjs';
 import { Budget } from '../model/budget.model';
 
 interface CalendarDay {
@@ -29,14 +28,6 @@ interface CalendarDay {
   imports: [CommonModule, SegmentedSwitchComponent],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  animations: [
-    trigger('dayAppear', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'scale(.92)' }),
-        animate('100ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
-      ]),
-    ]),
-  ],
 })
 export class CalendarComponent implements OnDestroy {
   @Input() selectedDate: Date = new Date();
@@ -49,6 +40,8 @@ export class CalendarComponent implements OnDestroy {
   viewDate: Date = new Date();
   weeks: CalendarDay[][] = [];
   weekDayLabels = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+  show: boolean;
 
   // mode switching between standard calendar month and irregular budget period
   calendarModes: SegmentedOption[] = [
@@ -79,8 +72,12 @@ export class CalendarComponent implements OnDestroy {
   private listenIrregularBudget() {
     this.irregularBudgetService
       .getValue()
-      .pipe(takeUntil(this.unsubscribe))
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribe)
+      )
       .subscribe(budget => {
+        this.show = true;
         this.currentBudget = { ...budget, period: budget.period };
         this.computeBudgetFrame();
         if (this.mode === 'period') {

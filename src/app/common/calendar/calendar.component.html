@@ -1,5 +1,5 @@
-<div class="calendar">
-  <div class="calendar-header" [@dayAppear]>
+<div class="calendar" *ngIf="show">
+  <div class="calendar-header">
     <button
       class="nav-btn"
       (click)="prevMonth()"
@@ -25,7 +25,6 @@
     <div class="week" *ngFor="let w of weeks">
       <div
         class="day"
-        [@dayAppear]
         *ngFor="let d of w"
         (click)="selectDay(d)"
         [class.outside]="!d.inMonth"

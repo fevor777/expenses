@@ -184,20 +184,7 @@
   z-index: 20;
 }
 
-.calendar-overlay app-calendar {
-  animation: fadeSlide 0.18s ease;
-}
-
-@keyframes fadeSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* Removed fadeSlide animation for calendar appearance per request */
 
 @keyframes shimmerFlash {
   0% {

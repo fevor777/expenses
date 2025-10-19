@@ -9,6 +9,10 @@
   user-select: none;
   box-sizing: border-box;
   position: relative;
+
+  .weeks {
+    min-height: 280px;
+  }
 }
 .calendar-header {
   display: flex;
@@ -159,9 +163,6 @@
   // background: rgba(60, 160, 90, 0.08);
   // box-shadow: inset 0 0 0 1px rgba(60,160,90,0.25);
   opacity: 0.85;
-}
-.day:active {
-  transform: scale(0.92);
 }
 .day-number {
   font-size: 14px;
