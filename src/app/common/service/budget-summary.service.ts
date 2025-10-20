@@ -7,7 +7,7 @@ import { NotificationService } from '../component/notification/notification.serv
 // Removed direct expense scanning utilities; logic moved into model class.
 import { BudgetSummary } from '../model/budget-summary/budget-summary.model';
 import { composeBudgetSummaryMessage } from '../model/budget-summary/budget-summary.br-notifi-formatter';
-import { composeAppBudgetInfoMessage } from '../model/budget-summary/budget-summary.app-notifi-formatter';
+import { composeAppBudgetInfoMessageList } from '../model/budget-summary/budget-summary.app-notifi-formatter';
 
 export interface BudgetSummaryBuildResult {
   summary: BudgetSummary | null;
@@ -88,7 +88,7 @@ export class BudgetSummaryService {
       );
     }
     const summary = result.summary;
-    const msg = composeAppBudgetInfoMessage(summary);
+    const msg = composeAppBudgetInfoMessageList(summary, { mode: 'full' });
     const remaining = summary.remaining;
     const percentUsed = summary.percentUsed;
     this.notificationService.showMessage(

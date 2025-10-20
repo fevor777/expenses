@@ -4,7 +4,7 @@ import { switchMap } from 'rxjs/operators';
 import { BudgetSummaryBuildResult } from '../../service/budget-summary.service';
 
 export interface NotificationPayload {
-  message: string;
+  message: string | string[];
   type?: 'info' | 'success' | 'error' | 'warning';
   /** Optional context tag to allow component to render extra UI */
   context?: string; // e.g. 'expense-added'
@@ -17,7 +17,7 @@ export interface NotificationPayload {
   providedIn: 'root',
 })
 export class NotificationService {
-  private readonly messageSubject: Subject<string | NotificationPayload> =
+  private readonly messageSubject: Subject<string | NotificationPayload | string[]> =
     new Subject();
   readonly message$ = this.messageSubject.asObservable();
 
@@ -38,7 +38,7 @@ export class NotificationService {
   }
 
   showMessage(
-    message: string,
+    message: string | string[],
     type: NotificationPayload['type'] = 'info',
     extras?: Pick<NotificationPayload, 'context' | 'expense'>
   ) {

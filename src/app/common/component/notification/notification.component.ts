@@ -7,7 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { BudgetSummaryService } from '../../service/budget-summary.service';
 import { ExpenseService } from '../../service/expense.service';
-import { PeriodSummaryIconComponent } from "../period-summary-icon/period-summary-icon.component";
+import { PeriodSummaryIconComponent } from '../period-summary-icon/period-summary-icon.component';
 
 type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
 
@@ -20,6 +20,7 @@ type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
 })
 export class NotificationComponent implements OnDestroy {
   message = '';
+  messageList: string[] = [];
   show = false;
   hiding = false;
   variant: NotificationVariant = 'info';
@@ -31,7 +32,7 @@ export class NotificationComponent implements OnDestroy {
   savingDescription = false;
 
   private hideTimeout: any;
-  private autoCloseMs = 60000; // shorter default for UX
+  private autoCloseMs = 120000; // shorter default for UX
 
   private readonly destroySubject: Subject<void> = new Subject();
 
@@ -65,6 +66,8 @@ export class NotificationComponent implements OnDestroy {
           } else {
             this.editableDescription = '';
           }
+        } else if (Array.isArray(payload) && payload.length > 0) {
+          this.showMessageList(payload);
         }
       });
 
@@ -76,12 +79,16 @@ export class NotificationComponent implements OnDestroy {
   showMessage(message: string, variant: NotificationVariant = 'info') {
     this.clearPending();
     this.message = message;
-    this.variant = variant;
-    this.icon = this.resolveIcon(variant);
-    this.hiding = false;
-    this.show = true;
-    this.notificationService.isShown = true;
-    this.hideTimeout = setTimeout(() => this.startHide(), this.autoCloseMs);
+    this.setUtilValues(variant);
+  }
+
+  showMessageList(
+    messageList: string[],
+    variant: NotificationVariant = 'info'
+  ) {
+    this.clearPending();
+    this.messageList = messageList;
+    this.setUtilValues(variant);
   }
 
   appendMark(mark: string) {
@@ -140,6 +147,8 @@ export class NotificationComponent implements OnDestroy {
     // allow animation to finish
     setTimeout(() => {
       this.show = false;
+      this.message = '';
+      this.messageList = [];
       this.notificationService.isShown = false;
       this.hiding = false;
     }, 250);
@@ -177,6 +186,15 @@ export class NotificationComponent implements OnDestroy {
       clearTimeout(this.hideTimeout);
       this.hideTimeout = null;
     }
+  }
+
+  private setUtilValues(variant: NotificationVariant): void {
+    this.variant = variant;
+    this.icon = this.resolveIcon(variant);
+    this.hiding = false;
+    this.show = true;
+    this.notificationService.isShown = true;
+    this.hideTimeout = setTimeout(() => this.startHide(), this.autoCloseMs);
   }
 
   ngOnDestroy(): void {

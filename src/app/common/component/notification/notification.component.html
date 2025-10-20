@@ -9,7 +9,10 @@
   <div class="notification-main">
     <span class="notification-icon" *ngIf="icon" [innerHTML]="icon"></span>
     <div class="notification-body">
-      <div class="notification-content" [innerHTML]="message"></div>
+      <div class="notification-content" *ngIf="message; else messageListTemplate" [innerHTML]="message"></div>
+      <ng-template #messageListTemplate>
+        <div class="notification-list" *ngFor="let msg of messageList" [innerHTML]="msg"></div>
+      </ng-template>
       <span *ngIf="isExpenseAddedContext">Description:</span>
       <div *ngIf="isExpenseAddedContext" class="notification-marks-row">
         <button type="button" class="mark-btn" (click)="appendMark(' ? ')" title="#необязательный" aria-label="#необязательный">#необязательный</button>
