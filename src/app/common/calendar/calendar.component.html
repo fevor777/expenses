@@ -42,20 +42,36 @@
         [attr.data-date]="d.date.toISOString()"
       >
         <span class="day-number">{{ d.date.getDate() }}</span>
-        <span *ngIf="isExhaustionDay(d.date)" class="exhaustion-dot" aria-label="Прогноз исчерпания бюджета"></span>
+        <span
+          *ngIf="isExhaustionDay(d.date)"
+          class="exhaustion-dot"
+          aria-label="Прогноз исчерпания бюджета"
+        ></span>
       </div>
     </div>
   </div>
-  <div *ngIf="summaryAvailable" class="calendar-budget-strip" [attr.aria-label]="stripAriaLabel">
+  <div *ngIf="summaryAvailable" class="calendar-separator" aria-hidden="true"></div>
+  <div
+    *ngIf="summaryAvailable"
+    class="calendar-budget-strip"
+    [attr.aria-label]="stripAriaLabel"
+  >
     <span class="segment spent-total">{{ stripSpentTotal }}</span>
     <span class="sep">•</span>
     <span class="segment remaining" title="Остаток">{{ stripRemaining }}</span>
     <span class="sep">|</span>
-    <span class="segment days" title="Прошло / всего дней"> ⏳ {{ stripDaysPassedFrame }}</span>
+    <span class="segment days" title="Прошло / всего дней">
+      ⏳ {{ stripDaysPassedFrame }}</span
+    >
     <span class="sep">•</span>
-    <span class="segment days-left" title="Осталось дней">{{ stripDaysLeft }}</span>
+    <span class="segment days-left" title="Осталось дней">{{
+      stripDaysLeft
+    }}</span>
     <span class="sep">|</span>
-  <span class="segment need" title="Нужно в день" *ngIf="stripNeedPerDay">{{ stripNeedIcon }}{{ stripNeedIcon ? ' ' : '' }}{{ stripNeedPerDay }}</span>
+    <span class="segment need" title="Нужно в день" *ngIf="stripNeedPerDay"
+      >{{ stripNeedIcon }}{{ stripNeedIcon ? ' ' : ''
+      }}{{ stripNeedPerDay }}</span
+    >
   </div>
   <div class="calendar-mode-switch">
     <i (click)="onClose()" class="calendar-close-icon fas fa-times"></i>
