@@ -8,17 +8,7 @@ export function composeBudgetSummaryMessage(
   summary: BudgetSummarySnapshot,
   opts: SummaryFormatterOptions = {}
 ) {
-  const parts = [
-    lineToday(summary),
-    lineBudget(summary),
-    lineDailyAverage(summary),
-    lineVelocity(summary),
-    lineMonthlyIrregular(summary),
-    lineExtra(summary),
-    lineNonEssential(summary),
-    lineMonth(summary),
-  ].filter(Boolean);
-  return parts.join('\n');
+  return composeBudgetSummaryMessageList(summary).join('\n');
 }
 
 export function composeBudgetSummaryMessageList(
