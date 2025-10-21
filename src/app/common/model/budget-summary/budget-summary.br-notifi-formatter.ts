@@ -78,6 +78,12 @@ function lineBudget(s: BudgetSummarySnapshot) {
   return `• ${spentStr} ◦ ${remainingStr}`;
 }
 
+export function lineRemaining(s: BudgetSummarySnapshot) {
+  if (!s.budget) return '';
+  const remainingStr = fmt(s.remaining);
+  return `Остаток: ${remainingStr}€`;
+}
+
 function linePeriod(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const daysPassed = s.meta?.daysPassed ?? 0;

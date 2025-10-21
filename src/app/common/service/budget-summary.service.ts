@@ -6,7 +6,7 @@ import { BudgetDataService } from './budget-data.service';
 import { NotificationService } from '../component/notification/notification.service';
 // Removed direct expense scanning utilities; logic moved into model class.
 import { BudgetSummary } from '../model/budget-summary/budget-summary.model';
-import { composeBudgetSummaryMessage, composeBudgetSummaryMessageList } from '../model/budget-summary/budget-summary.br-notifi-formatter';
+import { composeBudgetSummaryMessage, composeBudgetSummaryMessageList, lineRemaining } from '../model/budget-summary/budget-summary.br-notifi-formatter';
 
 export interface BudgetSummaryBuildResult {
   summary: BudgetSummary | null;
@@ -112,7 +112,7 @@ export class BudgetSummaryService {
   private pushBudgetSummaryNotification(
     summary: BudgetSummary
   ): Observable<void> {
-    const title = 'Сводка расходов';
+    const title = lineRemaining(summary);
     const message = composeBudgetSummaryMessage(summary); // externalized formatter
     const icon = this.generateBudgetIcon(summary.percentUsed);
     // Clear existing budget summary notifications prior to sending updated snapshot.
