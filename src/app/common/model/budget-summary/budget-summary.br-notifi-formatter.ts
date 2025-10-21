@@ -54,7 +54,7 @@ function lineToday(s: BudgetSummarySnapshot) {
   const iconPart = icon ? `${icon}` : '';
   const behavior = s.todaysNonEssential ? ` 💸: ${s.todaysNonEssential}€` : '';
   const todaysExpectation = s.todaysExpectation
-    ? ` л${fmt(s.todaysExpectation)}`
+    ? ` L${fmt(s.todaysExpectation)}`
     : '';
   return `• ☀️: ${s.todaysTotal}€ ${iconPart}${irr}${behavior}${todaysExpectation}`;
 }
