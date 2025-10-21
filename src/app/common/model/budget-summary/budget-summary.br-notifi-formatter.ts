@@ -74,8 +74,7 @@ function lineMonthlyIrregular(s: BudgetSummarySnapshot) {
 function lineBudget(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const spentStr = `${fmt(s.periodIrregular)}/${fmt(s.budget)}€`;
-  const remainingStr = fmt(s.remaining);
-  return `• ${spentStr} ◦ ${remainingStr}`;
+  return `• ${spentStr}`;
 }
 
 export function lineRemaining(s: BudgetSummarySnapshot) {
