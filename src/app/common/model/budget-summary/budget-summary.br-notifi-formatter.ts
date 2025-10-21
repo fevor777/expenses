@@ -28,6 +28,7 @@ export function composeBudgetSummaryMessageList(
   const parts = [
     lineToday(summary),
     lineBudget(summary),
+    linePeriod(summary),
     lineDailyAverage(summary),
     lineVelocity(summary),
     lineMonthlyIrregular(summary),
@@ -82,21 +83,20 @@ function lineMonthlyIrregular(s: BudgetSummarySnapshot) {
 }
 function lineBudget(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
-  const daysPassed = s.meta?.daysPassed ?? 0;
-  const frameDays = s.meta?.frameDays ?? 0;
   const spentStr = `${fmt(s.periodIrregular)}/${fmt(s.budget)}€`;
   const remainingStr = fmt(s.remaining);
-  const daysLeftStr = fmt(s.daysLeft);
-  let needStr = '';
-  let arrow = '';
-  if (s.needPerDay !== undefined && s.needPerDay > 0) {
-    needStr = `${fmt(s.needPerDay)}€/д`;
-    arrow = s.todaysNeedRatio !== undefined
-      ? (trendIconByRatio(s.todaysNeedRatio) || '↑')
-      : '↑';
-  }
-  return `• ${spentStr} ◦ ${remainingStr} :: ${daysPassed}/${frameDays}d ◦ ${daysLeftStr}`;
+  return `• ${spentStr} ◦ ${remainingStr}`;
 }
+
+function linePeriod(s: BudgetSummarySnapshot) {
+  if (!s.budget) return '';
+  const daysPassed = s.meta?.daysPassed ?? 0;
+  const frameDays = s.meta?.frameDays ?? 0;
+  const daysLeftStr = fmt(s.daysLeft);
+  return `• ${daysPassed}/${frameDays}d ◦ ${daysLeftStr}`;
+}
+
+
 function lineDailyAverage(s: BudgetSummarySnapshot) {
   const avgStr = fmt(s.dailyAverage);
   const plan =
