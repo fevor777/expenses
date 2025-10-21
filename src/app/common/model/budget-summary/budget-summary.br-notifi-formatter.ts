@@ -9,7 +9,6 @@ export function composeBudgetSummaryMessage(
   opts: SummaryFormatterOptions = {}
 ) {
   const parts = [
-    lineHeader(summary, opts),
     lineToday(summary),
     lineBudget(summary),
     lineDailyAverage(summary),
@@ -66,20 +65,23 @@ function lineMonthlyIrregular(s: BudgetSummarySnapshot) {
 }
 function lineBudget(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
-  const daysPassed = s.meta?.daysPassed;
-  const frameDays = s.meta?.frameDays;
-  const inFirstHalf =
-    daysPassed !== undefined && frameDays ? daysPassed <= frameDays / 2 : false;
-  // First half: emphasize progress (spent) first, show days passed + percent used; hide percent left & days left.
-  // Second half: emphasize remaining first, show days left + percent left; hide days passed & percent used after P.
-  if (inFirstHalf) {
-    return `• P: ${s.periodIrregular}€${
-      daysPassed !== undefined ? ' d' + daysPassed : ''
-    } ${s.percentUsed.toFixed(0)}% O: ${s.remaining.toFixed(0)}€ Б: ${s.budget}€`;
+  const daysPassed = s.meta?.daysPassed ?? 0;
+  const frameDays = s.meta?.frameDays ?? 0;
+  const spentStr = `${fmt(s.periodIrregular)}/${fmt(s.budget)}€`;
+  const remainingStr = fmt(s.remaining);
+  const daysLeftStr = fmt(s.daysLeft);
+  let needStr = '';
+  let arrow = '';
+  if (s.needPerDay !== undefined && s.needPerDay > 0) {
+    needStr = `${fmt(s.needPerDay)}€/д`;
+    arrow = s.todaysNeedRatio !== undefined
+      ? (trendIconByRatio(s.todaysNeedRatio) || '↑')
+      : '↑';
   }
-  return `• O: ${s.remaining.toFixed(0)}€${
-    s.daysLeft !== undefined ? ' d' + s.daysLeft : ''
-  } ${s.percentLeft.toFixed(0)}% P: ${s.periodIrregular}€ Б: ${s.budget}€`;
+  const needPart = needStr ? ` | ${arrow}${needStr}` : '';
+  // Calendar-style compact line:
+  // spent/budget€ • remaining | ⏳daysPassed/frameDays • daysLeft | ⇧needPerDay€/д
+  return `${spentStr} • ${remainingStr} | ⏳ ${daysPassed}/${frameDays} • ${daysLeftStr}${needPart}`;
 }
 function lineDailyAverage(s: BudgetSummarySnapshot) {
   const avgStr = fmt(s.dailyAverage);
