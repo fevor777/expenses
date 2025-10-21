@@ -21,6 +21,23 @@ export function composeBudgetSummaryMessage(
   return parts.join('\n');
 }
 
+export function composeBudgetSummaryMessageList(
+  summary: BudgetSummarySnapshot,
+  opts: SummaryFormatterOptions = {}
+) {
+  const parts = [
+    lineToday(summary),
+    lineBudget(summary),
+    lineDailyAverage(summary),
+    lineVelocity(summary),
+    lineMonthlyIrregular(summary),
+    lineExtra(summary),
+    lineNonEssential(summary),
+    lineMonth(summary),
+  ].filter(Boolean);
+  return parts;
+}
+
 export function trendIconByRatio(ratio: number | undefined): string {
   if (ratio === undefined) return '';
   if (ratio >= 1.4) return '↑';
