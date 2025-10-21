@@ -5,4 +5,4 @@ import{a as V}from"./chunk-XCWHORT5.js";import{b as H}from"./chunk-H7277PMV.js";
         ${n>0?`<path d="M ${t.center} ${t.center-t.radius} A ${t.radius} ${t.radius} 0 ${t.largeArc} 1 ${t.x} ${t.y}" fill="none" stroke="${t.color}" stroke-width="4" stroke-linecap="round"/>`:""}
         <text x="${t.center}" y="${t.center+5}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#333">${n.toFixed(0)}%</text>
       </svg>
-    `}svgToDataUrl(t){return`data:image/svg+xml;base64,${btoa(t)}`}static \u0275fac=function(n){return new(n||e)(O(V),O(E))};static \u0275prov=N({token:e,factory:e.\u0275fac,providedIn:"root"})};export{E as a,me as b};
+    `}svgToDataUrl(t){return`data:image/svg+xml;base64,${btoa(t)}`}static \u0275fac=function(n){return new(n||e)(O(V),O(E))};static \u0275prov=N({token:e,factory:e.\u0275fac,providedIn:"root"})};export{B as a,E as b,me as c};
