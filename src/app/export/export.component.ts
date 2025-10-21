@@ -51,7 +51,7 @@ export class ExportComponent implements OnDestroy {
     if (periodDays <= 0 || !this.budgetStartTs) return '';
     const msPerDay = 86400000;
     const start = new Date(this.budgetStartTs);
-    const end = new Date(start.getTime() + (periodDays - 1) * msPerDay);
+    const end = new Date(start.getTime() + (periodDays) * msPerDay);
     const fmt = new Intl.DateTimeFormat('en-US', {
       month: 'long',
       day: 'numeric',

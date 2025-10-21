@@ -175,13 +175,13 @@ export function computeFrameStats(
   ).getTime();
   const totalDays = Math.max(
     1,
-    Math.ceil((finishDayEnd - startDay + 1) / (1000 * 60 * 60 * 24))
+    Math.ceil((finishDayEnd - startDay) / (1000 * 60 * 60 * 24) - 1)
   );
   const daysPassed = Math.min(
     totalDays,
     Math.max(
       0,
-      Math.floor((now.getTime() - startDay) / (1000 * 60 * 60 * 24)) + 1
+      Math.floor((now.getTime() - startDay) / (1000 * 60 * 60 * 24))
     )
   );
   const daysLeft = Math.max(totalDays - daysPassed, 0);
