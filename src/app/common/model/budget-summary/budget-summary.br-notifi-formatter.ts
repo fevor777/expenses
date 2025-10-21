@@ -78,7 +78,7 @@ function lineBudget(s: BudgetSummarySnapshot) {
       ? (trendIconByRatio(s.todaysNeedRatio) || '↑')
       : '↑';
   }
-  return `• ${spentStr} ◦ ${remainingStr} | ${daysPassed}/${frameDays}d ◦ ${daysLeftStr}`;
+  return `• ${spentStr} ◦ ${remainingStr} :: ${daysPassed}/${frameDays}d ◦ ${daysLeftStr}`;
 }
 function lineDailyAverage(s: BudgetSummarySnapshot) {
   const avgStr = fmt(s.dailyAverage);

@@ -81,7 +81,7 @@ function lineBudget(s: BudgetSummarySnapshot): string {
   const daysPassed = s.meta?.daysPassed ?? 0;
   const frameDays = s.meta?.frameDays ?? 0;
   const daysLeftStr = fmtMoney(s.daysLeft);
-  return `<strong>•</strong> ${spentStr} • ${remainingStr} ◦ ${daysPassed}/${frameDays}d • ${daysLeftStr}`;
+  return `<strong>•</strong> ${spentStr} • ${remainingStr} :: ${daysPassed}/${frameDays}d • ${daysLeftStr}`;
 }
 
 function linePace(s: BudgetSummarySnapshot): string {
