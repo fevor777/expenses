@@ -78,10 +78,7 @@ function lineBudget(s: BudgetSummarySnapshot) {
       ? (trendIconByRatio(s.todaysNeedRatio) || '↑')
       : '↑';
   }
-  const needPart = needStr ? ` | ${arrow}${needStr}` : '';
-  // Calendar-style compact line:
-  // spent/budget€ • remaining | ⏳daysPassed/frameDays • daysLeft | ⇧needPerDay€/д
-  return `${spentStr} • ${remainingStr} | ⏳ ${daysPassed}/${frameDays} • ${daysLeftStr}${needPart}`;
+  return `• ${spentStr} ◦ ${remainingStr} ⏳ ${daysPassed}/${frameDays} ◦ ${daysLeftStr}`;
 }
 function lineDailyAverage(s: BudgetSummarySnapshot) {
   const avgStr = fmt(s.dailyAverage);

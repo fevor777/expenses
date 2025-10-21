@@ -75,7 +75,21 @@ function lineToday(s: BudgetSummarySnapshot): string {
 }
 
 function lineBudget(s: BudgetSummarySnapshot): string {
-  return `<strong>•</strong> Бюджет: Потрачено ${fmtMoney(s.periodIrregular)}€ / ${fmtMoney(s.budget)}€ (ост ${fmtMoney(s.remaining)}€, осталось дней: ${s.daysLeft ?? 0})`;
+  if (!s.budget) return `<strong>•</strong> Бюджет: нет`;
+  const spentStr = `${fmtMoney(s.periodIrregular)}/${fmtMoney(s.budget)}€`;
+  const remainingStr = fmtMoney(s.remaining);
+  const daysPassed = s.meta?.daysPassed ?? 0;
+  const frameDays = s.meta?.frameDays ?? 0;
+  const daysLeftStr = fmtMoney(s.daysLeft);
+  let needStr = '';
+  let arrow = '';
+  if (s.needPerDay !== undefined && s.needPerDay > 0) {
+    needStr = `${fmtMoney(s.needPerDay)}€/д`;
+    arrow = s.todaysNeedRatio !== undefined
+      ? (trendIconByRatio(s.todaysNeedRatio) || '⇧')
+      : '⇧';
+  }
+  return `<strong>•</strong> ${spentStr} • ${remainingStr} ⏳ ${daysPassed}/${frameDays} • ${daysLeftStr}`;
 }
 
 function linePace(s: BudgetSummarySnapshot): string {
