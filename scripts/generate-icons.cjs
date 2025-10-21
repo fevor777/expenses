@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 
-const srcSvg = path.resolve(__dirname, '../public/icons/app-icon2.svg');
+const srcSvg = path.resolve(__dirname, '../public/icons/app-icon.svg');
 const outDir = path.resolve(__dirname, '../public/icons');
 
 if (!fs.existsSync(srcSvg)) {
