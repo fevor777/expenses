@@ -10,8 +10,9 @@ import {
   SegmentedSwitchComponent,
   SegmentedOption,
 } from '../component/segmented/segmented-switch.component';
-import { IrregularBudgetService } from '../service/irregular-budget.service';
-import { first, Subject, Subscription, takeUntil } from 'rxjs';
+import { BudgetSummaryService, BudgetSummaryBuildResult } from '../service/budget-summary.service';
+import { trendIconByRatio } from '../model/budget-summary/budget-summary.br-notifi-formatter';
+import { first, Subject, takeUntil } from 'rxjs';
 import { Budget } from '../model/budget.model';
 
 interface CalendarDay {
@@ -54,14 +55,16 @@ export class CalendarComponent implements OnDestroy {
   // irregular budget period boundaries (computed from Budget.periodStartTs + period days)
   budgetStart?: Date;
   budgetEnd?: Date;
-  private currentBudget?: Budget;
+  private currentBudget?: Budget; // retained for compatibility; now derived from summary meta
+  private budgetSummaryResult?: BudgetSummaryBuildResult;
+  private exhaustionDate?: Date; // parsed from summary.budgetExhaustion ("F: dd.mm")
 
-  constructor(private irregularBudgetService: IrregularBudgetService) {}
+  constructor(private budgetSummaryService: BudgetSummaryService) {}
 
   ngOnInit() {
     this.viewDate = new Date(this.selectedDate);
     this.generate();
-    this.listenIrregularBudget();
+  this.listenBudgetSummary();
   }
 
   ngOnChanges() {
@@ -69,64 +72,36 @@ export class CalendarComponent implements OnDestroy {
     this.generate();
   }
 
-  private listenIrregularBudget() {
-    this.irregularBudgetService
-      .getValue()
-      .pipe(
-        first(),
-        takeUntil(this.unsubscribe)
-      )
-      .subscribe(budget => {
+  private listenBudgetSummary() {
+    this.budgetSummaryService
+      .buildCurrentBudgetSummary()
+      .pipe(first(), takeUntil(this.unsubscribe))
+      .subscribe(result => {
+        this.budgetSummaryResult = result;
+        if (!result.summary) {
+          // Fallback to month view if no active budget summary
+          this.mode = 'month';
+          this.generate();
+          this.clearBudgetStrip();
+          return;
+        }
         this.show = true;
-        this.currentBudget = { ...budget, period: budget.period };
-        this.computeBudgetFrame();
+        // Derive budget period from summary meta (frame boundaries)
+        const startMs = result.summary.meta?.dateFrameStart;
+        const finishMs = result.summary.meta?.dateFrameFinish;
+        if (startMs && finishMs) {
+          this.budgetStart = new Date(startMs);
+          this.budgetEnd = new Date(finishMs);
+        } else {
+          this.budgetStart = undefined;
+          this.budgetEnd = undefined;
+        }
+        this.computeBudgetStrip(result.summary);
+        this.parseExhaustionDate(result.summary);
         if (this.mode === 'period') {
           this.generatePeriod();
         }
       });
-  }
-
-  private computeBudgetFrame() {
-    const b = this.currentBudget;
-    if (!b) {
-      this.budgetStart = undefined;
-      this.budgetEnd = undefined;
-      return;
-    }
-    const periodDays = b.period && b.period > 0 ? Math.floor(b.period) : 30;
-    if (b.periodStartTs && !isNaN(b.periodStartTs)) {
-      const start = new Date(b.periodStartTs);
-      const finish = new Date(
-        start.getFullYear(),
-        start.getMonth(),
-        start.getDate() + periodDays - 1,
-        23,
-        59,
-        59,
-        999
-      );
-      this.budgetStart = start;
-      this.budgetEnd = finish;
-    } else {
-      // Fallback: rolling frame ending today inclusive
-      const today = new Date();
-      const start = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - (periodDays - 1)
-      );
-      const finish = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        23,
-        59,
-        59,
-        999
-      );
-      this.budgetStart = start;
-      this.budgetEnd = finish;
-    }
   }
 
   onModeSelect(value: string) {
@@ -360,6 +335,50 @@ export class CalendarComponent implements OnDestroy {
     // Saturday (6) or Sunday (0)
     return day === 6 || day === 0;
   }
+  // --- Compact strip variables (precomputed) ---
+  summaryAvailable: boolean = false;
+  stripSpentTotal = '';
+  stripRemaining = '';
+  stripDaysPassedFrame = '';
+  stripDaysLeft = '';
+  stripNeedPerDay = '';
+  stripNeedIcon = '';
+  stripAriaLabel = '';
+
+  private fmtMoney(n?: number): string {
+    if (n === undefined || n === null || isNaN(n)) return '0';
+    const rounded = Math.abs(n - Math.round(n)) < 0.05 ? n.toFixed(0) : n.toFixed(1);
+    return rounded.replace(/\.0$/, '');
+  }
+  private computeBudgetStrip(summary: any) {
+    this.summaryAvailable = !!summary;
+    if (!summary) {
+      this.clearBudgetStrip();
+      return;
+    }
+    this.stripSpentTotal = `${this.fmtMoney(summary.periodIrregular)}/${this.fmtMoney(summary.budget)}€`;
+    this.stripRemaining = this.fmtMoney(summary.remaining);
+    const passed = summary.meta?.daysPassed ?? 0;
+    const frameDays = summary.meta?.frameDays ?? 0;
+    this.stripDaysPassedFrame = `${passed}/${frameDays}`;
+    this.stripDaysLeft = `${summary.daysLeft ?? 0}`;
+    this.stripNeedPerDay = summary.needPerDay ? `${this.fmtMoney(summary.needPerDay)}€/д` : '';
+    // Dynamic trend icon based on today's need ratio (same logic as notification formatter)
+    this.stripNeedIcon = summary.todaysNeedRatio !== undefined ? trendIconByRatio(summary.todaysNeedRatio) : '';
+    const needLabelPart = this.stripNeedPerDay ? `${this.stripNeedIcon ? this.stripNeedIcon + ' ' : ''}${this.stripNeedPerDay}` : '';
+    this.stripAriaLabel = `Бюджет: ${this.stripSpentTotal} ост ${this.stripRemaining} дней прошло ${this.stripDaysPassedFrame} осталось дней ${this.stripDaysLeft} нужно в день ${needLabelPart}`;
+  }
+  private clearBudgetStrip() {
+    this.summaryAvailable = false;
+    this.stripSpentTotal = '';
+    this.stripRemaining = '';
+    this.stripDaysPassedFrame = '';
+    this.stripDaysLeft = '';
+    this.stripNeedPerDay = '';
+    this.stripNeedIcon = '';
+    this.stripAriaLabel = '';
+    this.exhaustionDate = undefined;
+  }
 
   get monthLabel(): string {
     if (this.mode === 'period' && this.budgetStart && this.budgetEnd) {
@@ -413,5 +432,37 @@ export class CalendarComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe.next();
     this.unsubscribe.complete();
+  }
+
+  private parseExhaustionDate(summary: any) {
+    this.exhaustionDate = undefined;
+    const label: string | undefined = summary?.budgetExhaustion; // format like "F: dd.mm"
+    if (!label) return;
+    const match = /F:\s*(\d{2})\.(\d{2})/.exec(label);
+    if (!match) return;
+    const [, ddStr, mmStr] = match;
+    const day = parseInt(ddStr, 10);
+    const monthIndex = parseInt(mmStr, 10) - 1; // zero-based
+    if (isNaN(day) || isNaN(monthIndex)) return;
+    const baseYear = this.budgetStart?.getFullYear() || new Date().getFullYear();
+    let candidate = new Date(baseYear, monthIndex, day);
+    if (this.budgetStart && this.budgetEnd && candidate.getTime() < this.budgetStart.getTime()) {
+      const startMonth = this.budgetStart.getMonth();
+      const endMonth = this.budgetEnd.getMonth();
+      // Cross-year frame (e.g., Dec -> Jan) means exhaustion date might be next year.
+      if (endMonth < startMonth) {
+        candidate = new Date(baseYear + 1, monthIndex, day);
+      }
+    }
+    this.exhaustionDate = candidate;
+  }
+
+  isExhaustionDay(d: Date): boolean {
+    if (!this.exhaustionDate) return false;
+    return (
+      d.getFullYear() === this.exhaustionDate.getFullYear() &&
+      d.getMonth() === this.exhaustionDate.getMonth() &&
+      d.getDate() === this.exhaustionDate.getDate()
+    );
   }
 }
