@@ -1,10 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  HostListener, // added
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -66,7 +61,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   enteredAmount = '';
   currentAmount: number = 0;
   currentBalanceAmount: number = 0;
-  currentBalance: number = 0;
   balance$: Observable<number>;
   balanceDate$: Observable<string>;
   monthlyExpenses: Expense[] = [];
@@ -94,7 +88,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private router: Router,
     private notificationService: NotificationService,
     private expenseService: ExpenseService,
-    private balanceService: BalanceService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
     private expenseSummaryService: BudgetSummaryService
@@ -111,10 +104,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       });
 
     this.balanceDate$ = this.balanceDateService.getBalanceDate();
-
-    this.balance$ = this.balanceService
-      .getBalance()
-      .pipe(tap(balance => (this.currentBalance = balance)));
 
     const currencyInLocalStorage = localStorage.getItem('currency');
     if (currencyInLocalStorage) {
@@ -144,6 +133,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         amount: amount,
         currency: 'EUR',
         date: Date.now(),
+        includeInBalance: getCategoryById(categoryName)?.includeInBalance,
         description: originalDescription || undefined,
       };
       if (!originalDescription) {
@@ -154,15 +144,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       this.expenseService
         .addExpense(newExpense)
         .pipe(
-          switchMap(addedExpense => {
-            let balanceObs: Observable<number> = of(this.currentBalance);
-            if (getCategoryById(categoryName)?.includeInBalance) {
-              this.currentBalance =
-                Math.round((this.currentBalance - amount) * 100) / 100;
-              balanceObs = this.balanceService.addBalance(this.currentBalance);
-            }
-            return balanceObs.pipe(map(() => addedExpense));
-          }),
           switchMap(addedExpense =>
             combineLatest([
               this.expenseSummaryService.buildCurrentBudgetSummary(),
@@ -247,13 +228,6 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           result
         );
       });
-  }
-
-  onBalanceChange(balance: number): void {
-    this.balanceService
-      .addBalance(balance)
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(() => (this.currentBalance = balance));
   }
 
   onAmountChange(amount: string): void {
@@ -364,7 +338,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     // Prefer already accumulated monthlyExpenses (includes latest new expense after add?)
     // We rely on calculateAmounts having been invoked by subscription earlier; fallback to fresh expenses list.
     const irregularSpent = expensesForBudgetPeriod
-      .filter(e => getCategoryById(e.category)?.includeInBalance)
+      .filter(e => e?.includeInBalance)
       .reduce((sum, e) => Math.round((sum + e.amount) * 100) / 100, 0);
     const remaining = Math.max(periodBudget - irregularSpent, 0);
     const percentUsed = periodBudget
@@ -448,10 +422,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       .forEach((expense: Expense) => {
         this.todaysExpenses.push(expense);
         newAmount = this.roundUp(newAmount + expense.amount);
-        if (
-          getCategoryById(expense.category)?.includeInBalance &&
-          !expense.isDeletedFromBalance
-        ) {
+        if (expense?.includeInBalance) {
           newBalanceAmount = this.roundUp(newBalanceAmount + expense.amount);
         }
       });

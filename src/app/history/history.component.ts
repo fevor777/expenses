@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -91,7 +98,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   // Fixed wrapper dynamic offset
   @ViewChild('historyFixed') private historyFixedRef?: ElementRef<HTMLElement>;
-  @ViewChild('historyContent') private historyContentRef?: ElementRef<HTMLElement>;
+  @ViewChild('historyContent')
+  private historyContentRef?: ElementRef<HTMLElement>;
   private fixedResizeObserver?: ResizeObserver;
   private fixedMutationObserver?: MutationObserver;
   private lastHeight = -1;
@@ -175,7 +183,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   onDelete(item: HistoryExpense) {
     if (confirm('Delete?')) {
-      this.updateBalance(item);
       const id = item.id;
       this.expenseService
         .deleteExpense(id)
@@ -184,9 +191,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDeleteFromBalance(item: HistoryExpense): void {
-    if (confirm('Return to balance?')) {
-      this.updateBalance(item, true);
+  onExcludeFromBudget(item: HistoryExpense): void {
+    if (confirm('Exclude from budget?')) {
+      this.updateExpenses(item);
     }
   }
 
@@ -196,39 +203,17 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.teardownDynamicLayout();
   }
 
-  private updateBalance(
-    item: HistoryExpense,
-    isDeleteFromBalance?: boolean
-  ): void {
-    const category = getCategoryById(item?.category);
-    if (item && !item?.isDeletedFromBalance && category?.includeInBalance) {
-      this.balanceService
-        .getBalance()
-        .pipe(
-          first(),
-          switchMap(balance => {
-            const newBalance = Math.round((balance + item.amount) * 100) / 100;
-            return this.balanceService.addBalance(newBalance);
-          }),
-          switchMap(() =>
-            this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
-          ),
-          takeUntil(this.destroySubject)
+  private updateExpenses(item: HistoryExpense): void {
+    const updatedItem = { ...item, includeInBalance: false };
+    this.expenseService
+      .updateExpense(updatedItem)
+      .pipe(
+        takeUntil(this.destroySubject),
+        switchMap(() =>
+          this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
         )
-        .subscribe();
-    }
-    if (isDeleteFromBalance) {
-      item.isDeletedFromBalance = isDeleteFromBalance;
-      this.expenseService
-        .updateExpense(item)
-        .pipe(
-          takeUntil(this.destroySubject),
-          switchMap(() =>
-            this.expenseSummaryService.sendBrowserNotificationWithBudgetSummary()
-          )
-        )
-        .subscribe();
-    }
+      )
+      .subscribe();
   }
 
   private handleSwipeGesture(): void {
@@ -495,11 +480,21 @@ export class HistoryComponent implements OnInit, OnDestroy {
   // ---- Dynamic layout methods ----
   private initDynamicLayout(): void {
     const el = this.historyFixedRef?.nativeElement;
-    if (!el) { return; }
-    this.fixedResizeObserver = new ResizeObserver(() => this.scheduleStabilization());
+    if (!el) {
+      return;
+    }
+    this.fixedResizeObserver = new ResizeObserver(() =>
+      this.scheduleStabilization()
+    );
     this.fixedResizeObserver.observe(el);
-    this.fixedMutationObserver = new MutationObserver(() => this.scheduleStabilization());
-    this.fixedMutationObserver.observe(el, { childList: true, subtree: true, characterData: true });
+    this.fixedMutationObserver = new MutationObserver(() =>
+      this.scheduleStabilization()
+    );
+    this.fixedMutationObserver.observe(el, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
     window.addEventListener('resize', this.resizeHandler, { passive: true });
     this.scheduleStabilization();
   }
@@ -517,7 +512,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
     requestAnimationFrame(() => {
       const wrapperEl = this.historyFixedRef?.nativeElement;
       const contentEl = this.historyContentRef?.nativeElement;
-      if (!wrapperEl || !contentEl) { return; }
+      if (!wrapperEl || !contentEl) {
+        return;
+      }
       const h = wrapperEl.offsetHeight || 0;
       // Use explicit expansion state from multi filter output
       const shouldBeFixed = !this.isMultiFilterExpanded;
@@ -528,17 +525,24 @@ export class HistoryComponent implements OnInit, OnDestroy {
         wrapperEl.classList.remove('is-fixed');
       }
       const effectiveHeight = shouldBeFixed ? h : 0;
-      if (effectiveHeight === this.lastHeight) { return; }
+      if (effectiveHeight === this.lastHeight) {
+        return;
+      }
       this.lastHeight = effectiveHeight;
       contentEl.style.marginTop = effectiveHeight - 5 + 'px';
     });
   }
 
-  private scheduleStabilization(iterations: number = 3, intervalMs: number = 40): void {
+  private scheduleStabilization(
+    iterations: number = 3,
+    intervalMs: number = 40
+  ): void {
     let i = 0;
     const run = () => {
       this.applyContentOffset();
-      if (++i < iterations) { setTimeout(run, intervalMs); }
+      if (++i < iterations) {
+        setTimeout(run, intervalMs);
+      }
     };
     run();
   }
@@ -550,7 +554,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
       // Use both window scroll and optional element scrollIntoView as fallback
       window.scrollTo({ top: 0, behavior: 'auto' });
       const topEl = document.getElementById('back');
-      if (topEl) { topEl.scrollIntoView({ behavior: 'auto', block: 'start' }); }
+      if (topEl) {
+        topEl.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
     }
     // After state change, recalc offset (single pass to allow CSS transition to handle smooth movement)
     this.scheduleStabilization(1);

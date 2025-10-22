@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon';
 import { Expense } from '../../common/model/expense.model';
 import {
-  getCategoryById,
   getCategoryNameById,
 } from '../../common/model/categories';
 import {
@@ -34,8 +33,7 @@ export function buildPeriodMetrics(
     const amount = e.amount || 0;
     total += amount;
     if (!largest || amount > largest.amount) largest = e;
-    const cat = getCategoryById(e.category);
-    if (cat && cat.includeInBalance === false) {
+    if (!e.includeInBalance) {
       regularSum += amount;
       regularCount++;
     } else {

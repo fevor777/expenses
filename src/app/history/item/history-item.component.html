@@ -53,15 +53,12 @@
           Delete
         </button>
         <button
-          *ngIf="
-            !item.isDeletedFromBalance &&
-            getCategoryByIdFunc(item.category).includeInBalance
-          "
+          *ngIf="item.includeInBalance"
           type="button"
           class="h-linkdanger"
-          (click)="onDeleteFromBalanceLabelClick(item)"
+          (click)="onExcludeFromBudget(item)"
         >
-          Delete from balance
+          Exclude from budget
         </button>
       </div>
     </div>

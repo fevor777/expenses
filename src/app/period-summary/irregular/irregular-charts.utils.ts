@@ -5,7 +5,6 @@ export const IRREGULAR_CATEGORY_IDS = Categories.filter(
   c => c.includeInBalance
 ).map(c => c.id);
 
-export function filterIrregular(expenses: Expense[]): Expense[] {
-  const set = new Set(IRREGULAR_CATEGORY_IDS);
-  return (expenses || []).filter(e => set.has(e.category));
+export function getIncudedInBudgetExpenses(expenses: Expense[]): Expense[] {
+  return (expenses || []).filter(e => e.includeInBalance);
 }

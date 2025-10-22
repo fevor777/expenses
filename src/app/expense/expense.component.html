@@ -2,14 +2,12 @@
   <app-expense-header
     [currentAmount]="currentAmount"
     [currentBalanceAmount]="currentBalanceAmount"
-    [balance]="balance$ | async"
     [balanceDate]="balanceDate$ | async"
     [amountLoading]="isAmountsLoading"
     (menuIconClick)="navigateToExport()"
     (historyIconClick)="navigateToHistory()"
     (statisticsIconClick)="navigateToStatistics()"
     (periodBudgetClick)="onHeaderBudgetInfoClick()"
-    (balanceChange)="onBalanceChange($event)"
     (calendarOpen)="onOpenCalendar()"
   >
   </app-expense-header>

@@ -6,5 +6,5 @@ export class Expense {
   currency: string;
   date: number;
   description?: string;
-  isDeletedFromBalance?: boolean;
+  includeInBalance?: boolean;
 }

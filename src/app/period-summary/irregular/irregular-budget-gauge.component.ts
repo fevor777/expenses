@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Expense } from '../../common/model/expense.model';
-import { filterIrregular } from './irregular-charts.utils';
+import { getIncudedInBudgetExpenses } from './irregular-charts.utils';
 
 @Component({
   selector: 'app-irregular-budget-gauge',
@@ -80,7 +80,7 @@ export class IrregularBudgetGaugeComponent implements OnChanges {
   percent = 0;
   dashArray = '0 100';
   ngOnChanges() {
-    const irr = filterIrregular(this.expenses);
+    const irr = getIncudedInBudgetExpenses(this.expenses);
     this.spent = irr.reduce((s, e) => s + (e.amount || 0), 0);
     this.percent =
       this.budget > 0 ? Math.min(100, (this.spent / this.budget) * 100) : 0;

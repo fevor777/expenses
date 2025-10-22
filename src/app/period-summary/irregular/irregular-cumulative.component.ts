@@ -5,7 +5,7 @@ import {
   DateFrame,
   Mode,
 } from '../../common/component/filter/date/dateFrame.model';
-import { filterIrregular } from './irregular-charts.utils';
+import { getIncudedInBudgetExpenses } from './irregular-charts.utils';
 
 @Component({
   selector: 'app-irregular-cumulative',
@@ -73,7 +73,7 @@ export class IrregularCumulativeComponent implements OnChanges {
     this.build();
   }
   private build() {
-    const irr = filterIrregular(this.expenses).sort((a, b) => a.date - b.date);
+    const irr = getIncudedInBudgetExpenses(this.expenses).sort((a, b) => a.date - b.date);
     const mode = this.date?.mode;
     const buckets = this.makeBuckets(mode);
     irr.forEach(e => {

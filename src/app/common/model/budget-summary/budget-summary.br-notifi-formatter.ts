@@ -8,7 +8,18 @@ export function composeBudgetSummaryMessage(
   summary: BudgetSummarySnapshot,
   opts: SummaryFormatterOptions = {}
 ) {
-  return composeBudgetSummaryMessageList(summary).join('\n');
+  const parts = [
+    lineToday(summary),
+    lineBudget(summary),
+    linePeriod(summary),
+    lineDailyAverage(summary),
+    lineVelocity(summary),
+    lineMonthlyIrregular(summary),
+    lineExtra(summary),
+    lineNonEssential(summary),
+    lineMonth(summary),
+  ].filter(Boolean);
+  return parts.join('\n');
 }
 
 export function composeBudgetSummaryMessageList(
@@ -17,7 +28,7 @@ export function composeBudgetSummaryMessageList(
 ) {
   const parts = [
     lineToday(summary),
-    lineBudget(summary),
+    lineBudgetWithRemaining(summary),
     linePeriod(summary),
     lineDailyAverage(summary),
     lineVelocity(summary),
@@ -77,6 +88,13 @@ function lineBudget(s: BudgetSummarySnapshot) {
   return `• ${spentStr}`;
 }
 
+function lineBudgetWithRemaining(s: BudgetSummarySnapshot) {
+  if (!s.budget) return '';
+  const remainingStr = fmt(s.remaining);
+  const spentStr = `${fmt(s.periodIrregular)}/${fmt(s.budget)}€`;
+  return `• ${spentStr} ◦ ${remainingStr}`;
+}
+
 export function lineRemaining(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const remainingStr = fmt(s.remaining);
@@ -91,13 +109,14 @@ function linePeriod(s: BudgetSummarySnapshot) {
   return `• ${daysPassed}/${frameDays}d ◦ ${daysLeftStr}`;
 }
 
-
 function lineDailyAverage(s: BudgetSummarySnapshot) {
   const avgStr = fmt(s.dailyAverage);
   const plan =
     s.budgetPerDay && s.budgetPerDay > 0 ? `п${fmt(s.budgetPerDay)}` : '';
   const need =
-    s.needPerDay && s.needPerDay < s.budgetPerDay ? `н${fmt(s.needPerDay)}` : '';
+    s.needPerDay && s.needPerDay < s.budgetPerDay
+      ? `н${fmt(s.needPerDay)}`
+      : '';
   const extras = [plan, need].filter(Boolean).join(' ');
   const pace = extras ? `Темп: ${avgStr} (${extras})` : `Темп: ${avgStr}`;
   return `• ${pace}`;

@@ -1,5 +1,4 @@
 import { Expense } from '../expense.model';
-import { getCategoryById } from '../categories';
 import { ClassificationTotals } from './budget-summary.types';
 
 export interface ClassificationContext {
@@ -27,7 +26,7 @@ export function classifyExpenses(
   for (const e of expenses) {
     const amt = e.amount || 0;
     frameTotal = roundUp(frameTotal + amt);
-    const include = getCategoryById(e.category)?.includeInBalance;
+    const include = e?.includeInBalance;
     if (include) {
       periodIrregular = roundUp(periodIrregular + amt);
       classification.irregular = periodIrregular;

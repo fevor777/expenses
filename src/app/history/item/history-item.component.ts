@@ -23,7 +23,7 @@ export class HistoryItemComponent {
     new EventEmitter();
   @Output() filterByCategory: EventEmitter<string> = new EventEmitter();
   @Output() deleteLabelClick: EventEmitter<HistoryExpense> = new EventEmitter();
-  @Output() deleteFromBalanceLabelClick: EventEmitter<HistoryExpense> =
+  @Output() excludeFromBudgetClick: EventEmitter<HistoryExpense> =
     new EventEmitter();
 
   readonly getCategoryNameByIdFunc = getCategoryNameById;
@@ -41,7 +41,7 @@ export class HistoryItemComponent {
     this.deleteLabelClick.emit(expense);
   }
 
-  onDeleteFromBalanceLabelClick(expense: HistoryExpense): void {
-    this.deleteFromBalanceLabelClick.emit(expense);
+  onExcludeFromBudget(expense: HistoryExpense): void {
+    this.excludeFromBudgetClick.emit(expense);
   }
 }
