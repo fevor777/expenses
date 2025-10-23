@@ -1,5 +1,6 @@
 // CLEAN REPLACEMENT FILE BELOW
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   Component,
   EventEmitter,
@@ -31,7 +32,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule, SegmentedSwitchComponent],
+  imports: [CommonModule, FormsModule, SegmentedSwitchComponent],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
 })
@@ -60,6 +61,7 @@ export class CalendarComponent implements OnDestroy {
   private currentBudget?: Budget; // retained for potential future use
   private budgetSummaryResult?: BudgetSummaryBuildResult;
   private exhaustionDate?: Date;
+  showVelocityHistory = false;
   private perDaySpent = new Map<string, number>();
   private perDayBudget = new Map<string, number>(); // dynamic daily budget per core day
 

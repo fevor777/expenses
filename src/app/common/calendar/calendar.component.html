@@ -37,10 +37,15 @@
           !isInBudgetCore(d.date) &&
           isInBudgetBuffer(d.date)
         "
+        [class.calendar-past-days-opacity]="
+          mode === 'period' && isBudgetCorePast(d.date) && !showVelocityHistory
+        "
+        [class.calendar-past-days-opacity-v2]="mode === 'period' && isBudgetCorePast(d.date) && showVelocityHistory"
+        [class.calendar-core-days-opacity]="mode === 'period' && !isBudgetCorePast(d.date) && showVelocityHistory"
         [class.period-past]="mode === 'period' && isBudgetCorePast(d.date)"
-        [class.limit-under]="d.limitState==='under'"
-        [class.limit-near]="d.limitState==='near'"
-        [class.limit-over]="d.limitState==='over'"
+        [class.limit-under]="showVelocityHistory && d.limitState === 'under'"
+        [class.limit-near]="showVelocityHistory && d.limitState === 'near'"
+        [class.limit-over]="showVelocityHistory && d.limitState === 'over'"
         [attr.aria-selected]="d.isSelected"
         [attr.data-date]="d.date.toISOString()"
       >
@@ -53,7 +58,11 @@
       </div>
     </div>
   </div>
-  <div *ngIf="summaryAvailable" class="calendar-separator" aria-hidden="true"></div>
+  <div
+    *ngIf="summaryAvailable"
+    class="calendar-separator"
+    aria-hidden="true"
+  ></div>
   <div
     *ngIf="summaryAvailable"
     class="calendar-budget-strip"
@@ -77,12 +86,20 @@
     >
   </div>
   <div class="calendar-mode-switch">
+    <div class="calendar-controls">
     <i (click)="onClose()" class="calendar-close-icon fas fa-times"></i>
-    <app-segmented-switch
-      [options]="calendarModes"
-      [active]="mode"
-      ariaLabel="Переключатель режима календаря"
-      (select)="onModeSelect($event)"
-    ></app-segmented-switch>
+      <app-segmented-switch
+        [options]="calendarModes"
+        [active]="mode"
+        ariaLabel="Переключатель режима календаря"
+        (select)="onModeSelect($event)"
+      ></app-segmented-switch>
+      <label
+        class="velocity-history-toggle"
+        aria-label="Показать историю темпа"
+      >
+        <input type="checkbox" [(ngModel)]="showVelocityHistory" /> Темп
+      </label>
+    </div>
   </div>
 </div>
