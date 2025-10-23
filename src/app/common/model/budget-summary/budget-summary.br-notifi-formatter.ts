@@ -98,7 +98,6 @@ function lineBudgetWithRemaining(s: BudgetSummarySnapshot) {
 export function lineRemaining(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const remainingStr = fmt(s.remaining);
-  // Остаток
   return `💰 ${remainingStr}€`;
 }
 
