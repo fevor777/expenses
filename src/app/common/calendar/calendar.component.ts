@@ -1,3 +1,4 @@
+// CLEAN REPLACEMENT FILE BELOW
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -10,7 +11,10 @@ import {
   SegmentedSwitchComponent,
   SegmentedOption,
 } from '../component/segmented/segmented-switch.component';
-import { BudgetSummaryService, BudgetSummaryBuildResult } from '../service/budget-summary.service';
+import {
+  BudgetSummaryService,
+  BudgetSummaryBuildResult,
+} from '../service/budget-summary.service';
 import { trendIconByRatio } from '../model/budget-summary/budget-summary.br-notifi-formatter';
 import { first, Subject, takeUntil } from 'rxjs';
 import { Budget } from '../model/budget.model';
@@ -21,6 +25,7 @@ interface CalendarDay {
   isToday: boolean;
   isSelected: boolean;
   isWeekend: boolean;
+  limitState?: 'under' | 'near' | 'over';
 }
 
 @Component({
@@ -35,41 +40,55 @@ export class CalendarComponent implements OnDestroy {
   @Output() dateChange = new EventEmitter<Date>();
   @Output() close = new EventEmitter<void>();
   @Output() today = new EventEmitter<Date>();
+  @Output() modeChange = new EventEmitter<'month' | 'period'>();
 
-  private unsubscribe: Subject<void> = new Subject();
+  private unsubscribe = new Subject<void>();
 
   viewDate: Date = new Date();
   weeks: CalendarDay[][] = [];
   weekDayLabels = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  show = false;
 
-  show: boolean;
-
-  // mode switching between standard calendar month and irregular budget period
   calendarModes: SegmentedOption[] = [
     { value: 'period', label: 'Бюджет' },
     { value: 'month', label: 'Месяц' },
   ];
   mode: 'month' | 'period' = 'period';
-  @Output() modeChange = new EventEmitter<'month' | 'period'>();
 
-  // irregular budget period boundaries (computed from Budget.periodStartTs + period days)
   budgetStart?: Date;
   budgetEnd?: Date;
-  private currentBudget?: Budget; // retained for compatibility; now derived from summary meta
+  private currentBudget?: Budget; // retained for potential future use
   private budgetSummaryResult?: BudgetSummaryBuildResult;
-  private exhaustionDate?: Date; // parsed from summary.budgetExhaustion ("F: dd.mm")
+  private exhaustionDate?: Date;
+  private perDaySpent = new Map<string, number>();
+  private perDayBudget = new Map<string, number>(); // dynamic daily budget per core day
+
+  // Budget strip variables
+  summaryAvailable = false;
+  stripSpentTotal = '';
+  stripRemaining = '';
+  stripDaysPassedFrame = '';
+  stripDaysLeft = '';
+  stripNeedPerDay = '';
+  stripNeedIcon = '';
+  stripAriaLabel = '';
 
   constructor(private budgetSummaryService: BudgetSummaryService) {}
 
   ngOnInit() {
     this.viewDate = new Date(this.selectedDate);
     this.generate();
-  this.listenBudgetSummary();
+    this.listenBudgetSummary();
   }
 
   ngOnChanges() {
     this.viewDate = new Date(this.selectedDate);
     this.generate();
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 
   private listenBudgetSummary() {
@@ -79,14 +98,12 @@ export class CalendarComponent implements OnDestroy {
       .subscribe(result => {
         this.budgetSummaryResult = result;
         if (!result.summary) {
-          // Fallback to month view if no active budget summary
           this.mode = 'month';
           this.generate();
           this.clearBudgetStrip();
           return;
         }
         this.show = true;
-        // Derive budget period from summary meta (frame boundaries)
         const startMs = result.summary.meta?.dateFrameStart;
         const finishMs = result.summary.meta?.dateFrameFinish;
         if (startMs && finishMs) {
@@ -98,9 +115,9 @@ export class CalendarComponent implements OnDestroy {
         }
         this.computeBudgetStrip(result.summary);
         this.parseExhaustionDate(result.summary);
-        if (this.mode === 'period') {
-          this.generatePeriod();
-        }
+        this.buildPerDaySpentMap(result.summary);
+        this.buildPerDayBudgetMap(result.summary);
+        if (this.mode === 'period') this.generatePeriod();
       });
   }
 
@@ -116,12 +133,41 @@ export class CalendarComponent implements OnDestroy {
     }
   }
 
+  prevMonth() {
+    this.viewDate = new Date(
+      this.viewDate.getFullYear(),
+      this.viewDate.getMonth() - 1,
+      1
+    );
+    this.generate();
+  }
+  nextMonth() {
+    this.viewDate = new Date(
+      this.viewDate.getFullYear(),
+      this.viewDate.getMonth() + 1,
+      1
+    );
+    this.generate();
+  }
+  goToday() {
+    const now = new Date();
+    this.viewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    this.selectedDate = now;
+    this.today.emit(now);
+    this.generate();
+  }
+  onClose() {
+    this.close.emit();
+  }
+  selectDay(_day: CalendarDay) {
+    /* selection disabled */
+  }
+
   private generatePeriod() {
     if (!this.budgetStart || !this.budgetEnd) {
       this.weeks = [];
       return;
     }
-    // include one extra week before and after
     const start = new Date(
       this.budgetStart.getFullYear(),
       this.budgetStart.getMonth(),
@@ -149,18 +195,19 @@ export class CalendarComponent implements OnDestroy {
     while (current <= extendedEnd) {
       const weekday = (current.getDay() + 6) % 7; // Monday=0
       if (week.length === 0 && weekday > 0) {
-        // pad start with blanks
         for (let i = 0; i < weekday; i++) {
+          const padDate = new Date(
+            current.getFullYear(),
+            current.getMonth(),
+            current.getDate() - (weekday - i)
+          );
           week.push({
-            date: new Date(
-              current.getFullYear(),
-              current.getMonth(),
-              current.getDate() - (weekday - i)
-            ),
+            date: padDate,
             inMonth: false,
             isToday: false,
             isSelected: false,
             isWeekend: false,
+            limitState: undefined,
           });
         }
       }
@@ -170,6 +217,7 @@ export class CalendarComponent implements OnDestroy {
         isToday: this.isSameDate(current, today),
         isSelected: this.isSameDate(current, this.selectedDate),
         isWeekend: this.isWeekend(current),
+        limitState: this.computeLimitState(current),
       });
       if (week.length === 7) {
         weeks.push(week);
@@ -195,6 +243,7 @@ export class CalendarComponent implements OnDestroy {
           isToday: this.isSameDate(nxt, today),
           isSelected: this.isSameDate(nxt, this.selectedDate),
           isWeekend: this.isWeekend(nxt),
+          limitState: undefined,
         });
       }
       weeks.push(week);
@@ -202,60 +251,18 @@ export class CalendarComponent implements OnDestroy {
     this.weeks = weeks;
   }
 
-  prevMonth() {
-    this.viewDate = new Date(
-      this.viewDate.getFullYear(),
-      this.viewDate.getMonth() - 1,
-      1
-    );
-    this.generate();
-  }
-
-  nextMonth() {
-    this.viewDate = new Date(
-      this.viewDate.getFullYear(),
-      this.viewDate.getMonth() + 1,
-      1
-    );
-    this.generate();
-  }
-
-  goToday() {
-    const now = new Date();
-    this.viewDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    this.selectedDate = now;
-    this.today.emit(now);
-    this.generate();
-  }
-
-  onClose() {
-    this.close.emit();
-  }
-
-  selectDay(day: CalendarDay) {
-    // if (!day.inMonth) return;
-    // this.selectedDate = day.date;
-    // this.dateChange.emit(day.date);
-    // this.generate();
-  }
-
   private generate() {
     const year = this.viewDate.getFullYear();
     const month = this.viewDate.getMonth();
     const firstOfMonth = new Date(year, month, 1);
-    const startDay = (firstOfMonth.getDay() + 6) % 7; // make Monday=0
+    const startDay = (firstOfMonth.getDay() + 6) % 7; // Monday=0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
     const today = new Date();
     const weeks: CalendarDay[][] = [];
     let currentDayCounter = 1;
-
-    // Previous month days to fill first week
     const prevMonthDays = startDay;
     const prevMonthLastDate = new Date(year, month, 0).getDate();
-
     let week: CalendarDay[] = [];
-
     for (let i = 0; i < prevMonthDays; i++) {
       const date = new Date(
         year,
@@ -268,9 +275,9 @@ export class CalendarComponent implements OnDestroy {
         isToday: this.isSameDate(date, today),
         isSelected: this.isSameDate(date, this.selectedDate),
         isWeekend: this.isWeekend(date),
+        limitState: undefined,
       });
     }
-
     while (currentDayCounter <= daysInMonth) {
       if (week.length === 7) {
         weeks.push(week);
@@ -283,11 +290,10 @@ export class CalendarComponent implements OnDestroy {
         isToday: this.isSameDate(date, today),
         isSelected: this.isSameDate(date, this.selectedDate),
         isWeekend: this.isWeekend(date),
+        limitState: this.computeLimitState(date),
       });
       currentDayCounter++;
     }
-
-    // Fill remaining days with next month
     let nextMonthDay = 1;
     while (week.length < 7) {
       const date = new Date(year, month + 1, nextMonthDay);
@@ -297,12 +303,11 @@ export class CalendarComponent implements OnDestroy {
         isToday: this.isSameDate(date, today),
         isSelected: this.isSameDate(date, this.selectedDate),
         isWeekend: this.isWeekend(date),
+        limitState: undefined,
       });
       nextMonthDay++;
     }
     weeks.push(week);
-
-    // Possibly an extra week if days overflow
     while (weeks.length < 6) {
       week = [];
       for (let i = 0; i < 7; i++) {
@@ -313,12 +318,12 @@ export class CalendarComponent implements OnDestroy {
           isToday: this.isSameDate(date, today),
           isSelected: this.isSameDate(date, this.selectedDate),
           isWeekend: this.isWeekend(date),
+          limitState: undefined,
         });
         nextMonthDay++;
       }
       weeks.push(week);
     }
-
     this.weeks = weeks;
   }
 
@@ -329,25 +334,15 @@ export class CalendarComponent implements OnDestroy {
       a.getDate() === b.getDate()
     );
   }
-
   private isWeekend(date: Date): boolean {
     const day = date.getDay();
-    // Saturday (6) or Sunday (0)
     return day === 6 || day === 0;
   }
-  // --- Compact strip variables (precomputed) ---
-  summaryAvailable: boolean = false;
-  stripSpentTotal = '';
-  stripRemaining = '';
-  stripDaysPassedFrame = '';
-  stripDaysLeft = '';
-  stripNeedPerDay = '';
-  stripNeedIcon = '';
-  stripAriaLabel = '';
 
   private fmtMoney(n?: number): string {
     if (n === undefined || n === null || isNaN(n)) return '0';
-    const rounded = Math.abs(n - Math.round(n)) < 0.05 ? n.toFixed(0) : n.toFixed(1);
+    const rounded =
+      Math.abs(n - Math.round(n)) < 0.05 ? n.toFixed(0) : n.toFixed(1);
     return rounded.replace(/\.0$/, '');
   }
   private computeBudgetStrip(summary: any) {
@@ -362,10 +357,16 @@ export class CalendarComponent implements OnDestroy {
     const frameDays = summary.meta?.frameDays ?? 0;
     this.stripDaysPassedFrame = `${passed}/${frameDays}`;
     this.stripDaysLeft = `${summary.daysLeft ?? 0}`;
-    this.stripNeedPerDay = summary.needPerDay ? `${this.fmtMoney(summary.needPerDay)}€/д` : '';
-    // Dynamic trend icon based on today's need ratio (same logic as notification formatter)
-    this.stripNeedIcon = summary.todaysNeedRatio !== undefined ? trendIconByRatio(summary.todaysNeedRatio) : '';
-    const needLabelPart = this.stripNeedPerDay ? `${this.stripNeedIcon ? this.stripNeedIcon + ' ' : ''}${this.stripNeedPerDay}` : '';
+    this.stripNeedPerDay = summary.needPerDay
+      ? `${this.fmtMoney(summary.needPerDay)}€/д`
+      : '';
+    this.stripNeedIcon =
+      summary.todaysNeedRatio !== undefined
+        ? trendIconByRatio(summary.todaysNeedRatio)
+        : '';
+    const needLabelPart = this.stripNeedPerDay
+      ? `${this.stripNeedIcon ? this.stripNeedIcon + ' ' : ''}${this.stripNeedPerDay}`
+      : '';
     this.stripAriaLabel = `Бюджет: ${this.stripSpentTotal} ост ${this.stripRemaining} дней прошло ${this.stripDaysPassedFrame} осталось дней ${this.stripDaysLeft} нужно в день ${needLabelPart}`;
   }
   private clearBudgetStrip() {
@@ -378,6 +379,8 @@ export class CalendarComponent implements OnDestroy {
     this.stripNeedIcon = '';
     this.stripAriaLabel = '';
     this.exhaustionDate = undefined;
+    this.perDaySpent.clear();
+    this.perDayBudget.clear();
   }
 
   get monthLabel(): string {
@@ -399,8 +402,6 @@ export class CalendarComponent implements OnDestroy {
       year: 'numeric',
     }).format(this.viewDate);
   }
-
-  // Period highlighting helpers
   isInBudgetCore(d: Date): boolean {
     if (!this.budgetStart || !this.budgetEnd) return false;
     const time = d.getTime();
@@ -408,16 +409,13 @@ export class CalendarComponent implements OnDestroy {
       time >= this.budgetStart.getTime() && time <= this.budgetEnd.getTime()
     );
   }
-
   isInBudgetBuffer(d: Date): boolean {
     if (!this.budgetStart || !this.budgetEnd) return false;
-    // buffer defined as +/- 7 days window around core we actually rendered
     const bufferStart = this.budgetStart.getTime() - 7 * 24 * 60 * 60 * 1000;
     const bufferEnd = this.budgetEnd.getTime() + 7 * 24 * 60 * 60 * 1000;
     const time = d.getTime();
     return time >= bufferStart && time <= bufferEnd;
   }
-
   isBudgetCorePast(d: Date): boolean {
     if (!this.isInBudgetCore(d)) return false;
     const today = new Date();
@@ -429,34 +427,31 @@ export class CalendarComponent implements OnDestroy {
     return d.getTime() < startOfToday;
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribe.next();
-    this.unsubscribe.complete();
-  }
-
   private parseExhaustionDate(summary: any) {
     this.exhaustionDate = undefined;
-    const label: string | undefined = summary?.budgetExhaustion; // format like "F: dd.mm"
+    const label: string | undefined = summary?.budgetExhaustion; // "F: dd.mm"
     if (!label) return;
     const match = /F:\s*(\d{2})\.(\d{2})/.exec(label);
     if (!match) return;
     const [, ddStr, mmStr] = match;
     const day = parseInt(ddStr, 10);
-    const monthIndex = parseInt(mmStr, 10) - 1; // zero-based
+    const monthIndex = parseInt(mmStr, 10) - 1;
     if (isNaN(day) || isNaN(monthIndex)) return;
-    const baseYear = this.budgetStart?.getFullYear() || new Date().getFullYear();
+    const baseYear =
+      this.budgetStart?.getFullYear() || new Date().getFullYear();
     let candidate = new Date(baseYear, monthIndex, day);
-    if (this.budgetStart && this.budgetEnd && candidate.getTime() < this.budgetStart.getTime()) {
+    if (
+      this.budgetStart &&
+      this.budgetEnd &&
+      candidate.getTime() < this.budgetStart.getTime()
+    ) {
       const startMonth = this.budgetStart.getMonth();
       const endMonth = this.budgetEnd.getMonth();
-      // Cross-year frame (e.g., Dec -> Jan) means exhaustion date might be next year.
-      if (endMonth < startMonth) {
+      if (endMonth < startMonth)
         candidate = new Date(baseYear + 1, monthIndex, day);
-      }
     }
     this.exhaustionDate = candidate;
   }
-
   isExhaustionDay(d: Date): boolean {
     if (!this.exhaustionDate) return false;
     return (
@@ -464,5 +459,75 @@ export class CalendarComponent implements OnDestroy {
       d.getMonth() === this.exhaustionDate.getMonth() &&
       d.getDate() === this.exhaustionDate.getDate()
     );
+  }
+
+  private buildPerDaySpentMap(summary: any) {
+    this.perDaySpent.clear();
+    const expenses: any[] = summary?.meta?.expenses || [];
+    if (!Array.isArray(expenses)) return;
+    for (const e of expenses) {
+      if (!e || typeof e.date !== 'number') continue;
+      const d = new Date(e.date);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      const prev = this.perDaySpent.get(key) || 0;
+      if (e.includeInBalance) this.perDaySpent.set(key, prev + (e.amount || 0));
+    }
+  }
+  private buildPerDayBudgetMap(summary: any) {
+    this.perDayBudget.clear();
+    if (!summary) return;
+    const startMs = summary.meta?.dateFrameStart;
+    const finishMs = summary.meta?.dateFrameFinish;
+    if (!startMs || !finishMs) return;
+    const frameStart = new Date(startMs);
+    const frameEnd = new Date(finishMs);
+    const coreDates: Date[] = [];
+    let cursor = new Date(
+      frameStart.getFullYear(),
+      frameStart.getMonth(),
+      frameStart.getDate()
+    );
+    while (cursor.getTime() <= frameEnd.getTime()) {
+      coreDates.push(new Date(cursor));
+      cursor = new Date(
+        cursor.getFullYear(),
+        cursor.getMonth(),
+        cursor.getDate() + 1
+      );
+    }
+    let remaining = summary.budget ?? 0;
+    for (let i = 0; i < coreDates.length; i++) {
+      const date = coreDates[i];
+      const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      const daysLeftIncludingToday = coreDates.length - i;
+      const daily =
+        daysLeftIncludingToday > 0 ? remaining / daysLeftIncludingToday : 0;
+      this.perDayBudget.set(key, daily);
+      const spent = this.perDaySpent.get(key) || 0;
+      remaining -= spent;
+      if (remaining < 0) remaining = 0;
+    }
+  }
+  private computeLimitState(date: Date): 'under' | 'near' | 'over' | undefined {
+    if (!this.isInBudgetCore(date)) return undefined;
+    if (!this.isBudgetCorePast(date) && !this.isSameDate(date, new Date()))
+      return undefined;
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    const spent = this.perDaySpent.get(key) || 0;
+    const budget = this.perDayBudget.get(key);
+    let result: 'under' | 'near' | 'over' | undefined = 'over';
+    if (!budget || budget <= 0) {
+      result = spent > 0 ? 'over' : 'under';
+    } else if (spent <= 0) {
+      result = 'under';
+    } else {
+      const ratio = spent / budget;
+      if (ratio < 0.75) {
+        result = 'under';
+      } else if (ratio <= 1.15) {
+        result = 'near';
+      }
+    }
+    return result;
   }
 }

@@ -38,6 +38,9 @@
           isInBudgetBuffer(d.date)
         "
         [class.period-past]="mode === 'period' && isBudgetCorePast(d.date)"
+        [class.limit-under]="d.limitState==='under'"
+        [class.limit-near]="d.limitState==='near'"
+        [class.limit-over]="d.limitState==='over'"
         [attr.aria-selected]="d.isSelected"
         [attr.data-date]="d.date.toISOString()"
       >
