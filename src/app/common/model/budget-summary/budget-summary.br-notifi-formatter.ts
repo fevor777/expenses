@@ -99,7 +99,7 @@ export function lineRemaining(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const remainingStr = fmt(s.remaining);
   // Остаток
-  return `🪙 ${remainingStr}€`;
+  return `💰 ${remainingStr}€`;
 }
 
 function linePeriod(s: BudgetSummarySnapshot) {
