@@ -33,7 +33,7 @@ export interface BaseMetrics {
   classification: ClassificationTotals;
 }
 
-export interface BudgetInput { value?: number; period?: number }
+export interface BudgetInput { value?: number; period?: number; minDayLimit?: number }
 
 export interface RollingFrameBudget {
   expenses: Expense[];
@@ -99,6 +99,7 @@ export interface BudgetSummarySnapshot {
   velocityProjectedTotal?: number;
   energyScore?: number;
   budgetExhaustion?: string;
+  exhaustDate?: number; // raw ms timestamp when budget projected to hit 0 (clamped)
 
   // Extras
   extra: number;

@@ -40,6 +40,8 @@ export class ExportComponent implements OnDestroy {
   irregularBudgetValue: number = 0;
   // New timestamp-based start (ms). When set, overrides legacy day-of-month logic.
   budgetStartTs?: number;
+  // Optional minimum number of days before exhaustion date is surfaced
+  minDayLimit?: number;
 
   // Swipe length configuration
   swipeLengthValue: number = 0;
@@ -76,6 +78,7 @@ export class ExportComponent implements OnDestroy {
         this.irregularBudgetValue = v?.value || 0;
         this.budgetPeriodDuration = v?.period || 1;
         this.budgetStartTs = v?.periodStartTs;
+        this.minDayLimit = v?.minDayLimit || 0;
       });
     this.savings$ = this.savingService.getSavings();
     this.savings$
@@ -223,6 +226,7 @@ export class ExportComponent implements OnDestroy {
       value: this.irregularBudgetValue,
       period: Math.floor(this.budgetPeriodDuration),
       periodStartTs: this.budgetStartTs,
+      minDayLimit: this.minDayLimit,
     };
     this.irregularBudgetService
       .addValue(budget)

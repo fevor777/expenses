@@ -8,6 +8,7 @@ import {
 } from './budget-summary.classifier';
 import {
   computePace,
+  computeExhaustionDate,
   computeExhaustionLabel,
   computeNeedPerDay,
   computeExpectPerDay,
@@ -79,11 +80,13 @@ export function createBudgetSummary(
   // Pace & velocity
   const budgetValue = rolling.budget?.value || 0;
   const pace = computePace(periodIrregular, budgetValue, frame);
-  const exhaustionLabel = computeExhaustionLabel(
+  const exhaustionMs = computeExhaustionDate(
     periodIrregular,
     budgetValue,
-    frame
+    frame,
+    rolling.budget?.minDayLimit
   );
+  const exhaustionLabel = computeExhaustionLabel(exhaustionMs);
   const need = computeNeedPerDay(
     periodIrregular,
     classification.todays.irregular,
@@ -125,7 +128,8 @@ export function createBudgetSummary(
     velocityOverrun: pace.overrun,
     velocityProjectedTotal: pace.projectedTotal,
     energyScore,
-    budgetExhaustion: exhaustionLabel,
+  budgetExhaustion: exhaustionLabel,
+  exhaustDate: exhaustionMs,
     extra: classification.extra,
     extraPct,
     daysSinceExtra: daysSince(classification.latest.extra),

@@ -6,4 +6,5 @@ export class Budget {
    * Start-of-period timestamp (ms since epoch, start-of-day local time).
    */
   periodStartTs?: number;
+  minDayLimit?: number;
 }

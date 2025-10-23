@@ -59,6 +59,16 @@
           class="bsd-input"
         />
       </div>
+      <div class="budget-start-row">
+        <label for="minDayLimit" class="bsd-label">Min Day Limit (exhaust):</label>
+        <input
+          id="minDayLimit"
+          type="number"
+          min="1"
+          [(ngModel)]="minDayLimit"
+          class="bsd-input"
+        />
+      </div>
       <div class="budget-start-row" *ngIf="budgetPeriodLabel">
         <span class="bsd-label">Period Preview:</span>
         <span class="bsd-value">{{ budgetPeriodLabel }}</span>
