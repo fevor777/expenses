@@ -61,7 +61,7 @@ export class CalendarComponent implements OnDestroy {
   private currentBudget?: Budget; // retained for potential future use
   private budgetSummaryResult?: BudgetSummaryBuildResult;
   private exhaustionDate?: Date;
-  showVelocityHistory = false;
+  showVelocityHistory = true;
   private perDaySpent = new Map<string, number>();
   private perDayBudget = new Map<string, number>(); // dynamic daily budget per core day
 
