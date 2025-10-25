@@ -29,7 +29,7 @@ export class DayTooltipComponent {
   @Output() navigateStatistics = new EventEmitter<Date>();
 
   formatAmount(amount: number | undefined | null): string {
-    if (amount === undefined || amount === null || isNaN(amount)) return '0€';
+    if (amount === undefined || amount === null || isNaN(amount)) return '0 €';
     const rounded = Math.abs(amount - Math.round(amount)) < 0.05 ? amount.toFixed(0) : amount.toFixed(1);
     return rounded.replace(/\.0$/, '') + '€';
   }

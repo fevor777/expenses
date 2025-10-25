@@ -638,7 +638,7 @@ export class CalendarComponent implements OnDestroy {
   }
 
   formatAmount(amount: number): string {
-    return this.fmtMoney(amount) + '€';
+    return this.fmtMoney(amount) + ' €';
   }
 
   // Tooltip footer icon handlers
