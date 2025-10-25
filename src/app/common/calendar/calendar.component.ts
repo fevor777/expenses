@@ -12,6 +12,7 @@ import {
   SegmentedSwitchComponent,
   SegmentedOption,
 } from '../component/segmented/segmented-switch.component';
+import { DayTooltipComponent } from './day-tooltip.component';
 import {
   BudgetSummaryService,
   BudgetSummaryBuildResult,
@@ -48,7 +49,7 @@ interface DayTooltipData {
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, SegmentedSwitchComponent],
+  imports: [CommonModule, FormsModule, SegmentedSwitchComponent, DayTooltipComponent],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
 })

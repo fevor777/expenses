@@ -1,0 +1,35 @@
+<div class="day-tooltip" *ngIf="data" role="dialog" [attr.aria-label]="'День: ' + (data?.date | date:'dd.MM.yyyy')">
+  <div class="dt-header">
+    <span>{{ data?.date | date : 'dd.MM' }}</span>
+    <span>· {{ data?.total }}</span>
+    <span *ngIf="data?.totalAmount">· {{ formatAmount(data?.totalAmount || 0) }}</span>
+  </div>
+  <div class="dt-cats" *ngIf="data?.categories?.length">
+    <div class="dt-cat" *ngFor="let c of data?.categories">
+      <span class="dt-cat-name" [title]="c.name">{{ c.name }}</span>
+      <span class="dt-cat-count" [attr.aria-label]="'Зап.: ' + c.count">{{ c.count }}</span>
+      <span class="dt-cat-amount" [attr.aria-label]="'Сумма: ' + formatAmount(c.amount)">{{ formatAmount(c.amount) }}</span>
+    </div>
+  </div>
+  <div class="dt-empty" *ngIf="data?.total === 0">Нет данных</div>
+  <div class="dt-footer" *ngIf="data?.total >= 0">
+    <button
+      type="button"
+      class="dt-footer-btn"
+      (click)="onHistory()"
+      [attr.aria-label]="'Перейти к истории (' + (data?.date | date:'dd.MM') + ')'"
+      title="История"
+    >
+      <i class="fa-solid fa-list"></i>
+    </button>
+    <button
+      type="button"
+      class="dt-footer-btn"
+      (click)="onStatistics()"
+      [attr.aria-label]="'Перейти к статистике (' + (data?.date | date:'dd.MM') + ')'"
+      title="Статистика"
+    >
+      <i class="fas fa-chart-line"></i>
+    </button>
+  </div>
+</div>
