@@ -19,6 +19,7 @@ import {
 import { trendIconByRatio } from '../model/budget-summary/budget-summary.br-notifi-formatter';
 import { first, Subject, takeUntil } from 'rxjs';
 import { Budget } from '../model/budget.model';
+import { getCategoryById } from '../model/categories';
 
 interface CalendarDay {
   date: Date;
@@ -27,6 +28,21 @@ interface CalendarDay {
   isSelected: boolean;
   isWeekend: boolean;
   limitState?: 'under' | 'near' | 'over';
+}
+
+interface DayCategoryStat {
+  id: string;
+  name: string;
+  short: string;
+  count: number;
+  amount: number; // summed amount for this category (includeInBalance only)
+}
+
+interface DayTooltipData {
+  date: Date;
+  total: number; // number of expense entries for the day
+  categories: DayCategoryStat[]; // aggregated per category
+  totalAmount: number; // summed amount for the day (includeInBalance only)
 }
 
 @Component({
@@ -42,6 +58,9 @@ export class CalendarComponent implements OnDestroy {
   @Output() close = new EventEmitter<void>();
   @Output() today = new EventEmitter<Date>();
   @Output() modeChange = new EventEmitter<'month' | 'period'>();
+  // Navigation events delegated to parent (expense page) per requirement
+  @Output() navigateHistory = new EventEmitter<Date>();
+  @Output() navigateStatistics = new EventEmitter<Date>();
 
   private unsubscribe = new Subject<void>();
 
@@ -64,6 +83,10 @@ export class CalendarComponent implements OnDestroy {
   showVelocityHistory = true;
   private perDaySpent = new Map<string, number>();
   private perDayBudget = new Map<string, number>(); // dynamic daily budget per core day
+  private perDayExpenses = new Map<string, any[]>(); // raw expenses per day (from summary.meta.expenses)
+
+  // Tooltip state
+  tooltip: DayTooltipData | null = null;
 
   // Budget strip variables
   summaryAvailable = false;
@@ -161,11 +184,10 @@ export class CalendarComponent implements OnDestroy {
   onClose() {
     this.close.emit();
   }
-  selectDay(_day: CalendarDay) {
-    /* selection disabled */
-  }
 
   private generatePeriod() {
+    // clear tooltip on regeneration (month/mode change)
+    this.tooltip = null;
     if (!this.budgetStart || !this.budgetEnd) {
       this.weeks = [];
       return;
@@ -254,6 +276,8 @@ export class CalendarComponent implements OnDestroy {
   }
 
   private generate() {
+    // clear tooltip when regenerating regular month view
+    this.tooltip = null;
     const year = this.viewDate.getFullYear();
     const month = this.viewDate.getMonth();
     const firstOfMonth = new Date(year, month, 1);
@@ -465,6 +489,7 @@ export class CalendarComponent implements OnDestroy {
 
   private buildPerDaySpentMap(summary: any) {
     this.perDaySpent.clear();
+    this.perDayExpenses.clear();
     const expenses: any[] = summary?.meta?.expenses || [];
     if (!Array.isArray(expenses)) return;
     for (const e of expenses) {
@@ -473,6 +498,10 @@ export class CalendarComponent implements OnDestroy {
       const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
       const prev = this.perDaySpent.get(key) || 0;
       if (e.includeInBalance) this.perDaySpent.set(key, prev + (e.amount || 0));
+      // retain raw expense regardless of includeInBalance for counting purposes
+      const list = this.perDayExpenses.get(key) || [];
+      list.push(e);
+      this.perDayExpenses.set(key, list);
     }
   }
   private buildPerDayBudgetMap(summary: any) {
@@ -531,5 +560,91 @@ export class CalendarComponent implements OnDestroy {
       }
     }
     return result;
+  }
+
+  // ===== Tooltip Logic =====
+  selectDay(day: CalendarDay) {
+    // Only allow tooltip for today or past days (no future days)
+    const today = new Date();
+    const startOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ).getTime();
+    const dayTime = new Date(
+      day.date.getFullYear(),
+      day.date.getMonth(),
+      day.date.getDate()
+    ).getTime();
+    if (dayTime > startOfToday) return; // future day -> ignore
+
+    // Toggle off if same day already visible
+    if (this.tooltip && this.isSameDate(this.tooltip.date, day.date)) {
+      this.tooltip = null;
+      return;
+    }
+
+    const key = `${day.date.getFullYear()}-${day.date.getMonth()}-${day.date.getDate()}`;
+    const raw = this.perDayExpenses.get(key) || [];
+    const total = raw.length;
+    const perCategory = new Map<string, number>();
+    const perCategoryAmount = new Map<string, number>();
+    let totalAmount = 0;
+    for (const e of raw) {
+      const catId: string | undefined = e.category;
+      if (!catId) continue;
+      if (e.includeInBalance) {
+        perCategory.set(catId, (perCategory.get(catId) || 0) + 1);
+        const amt = typeof e.amount === 'number' ? e.amount : 0;
+        perCategoryAmount.set(catId, (perCategoryAmount.get(catId) || 0) + amt);
+        totalAmount += amt;
+      }
+    }
+    const categories: DayCategoryStat[] = Array.from(perCategory.entries()).map(
+      ([id, count]) => {
+        const cat = getCategoryById(id);
+        const name = cat?.name || id;
+        return {
+          id,
+            name,
+            short: this.shortCategoryName(name),
+            count,
+            amount: perCategoryAmount.get(id) || 0,
+        } as DayCategoryStat;
+      }
+    );
+    categories.sort((a, b) => b.count - a.count || a.short.localeCompare(b.short));
+    this.tooltip = {
+      date: day.date,
+      total,
+      categories,
+      totalAmount,
+    };
+  }
+
+  isTooltipVisible(d: Date): boolean {
+    return !!this.tooltip && this.isSameDate(this.tooltip.date, d);
+  }
+
+  private shortCategoryName(name: string): string {
+    if (!name) return '';
+    // Remove trailing punctuation, take first segment
+    const firstSegment = name.replace(/\.+$/, '').split(/\s+/)[0] || name;
+    const seg = firstSegment.replace(/\.+$/, '');
+    if (seg.length <= 4) return seg;
+    if (seg.length <= 6) return seg.slice(0, 4);
+    return seg.slice(0, 3); // Long names -> 3 letters (e.g. 'Питание' -> 'Пит')
+  }
+
+  formatAmount(amount: number): string {
+    return this.fmtMoney(amount) + '€';
+  }
+
+  // Tooltip footer icon handlers
+  onNavigateHistory(): void {
+    if (this.tooltip?.date) this.navigateHistory.emit(this.tooltip.date);
+  }
+  onNavigateStatistics(): void {
+    if (this.tooltip?.date) this.navigateStatistics.emit(this.tooltip.date);
   }
 }
