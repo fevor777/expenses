@@ -15,6 +15,8 @@ import {
 
 import { CategoriesComponent } from '../common/component/category/categories.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
+import { DateTime } from 'luxon';
+import { Mode } from '../common/component/filter/date/dateFrame.model';
 import { NotificationService } from '../common/component/notification/notification.service';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
 import {
@@ -187,13 +189,33 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.showNumberBoard = true;
   }
 
-  navigateToHistory(): void {
+  navigateToHistory(date?: Date): void {
     this.notificationService.hide();
+    if (date instanceof Date) {
+      // Persist single-day frame for history page
+      this.dateFilterService.dateFilter = {
+        start: DateTime.fromJSDate(date).startOf('day'),
+        finish: DateTime.fromJSDate(date).endOf('day'),
+        display: date.toLocaleDateString('ru-RU'),
+        mode: Mode.DAY,
+      };
+      // Preserve description/category context if user has typed something
+      if (this.description) this.dateFilterService.description = this.description;
+    }
     this.router.navigate(['/history']);
   }
 
-  navigateToStatistics(): void {
+  navigateToStatistics(date?: Date): void {
     this.notificationService.hide();
+    if (date instanceof Date) {
+      this.dateFilterService.dateFilter = {
+        start: DateTime.fromJSDate(date).startOf('day'),
+        finish: DateTime.fromJSDate(date).endOf('day'),
+        display: date.toLocaleDateString('ru-RU'),
+        mode: Mode.DAY,
+      };
+      if (this.description) this.dateFilterService.description = this.description;
+    }
     this.router.navigate(['/statistics']);
   }
 

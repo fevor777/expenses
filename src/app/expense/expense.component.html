@@ -92,7 +92,7 @@
     [selectedDate]="calendarSelectedDate"
     (close)="onCloseCalendar()"
     (dateChange)="onCloseCalendar()"
-    (navigateHistory)="navigateToHistory()"
-    (navigateStatistics)="navigateToStatistics()"
+    (navigateHistory)="navigateToHistory($event)"
+    (navigateStatistics)="navigateToStatistics($event)"
   ></app-calendar>
 </div>
