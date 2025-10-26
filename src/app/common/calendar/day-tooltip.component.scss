@@ -11,11 +11,12 @@
   min-width: 140px;
   z-index: 30; /* above day */
   box-shadow: 0 6px 18px rgba(0,0,0,0.30);
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.3;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  letter-spacing: 0.7px;
   backdrop-filter: blur(4px);
 }
 .day-tooltip::before {
@@ -32,8 +33,33 @@
   transform-origin: center;
   border-radius: 2px;
 }
+.day-tooltip.tp-left {
+  bottom: auto;
+  top: 50%;
+  left: 0;
+  transform: translate(-105%, -50%);
+}
+.day-tooltip.tp-left::before {
+  bottom: auto;
+  top: 50%;
+  left: 100%;
+  transform: translate(-50%, -50%) rotate(135deg);
+  box-shadow: none;
+}
+.day-tooltip.tp-right {
+  bottom: auto;
+  top: 50%;
+  left: 100%;
+  transform: translate(8px, -50%);
+}
+.day-tooltip.tp-right::before {
+  bottom: auto;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+.day-tooltip.tp-top { /* explicit for clarity; retains default top styles */ }
 .dt-header {
-  font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.5px;
   display: flex;
@@ -46,6 +72,11 @@
   gap: 2px;
   overflow-y: auto;
 }
+
+.dt-day-amount {
+  
+}
+
 .dt-cat {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -57,19 +88,16 @@
   box-shadow: inset 0 0 0 1px var(--color-border);
 }
 .dt-cat-name {
-  font-weight: 500;
   max-width: 70px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .dt-cat-count {
-  font-weight: 600;
   color: var(--color-primary);
   margin-left: 6px;
 }
 .dt-cat-amount {
-  font-weight: 600;
   color: var(--color-text-secondary);
   font-size: 14px;
   letter-spacing: 1.7px;
@@ -84,6 +112,7 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 4px;
+  font-size: 14px;
   padding-top: 4px;
   border-top: 1px solid var(--color-border);
 }

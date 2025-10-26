@@ -7,6 +7,7 @@ import {
   Input,
   OnDestroy,
   Output,
+  HostListener,
 } from '@angular/core';
 import {
   SegmentedSwitchComponent,
@@ -647,5 +648,18 @@ export class CalendarComponent implements OnDestroy {
   }
   onNavigateStatistics(): void {
     if (this.tooltip?.date) this.navigateStatistics.emit(this.tooltip.date);
+  }
+
+  // Close tooltip when clicking outside of a day or the tooltip itself
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(ev: MouseEvent): void {
+    if (!this.tooltip) return;
+    const target = ev.target as HTMLElement | null;
+    if (!target) return;
+    // Keep if click inside tooltip
+    if (target.closest('.day-tooltip')) return;
+    // Keep if click inside a day cell that currently shows tooltip (selectDay handles toggle)
+    if (target.closest('.day')) return;
+    this.tooltip = null;
   }
 }
