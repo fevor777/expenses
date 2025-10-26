@@ -41,7 +41,6 @@
           mode === 'period' && isBudgetCorePast(d.date) && !showVelocityHistory
         "
         [class.calendar-past-days-opacity-v2]="mode === 'period' && isBudgetCorePast(d.date) && showVelocityHistory"
-        [class.calendar-core-days-opacity]="mode === 'period' && !isBudgetCorePast(d.date) && showVelocityHistory && !isTooltipVisible(d.date)"
         [style.opacity]="isTooltipVisible(d.date) ? 1 : null"
         [class.period-past]="mode === 'period' && isBudgetCorePast(d.date)"
         [class.limit-under]="showVelocityHistory && d.limitState === 'under'"
