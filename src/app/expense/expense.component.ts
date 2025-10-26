@@ -39,6 +39,7 @@ import {
 import { CalendarComponent } from '../common/calendar/calendar.component';
 import { DescriptionEditModalComponent } from './number-board/description-edit-modal.component';
 import { ExpenseEditModalComponent } from '../history/edit/expense-edit-modal.component';
+import { lineRemaining } from '../common/model/budget-summary/budget-summary.br-notifi-formatter';
 
 @Component({
   selector: 'app-expense',
@@ -355,21 +356,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       this.getMonthlyAmountByCategory(categoryName);
     const monthlyTotal = this.getMonthlyAmount();
     const budget = summary?.summary?.budget;
-    const expensesForBudgetPeriod = summary?.summary?.meta?.expenses || [];
-    const periodBudget = budget || 0;
-    // Prefer already accumulated monthlyExpenses (includes latest new expense after add?)
-    // We rely on calculateAmounts having been invoked by subscription earlier; fallback to fresh expenses list.
-    const irregularSpent = expensesForBudgetPeriod
-      .filter(e => e?.includeInBalance)
-      .reduce((sum, e) => Math.round((sum + e.amount) * 100) / 100, 0);
-    const remaining = Math.max(periodBudget - irregularSpent, 0);
-    const percentUsed = periodBudget
-      ? Math.min((irregularSpent / periodBudget) * 100, 100)
-      : 0;
-    const budgetLine = periodBudget
-      ? `<br><br>Бюджет: ${periodBudget} € | Потрачено (учёт): ${irregularSpent} € (${percentUsed.toFixed(
-          1
-        )}%) | Осталось: ${remaining.toFixed(2)} €`
+    const budgetLine = budget
+      ? `<br><br>${lineRemaining(summary?.summary)}<br><br>`
       : '';
 
     const inAppMessage =
