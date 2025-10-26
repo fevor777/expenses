@@ -73,24 +73,24 @@ function lineToday(s: BudgetSummarySnapshot) {
       : '';
   const iconPart = icon ? `${icon}` : '';
   const behavior = s.todaysNonEssential ? ` 💸: ${s.todaysNonEssential}€` : '';
-  return `• T: ${s.todaysTotal}€ ${iconPart}${irr}${behavior}`;
+  return `◦ T: ${s.todaysTotal}€ ${iconPart}${irr}${behavior}`;
 }
 function lineMonthlyIrregular(s: BudgetSummarySnapshot) {
   const prog = s.progressPct !== undefined ? s.progressPct.toFixed(0) : '';
   const exhaustion = s.budgetExhaustion ? ' ' + s.budgetExhaustion : '';
-  return `• Б: ${s.percentUsed.toFixed(0)}% П: ${prog}%${exhaustion}`;
+  return `◦ Б: ${s.percentUsed.toFixed(0)}% П: ${prog}%${exhaustion}`;
 }
 function lineBudget(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const spentStr = `${fmt(s.periodIrregular)}/${fmt(s.budget)}€`;
-  return `• ${spentStr}`;
+  return `◦ ${spentStr}`;
 }
 
 function lineBudgetWithRemaining(s: BudgetSummarySnapshot) {
   if (!s.budget) return '';
   const remainingStr = fmt(s.remaining);
   const spentStr = `${fmt(s.periodIrregular)}/${fmt(s.budget)}€`;
-  return `• ${spentStr} ◦ ${remainingStr}`;
+  return `◦ ${spentStr} • ${remainingStr}`;
 }
 
 export function lineRemaining(s: BudgetSummarySnapshot) {
@@ -108,7 +108,7 @@ function linePeriod(s: BudgetSummarySnapshot) {
   const daysPassed = s.meta?.daysPassed ?? 0;
   const frameDays = s.meta?.frameDays ?? 0;
   const daysLeftStr = fmt(s.daysLeft);
-  return `• ${daysPassed}/${frameDays}d ◦ ${daysLeftStr}`;
+  return `◦ ${daysPassed}/${frameDays}d • ${daysLeftStr}`;
 }
 
 function lineDailyAverage(s: BudgetSummarySnapshot) {
@@ -121,10 +121,10 @@ function lineDailyAverage(s: BudgetSummarySnapshot) {
       : '';
   const extras = [plan, need].filter(Boolean).join(' ');
   const pace = extras ? `Темп: ${avgStr} (${extras})` : `Темп: ${avgStr}`;
-  return `• ${pace}`;
+  return `◦ ${pace}`;
 }
 function lineVelocity(s: BudgetSummarySnapshot) {
-  if (!s.budget || s.budget <= 0) return '• Скорость: ⚡ (нет бюджета)';
+  if (!s.budget || s.budget <= 0) return '◦ Скорость: ⚡ (нет бюджета)';
   const over = s.velocityOverrun ?? 0;
   const projectedTotal = s.velocityProjectedTotal ?? 0;
   const icon = trendIconByRatio(s.velocityRatio) || '→';
@@ -140,10 +140,10 @@ function lineVelocity(s: BudgetSummarySnapshot) {
     else if (sc >= 1.5) emoji = '🙂';
     energy = ` ${emoji}${sc.toFixed(1)}`;
   }
-  return `• Скорость: ${icon} ${overStr} (${projectedTotal.toFixed(0)}€)${energy}`;
+  return `◦ Скорость: ${icon} ${overStr} (${projectedTotal.toFixed(0)}€)${energy}`;
 }
 function lineMonth(s: BudgetSummarySnapshot) {
-  return `• Период: ${s.frameTotal}€`;
+  return `◦ Период: ${s.frameTotal}€`;
 }
 function percentLine(v?: number) {
   return v !== undefined ? ` (${v.toFixed(0)}%)` : '';
@@ -152,8 +152,8 @@ function daysLine(v?: number) {
   return v !== undefined && v >= 0 ? ` d${v}` : '';
 }
 function lineExtra(s: BudgetSummarySnapshot) {
-  return `• Экстра: ${s.extra}€${percentLine(s.extraPct)}${daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
+  return `◦ Экстра: ${s.extra}€${percentLine(s.extraPct)}${daysLine(s.daysSinceExtra)}${s.extraSpike ? ' ⚠️' : ''}`;
 }
 function lineNonEssential(s: BudgetSummarySnapshot) {
-  return `• Хотелки: ${s.nonEssential}€${percentLine(s.nonEssentialPct)}${daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
+  return `◦ Хотелки: ${s.nonEssential}€${percentLine(s.nonEssentialPct)}${daysLine(s.daysSinceNonEssential)}${s.nonEssentialSpike ? ' ⚠️' : ''}`;
 }
