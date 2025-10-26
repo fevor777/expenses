@@ -30,20 +30,7 @@
       *ngIf="isLeftIconListVisible && !amount"
       >|</span
     >
-    <i
-      *ngIf="isLeftIconListVisible && !amount"
-      class="expense-hidden-icon expense-edit-budget-icon fa-solid fa-receipt"
-      aria-label="perion-budget"
-      (click)="onPeriodSummaryIconClick()"
-      role="button"
-      tabindex="0"
-      [class.animate-from-left]="animateIconsIn"
-    ></i>
-    <span
-      class="expense-edit-budget-separator"
-      *ngIf="isLeftIconListVisible && !amount"
-      >|</span
-    >
+
     <i
       *ngIf="isLeftIconListVisible && !amount"
       (click)="onCalendarIconClick()"
@@ -53,7 +40,20 @@
       tabindex="0"
       [class.animate-from-left]="animateIconsIn"
     ></i>
-
+    <span
+      class="expense-edit-budget-separator"
+      *ngIf="isLeftIconListVisible && !amount"
+      >|</span
+    >
+    <i
+      *ngIf="isLeftIconListVisible && !amount"
+      (click)="onBrNotificationIconClick()"
+      class="expense-hidden-icon expense-edit-budget-icon fas fa-bell"
+      aria-label="br-notification-icon"
+      role="button"
+      tabindex="0"
+      [class.animate-from-left]="animateIconsIn"
+    ></i>
     <span
       class="expense-edit-budget-separator"
       *ngIf="isLeftIconListVisible && !amount"
@@ -62,9 +62,9 @@
 
     <i
       *ngIf="isLeftIconListVisible && !amount"
-      (click)="onBrNotificationIconClick()"
-      class="expense-hidden-icon expense-edit-budget-icon fas fa-bell"
-      aria-label="br-notification-icon"
+      class="expense-hidden-icon expense-edit-budget-icon fa-solid fa-receipt"
+      aria-label="perion-budget"
+      (click)="onPeriodSummaryIconClick()"
       role="button"
       tabindex="0"
       [class.animate-from-left]="animateIconsIn"

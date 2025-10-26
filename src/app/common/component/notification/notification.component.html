@@ -9,24 +9,52 @@
   <div class="notification-main">
     <span class="notification-icon" *ngIf="icon" [innerHTML]="icon"></span>
     <div class="notification-body">
-      <div class="notification-content" *ngIf="message; else messageListTemplate" [innerHTML]="message"></div>
+      <div
+        class="notification-content"
+        *ngIf="message; else messageListTemplate"
+        [innerHTML]="message"
+      ></div>
       <ng-template #messageListTemplate>
-        <div class="notification-list" *ngFor="let msg of messageList" [innerHTML]="msg"></div>
+        <div
+          class="notification-list"
+          *ngFor="let msg of messageList"
+          [innerHTML]="msg"
+        ></div>
       </ng-template>
       <span *ngIf="isExpenseAddedContext">Description:</span>
       <div *ngIf="isExpenseAddedContext" class="notification-marks-row">
-        <button type="button" class="mark-btn" (click)="appendMark(' ? ')" title="#необязательный" aria-label="#необязательный">#необязательный</button>
-        <button type="button" class="mark-btn" (click)="appendMark(' ! ')" title="#лишний" aria-label="#лишний">#лишний</button>
+        <button
+          type="button"
+          class="mark-btn"
+          (click)="appendMark(' ? ')"
+          title="#необязательный"
+          aria-label="#необязательный"
+        >
+          #необязательный
+        </button>
+        <button
+          type="button"
+          class="mark-btn"
+          (click)="appendMark(' ! ')"
+          title="#лишний"
+          aria-label="#лишний"
+        >
+          #лишний
+        </button>
       </div>
       <div *ngIf="isExpenseAddedContext" class="notification-edit-row">
         <input
           type="text"
           class="desc-input"
-          [placeholder]="lastExpense?.description ? 'Изменить описание' : 'Добавить описание'"
+          [placeholder]="
+            lastExpense?.description ? 'Изменить описание' : 'Добавить описание'
+          "
           [(ngModel)]="this.lastExpense.description"
           (keyup.enter)="saveDescription()"
         />
-        <button type="button" class="save-btn" (click)="saveDescription()">OK</button>
+        <button type="button" class="save-btn" (click)="saveDescription()">
+          OK
+        </button>
       </div>
     </div>
   </div>
@@ -56,6 +84,21 @@
       title="Details"
     >
       <app-period-summary-icon></app-period-summary-icon>
+    </button>
+    <button
+      type="button"
+      (click)="onBudgetInfoIconClick()"
+      class="notification-details"
+      aria-label="Open details"
+      title="Details"
+    >
+      <i
+        class="expense-hidden-icon expense-edit-budget-icon fas fa-circle-info"
+        [class.animate-from-left]="animateIconsIn"
+        aria-label="budget-info"
+        role="button"
+        tabindex="0"
+      ></i>
     </button>
   </div>
 </div>

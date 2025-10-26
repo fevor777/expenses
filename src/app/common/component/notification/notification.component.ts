@@ -30,6 +30,8 @@ export class NotificationComponent implements OnDestroy {
   lastExpense: any = null; // made public for template binding
   editableDescription: string = '';
   savingDescription = false;
+  // animation flag for newly added budget info icon
+  animateIconsIn = false;
 
   private hideTimeout: any;
   private autoCloseMs = 120000; // shorter default for UX
@@ -53,7 +55,7 @@ export class NotificationComponent implements OnDestroy {
         } else if (
           payload &&
           typeof payload === 'object' &&
-          'message' in payload
+          'message' in payload && !Array.isArray(payload.message)
         ) {
           this.showMessage(payload.message, (payload.type as any) || 'info');
           // detect context
@@ -66,8 +68,11 @@ export class NotificationComponent implements OnDestroy {
           } else {
             this.editableDescription = '';
           }
-        } else if (Array.isArray(payload) && payload.length > 0) {
-          this.showMessageList(payload);
+        } else if (Array.isArray(payload.message) && payload?.message.length > 0) {
+          this.lastExpense = null;
+          this.editableDescription = '';
+          this.isExpenseAddedContext = false;
+          this.showMessageList(payload.message);
         }
       });
 
@@ -78,6 +83,7 @@ export class NotificationComponent implements OnDestroy {
 
   showMessage(message: string, variant: NotificationVariant = 'info') {
     this.clearPending();
+    this.messageList = [];
     this.message = message;
     this.setUtilValues(variant);
   }
@@ -87,6 +93,7 @@ export class NotificationComponent implements OnDestroy {
     variant: NotificationVariant = 'info'
   ) {
     this.clearPending();
+    this.message = '';
     this.messageList = messageList;
     this.setUtilValues(variant);
   }
@@ -195,6 +202,15 @@ export class NotificationComponent implements OnDestroy {
     this.show = true;
     this.notificationService.isShown = true;
     this.hideTimeout = setTimeout(() => this.startHide(), this.autoCloseMs);
+    this.animateIconsIn = true;
+    setTimeout(() => (this.animateIconsIn = false), 400);
+  }
+
+  onBudgetInfoIconClick(): void {
+    this.expenseSummaryService
+      .showAppBudgetInfo()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe();
   }
 
   ngOnDestroy(): void {
