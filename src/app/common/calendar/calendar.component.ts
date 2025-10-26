@@ -615,7 +615,7 @@ export class CalendarComponent implements OnDestroy {
         } as DayCategoryStat;
       }
     );
-    categories.sort((a, b) => b.count - a.count || a.short.localeCompare(b.short));
+    categories.sort((a, b) => b.amount - a.amount);
     this.tooltip = {
       date: day.date,
       total,
