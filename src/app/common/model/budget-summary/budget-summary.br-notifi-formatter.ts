@@ -98,9 +98,9 @@ export function lineRemaining(s: BudgetSummarySnapshot) {
   const remainingStr = fmt(s.remaining);
   const daysLeftStr = fmt(s.daysLeft);
     const todaysExpectation = s.todaysExpectation
-    ? ` L${fmt(s.todaysExpectation)}`
+    ? `L${fmt(s.todaysExpectation)}`
     : '';
-  return `💰 ${remainingStr}€ ${daysLeftStr}d ${todaysExpectation}`;
+  return `💰 ${remainingStr}€ • ${daysLeftStr}d • ${todaysExpectation}`;
 }
 
 function linePeriod(s: BudgetSummarySnapshot) {
