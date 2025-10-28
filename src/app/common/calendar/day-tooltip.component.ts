@@ -49,6 +49,11 @@ export class DayTooltipComponent implements AfterViewInit, OnChanges {
     return rounded.replace(/\.0$/, '') + '€';
   }
 
+  getCategoryPercentage(amount: number): number {
+    if (!this.data?.totalAmount || this.data.totalAmount === 0) return 0;
+    return Math.round((amount / this.data.totalAmount) * 100);
+  }
+
   onHistory() {
     if (this.data?.date) this.navigateHistory.emit(this.data.date);
   }
