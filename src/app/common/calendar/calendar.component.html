@@ -19,13 +19,23 @@
     </button>
   </div>
   <div class="week-labels">
+    <div class="week-number-header">Н</div>
     <div class="week-label" *ngFor="let wd of weekDayLabels">{{ wd }}</div>
   </div>
   <div class="weeks">
     <div class="week" *ngFor="let w of weeks">
+      <div class="week-number" (click)="selectWeek(w)" [class.week-number-active]="isWeekTooltipVisible(w.weekNumber)">
+        {{ w.weekNumber }}
+        <app-day-tooltip
+          *ngIf="isWeekTooltipVisible(w.weekNumber)"
+          [data]="weekTooltip"
+          (navigateHistory)="onNavigateHistory()"
+          (navigateStatistics)="onNavigateStatistics()"
+        ></app-day-tooltip>
+      </div>
       <div
         class="day"
-        *ngFor="let d of w"
+        *ngFor="let d of w.days"
         (click)="selectDay(d)"
         [class.outside]="!d.inMonth"
         [class.today]="d.isToday"
@@ -40,7 +50,9 @@
         [class.calendar-past-days-opacity]="
           mode === 'period' && isBudgetCorePast(d.date) && !showVelocityHistory
         "
-        [class.calendar-past-days-opacity-v2]="mode === 'period' && isBudgetCorePast(d.date) && showVelocityHistory"
+        [class.calendar-past-days-opacity-v2]="
+          mode === 'period' && isBudgetCorePast(d.date) && showVelocityHistory
+        "
         [style.opacity]="isTooltipVisible(d.date) ? 1 : null"
         [class.period-past]="mode === 'period' && isBudgetCorePast(d.date)"
         [class.limit-under]="showVelocityHistory && d.limitState === 'under'"
@@ -93,7 +105,7 @@
   </div>
   <div class="calendar-mode-switch">
     <div class="calendar-controls">
-    <i (click)="onClose()" class="calendar-close-icon fas fa-times"></i>
+      <i (click)="onClose()" class="calendar-close-icon fas fa-times"></i>
       <app-segmented-switch
         [options]="calendarModes"
         [active]="mode"

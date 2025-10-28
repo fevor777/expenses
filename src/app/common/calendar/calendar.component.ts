@@ -23,6 +23,26 @@ import { first, Subject, takeUntil } from 'rxjs';
 import { Budget } from '../model/budget.model';
 import { getCategoryById } from '../model/categories';
 
+interface DayData {
+  date: Date;
+  key: string;
+  expenses: any[];
+  totalAmount: number; // includeInBalance amount
+  totalEntries: number;
+  categories: Map<string, { count: number; amount: number }>;
+  dynamicBudget: number; // calculated daily budget for this day
+  limitState: 'under' | 'near' | 'over' | undefined;
+}
+
+interface WeekData {
+  weekNumber: number;
+  days: DayData[];
+  totalAmount: number;
+  totalEntries: number;
+  categories: Map<string, { count: number; amount: number }>;
+  daysWithExpenses: number;
+}
+
 interface CalendarDay {
   date: Date;
   inMonth: boolean;
@@ -30,6 +50,11 @@ interface CalendarDay {
   isSelected: boolean;
   isWeekend: boolean;
   limitState?: 'under' | 'near' | 'over';
+}
+
+interface CalendarWeek {
+  weekNumber: number;
+  days: CalendarDay[];
 }
 
 interface DayCategoryStat {
@@ -67,9 +92,13 @@ export class CalendarComponent implements OnDestroy {
   private unsubscribe = new Subject<void>();
 
   viewDate: Date = new Date();
-  weeks: CalendarDay[][] = [];
+  weeks: CalendarWeek[] = [];
   weekDayLabels = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   show = false;
+
+  // Optimized data structures
+  private dayDataMap = new Map<string, DayData>();
+  private weekDataMap = new Map<number, WeekData>();
 
   calendarModes: SegmentedOption[] = [
     { value: 'period', label: 'Бюджет' },
@@ -83,12 +112,16 @@ export class CalendarComponent implements OnDestroy {
   private budgetSummaryResult?: BudgetSummaryBuildResult;
   private exhaustionDate?: Date;
   showVelocityHistory = true;
+  
+  // Legacy maps - kept for compatibility but will be populated from dayDataMap
   private perDaySpent = new Map<string, number>();
   private perDayBudget = new Map<string, number>(); // dynamic daily budget per core day
   private perDayExpenses = new Map<string, any[]>(); // raw expenses per day (from summary.meta.expenses)
 
   // Tooltip state
   tooltip: DayTooltipData | null = null;
+  weekTooltip: DayTooltipData | null = null;
+  activeWeekNumber: number | null = null;
 
   // Budget strip variables
   summaryAvailable = false;
@@ -101,6 +134,17 @@ export class CalendarComponent implements OnDestroy {
   stripAriaLabel = '';
 
   constructor(private budgetSummaryService: BudgetSummaryService) {}
+
+  private getISOWeekNumber(date: Date): number {
+    const tempDate = new Date(date.getTime());
+    tempDate.setHours(0, 0, 0, 0);
+    // Thursday in current week decides the year
+    tempDate.setDate(tempDate.getDate() + 3 - (tempDate.getDay() + 6) % 7);
+    // January 4 is always in week 1
+    const week1 = new Date(tempDate.getFullYear(), 0, 4);
+    // Adjust to Thursday in week 1 and count weeks from there
+    return 1 + Math.round(((tempDate.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  }
 
   ngOnInit() {
     this.viewDate = new Date(this.selectedDate);
@@ -142,8 +186,7 @@ export class CalendarComponent implements OnDestroy {
         }
         this.computeBudgetStrip(result.summary);
         this.parseExhaustionDate(result.summary);
-        this.buildPerDaySpentMap(result.summary);
-        this.buildPerDayBudgetMap(result.summary);
+        this.buildComprehensiveDataMaps(result.summary);
         if (this.mode === 'period') this.generatePeriod();
       });
   }
@@ -190,6 +233,8 @@ export class CalendarComponent implements OnDestroy {
   private generatePeriod() {
     // clear tooltip on regeneration (month/mode change)
     this.tooltip = null;
+    this.weekTooltip = null;
+    this.activeWeekNumber = null;
     if (!this.budgetStart || !this.budgetEnd) {
       this.weeks = [];
       return;
@@ -215,7 +260,7 @@ export class CalendarComponent implements OnDestroy {
       end.getDate() + 7
     );
     const today = new Date();
-    const weeks: CalendarDay[][] = [];
+    const weeks: CalendarWeek[] = [];
     let current = new Date(extendedStart);
     let week: CalendarDay[] = [];
     while (current <= extendedEnd) {
@@ -233,7 +278,7 @@ export class CalendarComponent implements OnDestroy {
             isToday: false,
             isSelected: false,
             isWeekend: false,
-            limitState: undefined,
+            limitState: this.getLimitState(padDate),
           });
         }
       }
@@ -243,10 +288,11 @@ export class CalendarComponent implements OnDestroy {
         isToday: this.isSameDate(current, today),
         isSelected: this.isSameDate(current, this.selectedDate),
         isWeekend: this.isWeekend(current),
-        limitState: this.computeLimitState(current),
+        limitState: this.getLimitState(current),
       });
       if (week.length === 7) {
-        weeks.push(week);
+        const weekNumber = this.getISOWeekNumber(week[0].date);
+        weeks.push({ weekNumber, days: week });
         week = [];
       }
       current = new Date(
@@ -269,24 +315,28 @@ export class CalendarComponent implements OnDestroy {
           isToday: this.isSameDate(nxt, today),
           isSelected: this.isSameDate(nxt, this.selectedDate),
           isWeekend: this.isWeekend(nxt),
-          limitState: undefined,
+          limitState: this.getLimitState(nxt),
         });
       }
-      weeks.push(week);
+      const weekNumber = this.getISOWeekNumber(week[0].date);
+      weeks.push({ weekNumber, days: week });
     }
     this.weeks = weeks;
+    this.buildWeekData(weeks);
   }
 
   private generate() {
     // clear tooltip when regenerating regular month view
     this.tooltip = null;
+    this.weekTooltip = null;
+    this.activeWeekNumber = null;
     const year = this.viewDate.getFullYear();
     const month = this.viewDate.getMonth();
     const firstOfMonth = new Date(year, month, 1);
     const startDay = (firstOfMonth.getDay() + 6) % 7; // Monday=0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
-    const weeks: CalendarDay[][] = [];
+    const weeks: CalendarWeek[] = [];
     let currentDayCounter = 1;
     const prevMonthDays = startDay;
     const prevMonthLastDate = new Date(year, month, 0).getDate();
@@ -308,7 +358,8 @@ export class CalendarComponent implements OnDestroy {
     }
     while (currentDayCounter <= daysInMonth) {
       if (week.length === 7) {
-        weeks.push(week);
+        const weekNumber = this.getISOWeekNumber(week[0].date);
+        weeks.push({ weekNumber, days: week });
         week = [];
       }
       const date = new Date(year, month, currentDayCounter);
@@ -318,7 +369,7 @@ export class CalendarComponent implements OnDestroy {
         isToday: this.isSameDate(date, today),
         isSelected: this.isSameDate(date, this.selectedDate),
         isWeekend: this.isWeekend(date),
-        limitState: this.computeLimitState(date),
+        limitState: this.getLimitState(date),
       });
       currentDayCounter++;
     }
@@ -335,7 +386,8 @@ export class CalendarComponent implements OnDestroy {
       });
       nextMonthDay++;
     }
-    weeks.push(week);
+    const weekNumber = this.getISOWeekNumber(week[0].date);
+    weeks.push({ weekNumber, days: week });
     while (weeks.length < 6) {
       week = [];
       for (let i = 0; i < 7; i++) {
@@ -350,9 +402,11 @@ export class CalendarComponent implements OnDestroy {
         });
         nextMonthDay++;
       }
-      weeks.push(week);
+      const weekNumber = this.getISOWeekNumber(week[0].date);
+      weeks.push({ weekNumber, days: week });
     }
     this.weeks = weeks;
+    this.buildWeekData(weeks);
   }
 
   private isSameDate(a: Date, b: Date): boolean {
@@ -409,6 +463,8 @@ export class CalendarComponent implements OnDestroy {
     this.exhaustionDate = undefined;
     this.perDaySpent.clear();
     this.perDayBudget.clear();
+    this.dayDataMap.clear();
+    this.weekDataMap.clear();
   }
 
   get monthLabel(): string {
@@ -489,79 +545,200 @@ export class CalendarComponent implements OnDestroy {
     );
   }
 
-  private buildPerDaySpentMap(summary: any) {
+  private buildComprehensiveDataMaps(summary: any) {
+    // Clear all data structures
+    this.dayDataMap.clear();
+    this.weekDataMap.clear();
     this.perDaySpent.clear();
+    this.perDayBudget.clear();
     this.perDayExpenses.clear();
+
     const expenses: any[] = summary?.meta?.expenses || [];
     if (!Array.isArray(expenses)) return;
-    for (const e of expenses) {
-      if (!e || typeof e.date !== 'number') continue;
-      const d = new Date(e.date);
-      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-      const prev = this.perDaySpent.get(key) || 0;
-      if (e.includeInBalance) this.perDaySpent.set(key, prev + (e.amount || 0));
-      // retain raw expense regardless of includeInBalance for counting purposes
-      const list = this.perDayExpenses.get(key) || [];
-      list.push(e);
-      this.perDayExpenses.set(key, list);
-    }
-  }
-  private buildPerDayBudgetMap(summary: any) {
-    this.perDayBudget.clear();
-    if (!summary) return;
-    const startMs = summary.meta?.dateFrameStart;
-    const finishMs = summary.meta?.dateFrameFinish;
-    if (!startMs || !finishMs) return;
-    const frameStart = new Date(startMs);
-    const frameEnd = new Date(finishMs);
-    const coreDates: Date[] = [];
-    let cursor = new Date(
-      frameStart.getFullYear(),
-      frameStart.getMonth(),
-      frameStart.getDate()
-    );
-    while (cursor.getTime() <= frameEnd.getTime()) {
-      coreDates.push(new Date(cursor));
-      cursor = new Date(
-        cursor.getFullYear(),
-        cursor.getMonth(),
-        cursor.getDate() + 1
-      );
-    }
-    let remaining = summary.budget ?? 0;
-    for (let i = 0; i < coreDates.length; i++) {
-      const date = coreDates[i];
+
+    // Step 1: Initialize day data structure and process expenses
+    const dayDataMapTemp = new Map<string, DayData>();
+    
+    for (const expense of expenses) {
+      if (!expense || typeof expense.date !== 'number') continue;
+      
+      const date = new Date(expense.date);
       const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-      const daysLeftIncludingToday = coreDates.length - i;
-      const daily =
-        daysLeftIncludingToday > 0 ? remaining / daysLeftIncludingToday : 0;
-      this.perDayBudget.set(key, daily);
-      const spent = this.perDaySpent.get(key) || 0;
-      remaining -= spent;
-      if (remaining < 0) remaining = 0;
-    }
-  }
-  private computeLimitState(date: Date): 'under' | 'near' | 'over' | undefined {
-    if (!this.isInBudgetCore(date)) return undefined;
-    if (!this.isBudgetCorePast(date) && !this.isSameDate(date, new Date()))
-      return undefined;
-    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-    const spent = this.perDaySpent.get(key) || 0;
-    const budget = this.perDayBudget.get(key);
-    let result: 'under' | 'near' | 'over' | undefined = 'over';
-    if (!budget || budget <= 0) {
-      result = spent > 0 ? 'over' : 'under';
-    } else if (spent <= 0) {
-      result = 'under';
-    } else {
-      const ratio = spent / budget;
-      if (ratio < 0.75) {
-        result = 'under';
-      } else if (ratio <= 1.15) {
-        result = 'near';
+      
+      // Initialize day data if not exists
+      if (!dayDataMapTemp.has(key)) {
+        dayDataMapTemp.set(key, {
+          date,
+          key,
+          expenses: [],
+          totalAmount: 0,
+          totalEntries: 0,
+          categories: new Map(),
+          dynamicBudget: 0,
+          limitState: undefined
+        });
+      }
+      
+      const dayData = dayDataMapTemp.get(key)!;
+      dayData.expenses.push(expense);
+      dayData.totalEntries++;
+      
+      // Process category and amount data
+      if (expense.includeInBalance) {
+        const amount = typeof expense.amount === 'number' ? expense.amount : 0;
+        dayData.totalAmount += amount;
+        
+        const categoryId = expense.category;
+        if (categoryId) {
+          const existing = dayData.categories.get(categoryId) || { count: 0, amount: 0 };
+          existing.count++;
+          existing.amount += amount;
+          dayData.categories.set(categoryId, existing);
+        }
       }
     }
-    return result;
+
+    // Step 2: Calculate dynamic budgets for core days
+    const startMs = summary?.meta?.dateFrameStart;
+    const finishMs = summary?.meta?.dateFrameFinish;
+    
+    if (startMs && finishMs) {
+      const frameStart = new Date(startMs);
+      const frameEnd = new Date(finishMs);
+      const coreDates: Date[] = [];
+      
+      let cursor = new Date(frameStart.getFullYear(), frameStart.getMonth(), frameStart.getDate());
+      while (cursor.getTime() <= frameEnd.getTime()) {
+        coreDates.push(new Date(cursor));
+        cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 1);
+      }
+      
+      let remainingBudget = summary?.budget ?? 0;
+      
+      for (let i = 0; i < coreDates.length; i++) {
+        const date = coreDates[i];
+        const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        const daysLeftIncludingToday = coreDates.length - i;
+        const dailyBudget = daysLeftIncludingToday > 0 ? remainingBudget / daysLeftIncludingToday : 0;
+        
+        // Ensure day data exists for core days even if no expenses
+        if (!dayDataMapTemp.has(key)) {
+          dayDataMapTemp.set(key, {
+            date,
+            key,
+            expenses: [],
+            totalAmount: 0,
+            totalEntries: 0,
+            categories: new Map(),
+            dynamicBudget: dailyBudget,
+            limitState: undefined
+          });
+        } else {
+          dayDataMapTemp.get(key)!.dynamicBudget = dailyBudget;
+        }
+        
+        const spent = dayDataMapTemp.get(key)?.totalAmount || 0;
+        remainingBudget -= spent;
+        if (remainingBudget < 0) remainingBudget = 0;
+      }
+    }
+
+    // Step 3: Calculate limit states for past and current days
+    const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    
+    for (const [key, dayData] of dayDataMapTemp) {
+      const dayTime = dayData.date.getTime();
+      const isPastOrToday = dayTime <= startOfToday;
+      const isInBudgetCore = startMs && finishMs && dayTime >= startMs && dayTime <= finishMs;
+      
+      if (isPastOrToday && isInBudgetCore) {
+        const spent = dayData.totalAmount;
+        const budget = dayData.dynamicBudget;
+        
+        if (!budget || budget <= 0) {
+          dayData.limitState = spent > 0 ? 'over' : 'under';
+        } else if (spent <= 0) {
+          dayData.limitState = 'under';
+        } else {
+          const ratio = spent / budget;
+          if (ratio < 0.75) {
+            dayData.limitState = 'under';
+          } else if (ratio <= 1.15) {
+            dayData.limitState = 'near';
+          } else {
+            dayData.limitState = 'over';
+          }
+        }
+      }
+    }
+    
+    // Step 4: Store in main data structure and populate legacy maps
+    this.dayDataMap = dayDataMapTemp;
+    
+    for (const [key, dayData] of this.dayDataMap) {
+      this.perDaySpent.set(key, dayData.totalAmount);
+      this.perDayBudget.set(key, dayData.dynamicBudget);
+      this.perDayExpenses.set(key, dayData.expenses);
+    }
+  }
+
+  private getLimitState(date: Date): 'under' | 'near' | 'over' | undefined {
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    const dayData = this.dayDataMap.get(key);
+    return dayData?.limitState;
+  }
+
+  private buildWeekData(weeks: CalendarWeek[]) {
+    this.weekDataMap.clear();
+    
+    for (const week of weeks) {
+      const weekData: WeekData = {
+        weekNumber: week.weekNumber,
+        days: [],
+        totalAmount: 0,
+        totalEntries: 0,
+        categories: new Map(),
+        daysWithExpenses: 0
+      };
+      
+      // Only include past and current days
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+      
+      for (const calendarDay of week.days) {
+        const dayTime = new Date(
+          calendarDay.date.getFullYear(),
+          calendarDay.date.getMonth(),
+          calendarDay.date.getDate()
+        ).getTime();
+        
+        if (dayTime <= startOfToday) {
+          const key = `${calendarDay.date.getFullYear()}-${calendarDay.date.getMonth()}-${calendarDay.date.getDate()}`;
+          const dayData = this.dayDataMap.get(key);
+          
+          if (dayData) {
+            weekData.days.push(dayData);
+            weekData.totalAmount += dayData.totalAmount;
+            weekData.totalEntries += dayData.totalEntries;
+            
+            if (dayData.totalEntries > 0) {
+              weekData.daysWithExpenses++;
+            }
+            
+            // Aggregate categories
+            for (const [catId, catData] of dayData.categories) {
+              const existing = weekData.categories.get(catId) || { count: 0, amount: 0 };
+              existing.count += catData.count;
+              existing.amount += catData.amount;
+              weekData.categories.set(catId, existing);
+            }
+          }
+        }
+      }
+      
+      this.weekDataMap.set(week.weekNumber, weekData);
+    }
   }
 
   // ===== Tooltip Logic =====
@@ -586,46 +763,95 @@ export class CalendarComponent implements OnDestroy {
       return;
     }
 
+    // Clear week tooltip when selecting a day
+    this.weekTooltip = null;
+    this.activeWeekNumber = null;
+
     const key = `${day.date.getFullYear()}-${day.date.getMonth()}-${day.date.getDate()}`;
-    const raw = this.perDayExpenses.get(key) || [];
-    const total = raw.length;
-    const perCategory = new Map<string, number>();
-    const perCategoryAmount = new Map<string, number>();
-    let totalAmount = 0;
-    for (const e of raw) {
-      const catId: string | undefined = e.category;
-      if (!catId) continue;
-      if (e.includeInBalance) {
-        perCategory.set(catId, (perCategory.get(catId) || 0) + 1);
-        const amt = typeof e.amount === 'number' ? e.amount : 0;
-        perCategoryAmount.set(catId, (perCategoryAmount.get(catId) || 0) + amt);
-        totalAmount += amt;
-      }
+    const dayData = this.dayDataMap.get(key);
+    
+    if (!dayData) {
+      this.tooltip = null;
+      return;
     }
-    const categories: DayCategoryStat[] = Array.from(perCategory.entries()).map(
-      ([id, count]) => {
+
+    // Convert category data to the expected format
+    const categories: DayCategoryStat[] = Array.from(dayData.categories.entries()).map(
+      ([id, catData]) => {
         const cat = getCategoryById(id);
         const name = cat?.name || id;
         return {
           id,
-            name,
-            short: this.shortCategoryName(name),
-            count,
-            amount: perCategoryAmount.get(id) || 0,
+          name,
+          short: this.shortCategoryName(name),
+          count: catData.count,
+          amount: catData.amount,
         } as DayCategoryStat;
       }
     );
     categories.sort((a, b) => b.amount - a.amount);
+    
     this.tooltip = {
       date: day.date,
-      total,
+      total: dayData.totalEntries,
       categories,
-      totalAmount,
+      totalAmount: dayData.totalAmount,
     };
   }
 
   isTooltipVisible(d: Date): boolean {
     return !!this.tooltip && this.isSameDate(this.tooltip.date, d);
+  }
+
+  isWeekTooltipVisible(weekNumber: number): boolean {
+    return !!this.weekTooltip && this.activeWeekNumber === weekNumber;
+  }
+
+  selectWeek(week: CalendarWeek) {
+    // Toggle off if same week already visible
+    if (this.weekTooltip && this.activeWeekNumber === week.weekNumber) {
+      this.weekTooltip = null;
+      this.activeWeekNumber = null;
+      return;
+    }
+
+    // Clear day tooltip when showing week tooltip
+    this.tooltip = null;
+
+    // Get precomputed week data
+    const weekData = this.weekDataMap.get(week.weekNumber);
+    if (!weekData || weekData.totalEntries === 0) {
+      this.weekTooltip = null;
+      this.activeWeekNumber = null;
+      return;
+    }
+
+    // Convert category data to the expected format
+    const categories: DayCategoryStat[] = Array.from(weekData.categories.entries()).map(
+      ([id, catData]) => {
+        const cat = getCategoryById(id);
+        const name = cat?.name || id;
+        return {
+          id,
+          name,
+          short: this.shortCategoryName(name),
+          count: catData.count,
+          amount: catData.amount,
+        } as DayCategoryStat;
+      }
+    );
+    categories.sort((a, b) => b.amount - a.amount);
+
+    // Use the first day of the week as the "date" for the tooltip
+    const startDate = weekData.days[0]?.date || week.days[0].date;
+
+    this.weekTooltip = {
+      date: startDate,
+      total: weekData.totalEntries,
+      categories,
+      totalAmount: weekData.totalAmount,
+    };
+    this.activeWeekNumber = week.weekNumber;
   }
 
   private shortCategoryName(name: string): string {
@@ -653,13 +879,21 @@ export class CalendarComponent implements OnDestroy {
   // Close tooltip when clicking outside of a day or the tooltip itself
   @HostListener('document:click', ['$event'])
   onDocumentClick(ev: MouseEvent): void {
-    if (!this.tooltip) return;
+    if (!this.tooltip && !this.weekTooltip) return;
     const target = ev.target as HTMLElement | null;
     if (!target) return;
+    
     // Keep if click inside tooltip
     if (target.closest('.day-tooltip')) return;
+    
     // Keep if click inside a day cell that currently shows tooltip (selectDay handles toggle)
     if (target.closest('.day')) return;
+    
+    // Keep if click inside a week number that currently shows tooltip (selectWeek handles toggle)
+    if (target.closest('.week-number')) return;
+    
     this.tooltip = null;
+    this.weekTooltip = null;
+    this.activeWeekNumber = null;
   }
 }
