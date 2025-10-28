@@ -24,7 +24,7 @@
   </div>
   <div class="weeks">
     <div class="week" *ngFor="let w of weeks">
-      <div class="week-number" (click)="selectWeek(w)" [class.week-number-active]="isWeekTooltipVisible(w.weekNumber)">
+      <div class="week-number" (click)="selectWeek(w)">
         {{ w.weekNumber }}
         <app-day-tooltip
           *ngIf="isWeekTooltipVisible(w.weekNumber)"
