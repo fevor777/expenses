@@ -16,6 +16,7 @@ import { BalanceDateService } from '../common/service/balance-date.service';
 import { Budget } from '../common/model/budget.model';
 import { FormsModule } from '@angular/forms';
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
+import { MorningReminderService, MorningReminderConfig } from '../common/service/morning-reminder.service';
 
 @Component({
   selector: 'app-export',
@@ -47,6 +48,11 @@ export class ExportComponent implements OnDestroy {
   swipeLengthValue: number = 0;
   swipeLengthInput: number = 0;
 
+  // Morning reminder configuration
+  morningReminderEnabled: boolean = true;
+  morningStartHour: number = 6;
+  morningEndHour: number = 11;
+
   // Display-only derived label for current period preview (e.g., "September 5 - October 8")
   get budgetPeriodLabel(): string {
     const periodDays = Math.floor(this.budgetPeriodDuration);
@@ -69,7 +75,8 @@ export class ExportComponent implements OnDestroy {
     private irregularBudgetService: IrregularBudgetService,
     private savingService: SavingService,
     private afAuth: AngularFireAuth,
-    private swipeLengthStore: GlobalSwipeLengthStoreService
+    private swipeLengthStore: GlobalSwipeLengthStoreService,
+    private morningReminderService: MorningReminderService
   ) {
     this.irregularBudgetService
       .getValue()
@@ -89,6 +96,11 @@ export class ExportComponent implements OnDestroy {
     // Initialize swipe length values
     this.swipeLengthValue = this.swipeLengthStore.getSwipeLength();
     this.swipeLengthInput = this.swipeLengthValue;
+    // Initialize morning reminder config
+    const morningConfig = this.morningReminderService.getConfig();
+    this.morningReminderEnabled = morningConfig.enabled;
+    this.morningStartHour = morningConfig.startHour;
+    this.morningEndHour = morningConfig.endHour;
   }
 
   // Method to trigger Google Sign-in
@@ -243,5 +255,45 @@ export class ExportComponent implements OnDestroy {
       // Reset input to current valid value if invalid provided
       this.swipeLengthInput = this.swipeLengthValue;
     }
+  }
+
+  // Morning reminder methods
+  onMorningReminderToggle(event: Event): void {
+    this.morningReminderEnabled = (event.target as HTMLInputElement).checked;
+    this.morningReminderService.saveConfig({
+      enabled: this.morningReminderEnabled,
+      startHour: this.morningStartHour,
+      endHour: this.morningEndHour,
+    });
+  }
+
+  onSaveMorningReminder(): void {
+    if (this.morningStartHour >= 0 && this.morningStartHour < 24 &&
+        this.morningEndHour >= 0 && this.morningEndHour < 24 &&
+        this.morningStartHour < this.morningEndHour) {
+      this.morningReminderService.saveConfig({
+        enabled: this.morningReminderEnabled,
+        startHour: this.morningStartHour,
+        endHour: this.morningEndHour,
+      });
+    }
+  }
+
+  onTestMorningReminder(): void {
+    // Reset the "shown today" flag and trigger reminder
+    this.morningReminderService.resetTodayFlag();
+    this.morningReminderService
+      .checkAndShowMorningReminder()
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe(shown => {
+        if (!shown) {
+          // If browser notification didn't work, show in-app
+          this.morningReminderService.resetTodayFlag();
+          this.morningReminderService
+            .showInAppMorningReminder()
+            .pipe(first(), takeUntil(this.destroySubject))
+            .subscribe();
+        }
+      });
   }
 }

@@ -40,6 +40,7 @@ import { CalendarComponent } from '../common/calendar/calendar.component';
 import { DescriptionEditModalComponent } from './number-board/description-edit-modal.component';
 import { ExpenseEditModalComponent } from '../history/edit/expense-edit-modal.component';
 import { lineRemaining } from '../common/model/budget-summary/budget-summary.br-notifi-formatter';
+import { MorningReminderService } from '../common/service/morning-reminder.service';
 
 @Component({
   selector: 'app-expense',
@@ -93,7 +94,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private expenseService: ExpenseService,
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
-    private expenseSummaryService: BudgetSummaryService
+    private expenseSummaryService: BudgetSummaryService,
+    private morningReminderService: MorningReminderService
   ) {}
 
   ngOnInit(): void {
@@ -123,6 +125,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.showBudgetNotification = false;
       });
+
+    // Check and show morning reminder if applicable
+    this.morningReminderService
+      .checkAndShowMorningReminder()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe();
   }
 
   onCategoryClick(categoryName: string) {

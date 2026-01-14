@@ -118,4 +118,62 @@
       <button type="button" (click)="onSaveSwipeLength()" class="btn btn-primary bsd-save">Save</button>
     </div>
   </app-tab>
+  <app-tab key="reminders" label="Reminders">
+    <div style="margin-top:12px">
+      <div class="budget-start-row">
+        <label class="bsd-label">Morning Reminder:</label>
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            [checked]="morningReminderEnabled"
+            (change)="onMorningReminderToggle($event)"
+          />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="budget-start-row" *ngIf="morningReminderEnabled">
+        <label for="morningStartHour" class="bsd-label">Start Hour:</label>
+        <input
+          id="morningStartHour"
+          type="number"
+          min="0"
+          max="23"
+          [(ngModel)]="morningStartHour"
+          class="bsd-input"
+          style="width: 60px"
+        />
+      </div>
+      <div class="budget-start-row" *ngIf="morningReminderEnabled">
+        <label for="morningEndHour" class="bsd-label">End Hour:</label>
+        <input
+          id="morningEndHour"
+          type="number"
+          min="0"
+          max="23"
+          [(ngModel)]="morningEndHour"
+          class="bsd-input"
+          style="width: 60px"
+        />
+      </div>
+      <button 
+        type="button" 
+        (click)="onSaveMorningReminder()" 
+        class="btn btn-primary bsd-save"
+        *ngIf="morningReminderEnabled"
+      >
+        Save
+      </button>
+      <div class="reminder-info" *ngIf="morningReminderEnabled">
+        <small>☀️ Push notification will appear between {{ morningStartHour }}:00 and {{ morningEndHour }}:00 when you open the app</small>
+      </div>
+      <button 
+        type="button" 
+        (click)="onTestMorningReminder()" 
+        class="btn btn-secondary bsd-save"
+        style="margin-top: 8px;"
+      >
+        Test Now
+      </button>
+    </div>
+  </app-tab>
 </app-tabs-container>
