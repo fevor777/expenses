@@ -2,6 +2,67 @@
   >&lt; Back</span
 >
 <app-tabs-container [(active)]="activeTab">
+  <app-tab key="reminders" label="Reminders">
+    <div style="margin-top: 12px">
+      <div class="budget-start-row">
+        <label class="bsd-label">Morning Reminder:</label>
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            [checked]="morningReminderEnabled"
+            (change)="onMorningReminderToggle($event)"
+          />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="budget-start-row" *ngIf="morningReminderEnabled">
+        <label for="morningStartHour" class="bsd-label">Start Hour:</label>
+        <input
+          id="morningStartHour"
+          type="number"
+          min="0"
+          max="23"
+          [(ngModel)]="morningStartHour"
+          class="bsd-input"
+          style="width: 60px"
+        />
+      </div>
+      <div class="budget-start-row" *ngIf="morningReminderEnabled">
+        <label for="morningEndHour" class="bsd-label">End Hour:</label>
+        <input
+          id="morningEndHour"
+          type="number"
+          min="0"
+          max="23"
+          [(ngModel)]="morningEndHour"
+          class="bsd-input"
+          style="width: 60px"
+        />
+      </div>
+      <button
+        type="button"
+        (click)="onSaveMorningReminder()"
+        class="btn btn-primary bsd-save"
+        *ngIf="morningReminderEnabled"
+      >
+        Save
+      </button>
+      <div class="reminder-info" *ngIf="morningReminderEnabled">
+        <small
+          >☀️ Push notification will appear between {{ morningStartHour }}:00
+          and {{ morningEndHour }}:00 when you open the app</small
+        >
+      </div>
+      <button
+        type="button"
+        (click)="onTestMorningReminder()"
+        class="btn btn-secondary bsd-save"
+        style="margin-top: 8px"
+      >
+        Test Now
+      </button>
+    </div>
+  </app-tab>
   <app-tab key="general" label="General">
     <div style="margin-top: 12px">
       <div>
@@ -25,9 +86,7 @@
   <app-tab key="budget" label="Budget">
     <div style="margin-top: 12px">
       <div class="budget-start-row">
-        <label for="irregularBudgetValue" class="bsd-label"
-          >Budget:</label
-        >
+        <label for="irregularBudgetValue" class="bsd-label">Budget:</label>
         <input
           id="irregularBudgetValue"
           type="number"
@@ -37,12 +96,14 @@
         />
       </div>
       <div class="budget-start-row">
-        <label for="budgetStartDate" class="bsd-label">Start Budget Period:</label>
+        <label for="budgetStartDate" class="bsd-label"
+          >Start Budget Period:</label
+        >
         <input
           id="budgetStartDate"
           type="date"
           class="bsd-input"
-          [value]="budgetStartTs ? (budgetStartTs | date:'yyyy-MM-dd') : ''"
+          [value]="budgetStartTs ? (budgetStartTs | date: 'yyyy-MM-dd') : ''"
           (change)="onStartDateChange($event)"
         />
       </div>
@@ -60,7 +121,9 @@
         />
       </div>
       <div class="budget-start-row">
-        <label for="minDayLimit" class="bsd-label">Min Day Limit (exhaust):</label>
+        <label for="minDayLimit" class="bsd-label"
+          >Min Day Limit (exhaust):</label
+        >
         <input
           id="minDayLimit"
           type="number"
@@ -100,9 +163,11 @@
     </div>
   </app-tab>
   <app-tab key="swipe" label="Swipe">
-    <div style="margin-top:12px">
+    <div style="margin-top: 12px">
       <div class="budget-start-row">
-        <label for="swipeLengthInput" class="bsd-label">Global Swipe Length:</label>
+        <label for="swipeLengthInput" class="bsd-label"
+          >Global Swipe Length:</label
+        >
         <input
           id="swipeLengthInput"
           type="number"
@@ -115,64 +180,12 @@
         <span class="bsd-label">Current Value:</span>
         <span class="bsd-value">{{ swipeLengthValue }}</span>
       </div>
-      <button type="button" (click)="onSaveSwipeLength()" class="btn btn-primary bsd-save">Save</button>
-    </div>
-  </app-tab>
-  <app-tab key="reminders" label="Reminders">
-    <div style="margin-top:12px">
-      <div class="budget-start-row">
-        <label class="bsd-label">Morning Reminder:</label>
-        <label class="toggle-switch">
-          <input
-            type="checkbox"
-            [checked]="morningReminderEnabled"
-            (change)="onMorningReminderToggle($event)"
-          />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="budget-start-row" *ngIf="morningReminderEnabled">
-        <label for="morningStartHour" class="bsd-label">Start Hour:</label>
-        <input
-          id="morningStartHour"
-          type="number"
-          min="0"
-          max="23"
-          [(ngModel)]="morningStartHour"
-          class="bsd-input"
-          style="width: 60px"
-        />
-      </div>
-      <div class="budget-start-row" *ngIf="morningReminderEnabled">
-        <label for="morningEndHour" class="bsd-label">End Hour:</label>
-        <input
-          id="morningEndHour"
-          type="number"
-          min="0"
-          max="23"
-          [(ngModel)]="morningEndHour"
-          class="bsd-input"
-          style="width: 60px"
-        />
-      </div>
-      <button 
-        type="button" 
-        (click)="onSaveMorningReminder()" 
+      <button
+        type="button"
+        (click)="onSaveSwipeLength()"
         class="btn btn-primary bsd-save"
-        *ngIf="morningReminderEnabled"
       >
         Save
-      </button>
-      <div class="reminder-info" *ngIf="morningReminderEnabled">
-        <small>☀️ Push notification will appear between {{ morningStartHour }}:00 and {{ morningEndHour }}:00 when you open the app</small>
-      </div>
-      <button 
-        type="button" 
-        (click)="onTestMorningReminder()" 
-        class="btn btn-secondary bsd-save"
-        style="margin-top: 8px;"
-      >
-        Test Now
       </button>
     </div>
   </app-tab>

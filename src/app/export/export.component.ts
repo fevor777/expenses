@@ -32,7 +32,7 @@ import { MorningReminderService, MorningReminderConfig } from '../common/service
   ],
 })
 export class ExportComponent implements OnDestroy {
-  activeTab = 'general';
+  activeTab = 'reminders';
   savings$!: Observable<number>;
   savingsValue: number = 0;
   user$: Observable<User>;
