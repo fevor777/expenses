@@ -161,7 +161,7 @@ export class MorningReminderService {
 
     // Days left
     if (summary.daysLeft !== undefined) {
-      lines.push(`📅 Дней до конца: ${summary.daysLeft}`);
+      lines.push(`📅 Дней до конца периода: ${summary.daysLeft}`);
     }
 
     // Yesterday comparison (if available from meta)
