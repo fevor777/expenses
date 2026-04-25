@@ -93,12 +93,16 @@ export class CalculatorModalComponent {
       const safeExp = this.expression.replace(/[^0-9+\-*/().]/g, '');
       // eslint-disable-next-line no-new-func
       const result = Function(`"use strict"; return (${safeExp})`)();
-      const normalized = (result ?? 0);
+      const normalized = this.normalizeResult(result);
+      if (normalized === null) {
+        this.cancel.emit();
+        return;
+      }
       // If result is numerically zero, emit empty string per requirement
-      if (Number(normalized) === 0) {
+      if (normalized === 0) {
         this.apply.emit('');
       } else {
-        this.apply.emit(normalized.toString());
+        this.apply.emit(this.formatResult(normalized));
       }
     } catch {
       this.cancel.emit();
@@ -110,7 +114,11 @@ export class CalculatorModalComponent {
       const safeExp = this.expression.replace(/[^0-9+\-*/().]/g, '');
       // eslint-disable-next-line no-new-func
       const result = Function(`"use strict"; return (${safeExp})`)();
-      this.expression = (result ?? 0).toString();
+      const normalized = this.normalizeResult(result);
+      if (normalized === null) {
+        return;
+      }
+      this.expression = this.formatResult(normalized);
       this.caretPos = this.expression.length;
     } catch {
       // Keep expression unchanged on error
@@ -166,5 +174,19 @@ export class CalculatorModalComponent {
         el.setSelectionRange(this.caretPos, this.caretPos);
       }
     });
+  }
+
+  private normalizeResult(result: unknown): number | null {
+    const numericResult = Number(result);
+    if (!Number.isFinite(numericResult)) {
+      return null;
+    }
+
+    const rounded = Math.round((numericResult + Number.EPSILON) * 100) / 100;
+    return Object.is(rounded, -0) ? 0 : rounded;
+  }
+
+  private formatResult(result: number): string {
+    return result === 0 ? '0' : result.toString();
   }
 }
