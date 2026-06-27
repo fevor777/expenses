@@ -1,5 +1,11 @@
 import type { Firestore } from 'firebase-admin/firestore';
-import type { BudgetDocument } from '../domain/models.js';
+import {
+  canonicalizeBudget,
+  DEFAULT_BUDGET,
+  roundCurrency,
+  type BudgetDocument,
+  type UpdateBudgetInput,
+} from '../domain/models.js';
 
 export class SettingsRepository {
   constructor(
@@ -19,17 +25,43 @@ export class SettingsRepository {
 
     const value = document.data() ?? {};
 
-    return {
+    return canonicalizeBudget({
       uid: this.ownerUid,
-      value: Number(value.value ?? 0),
-      period: Number(value.period ?? 30),
+      value: Number(value.value ?? DEFAULT_BUDGET.value),
+      period: Number(value.period ?? DEFAULT_BUDGET.period),
       ...(value.periodStartTs !== undefined
         ? { periodStartTs: Number(value.periodStartTs) }
         : {}),
       ...(value.minDayLimit !== undefined
         ? { minDayLimit: Number(value.minDayLimit) }
         : {}),
-    };
+    });
+  }
+
+  async updateBudget(input: UpdateBudgetInput): Promise<BudgetDocument> {
+    const existing = await this.getBudget();
+    const budget = canonicalizeBudget({
+      uid: this.ownerUid,
+      value: input.value ?? existing?.value ?? DEFAULT_BUDGET.value,
+      period: input.period ?? existing?.period ?? DEFAULT_BUDGET.period,
+      ...(input.periodStartTs !== undefined
+        ? { periodStartTs: input.periodStartTs }
+        : existing?.periodStartTs !== undefined
+          ? { periodStartTs: existing.periodStartTs }
+          : {}),
+      ...(input.minDayLimit !== undefined
+        ? { minDayLimit: input.minDayLimit }
+        : existing?.minDayLimit !== undefined
+          ? { minDayLimit: existing.minDayLimit }
+          : {}),
+    });
+
+    await this.firestore
+      .collection('irregularBudget')
+      .doc(this.ownerUid)
+      .set(budget);
+
+    return budget;
   }
 
   async getSavings(): Promise<number> {
@@ -38,6 +70,17 @@ export class SettingsRepository {
       return 0;
     }
 
-    return Number(document.data()?.value ?? 0);
+    return roundCurrency(Number(document.data()?.value ?? 0));
+  }
+
+  async updateSavings(value: number): Promise<number> {
+    const savings = roundCurrency(value);
+
+    await this.firestore.collection('savings').doc(this.ownerUid).set({
+      uid: this.ownerUid,
+      value: savings,
+    });
+
+    return savings;
   }
 }

@@ -8,6 +8,10 @@ const categoryIds = CATEGORY_DEFINITIONS.map(category => category.id) as [
 
 export const categoryIdSchema = z.enum(categoryIds);
 
+export const noInputShape = {};
+
+export const noInputSchema = z.object(noInputShape).strict();
+
 export const expenseFilterShape = {
   startDate: z.number().int().nonnegative().optional(),
   endDate: z.number().int().nonnegative().optional(),
@@ -69,12 +73,56 @@ export const updateExpenseSchema = z
     'At least one mutable field must be provided'
   );
 
+export const updateBudgetShape = {
+  value: z.number().finite().min(0).optional(),
+  period: z.number().int().min(1).max(120).optional(),
+  periodStartTs: z.number().int().nonnegative().optional(),
+  minDayLimit: z.number().finite().min(0).optional(),
+};
+
+export const updateBudgetSchema = z
+  .object(updateBudgetShape)
+  .strict()
+  .refine(
+    value =>
+      value.value !== undefined ||
+      value.period !== undefined ||
+      value.periodStartTs !== undefined ||
+      value.minDayLimit !== undefined,
+    'At least one budget field must be provided'
+  );
+
+export const savingsValueShape = {
+  value: z.number().finite().min(0),
+};
+
+export const savingsValueSchema = z.object(savingsValueShape).strict();
+
 export const monthlySummaryShape = {
   includeCategoryBreakdown: z.boolean().optional(),
 };
 
 export const monthlySummarySchema = z
   .object(monthlySummaryShape)
+  .strict();
+
+export const monthPeriodSummaryShape = {
+  year: z.number().int().min(1970).max(3000),
+  month: z.number().int().min(1).max(12),
+  includeCategoryBreakdown: z.boolean().optional(),
+};
+
+export const monthPeriodSummarySchema = z
+  .object(monthPeriodSummaryShape)
+  .strict();
+
+export const budgetPeriodSummaryShape = {
+  includeCategoryBreakdown: z.boolean().optional(),
+  periodOffset: z.number().int().min(-24).max(24).optional(),
+};
+
+export const budgetPeriodSummarySchema = z
+  .object(budgetPeriodSummaryShape)
   .strict();
 
 export const exportExpensesShape = {

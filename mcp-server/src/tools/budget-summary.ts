@@ -4,30 +4,34 @@ import {
   monthlySummaryShape,
 } from '../domain/schemas.js';
 import {
-  buildCurrentMonthFrame,
-  summarizeMonthlyExpenses,
+  buildRollingBudgetFrame,
+  summarizeExpensesForFrame,
 } from '../domain/summaries.js';
 import type { ToolDependencies } from './shared.js';
 import { executeTool, jsonResult } from './shared.js';
 
-export function registerMonthlySummaryTool(
+export function registerBudgetSummaryTool(
   server: McpServer,
   deps: ToolDependencies
 ): void {
   server.tool(
-    'monthly_summary',
-    'Return a summary for the current calendar month. This tool is not budget-based and includes all expenses in the month-to-date window.',
+    'budget_summary',
+    'Return the current rolling budget summary for the active budget period. Remaining budget uses only expenses where includeInBalance is true, and the active frame is derived from the configured budget start date and duration.',
     monthlySummaryShape,
     async input => {
       const args = monthlySummarySchema.parse(input);
-      return executeTool(deps, 'monthly_summary', async () => {
-        const frame = buildCurrentMonthFrame();
+      return executeTool(deps, 'budget_summary', async () => {
+        const budget = await deps.settingsRepository.getBudget();
+        const savings = await deps.settingsRepository.getSavings();
+        const frame = buildRollingBudgetFrame(budget);
         const expenses = await deps.expensesRepository.listInRange(
           frame.start,
           frame.finish
         );
-        const summary = summarizeMonthlyExpenses(
+        const summary = summarizeExpensesForFrame(
           expenses,
+          budget,
+          savings,
           frame,
           args.includeCategoryBreakdown ?? false
         );

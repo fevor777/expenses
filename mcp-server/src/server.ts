@@ -11,17 +11,27 @@ import {
 } from './auth.js';
 import { resolveRequestOwnerUid } from './firebase-user-resolver.js';
 import { getFirestoreClient } from './firestore/client.js';
+import { registerExpenseAnalysisPrompts } from './prompts/expense-analysis.js';
 import { ExpensesRepository } from './firestore/expenses.repository.js';
 import { SettingsRepository } from './firestore/settings.repository.js';
 import { registerOAuthBrokerRoutes } from './oauth-broker.js';
 import { registerCreateExpenseTool } from './tools/create-expense.js';
+import { registerBudgetPeriodSummaryTool } from './tools/budget-period-summary.js';
+import { registerBudgetSummaryTool } from './tools/budget-summary.js';
+import { registerDeleteExpenseTool } from './tools/delete-expense.js';
 import { registerExportExpensesTool } from './tools/export-expenses.js';
+import { registerGetBudgetTool } from './tools/get-budget.js';
 import { registerGetExpenseTool } from './tools/get-expense.js';
+import { registerGetSavingsTool } from './tools/get-savings.js';
+import { registerListCategoriesTool } from './tools/list-categories.js';
 import { registerListExpensesTool } from './tools/list-expenses.js';
+import { registerMonthPeriodSummaryTool } from './tools/month-period-summary.js';
 import { registerMonthlySummaryTool } from './tools/monthly-summary.js';
 import { registerSearchExpensesTool } from './tools/search-expenses.js';
 import { type ToolDependencies } from './tools/shared.js';
+import { registerUpdateBudgetTool } from './tools/update-budget.js';
 import { registerUpdateExpenseTool } from './tools/update-expense.js';
+import { registerUpdateSavingsTool } from './tools/update-savings.js';
 
 export function createHttpApp(config: AppConfig, logger: Logger): Express {
   const firestore = getFirestoreClient(config);
@@ -105,11 +115,22 @@ function buildMcpServer(deps: ToolDependencies): McpServer {
     version: '0.1.0',
   });
 
+  registerExpenseAnalysisPrompts(server);
+
   registerListExpensesTool(server, deps);
   registerSearchExpensesTool(server, deps);
   registerGetExpenseTool(server, deps);
+  registerDeleteExpenseTool(server, deps);
+  registerBudgetSummaryTool(server, deps);
+  registerBudgetPeriodSummaryTool(server, deps);
   registerMonthlySummaryTool(server, deps);
+  registerMonthPeriodSummaryTool(server, deps);
   registerExportExpensesTool(server, deps);
+  registerListCategoriesTool(server, deps);
+  registerGetBudgetTool(server, deps);
+  registerUpdateBudgetTool(server, deps);
+  registerGetSavingsTool(server, deps);
+  registerUpdateSavingsTool(server, deps);
   registerCreateExpenseTool(server, deps);
   registerUpdateExpenseTool(server, deps);
 

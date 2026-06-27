@@ -7,12 +7,40 @@ Standalone MCP runtime for the Expenses app. It exposes Firestore-backed tools o
 - `list_expenses`
 - `search_expenses`
 - `get_expense`
+- `delete_expense`
+- `budget_summary`
+- `budget_period_summary`
 - `monthly_summary`
+- `month_period_summary`
 - `export_expenses`
+- `list_categories`
+- `get_budget`
+- `update_budget`
+- `get_savings`
+- `update_savings`
 - `create_expense`
 - `update_expense`
 
 In `AUTH_MODE=oauth`, the server resolves the authenticated OAuth user to a Firebase user and scopes all queries to that Firebase uid. In legacy bearer mode, queries remain hard-scoped to `EXPENSES_OWNER_UID`.
+
+## Prompt templates
+
+- `analyze_expenses_today`
+- `analyze_expenses_yesterday`
+- `analyze_expenses_week`
+- `analyze_expenses_month`
+
+These prompts return reusable Russian-language analysis instructions for ChatGPT-compatible MCP clients. Each prompt tells the client to call `list_expenses` for the requested period and for the previous comparable period so the response includes a direct comparison.
+
+Budget-oriented summary tools use budget semantics, not calendar-month semantics:
+
+- remaining budget is calculated only from expenses where `includeInBalance = true`
+- the active budget frame comes from the configured budget start date and period length
+- therefore the budget period may start/end on dates that do not match the start/end of a calendar month
+
+`monthly_summary` is different: it returns a current calendar month summary and is not tied to budget settings.
+
+`month_period_summary` returns a full arbitrary calendar month by `year` and `month`, also independent from budget settings.
 
 ## Environment
 

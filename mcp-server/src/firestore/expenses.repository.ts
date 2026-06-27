@@ -92,6 +92,16 @@ export class ExpensesRepository {
     return updatedExpense;
   }
 
+  async delete(id: string): Promise<string> {
+    const existing = await this.getById(id);
+    if (!existing) {
+      throw new Error(`Expense ${id} not found`);
+    }
+
+    await this.firestore.collection('expenses').doc(existing.id).delete();
+    return existing.id;
+  }
+
   private baseQuery(): Query {
     return this.firestore.collection('expenses').where('uid', '==', this.ownerUid);
   }

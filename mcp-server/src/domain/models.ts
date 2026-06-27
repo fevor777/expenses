@@ -42,6 +42,13 @@ export type UpdateExpenseInput = {
   includeInBalance?: boolean;
 };
 
+export type UpdateBudgetInput = {
+  value?: number;
+  period?: number;
+  periodStartTs?: number;
+  minDayLimit?: number;
+};
+
 export type BudgetDocument = {
   uid?: string;
   value: number;
@@ -85,6 +92,20 @@ export function canonicalizeExpense(
       : {}),
     includeInBalance:
       expense.includeInBalance ?? getDefaultIncludeInBalance(expense.category),
+  };
+}
+
+export function canonicalizeBudget(budget: BudgetDocument): BudgetDocument {
+  return {
+    ...(budget.uid ? { uid: budget.uid } : {}),
+    value: roundCurrency(budget.value),
+    period: Math.trunc(budget.period),
+    ...(budget.periodStartTs !== undefined
+      ? { periodStartTs: Math.trunc(budget.periodStartTs) }
+      : {}),
+    ...(budget.minDayLimit !== undefined
+      ? { minDayLimit: roundCurrency(budget.minDayLimit) }
+      : {}),
   };
 }
 
