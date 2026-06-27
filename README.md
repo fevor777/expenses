@@ -19,6 +19,29 @@ npm run android:apk
 
 The web app running inside the WebView will call the native bridge via `window.NativeAuth.requestGoogleSignIn()`; on success the native layer forwards the ID token to the web app (`window.onNativeGoogleIdToken`).
 
+## MCP
+
+The repository includes project-level MCP client configs for the standalone server in `mcp-server/`:
+
+- Claude Code: `.mcp.json`
+- VS Code: `.vscode/mcp.json`
+- Cursor: `.cursor/mcp.json`
+
+Local usage:
+
+```bash
+export EXPENSES_OWNER_UID="your-firebase-uid"
+export MCP_BEARER_TOKEN="replace-with-long-random-token"
+export FIREBASE_PROJECT_ID="your-gcp-project"
+npm run mcp:dev
+```
+
+Notes:
+
+- Claude Code reads `MCP_BEARER_TOKEN` from your shell and uses `EXPENSES_MCP_URL` if you want to override `http://localhost:8080/mcp`.
+- VS Code prompts for the MCP URL and bearer token from `.vscode/mcp.json`.
+- Cursor reads `MCP_BEARER_TOKEN` from your environment and targets `http://localhost:8080/mcp` by default.
+
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 

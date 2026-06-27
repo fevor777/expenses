@@ -4,10 +4,16 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { Logger } from 'pino';
 import type { AppConfig } from './config.js';
-import { createBearerAuth, buildCallerFingerprint } from './auth.js';
+import {
+  buildCallerFingerprint,
+  createAuthMiddleware,
+  OAUTH_RESOURCE_METADATA_PATH,
+} from './auth.js';
+import { resolveRequestOwnerUid } from './firebase-user-resolver.js';
 import { getFirestoreClient } from './firestore/client.js';
 import { ExpensesRepository } from './firestore/expenses.repository.js';
 import { SettingsRepository } from './firestore/settings.repository.js';
+import { registerOAuthBrokerRoutes } from './oauth-broker.js';
 import { registerCreateExpenseTool } from './tools/create-expense.js';
 import { registerExportExpensesTool } from './tools/export-expenses.js';
 import { registerGetExpenseTool } from './tools/get-expense.js';
@@ -19,26 +25,39 @@ import { registerUpdateExpenseTool } from './tools/update-expense.js';
 
 export function createHttpApp(config: AppConfig, logger: Logger): Express {
   const firestore = getFirestoreClient(config);
-  const toolDependencies: ToolDependencies = {
-    config,
-    logger,
-    expensesRepository: new ExpensesRepository(firestore, config.ownerUid),
-    settingsRepository: new SettingsRepository(firestore, config.ownerUid),
-  };
 
   const app = express();
   app.disable('x-powered-by');
+  app.set('trust proxy', true);
   app.use(express.json({ limit: '256kb' }));
+  app.use(express.urlencoded({ extended: false }));
   app.use(createRequestLogger(logger));
   app.get('/healthz', (_req, res) => {
     res.status(200).json({ ok: true });
   });
+  registerOAuthBrokerRoutes(app, config, logger);
 
-  const auth = createBearerAuth(config.bearerToken);
+  const oauthConfig = config.oauth;
+  if (oauthConfig) {
+    app.get(OAUTH_RESOURCE_METADATA_PATH, (_req, res) => {
+      res.status(200).json({
+        resource: oauthConfig.audience,
+        authorization_servers: [oauthConfig.authorizationServer],
+        bearer_methods_supported: ['header'],
+        scopes_supported: ['expenses.read', 'expenses.write'],
+        resource_name: 'Expenses MCP',
+      });
+    });
+  }
+
+  const auth = createAuthMiddleware(config);
   const rateLimiter = createRateLimitMiddleware(config.requestsPerMinute);
 
   app.all('/mcp', auth, rateLimiter, async (req, res, next) => {
-    const server = buildMcpServer(toolDependencies);
+    const ownerUid = await resolveRequestOwnerUid(req, config, logger);
+    const server = buildMcpServer(
+      createToolDependencies(config, logger, firestore, ownerUid)
+    );
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
     });
@@ -56,13 +75,28 @@ export function createHttpApp(config: AppConfig, logger: Logger): Express {
 
   app.use((error: unknown, _req: Request, res: Response, _next: express.NextFunction) => {
     const message = error instanceof Error ? error.message : 'Unexpected error';
-    logger.error({ error: message }, 'Unhandled request error');
+    const statusCode = getErrorStatusCode(error);
+    logger.error({ error: message, statusCode }, 'Unhandled request error');
     if (!res.headersSent) {
-      res.status(500).json({ error: message });
+      res.status(statusCode).json({ error: message });
     }
   });
 
   return app;
+}
+
+function createToolDependencies(
+  config: AppConfig,
+  logger: Logger,
+  firestore: ReturnType<typeof getFirestoreClient>,
+  ownerUid: string
+): ToolDependencies {
+  return {
+    config,
+    logger,
+    expensesRepository: new ExpensesRepository(firestore, ownerUid),
+    settingsRepository: new SettingsRepository(firestore, ownerUid),
+  };
 }
 
 function buildMcpServer(deps: ToolDependencies): McpServer {
@@ -101,6 +135,21 @@ function createRequestLogger(logger: Logger) {
     });
     next();
   };
+}
+
+function getErrorStatusCode(error: unknown): number {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'statusCode' in error &&
+    typeof error.statusCode === 'number' &&
+    error.statusCode >= 400 &&
+    error.statusCode < 600
+  ) {
+    return error.statusCode;
+  }
+
+  return 500;
 }
 
 function createRateLimitMiddleware(requestsPerMinute: number) {

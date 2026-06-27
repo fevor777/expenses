@@ -9,7 +9,7 @@ export function registerCreateExpenseTool(
 ): void {
   server.tool(
     'create_expense',
-    'Create a new expense for the configured owner.',
+    'Create a new expense for the authenticated Firebase user.',
     createExpenseShape,
     async input => {
       const args = createExpenseSchema.parse(input);

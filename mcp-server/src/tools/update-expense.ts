@@ -9,7 +9,7 @@ export function registerUpdateExpenseTool(
 ): void {
   server.tool(
     'update_expense',
-    'Update mutable fields of an existing expense owned by the configured user.',
+    'Update mutable fields of an existing expense owned by the authenticated Firebase user.',
     updateExpenseShape,
     async input => {
       const args = updateExpenseSchema.parse(input);

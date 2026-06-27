@@ -10,8 +10,9 @@ async function main(): Promise<void> {
   app.listen(config.port, () => {
     logger.info(
       {
+        authMode: config.authMode,
+        ...(config.ownerUid ? { defaultOwnerUid: config.ownerUid } : {}),
         port: config.port,
-        ownerUid: config.ownerUid,
       },
       'expenses-mcp listening'
     );

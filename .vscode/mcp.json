@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "expenses": {
+      "type": "http",
+      "url": "https://expenses-mcp-kxj4h4t3fq-ew.a.run.app/mcp"
+    }
+  }
+}

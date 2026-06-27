@@ -9,7 +9,7 @@ export function registerGetExpenseTool(
 ): void {
   server.tool(
     'get_expense',
-    'Fetch a single expense by id for the configured owner.',
+    'Fetch a single expense by id for the authenticated Firebase user.',
     expenseIdShape,
     async input => {
       const args = expenseIdSchema.parse(input);
