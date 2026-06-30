@@ -27,6 +27,7 @@ export type ExpenseDocument = {
   currency: string;
   date: number;
   description?: string;
+  tagIds?: string[];
   includeInBalance?: boolean;
 };
 
@@ -39,7 +40,24 @@ export type UpdateExpenseInput = {
   currency?: string;
   date?: number;
   description?: string;
+  tagIds?: string[];
   includeInBalance?: boolean;
+};
+
+export type TagDocument = {
+  id: string;
+  uid: string;
+  name: string;
+  normalizedName: string;
+  star?: boolean;
+};
+
+export type CreateTagInput = Omit<TagDocument, 'id' | 'uid' | 'normalizedName'>;
+
+export type UpdateTagInput = {
+  id: string;
+  name?: string;
+  star?: boolean;
 };
 
 export type UpdateBudgetInput = {
@@ -77,9 +95,32 @@ export function normalizeDescription(
   return value ? value : undefined;
 }
 
+export function normalizeTagName(name?: string): string | undefined {
+  const value = name?.replace(/\s+/g, ' ').trim().toLowerCase();
+  return value ? value : undefined;
+}
+
+export function normalizeTagIds(tagIds?: string[]): string[] | undefined {
+  if (!Array.isArray(tagIds) || tagIds.length === 0) {
+    return undefined;
+  }
+
+  const normalized = Array.from(
+    new Set(
+      tagIds
+        .filter((tagId): tagId is string => typeof tagId === 'string')
+        .map(tagId => tagId.trim())
+        .filter(Boolean)
+    )
+  ).sort((left, right) => left.localeCompare(right));
+
+  return normalized.length > 0 ? normalized : undefined;
+}
+
 export function canonicalizeExpense(
   expense: ExpenseDocument | (CreateExpenseInput & { id: string; uid: string })
 ): ExpenseDocument {
+  const tagIds = normalizeTagIds(expense.tagIds);
   return {
     id: expense.id,
     uid: expense.uid,
@@ -90,8 +131,26 @@ export function canonicalizeExpense(
     ...(normalizeDescription(expense.description)
       ? { description: normalizeDescription(expense.description) }
       : {}),
+    ...(tagIds ? { tagIds } : {}),
     includeInBalance:
       expense.includeInBalance ?? getDefaultIncludeInBalance(expense.category),
+  };
+}
+
+export function canonicalizeTag(
+  tag: TagDocument | (CreateTagInput & { id: string; uid: string })
+): TagDocument {
+  const normalizedName = normalizeTagName(tag.name);
+  if (!normalizedName) {
+    throw new Error('Tag name is required');
+  }
+
+  return {
+    id: tag.id,
+    uid: tag.uid,
+    name: tag.name.replace(/\s+/g, ' ').trim(),
+    normalizedName,
+    star: tag.star === true,
   };
 }
 

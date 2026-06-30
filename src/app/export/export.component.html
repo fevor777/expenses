@@ -83,6 +83,57 @@
       </div>
     </div>
   </app-tab>
+  <app-tab key="tags" label="Tags">
+    <div class="tag-settings">
+      <div class="tag-settings__row">
+        <label for="tagDraft" class="bsd-label">New tag:</label>
+        <input
+          id="tagDraft"
+          type="text"
+          [(ngModel)]="tagDraft"
+          class="bsd-input tag-settings__input"
+          placeholder="e.g. groceries"
+          (keyup.enter)="addTag()"
+        />
+        <button type="button" class="btn btn-primary bsd-save" (click)="addTag()">
+          Add
+        </button>
+      </div>
+
+      <div class="tag-settings__hint">
+        Теги хранятся отдельно в базе и затем привязываются к расходам по id.
+      </div>
+
+      <div class="tag-settings__empty" *ngIf="(tags$ | async)?.length === 0">
+        No tags yet.
+      </div>
+
+      <div class="tag-settings__list" *ngIf="(tags$ | async)?.length">
+        <div class="tag-settings__item" *ngFor="let tag of tags$ | async">
+          <div class="tag-settings__meta">
+            <span class="badge">{{ tag.name }}</span>
+            <span class="tag-settings__normalized">{{ tag.normalizedName }}</span>
+            <label class="tag-settings__star-toggle">
+              <input
+                type="checkbox"
+                [checked]="tag.star === true"
+                (change)="toggleTagStar(tag, $event)"
+              />
+              <span>Star</span>
+            </label>
+          </div>
+          <div class="tag-settings__actions">
+            <button type="button" class="btn btn-secondary bsd-save" (click)="renameTag(tag)">
+              Rename
+            </button>
+            <button type="button" class="btn btn-secondary bsd-save" (click)="deleteTag(tag)">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </app-tab>
   <app-tab key="budget" label="Budget">
     <div style="margin-top: 12px">
       <div class="budget-start-row">

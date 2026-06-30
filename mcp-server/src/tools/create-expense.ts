@@ -20,6 +20,7 @@ export function registerCreateExpenseTool(
           currency: args.currency ?? 'EUR',
           date: args.date,
           ...(args.description !== undefined ? { description: args.description } : {}),
+          ...(args.tagIds !== undefined ? { tagIds: args.tagIds } : {}),
           ...(args.includeInBalance !== undefined
             ? { includeInBalance: args.includeInBalance }
             : {}),

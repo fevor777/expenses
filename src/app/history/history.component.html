@@ -44,6 +44,7 @@
         <app-history-item
           *ngFor="let item of expenses"
           [item]="item"
+          [tagNamesById]="tagNamesById"
           [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
           (editIconClick)="updateExpense($event)"
           (filterByCategory)="filterByCategory($event)"

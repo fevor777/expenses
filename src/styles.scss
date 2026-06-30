@@ -185,8 +185,9 @@ small,
   padding: 3px 8px;
   font-size: 11px;
   border-radius: 999px;
-  background: var(--color-primary-alpha);
-  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 18%, white 82%);
+  color: color-mix(in srgb, var(--color-primary) 72%, #5b3a00 28%);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 52%, white 48%);
   font-weight: 600;
   letter-spacing: 0.3px;
 }

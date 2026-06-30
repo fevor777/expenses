@@ -8,6 +8,8 @@ import { NotificationService } from './notification.service';
 import { BudgetSummaryService } from '../../service/budget-summary.service';
 import { ExpenseService } from '../../service/expense.service';
 import { PeriodSummaryIconComponent } from '../period-summary-icon/period-summary-icon.component';
+import { TagService } from '../../service/tag.service';
+import { TagSelectorComponent } from '../tag-selector/tag-selector.component';
 
 type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
 
@@ -16,7 +18,7 @@ type NotificationVariant = 'info' | 'success' | 'error' | 'warning';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, PeriodSummaryIconComponent],
+  imports: [CommonModule, FormsModule, PeriodSummaryIconComponent, TagSelectorComponent],
 })
 export class NotificationComponent implements OnDestroy {
   message = '';
@@ -28,6 +30,7 @@ export class NotificationComponent implements OnDestroy {
   // extra UI for expense-added context
   isExpenseAddedContext = false;
   lastExpense: any = null; // made public for template binding
+  tagNamesById: Record<string, string> = {};
   editableDescription: string = '';
   savingDescription = false;
   // animation flag for newly added budget info icon
@@ -42,8 +45,19 @@ export class NotificationComponent implements OnDestroy {
     private notificationService: NotificationService,
     private router: Router,
     private expenseSummaryService: BudgetSummaryService,
-    private expenseService: ExpenseService
+    private expenseService: ExpenseService,
+    private tagService: TagService
   ) {
+    this.tagService
+      .getTags()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(tags => {
+        this.tagNamesById = (tags || []).reduce(
+          (acc, tag) => ({ ...acc, [tag.id]: tag.name }),
+          {}
+        );
+      });
+
     this.notificationService.message$
       .pipe(takeUntil(this.destroySubject))
       .subscribe((payload: any) => {
@@ -98,25 +112,38 @@ export class NotificationComponent implements OnDestroy {
     this.setUtilValues(variant);
   }
 
-  appendMark(mark: string) {
-    if (!this.isExpenseAddedContext || !this.lastExpense) return;
-    const desc: string = (this.lastExpense.description || '').trim();
-    // Prevent duplicate marks
-    if (desc.endsWith(mark.trim())) return; // avoid duplicates irrespective of leading space
-    const updated = desc + mark;
-    const originalDesc = desc;
-    this.lastExpense.description = updated;
-    // optimistic UI update
-    try {
-      // this.message = this.message.replace(originalDesc, updated);
-    } catch {}
-    // Persist to backend if id present
-    if (this.lastExpense.id) {
-      this.expenseService
-        .updateExpense({ ...this.lastExpense })
-        .pipe(takeUntil(this.destroySubject))
-        .subscribe();
+  get expenseTagNames(): string[] {
+    if (!this.lastExpense?.tagIds?.length) {
+      return [];
     }
+
+    return this.lastExpense.tagIds
+      .map((tagId: string) => this.tagNamesById[tagId] || tagId)
+      .filter(Boolean);
+  }
+
+  onTagIdsChange(tagIds: string[]): void {
+    if (!this.lastExpense) {
+      return;
+    }
+
+    this.lastExpense = {
+      ...this.lastExpense,
+      tagIds: tagIds || [],
+    };
+
+    if (!this.lastExpense.id) {
+      return;
+    }
+
+    this.savingDescription = true;
+    this.expenseService
+      .updateExpense({ ...this.lastExpense })
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: () => (this.savingDescription = false),
+        error: () => (this.savingDescription = false),
+      });
   }
 
   saveDescription() {

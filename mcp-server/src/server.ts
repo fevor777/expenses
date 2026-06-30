@@ -14,10 +14,13 @@ import { getFirestoreClient } from './firestore/client.js';
 import { registerExpenseAnalysisPrompts } from './prompts/expense-analysis.js';
 import { ExpensesRepository } from './firestore/expenses.repository.js';
 import { SettingsRepository } from './firestore/settings.repository.js';
+import { TagsRepository } from './firestore/tags.repository.js';
 import { registerOAuthBrokerRoutes } from './oauth-broker.js';
 import { registerCreateExpenseTool } from './tools/create-expense.js';
+import { registerCreateTagTool } from './tools/create-tag.js';
 import { registerBudgetPeriodSummaryTool } from './tools/budget-period-summary.js';
 import { registerBudgetSummaryTool } from './tools/budget-summary.js';
+import { registerDeleteTagTool } from './tools/delete-tag.js';
 import { registerDeleteExpenseTool } from './tools/delete-expense.js';
 import { registerExportExpensesTool } from './tools/export-expenses.js';
 import { registerGetBudgetTool } from './tools/get-budget.js';
@@ -25,10 +28,12 @@ import { registerGetExpenseTool } from './tools/get-expense.js';
 import { registerGetSavingsTool } from './tools/get-savings.js';
 import { registerListCategoriesTool } from './tools/list-categories.js';
 import { registerListExpensesTool } from './tools/list-expenses.js';
+import { registerListTagsTool } from './tools/list-tags.js';
 import { registerMonthPeriodSummaryTool } from './tools/month-period-summary.js';
 import { registerMonthlySummaryTool } from './tools/monthly-summary.js';
 import { registerSearchExpensesTool } from './tools/search-expenses.js';
 import { type ToolDependencies } from './tools/shared.js';
+import { registerUpdateTagTool } from './tools/update-tag.js';
 import { registerUpdateBudgetTool } from './tools/update-budget.js';
 import { registerUpdateExpenseTool } from './tools/update-expense.js';
 import { registerUpdateSavingsTool } from './tools/update-savings.js';
@@ -106,6 +111,7 @@ function createToolDependencies(
     logger,
     expensesRepository: new ExpensesRepository(firestore, ownerUid),
     settingsRepository: new SettingsRepository(firestore, ownerUid),
+    tagsRepository: new TagsRepository(firestore, ownerUid),
   };
 }
 
@@ -127,10 +133,14 @@ function buildMcpServer(deps: ToolDependencies): McpServer {
   registerMonthPeriodSummaryTool(server, deps);
   registerExportExpensesTool(server, deps);
   registerListCategoriesTool(server, deps);
+  registerListTagsTool(server, deps);
   registerGetBudgetTool(server, deps);
   registerUpdateBudgetTool(server, deps);
   registerGetSavingsTool(server, deps);
   registerUpdateSavingsTool(server, deps);
+  registerCreateTagTool(server, deps);
+  registerUpdateTagTool(server, deps);
+  registerDeleteTagTool(server, deps);
   registerCreateExpenseTool(server, deps);
   registerUpdateExpenseTool(server, deps);
 

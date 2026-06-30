@@ -18,6 +18,7 @@ import { HistoryExpense } from '../history-expense';
 export class HistoryItemComponent {
   @Input() item: HistoryExpense;
   @Input() totalAmountPerDays: number;
+  @Input() tagNamesById: Record<string, string> = {};
 
   @Output() editIconClick: EventEmitter<HistoryExpense> =
     new EventEmitter();
@@ -43,5 +44,15 @@ export class HistoryItemComponent {
 
   onExcludeFromBudget(expense: HistoryExpense): void {
     this.excludeFromBudgetClick.emit(expense);
+  }
+
+  getTagNames(tagIds?: string[]): string[] {
+    if (!Array.isArray(tagIds) || tagIds.length === 0) {
+      return [];
+    }
+
+    return tagIds
+      .map(tagId => this.tagNamesById[tagId] || tagId)
+      .filter(Boolean);
   }
 }

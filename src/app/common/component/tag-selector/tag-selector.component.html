@@ -1,0 +1,40 @@
+<div
+  class="tag-selector"
+  [class.tag-selector--compact]="compact"
+  [class.tag-selector--inline]="inline"
+>
+  <div
+    class="tag-selector__header"
+    *ngIf="!hideLabel || (allowClear && localSelectedTagIds.length > 0)"
+  >
+    <span class="tag-selector__label" *ngIf="!hideLabel">{{ label }}</span>
+    <button
+      *ngIf="allowClear && localSelectedTagIds.length > 0"
+      type="button"
+      class="tag-selector__clear"
+      (click)="clearSelection()"
+    >
+      Clear
+    </button>
+  </div>
+
+  <div class="tag-selector__empty" *ngIf="tags.length === 0">
+    {{ emptyLabel }}
+  </div>
+
+  <div class="tag-selector__empty" *ngIf="tags.length > 0 && visibleTags.length === 0">
+    {{ emptyLabel }}
+  </div>
+
+  <div class="tag-selector__chips" *ngIf="visibleTags.length > 0">
+    <button
+      type="button"
+      class="tag-selector__chip"
+      *ngFor="let tag of visibleTags"
+      [class.tag-selector__chip--selected]="isSelected(tag.id)"
+      (click)="toggleTag(tag.id)"
+    >
+      {{ tag.name }}
+    </button>
+  </div>
+</div>

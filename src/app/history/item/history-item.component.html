@@ -44,6 +44,12 @@
           ></ng-template
         >
       </div>
+      <div class="h-row h-tags" *ngIf="getTagNames(item.tagIds).length > 0">
+        <span class="h-description-label">Tags:</span>
+        <span class="badge" *ngFor="let tagName of getTagNames(item.tagIds)">
+          {{ tagName }}
+        </span>
+      </div>
       <div class="h-row h-ops">
         <button
           type="button"

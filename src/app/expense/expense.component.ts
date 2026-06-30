@@ -41,6 +41,8 @@ import { DescriptionEditModalComponent } from './number-board/description-edit-m
 import { ExpenseEditModalComponent } from '../history/edit/expense-edit-modal.component';
 import { lineRemaining } from '../common/model/budget-summary/budget-summary.br-notifi-formatter';
 import { MorningReminderService } from '../common/service/morning-reminder.service';
+import { TagSelectorComponent } from '../common/component/tag-selector/tag-selector.component';
+import { normalizeTagIds } from '../common/model/tag.model';
 
 @Component({
   selector: 'app-expense',
@@ -59,6 +61,7 @@ import { MorningReminderService } from '../common/service/morning-reminder.servi
     CalendarComponent,
     DescriptionEditModalComponent,
     ExpenseEditModalComponent,
+    TagSelectorComponent,
   ],
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
@@ -75,6 +78,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   currency: Currency;
   description: string = '';
+  selectedTagIds: string[] = [];
   calendarSelectedDate: Date = new Date();
 
   showCalculator = false;
@@ -146,12 +150,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         date: Date.now(),
         includeInBalance: getCategoryById(categoryName)?.includeInBalance,
         description: originalDescription || undefined,
+        tagIds: normalizeTagIds(this.selectedTagIds),
       };
       if (!originalDescription) {
         delete newExpense.description;
       }
       this.enteredAmount = '';
       this.description = '';
+      this.selectedTagIds = [];
       this.expenseService
         .addExpense(newExpense)
         .pipe(
@@ -308,6 +314,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   onDescriptionChange(description: string): void {
     this.description = description;
+  }
+
+  onTagIdsChange(tagIds: string[]): void {
+    this.selectedTagIds = tagIds || [];
   }
 
   onOpenDescription(): void {

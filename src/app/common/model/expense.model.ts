@@ -6,5 +6,6 @@ export class Expense {
   currency: string;
   date: number;
   description?: string;
+  tagIds?: string[];
   includeInBalance?: boolean;
 }

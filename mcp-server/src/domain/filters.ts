@@ -5,6 +5,7 @@ export type ExpenseFilterInput = {
   endDate?: number;
   categories?: CategoryId[];
   description?: string;
+  tagIds?: string[];
   limit?: number;
   sort?: 'asc' | 'desc';
 };
@@ -14,6 +15,7 @@ export type NormalizedExpenseFilter = {
   endDate?: number;
   categories: CategoryId[];
   description?: string;
+  tagIds: string[];
   limit: number;
   sort: 'asc' | 'desc';
 };
@@ -32,6 +34,14 @@ export function normalizeExpenseFilter(
 
   const categories = Array.from(new Set(input.categories ?? []));
   const description = input.description?.trim().toLowerCase() || undefined;
+  const tagIds = Array.from(
+    new Set(
+      (input.tagIds ?? [])
+        .filter((tagId): tagId is string => typeof tagId === 'string')
+        .map(tagId => tagId.trim())
+        .filter(Boolean)
+    )
+  );
   const limit = Math.min(
     Math.max(1, input.limit ?? Math.min(maxResultLimit, 100)),
     maxResultLimit
@@ -42,6 +52,7 @@ export function normalizeExpenseFilter(
     endDate: input.endDate,
     categories,
     description,
+    tagIds,
     limit,
     sort: input.sort ?? 'desc',
   };
@@ -57,5 +68,18 @@ export function applyDescriptionFilter(
 
   return expenses.filter(expense =>
     (expense.description || '').toLowerCase().includes(description)
+  );
+}
+
+export function applyTagIdsFilter(
+  expenses: ExpenseDocument[],
+  tagIds: string[]
+): ExpenseDocument[] {
+  if (!tagIds.length) {
+    return expenses;
+  }
+
+  return expenses.filter(expense =>
+    (expense.tagIds || []).some(tagId => tagIds.includes(tagId))
   );
 }

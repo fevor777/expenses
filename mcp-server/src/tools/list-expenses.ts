@@ -10,7 +10,7 @@ export function registerListExpensesTool(
 ): void {
   server.tool(
     'list_expenses',
-    'List expenses using the same date, category, and description semantics as the Angular application.',
+    'List expenses using the same date, category, description, and tag semantics as the Angular application.',
     expenseFilterShape,
     async input => {
       const args = expenseFilterSchema.parse(input);

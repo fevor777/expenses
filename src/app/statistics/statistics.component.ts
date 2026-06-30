@@ -32,6 +32,7 @@ import { SegmentedSwitchComponent } from '../common/component/segmented/segmente
 import { MicroVisualsComponent } from '../period-summary/micro/micro-visuals.component';
 import { CategoryTypeFiltersComponent } from './category-type-filters/category-type-filters.component';
 import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
+import { TagSelectorComponent } from '../common/component/tag-selector/tag-selector.component';
 // Dynamic swipe length from store (fallback constant inside service defaults)
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 import { PeriodSummaryIconComponent } from '../common/component/period-summary-icon/period-summary-icon.component';
@@ -66,6 +67,7 @@ import { SpinnerComponent } from '../common/component/spinner/spinner.component'
     MicroVisualsComponent,
     CategoryTypeFiltersComponent,
     CategoryFilterComponent,
+    TagSelectorComponent,
     PeriodSummaryIconComponent,
     SpinnerComponent,
   ],
@@ -110,6 +112,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   filteredExpenses: Expense[] = [];
   descriptionSearch: string = '';
+  selectedTagIds: string[] = [];
   // categoryFilterValuesStore: string[] = [];
   categoryFilterValues: string[] = [];
   isHowSuggestionDateButton: boolean = false;
@@ -242,6 +245,12 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       this.descriptionSearch = descriptionFilter;
       this.dateFilterService.description = undefined;
     }
+
+    const tagIds = this.dateFilterService.tagIds;
+    if (Array.isArray(tagIds) && tagIds.length > 0) {
+      this.selectedTagIds = [...tagIds];
+      this.dateFilterService.tagIds = undefined;
+    }
   }
 
   onDescriptionSearchChange(value: string): void {
@@ -306,6 +315,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       this.dateFilterService.categories = this.getRemainCategories();
     }
     this.dateFilterService.description = this.descriptionSearch;
+    this.dateFilterService.tagIds = this.selectedTagIds;
     this.dateFilterService.dateFilter = dateFrame || this.currentFilter;
     this.router.navigate(['/history']);
   }
@@ -327,16 +337,16 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     const categories = category ? [category] : this.getRemainCategories();
     const useCache = this.currentFilter?.mode !== 'year';
     this.expenseService
-      .getExpenses(this.currentFilter, categories, null, useCache)
+      .getExpenses(
+        this.currentFilter,
+        categories,
+        this.descriptionSearch,
+        useCache,
+        this.selectedTagIds
+      )
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(expenses => {
         expensesFilteredByDate = expenses;
-        if (this.descriptionSearch) {
-          const lower = this.descriptionSearch.toLowerCase();
-          expensesFilteredByDate = expensesFilteredByDate.filter(e =>
-            (e.description || '').toLowerCase().includes(lower)
-          );
-        }
         if (isCurrentCategoriesUpdate) {
           this.currentCategories = Array.from(
             new Set(expensesFilteredByDate.map(expense => expense.category))
@@ -445,9 +455,15 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.regularCategoriesCheckboxValue = true;
     this.excludedCategories = [];
     this.descriptionSearch = '';
+    this.selectedTagIds = [];
     this.updateCategoriesFilterValues([]);
     this.currentFilter = { ...this.initialFilterValue };
     this.calculateCategoryTotals(null, false);
+  }
+
+  onTagIdsChange(tagIds: string[]): void {
+    this.selectedTagIds = tagIds || [];
+    this.calculateCategoryTotals();
   }
 
   onCategoriesRefresh(): void {
@@ -593,6 +609,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   private mutationObserver?: MutationObserver;
   private resizeHandler = () => this.applyContentOffset();
   private lastHeight = -1;
+  private layoutTimeouts: number[] = [];
+  private offsetFramePending = false;
 
   private initDynamicLayout(): void {
     const wrapperEl = this.fixedWrapperRef?.nativeElement;
@@ -607,7 +625,6 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.mutationObserver.observe(wrapperEl, {
       childList: true,
       subtree: true,
-      characterData: true,
     });
     window.addEventListener('resize', this.resizeHandler, { passive: true });
     this.applyContentOffset();
@@ -620,10 +637,17 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     }
     this.mutationObserver?.disconnect();
     window.removeEventListener('resize', this.resizeHandler);
+    this.clearPendingLayoutStabilization();
   }
 
   private applyContentOffset(): void {
+    if (this.offsetFramePending) {
+      return;
+    }
+
+    this.offsetFramePending = true;
     requestAnimationFrame(() => {
+      this.offsetFramePending = false;
       const height = this.fixedWrapperRef?.nativeElement?.offsetHeight || 0;
       if (height === this.lastHeight) {
         return;
@@ -639,13 +663,20 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     iterations: number = 3,
     intervalMs: number = 40
   ): void {
+    this.clearPendingLayoutStabilization();
     let count = 0;
     const run = () => {
       this.applyContentOffset();
       if (++count < iterations) {
-        setTimeout(run, intervalMs);
+        const timeoutId = window.setTimeout(run, intervalMs);
+        this.layoutTimeouts.push(timeoutId);
       }
     };
     run();
+  }
+
+  private clearPendingLayoutStabilization(): void {
+    this.layoutTimeouts.forEach(timeoutId => window.clearTimeout(timeoutId));
+    this.layoutTimeouts = [];
   }
 }

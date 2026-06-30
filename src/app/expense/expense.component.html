@@ -63,6 +63,15 @@
     (openEditLatestRequest)="onOpenEditLatest()"
   >
   </app-expense-number-board>
+
+  <!-- <app-tag-selector
+    *ngIf="showNumberBoard"
+    [selectedTagIds]="selectedTagIds"
+    label="Expense tags"
+    emptyLabel="Create tags in Settings"
+    searchPlaceholder="Select tags for this expense"
+    (selectedTagIdsChange)="onTagIdsChange($event)"
+  ></app-tag-selector> -->
 </div>
 
 <app-description-edit-modal

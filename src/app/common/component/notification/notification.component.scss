@@ -81,6 +81,10 @@
       transform var(--transition-fast);
   }
 
+  .notification-tags-block {
+    border-top: 1px solid var(--color-border);
+    padding-top: 8px;
+  }
   .notification-marks-row { display:flex; gap:6px; flex-wrap:wrap; }
   .notification-edit-row { display:flex; gap:6px; align-items:center; }
   .notification-edit-row .desc-input { flex:1 1 auto; min-width:120px; font-size:12px; padding:4px 8px; border:1px solid var(--color-border); border-radius:8px; background:var(--color-bg); color:var(--color-text); }
@@ -88,7 +92,6 @@
   .notification-edit-row .save-btn:disabled { opacity:.5; cursor:default; }
 
   .mark-btn {
-    cursor: pointer;
     background: var(--color-primary-alpha);
     border: 1px solid var(--color-border);
     color: var(--color-text);

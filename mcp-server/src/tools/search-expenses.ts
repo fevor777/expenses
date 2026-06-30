@@ -10,7 +10,7 @@ export function registerSearchExpensesTool(
 ): void {
   server.tool(
     'search_expenses',
-    'Search expenses using the same filter contract as list_expenses.',
+    'Search expenses using the same filter contract as list_expenses, including tag filters.',
     expenseFilterShape,
     async input => {
       const args = expenseFilterSchema.parse(input);

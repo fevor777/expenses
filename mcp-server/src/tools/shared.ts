@@ -2,12 +2,14 @@ import type { Logger } from 'pino';
 import type { AppConfig } from '../config.js';
 import type { ExpensesRepository } from '../firestore/expenses.repository.js';
 import type { SettingsRepository } from '../firestore/settings.repository.js';
+import type { TagsRepository } from '../firestore/tags.repository.js';
 
 export type ToolDependencies = {
   config: AppConfig;
   logger: Logger;
   expensesRepository: ExpensesRepository;
   settingsRepository: SettingsRepository;
+  tagsRepository: TagsRepository;
 };
 
 export async function executeTool<T>(

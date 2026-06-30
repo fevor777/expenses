@@ -9,14 +9,16 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Categories, Category } from '../../common/model/categories';
 import { Expense } from '../../common/model/expense.model';
+import { normalizeTagIds } from '../../common/model/tag.model';
 import { ExpenseService } from '../../common/service/expense.service';
 import { first, Subject, Subscription, takeUntil } from 'rxjs';
 import { SpinnerComponent } from '../../common/component/spinner/spinner.component';
+import { TagSelectorComponent } from '../../common/component/tag-selector/tag-selector.component';
 
 @Component({
   selector: 'app-expense-edit-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, SpinnerComponent],
+  imports: [CommonModule, FormsModule, SpinnerComponent, TagSelectorComponent],
   templateUrl: './expense-edit-modal.component.html',
   styleUrls: ['./expense-edit-modal.component.scss'],
 })
@@ -34,6 +36,7 @@ export class ExpenseEditModalComponent {
   amount: number; // stored as number
   description: string = '';
   category: string = '';
+  tagIds: string[] = [];
   // HTML datetime-local formatted string (yyyy-MM-ddTHH:mm)
   dateLocal: string = '';
 
@@ -78,6 +81,7 @@ export class ExpenseEditModalComponent {
     this.amount = this.expense.amount;
     this.description = this.expense.description || '';
     this.category = this.expense.category;
+    this.tagIds = this.expense.tagIds || [];
     try {
       const d = new Date(this.expense.date);
       const pad = (v: number) => v.toString().padStart(2, '0');
@@ -106,9 +110,14 @@ export class ExpenseEditModalComponent {
       amount: +(+this.amount || 0).toFixed(2),
       description: this.description?.trim(),
       category: this.category,
+      tagIds: normalizeTagIds(this.tagIds),
       date: this.parseDateLocalToEpoch(this.dateLocal, this.expense.date),
     };
     this.apply.emit(updated);
+  }
+
+  onTagIdsChange(tagIds: string[]): void {
+    this.tagIds = tagIds || [];
   }
 
   onDelete(): void {

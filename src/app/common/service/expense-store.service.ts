@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Expense } from '../model/expense.model';
+import { canonicalizeTagIds, normalizeTagIds } from '../model/tag.model';
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { getExpensesFromTo } from '../../statistics/functions/expense-helpers';
 import { MultiFilter } from '../component/filter/multi/multi-filter.component';
@@ -23,21 +24,24 @@ export class ExpenseStoreService {
   getExpensesObs(
     dateFilter?: DateFrame,
     category?: string[],
-    descriptionFilter?: string
+    descriptionFilter?: string,
+    tagIds?: string[]
   ): Observable<Expense[]> {
     let expensesFromLocStorage = JSON.parse(
       localStorage.getItem('expenses') || '[]'
-    );
+    ).map((expense: Expense) => canonicalizeTagIds(expense));
     expensesFromLocStorage = this.filterExpenses(
       expensesFromLocStorage,
       dateFilter,
       category,
-      descriptionFilter
+      descriptionFilter,
+      tagIds
     );
     this.filter = {
       date: dateFilter,
       categories: category,
       description: descriptionFilter,
+      tagIds: normalizeTagIds(tagIds) || [],
     } as MultiFilter;
     this.updateExpenses(expensesFromLocStorage);
     return this.expenses$;
@@ -60,38 +64,42 @@ export class ExpenseStoreService {
 
   addExpense(expense: Expense): Observable<Expense> {
     const jsonInLocalStorage = localStorage.getItem('expenses');
+    const normalizedExpense = canonicalizeTagIds(expense);
     let expenseList = jsonInLocalStorage ? JSON.parse(jsonInLocalStorage) : [];
-    expenseList.unshift(expense);
+    expenseList.unshift(normalizedExpense);
     localStorage.setItem('expenses', JSON.stringify(expenseList));
     expenseList = this.filterExpenses(
-      expenseList,
+      expenseList.map((item: Expense) => canonicalizeTagIds(item)),
       this.filter?.date,
       this.filter?.categories,
-      this.filter?.description
+      this.filter?.description,
+      this.filter?.tagIds
     );
     this.updateExpenses(expenseList);
-    return of(expense);
+    return of(normalizedExpense);
   }
 
   updateExpense(expense: Expense): Observable<Expense> {
+    const normalizedExpense = canonicalizeTagIds(expense);
     const expensesFromLocStorage = JSON.parse(
       localStorage.getItem('expenses') || '[]'
     );
     let updatedExpenses = expensesFromLocStorage.map((exp: Expense) => {
-      if (exp.id === expense.id) {
-        return expense;
+      if (exp.id === normalizedExpense.id) {
+        return normalizedExpense;
       }
-      return exp;
+      return canonicalizeTagIds(exp);
     });
     localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
     updatedExpenses = this.filterExpenses(
       updatedExpenses,
       this.filter?.date,
       this.filter?.categories,
-      this.filter?.description
+      this.filter?.description,
+      this.filter?.tagIds
     );
     this.updateExpenses(updatedExpenses);
-    return of(expense);
+    return of(normalizedExpense);
   }
 
   deleteExpense(id: string): Observable<string> {
@@ -103,10 +111,11 @@ export class ExpenseStoreService {
     );
     localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
     updatedExpenses = this.filterExpenses(
-      updatedExpenses,
+      updatedExpenses.map((expense: Expense) => canonicalizeTagIds(expense)),
       this.filter?.date,
       this.filter?.categories,
-      this.filter?.description
+      this.filter?.description,
+      this.filter?.tagIds
     );
     this.updateExpenses(updatedExpenses);
     return of(id);
@@ -116,7 +125,8 @@ export class ExpenseStoreService {
     expenses: Expense[],
     dateFilter?: DateFrame,
     category?: string[],
-    descriptionFilter?: string
+    descriptionFilter?: string,
+    tagIds?: string[]
   ): Expense[] {
     let filteredExpenses: Expense[] = [];
     if (Array.isArray(expenses) && expenses.length > 0) {
@@ -140,6 +150,13 @@ export class ExpenseStoreService {
         const desc = descriptionFilter.trim().toLowerCase();
         filteredExpenses = filteredExpenses.filter(expense =>
           (expense.description || '').toLowerCase().includes(desc)
+        );
+      }
+
+      const normalizedTagIds = normalizeTagIds(tagIds);
+      if (normalizedTagIds?.length) {
+        filteredExpenses = filteredExpenses.filter(expense =>
+          (expense.tagIds || []).some(tagId => normalizedTagIds.includes(tagId))
         );
       }
     }

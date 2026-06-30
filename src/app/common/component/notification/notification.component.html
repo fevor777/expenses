@@ -21,26 +21,14 @@
           [innerHTML]="msg"
         ></div>
       </ng-template>
-      <span *ngIf="isExpenseAddedContext">Description:</span>
-      <div *ngIf="isExpenseAddedContext" class="notification-marks-row">
-        <button
-          type="button"
-          class="mark-btn"
-          (click)="appendMark(' ? ')"
-          title="#необязательный"
-          aria-label="#необязательный"
-        >
-          #необязательный
-        </button>
-        <button
-          type="button"
-          class="mark-btn"
-          (click)="appendMark(' ! ')"
-          title="#лишний"
-          aria-label="#лишний"
-        >
-          #лишний
-        </button>
+      <div *ngIf="isExpenseAddedContext" class="notification-tags-block">
+        <app-tag-selector
+          [selectedTagIds]="lastExpense?.tagIds || []"
+          label="Tags"
+          emptyLabel="No starred tags in settings"
+          [starredOnly]="true"
+          (selectedTagIdsChange)="onTagIdsChange($event)"
+        ></app-tag-selector>
       </div>
       <div *ngIf="isExpenseAddedContext" class="notification-edit-row">
         <input

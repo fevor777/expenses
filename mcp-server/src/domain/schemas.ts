@@ -17,6 +17,7 @@ export const expenseFilterShape = {
   endDate: z.number().int().nonnegative().optional(),
   categories: z.array(categoryIdSchema).min(1).max(10).optional(),
   description: z.string().trim().max(500).optional(),
+  tagIds: z.array(z.string().trim().min(1)).min(1).max(20).optional(),
   limit: z.number().int().min(1).max(500).optional(),
   sort: z.enum(['asc', 'desc']).optional(),
 };
@@ -44,6 +45,7 @@ export const createExpenseShape = {
   currency: z.string().trim().min(1).max(8).default('EUR').optional(),
   date: z.number().int().nonnegative(),
   description: z.string().trim().max(500).optional(),
+  tagIds: z.array(z.string().trim().min(1)).max(20).optional(),
   includeInBalance: z.boolean().optional(),
 };
 
@@ -56,6 +58,7 @@ export const updateExpenseShape = {
   currency: z.string().trim().min(1).max(8).optional(),
   date: z.number().int().nonnegative().optional(),
   description: z.string().trim().max(500).optional(),
+  tagIds: z.array(z.string().trim().min(1)).max(20).optional(),
   includeInBalance: z.boolean().optional(),
 };
 
@@ -69,9 +72,38 @@ export const updateExpenseSchema = z
       value.currency !== undefined ||
       value.date !== undefined ||
       value.description !== undefined ||
+      value.tagIds !== undefined ||
       value.includeInBalance !== undefined,
     'At least one mutable field must be provided'
   );
+
+export const tagIdShape = {
+  id: z.string().trim().min(1),
+};
+
+export const tagIdSchema = z.object(tagIdShape).strict();
+
+export const createTagShape = {
+  name: z.string().trim().min(1).max(80),
+  star: z.boolean().optional(),
+};
+
+export const createTagSchema = z.object(createTagShape).strict();
+
+export const updateTagShape = {
+  id: z.string().trim().min(1),
+  name: z.string().trim().min(1).max(80).optional(),
+  star: z.boolean().optional(),
+};
+
+export const updateTagSchema = z
+  .object(updateTagShape)
+  .strict()
+  .refine(value => value.name !== undefined || value.star !== undefined, 'At least one tag field must be provided');
+
+export const listTagsShape = {};
+
+export const listTagsSchema = z.object(listTagsShape).strict();
 
 export const updateBudgetShape = {
   value: z.number().finite().min(0).optional(),

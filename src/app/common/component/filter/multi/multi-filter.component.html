@@ -20,6 +20,10 @@
         <span class="mf-key">Description:</span>
         <span class="mf-value mf-value--quoted">"{{ descriptionFilter }}"</span>
       </div>
+      <div class="mf-group" *ngIf="selectedTagIds.length > 0">
+        <span class="mf-key">Tags:</span>
+        <span class="mf-value">{{ selectedTagIds.length }}</span>
+      </div>
       <div class="mf-group">
         <span class="mf-key">Категории:</span>
         <span class="mf-value">{{ getCategoryFilters() || 'Все' }}</span>
@@ -123,6 +127,15 @@
           [(ngModel)]="descriptionFilter"
           (ngModelChange)="emitDescriptionFilter()"
         />
+      </div>
+      <div class="mf-field">
+        <app-tag-selector
+          [selectedTagIds]="selectedTagIds"
+          label="Tags"
+          emptyLabel="No tags in settings"
+          [compact]="true"
+          (selectedTagIdsChange)="emitTagFilters($event)"
+        ></app-tag-selector>
       </div>
       <div class="mf-field">
         <app-category-filter

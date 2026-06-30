@@ -72,6 +72,15 @@
   justify-content: center;
   background: var(--color-bg);
 }
+.statistics-filter--tags {
+  padding: 2px 4px 4px;
+  justify-content: center;
+}
+
+.statistics-filter--tags app-tag-selector {
+  width: auto;
+  max-width: 100%;
+}
 .statistics-total-amount {
   display: inline-block;
   transform-origin: top center;

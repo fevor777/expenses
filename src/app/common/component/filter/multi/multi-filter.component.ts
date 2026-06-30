@@ -24,11 +24,13 @@ import { Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { DateFilterService } from '../date/date-filter.service';
 import { PeriodSummaryIconComponent } from "../../period-summary-icon/period-summary-icon.component";
+import { TagSelectorComponent } from '../../tag-selector/tag-selector.component';
 
 export type MultiFilter = {
   categories: string[];
   date: DateFrame;
   description?: string; // substring filter for expense description
+  tagIds?: string[];
 };
 
 @Component({
@@ -41,7 +43,8 @@ export type MultiFilter = {
     FormsModule,
     DateFilterComponent,
     CategoryFilterComponent,
-    PeriodSummaryIconComponent
+    PeriodSummaryIconComponent,
+    TagSelectorComponent,
 ],
 })
 export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, AfterViewInit {
@@ -68,6 +71,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
   predefineCategories: string[] = [];
   expandFilters: boolean = false;
   descriptionFilter: string = '';
+  selectedTagIds: string[] = [];
   showCompact: boolean = false; // toggled by scroll
   compactSummary: string = '';
   private scrollThreshold = 10; // px before compact view shows
@@ -101,6 +105,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       this.selectedCategories = this.value.categories;
       this.predefineCategories = this.value.categories;
       this.descriptionFilter = this.value.description || '';
+      this.selectedTagIds = this.value.tagIds || [];
     }
   }
 
@@ -120,7 +125,10 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
     const descPart = this.descriptionFilter?.trim()
       ? `; "${this.descriptionFilter.trim()}"`
       : '';
-    this.compactSummary = `${datePart} • ${catPart}${descPart}`.trim();
+    const tagsPart = this.selectedTagIds?.length
+      ? `; tags: ${this.selectedTagIds.length}`
+      : '';
+    this.compactSummary = `${datePart} • ${catPart}${descPart}${tagsPart}`.trim();
   }
 
   private evaluateScrollPosition(): void {
@@ -137,10 +145,12 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
     this.predefineCategories = [];
     this.selectedCategories = [];
     this.descriptionFilter = '';
+    this.selectedTagIds = [];
     this.selectedFilters.emit({
       categories: [],
       date: this.defaultDateValue,
       description: '',
+      tagIds: [],
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -152,6 +162,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       categories: this.selectedCategories,
       date: dateFilter,
       description: this.descriptionFilter?.trim(),
+      tagIds: this.selectedTagIds,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -163,6 +174,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       categories: selectedCategories,
       date: this.dateFilter,
       description: this.descriptionFilter?.trim(),
+      tagIds: this.selectedTagIds,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -173,6 +185,19 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       categories: this.selectedCategories,
       date: this.dateFilter,
       description: this.descriptionFilter?.trim(),
+      tagIds: this.selectedTagIds,
+    });
+    this.buildCompactSummary();
+    this.evaluateScrollPosition();
+  }
+
+  emitTagFilters(selectedTagIds: string[]): void {
+    this.selectedTagIds = selectedTagIds || [];
+    this.selectedFilters.emit({
+      categories: this.selectedCategories,
+      date: this.dateFilter,
+      description: this.descriptionFilter?.trim(),
+      tagIds: this.selectedTagIds,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -216,6 +241,9 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
     }
     if (this.descriptionFilter?.trim()) {
       this.dateFilterService.description = this.descriptionFilter.trim();
+    }
+    if (this.selectedTagIds?.length) {
+      this.dateFilterService.tagIds = [...this.selectedTagIds];
     }
     this.router.navigate(['/history']);
   }

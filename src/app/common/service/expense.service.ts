@@ -5,6 +5,7 @@ import { filter, from, map, Observable } from 'rxjs';
 
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { Expense } from '../model/expense.model';
+import { canonicalizeTagIds, normalizeTagIds } from '../model/tag.model';
 import { ExpenseStoreService } from './expense-store.service';
 import { withUserId } from './with-user-id.helper';
 
@@ -24,7 +25,7 @@ export class ExpenseService {
 
   addExpense(expense: Expense): Observable<Expense> {
     const id = this.fireStore.createId();
-    const itemWithId = { ...expense, id };
+    const itemWithId = canonicalizeTagIds({ ...expense, id });
     const fallback = () => this.expenseStoreService.addExpense(itemWithId);
     const request = (uid: string) =>
       from(this.expensesCollection.doc(id).set({ ...itemWithId, uid })).pipe(
@@ -37,32 +38,50 @@ export class ExpenseService {
     dateFilter?: DateFrame,
     category?: string[],
     descriptionFilter?: string,
-    useCache = true
+    useCache = true,
+    tagIds?: string[]
   ): Observable<Expense[]> {
     const desc = (descriptionFilter || '').trim().toLowerCase();
+    const normalizedTagIds = normalizeTagIds(tagIds);
     const applyDescriptionFilter = (expenses: Expense[]) => {
       if (!desc) return expenses;
       return expenses.filter(e =>
         (e.description || '').toLowerCase().includes(desc)
       );
     };
+    const applyTagFilter = (expenses: Expense[]) => {
+      if (!normalizedTagIds?.length) return expenses;
+      return expenses.filter(expense =>
+        (expense.tagIds || []).some(tagId => normalizedTagIds.includes(tagId))
+      );
+    };
     const fallback = () =>
       this.expenseStoreService.getExpensesObs(
         dateFilter,
         category,
-        descriptionFilter
+        descriptionFilter,
+        normalizedTagIds
       );
     const request = (userId: string) =>
-      this.getExpensesFromFirebase(dateFilter, category, userId, useCache).pipe(
-        map(applyDescriptionFilter)
+      this.getExpensesFromFirebase(
+        dateFilter,
+        category,
+        userId,
+        useCache,
+        normalizedTagIds
+      ).pipe(
+        map(expenses => expenses.map(expense => canonicalizeTagIds(expense))),
+        map(applyDescriptionFilter),
+        map(applyTagFilter)
       );
     return withUserId(this.afAuth, request, fallback, fallback);
   }
 
   updateExpense(expense: Expense): Observable<unknown> {
-    const fallback = () => this.expenseStoreService.updateExpense(expense);
+    const normalizedExpense = canonicalizeTagIds(expense);
+    const fallback = () => this.expenseStoreService.updateExpense(normalizedExpense);
     const request = () =>
-      from(this.expensesCollection.doc(expense.id).update(expense));
+      from(this.expensesCollection.doc(normalizedExpense.id).update(normalizedExpense));
     return withUserId(this.afAuth, request, fallback, fallback);
   }
 
@@ -102,7 +121,7 @@ export class ExpenseService {
             const a = actions[0];
             const data = a.payload.doc.data();
             const id = a.payload.doc.id;
-            return { id, ...data } as Expense;
+            return canonicalizeTagIds({ id, ...data } as Expense);
           })
         );
 
@@ -113,7 +132,8 @@ export class ExpenseService {
     dateFilter?: DateFrame,
     category?: string[],
     userId?: string,
-    useCache = true
+    useCache = true,
+    tagIds?: string[]
   ): Observable<Expense[]> {
     return this.fireStore
       .collection<Expense>('expenses', ref => {
@@ -130,6 +150,10 @@ export class ExpenseService {
           query = query.where('category', 'in', category);
         }
 
+        if ((!category || category.length === 0) && Array.isArray(tagIds) && tagIds.length > 0) {
+          query = query.where('tagIds', 'array-contains-any', tagIds);
+        }
+
         // Always order by date
         return query.orderBy('date', 'desc');
       })
@@ -143,7 +167,7 @@ export class ExpenseService {
           actions.map(a => {
             const data = a.payload.doc.data();
             const id = a.payload.doc.id;
-            return { id, ...data };
+            return canonicalizeTagIds({ id, ...data } as Expense);
           })
         )
       );

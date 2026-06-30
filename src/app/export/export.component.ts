@@ -17,6 +17,8 @@ import { Budget } from '../common/model/budget.model';
 import { FormsModule } from '@angular/forms';
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 import { MorningReminderService, MorningReminderConfig } from '../common/service/morning-reminder.service';
+import { Tag, normalizeTagName } from '../common/model/tag.model';
+import { TagService } from '../common/service/tag.service';
 
 @Component({
   selector: 'app-export',
@@ -52,6 +54,9 @@ export class ExportComponent implements OnDestroy {
   morningReminderEnabled: boolean = true;
   morningStartHour: number = 6;
   morningEndHour: number = 11;
+  tags$: Observable<Tag[]>;
+  tags: Tag[] = [];
+  tagDraft: string = '';
 
   // Display-only derived label for current period preview (e.g., "September 5 - October 8")
   get budgetPeriodLabel(): string {
@@ -76,7 +81,8 @@ export class ExportComponent implements OnDestroy {
     private savingService: SavingService,
     private afAuth: AngularFireAuth,
     private swipeLengthStore: GlobalSwipeLengthStoreService,
-    private morningReminderService: MorningReminderService
+    private morningReminderService: MorningReminderService,
+    private tagService: TagService
   ) {
     this.irregularBudgetService
       .getValue()
@@ -101,6 +107,10 @@ export class ExportComponent implements OnDestroy {
     this.morningReminderEnabled = morningConfig.enabled;
     this.morningStartHour = morningConfig.startHour;
     this.morningEndHour = morningConfig.endHour;
+    this.tags$ = this.tagService.getTags();
+    this.tags$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(tags => (this.tags = tags || []));
   }
 
   // Method to trigger Google Sign-in
@@ -180,7 +190,7 @@ export class ExportComponent implements OnDestroy {
     this.destroySubject.complete();
   }
 
-  private formatData(data: Expense): Expense {
+  private formatData(data: Expense): Record<string, string | number | string[]> {
     return {
       id: data?.id || '',
       uid: data?.uid || '',
@@ -189,7 +199,20 @@ export class ExportComponent implements OnDestroy {
       currency: data?.currency || '',
       date: data.date || 0,
       description: data.description || '',
+      tagIds: data.tagIds || [],
+      tags: this.getTagNames(data.tagIds).join('|'),
     };
+  }
+
+  private getTagNames(tagIds?: string[]): string[] {
+    if (!Array.isArray(tagIds) || tagIds.length === 0) {
+      return [];
+    }
+
+    const tagsById = new Map(this.tags.map(tag => [tag.id, tag.name]));
+    return tagIds
+      .map(tagId => tagsById.get(tagId) || tagId)
+      .filter(Boolean);
   }
 
   private exportToFile(data: any[]): void {
@@ -295,5 +318,67 @@ export class ExportComponent implements OnDestroy {
             .subscribe();
         }
       });
+  }
+
+  addTag(): void {
+    const normalizedName = normalizeTagName(this.tagDraft);
+    if (!normalizedName) {
+      return;
+    }
+
+    if (this.tags.some(tag => tag.normalizedName === normalizedName)) {
+      return;
+    }
+
+    this.tagService
+      .addTag(this.tagDraft)
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe(() => {
+        this.tagDraft = '';
+      });
+  }
+
+  renameTag(tag: Tag): void {
+    const nextName = prompt('Rename tag', tag.name);
+    if (nextName === null) {
+      return;
+    }
+
+    const normalizedName = normalizeTagName(nextName);
+    if (!normalizedName || normalizedName === tag.normalizedName) {
+      return;
+    }
+
+    if (
+      this.tags.some(
+        item => item.id !== tag.id && item.normalizedName === normalizedName
+      )
+    ) {
+      return;
+    }
+
+    this.tagService
+      .updateTag({ ...tag, name: nextName })
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe();
+  }
+
+  toggleTagStar(tag: Tag, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.tagService
+      .updateTag({ ...tag, star: checked })
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe();
+  }
+
+  deleteTag(tag: Tag): void {
+    if (!tag.id || !confirm(`Delete tag "${tag.name}"?`)) {
+      return;
+    }
+
+    this.tagService
+      .deleteTag(tag.id)
+      .pipe(first(), takeUntil(this.destroySubject))
+      .subscribe();
   }
 }

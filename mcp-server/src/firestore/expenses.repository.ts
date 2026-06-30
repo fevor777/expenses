@@ -2,6 +2,7 @@ import type { Firestore, Query } from 'firebase-admin/firestore';
 import { FieldPath } from 'firebase-admin/firestore';
 import {
   applyDescriptionFilter,
+  applyTagIdsFilter,
   type NormalizedExpenseFilter,
 } from '../domain/filters.js';
 import {
@@ -30,6 +31,10 @@ export class ExpensesRepository {
       query = query.where('category', 'in', filter.categories);
     }
 
+    if (filter.categories.length === 0 && filter.tagIds.length > 0) {
+      query = query.where('tagIds', 'array-contains-any', filter.tagIds);
+    }
+
     query = query.orderBy('date', filter.sort);
 
     if (!filter.description) {
@@ -39,8 +44,9 @@ export class ExpensesRepository {
     const snapshot = await query.get();
     const expenses = snapshot.docs.map(document => this.mapExpense(document.id, document.data()));
     const filteredByDescription = applyDescriptionFilter(expenses, filter.description);
+    const filteredByTags = applyTagIdsFilter(filteredByDescription, filter.tagIds);
 
-    return filteredByDescription.slice(0, filter.limit);
+    return filteredByTags.slice(0, filter.limit);
   }
 
   async listInRange(startDate: number, endDate: number): Promise<ExpenseDocument[]> {
@@ -120,6 +126,9 @@ export class ExpensesRepository {
       date: Number(value.date ?? 0),
       description:
         typeof value.description === 'string' ? value.description : undefined,
+      tagIds: Array.isArray(value.tagIds)
+        ? value.tagIds.filter((tagId: unknown): tagId is string => typeof tagId === 'string')
+        : undefined,
       includeInBalance:
         typeof value.includeInBalance === 'boolean'
           ? value.includeInBalance

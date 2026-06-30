@@ -58,6 +58,15 @@
         placeholder="Optional"
       ></textarea>
     </label>
+    <div class="eem-field">
+      <app-tag-selector
+        [selectedTagIds]="tagIds"
+        label="Tags"
+        emptyLabel="Create tags in settings"
+        searchPlaceholder="Filter tags..."
+        (selectedTagIdsChange)="onTagIdsChange($event)"
+      ></app-tag-selector>
+    </div>
     <div class="eem-actions">
       <button type="submit" class="eem-btn eem-btn--primary">Save</button>
       <button type="button" class="eem-btn" (click)="onBackdrop()">

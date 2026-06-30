@@ -39,6 +39,7 @@ import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-le
 import { BudgetSummaryService } from '../common/service/budget-summary.service';
 import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
+import { TagService } from '../common/service/tag.service';
 
 @Component({
   selector: 'app-history',
@@ -83,6 +84,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   // Edit modal state
   editingExpense: Expense | null = null;
   showEditModal: boolean = false;
+  tagNamesById: Record<string, string> = {};
 
   error: any;
 
@@ -93,7 +95,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private balanceService: BalanceService,
     private dateFilterService: DateFilterService,
     private expenseSummaryService: BudgetSummaryService,
-    private swipeLengthStore: GlobalSwipeLengthStoreService
+    private swipeLengthStore: GlobalSwipeLengthStoreService,
+    private tagService: TagService
   ) {}
 
   // Fixed wrapper dynamic offset
@@ -105,6 +108,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
   private lastHeight = -1;
   private resizeHandler = () => this.applyContentOffset();
   private isMultiFilterExpanded = false;
+  private stabilizationTimeouts: number[] = [];
+  private offsetFramePending = false;
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -121,6 +126,15 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
+    this.tagService
+      .getTags()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(tags => {
+        this.tagNamesById = (tags || []).reduce(
+          (acc, tag) => ({ ...acc, [tag.id]: tag.name }),
+          {}
+        );
+      });
     this.initFilter();
     this.updateFilterAndLoadExpenses();
     // Delay init until view children rendered
@@ -238,6 +252,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   navigateToStatistics(): void {
     this.dateFilterService.categories = this.currentFilter?.categories;
     this.dateFilterService.description = this.currentFilter?.description;
+    this.dateFilterService.tagIds = this.currentFilter?.tagIds;
     this.dateFilterService.dateFilter = this.currentFilter?.date;
     this.router.navigate(['/statistics']);
   }
@@ -289,7 +304,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
       .getExpenses(
         this.currentFilter?.date,
         this.currentFilter?.categories,
-        this.currentFilter?.description
+        this.currentFilter?.description,
+        true,
+        this.currentFilter?.tagIds
       )
       .pipe(map(expenses => this.calculateAmountsAndModifyExpenses(expenses)));
   }
@@ -472,6 +489,15 @@ export class HistoryComponent implements OnInit, OnDestroy {
       this.dateFilterService.description = undefined;
     }
 
+    const tagIds = this.dateFilterService.tagIds;
+    if (Array.isArray(tagIds) && tagIds.length > 0) {
+      this.defaultFilter = {
+        ...this.defaultFilter,
+        tagIds,
+      };
+      this.dateFilterService.tagIds = undefined;
+    }
+
     this.currentFilter = {
       ...this.defaultFilter,
     };
@@ -493,7 +519,6 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.fixedMutationObserver.observe(el, {
       childList: true,
       subtree: true,
-      characterData: true,
     });
     window.addEventListener('resize', this.resizeHandler, { passive: true });
     this.scheduleStabilization();
@@ -506,10 +531,17 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
     this.fixedMutationObserver?.disconnect();
     window.removeEventListener('resize', this.resizeHandler);
+    this.clearPendingStabilization();
   }
 
   private applyContentOffset(): void {
+    if (this.offsetFramePending) {
+      return;
+    }
+
+    this.offsetFramePending = true;
     requestAnimationFrame(() => {
+      this.offsetFramePending = false;
       const wrapperEl = this.historyFixedRef?.nativeElement;
       const contentEl = this.historyContentRef?.nativeElement;
       if (!wrapperEl || !contentEl) {
@@ -537,14 +569,21 @@ export class HistoryComponent implements OnInit, OnDestroy {
     iterations: number = 3,
     intervalMs: number = 40
   ): void {
+    this.clearPendingStabilization();
     let i = 0;
     const run = () => {
       this.applyContentOffset();
       if (++i < iterations) {
-        setTimeout(run, intervalMs);
+        const timeoutId = window.setTimeout(run, intervalMs);
+        this.stabilizationTimeouts.push(timeoutId);
       }
     };
     run();
+  }
+
+  private clearPendingStabilization(): void {
+    this.stabilizationTimeouts.forEach(timeoutId => window.clearTimeout(timeoutId));
+    this.stabilizationTimeouts = [];
   }
 
   onMultiFilterExpandChange(isExpanded: boolean): void {

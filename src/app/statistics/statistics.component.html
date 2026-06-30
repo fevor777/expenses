@@ -15,6 +15,16 @@
       ></app-search-input>
       <span class="app-link statistics-home-link" routerLink="/">Home ></span>
     </div>
+    <div class="statistics-filter statistics-filter--tags">
+      <app-tag-selector
+        [selectedTagIds]="selectedTagIds"
+        label="Tags:"
+        emptyLabel="Create tags in Settings"
+        [inline]="true"
+        [compact]="true"
+        (selectedTagIdsChange)="onTagIdsChange($event)"
+      ></app-tag-selector>
+    </div>
     <app-date-filter
       class="statistics-filter"
       #statsFilter
