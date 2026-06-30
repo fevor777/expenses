@@ -1,0 +1,19 @@
+{
+  "name": "Expenses Tracker",
+  "short_name": "Expenses",
+  "description": "Track and analyze your expenses offline with sync when online.",
+  "start_url": "/expenses/",
+  "scope": "/expenses/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e293b",
+  "lang": "en",
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "favicon2.ico", "sizes": "64x64 32x32 16x16", "type": "image/x-icon" },
+    { "src": "icons/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/maskable-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
