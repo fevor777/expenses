@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 import { filter, from, map, Observable } from 'rxjs';
 
 import { DateFrame } from '../component/filter/date/dateFrame.model';
@@ -80,8 +82,17 @@ export class ExpenseService {
   updateExpense(expense: Expense): Observable<unknown> {
     const normalizedExpense = canonicalizeTagIds(expense);
     const fallback = () => this.expenseStoreService.updateExpense(normalizedExpense);
-    const request = () =>
-      from(this.expensesCollection.doc(normalizedExpense.id).update(normalizedExpense));
+    const request = () => {
+      const payload: Record<string, unknown> = {
+        ...normalizedExpense,
+      };
+
+      if (!normalizedExpense.tagIds?.length) {
+        payload['tagIds'] = firebase.firestore.FieldValue.delete();
+      }
+
+      return from(this.expensesCollection.doc(normalizedExpense.id).update(payload));
+    };
     return withUserId(this.afAuth, request, fallback, fallback);
   }
 
