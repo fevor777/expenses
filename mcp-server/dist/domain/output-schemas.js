@@ -205,14 +205,3 @@ export const monthPeriodSummaryResultSchema = z
     summary: monthlyExpenseSummarySchema,
 })
     .strict();
-export const exportExpensesResultSchema = z
-    .object({
-    format: z.literal('json'),
-    exportedAt: z.string().trim().min(1),
-    filter: normalizedExpenseFilterSchema,
-    count: z.number().int().min(0),
-    expenses: z.array(expenseDocumentSchema),
-    budget: budgetDocumentSchema.optional(),
-    savings: z.number().finite().min(0).optional(),
-})
-    .strict();

@@ -156,12 +156,3 @@ export const budgetPeriodSummaryShape = {
 export const budgetPeriodSummarySchema = z
   .object(budgetPeriodSummaryShape)
   .strict();
-
-export const exportExpensesShape = {
-  ...expenseFilterShape,
-  format: z.enum(['json']).default('json').optional(),
-  includeBudget: z.boolean().optional(),
-  includeSavings: z.boolean().optional(),
-};
-
-export const exportExpensesSchema = z.object(exportExpensesShape).strict();

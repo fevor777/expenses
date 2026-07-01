@@ -200,18 +200,9 @@ MCP должен повторять бизнес-семантику текуще
 `get_expense`
 - Возвращает одну запись по id
 
-`search_expenses`
-- Поиск по комбинации фильтров
-- Можно сделать alias к `list_expenses`, если не нужен отдельный tool
-
 `monthly_summary`
 - Возвращает totals за месяц
 - Включает irregular spend, remaining budget, optional category breakdown
-
-`export_expenses`
-- Возвращает набор данных для экспорта
-- Формат первой версии лучше сделать JSON
-- CSV можно добавить позже как отдельный output mode
 
 ### 10.2 Mutating tools
 
@@ -343,7 +334,6 @@ MCP должен повторять бизнес-семантику текуще
 ### Phase 3
 
 Добавить:
-- `export_expenses`
 - расширенные summaries
 - category breakdowns
 

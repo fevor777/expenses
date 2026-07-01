@@ -22,7 +22,6 @@ import { registerBudgetPeriodSummaryTool } from './tools/budget-period-summary.j
 import { registerBudgetSummaryTool } from './tools/budget-summary.js';
 import { registerDeleteTagTool } from './tools/delete-tag.js';
 import { registerDeleteExpenseTool } from './tools/delete-expense.js';
-import { registerExportExpensesTool } from './tools/export-expenses.js';
 import { registerGetBudgetTool } from './tools/get-budget.js';
 import { registerGetExpenseTool } from './tools/get-expense.js';
 import { registerGetSavingsTool } from './tools/get-savings.js';
@@ -31,7 +30,6 @@ import { registerListExpensesTool } from './tools/list-expenses.js';
 import { registerListTagsTool } from './tools/list-tags.js';
 import { registerMonthPeriodSummaryTool } from './tools/month-period-summary.js';
 import { registerMonthlySummaryTool } from './tools/monthly-summary.js';
-import { registerSearchExpensesTool } from './tools/search-expenses.js';
 import { type ToolDependencies } from './tools/shared.js';
 import { registerUpdateTagTool } from './tools/update-tag.js';
 import { registerUpdateBudgetTool } from './tools/update-budget.js';
@@ -124,14 +122,12 @@ function buildMcpServer(deps: ToolDependencies): McpServer {
   registerExpenseAnalysisPrompts(server);
 
   registerListExpensesTool(server, deps);
-  registerSearchExpensesTool(server, deps);
   registerGetExpenseTool(server, deps);
   registerDeleteExpenseTool(server, deps);
   registerBudgetSummaryTool(server, deps);
   registerBudgetPeriodSummaryTool(server, deps);
   registerMonthlySummaryTool(server, deps);
   registerMonthPeriodSummaryTool(server, deps);
-  registerExportExpensesTool(server, deps);
   registerListCategoriesTool(server, deps);
   registerListTagsTool(server, deps);
   registerGetBudgetTool(server, deps);
