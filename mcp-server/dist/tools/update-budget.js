@@ -1,13 +1,14 @@
 import { updateBudgetResultSchema } from '../domain/output-schemas.js';
 import { updateBudgetSchema } from '../domain/schemas.js';
-import { executeTool, jsonResult } from './shared.js';
+import { assertAtLeastOneDefinedField, executeTool, jsonResult, } from './shared.js';
 export function registerUpdateBudgetTool(server, deps) {
     server.registerTool('update_budget', {
-        description: 'Update one or more budget settings for the authenticated Firebase user.',
+        description: 'Update the authenticated user\'s budget settings. Provide at least one of: value, period, periodStartTs, or minDayLimit.',
         inputSchema: updateBudgetSchema,
         outputSchema: updateBudgetResultSchema,
     }, async (input) => {
         return executeTool(deps, 'update_budget', async () => {
+            assertAtLeastOneDefinedField(input, ['value', 'period', 'periodStartTs', 'minDayLimit'], 'At least one budget field must be provided');
             const budget = await deps.settingsRepository.updateBudget(input);
             return jsonResult({
                 status: 'updated',

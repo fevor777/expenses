@@ -3,7 +3,7 @@ import { CATEGORY_DEFINITIONS } from '../domain/models.js';
 import { executeTool, jsonResult } from './shared.js';
 export function registerListCategoriesTool(server, deps) {
     server.registerTool('list_categories', {
-        description: 'List valid expense categories and their default includeInBalance behavior.',
+        description: 'Return all valid expense categories and each category\'s default includeInBalance value. This tool takes no input arguments.',
         outputSchema: listCategoriesResultSchema,
     }, async () => {
         return executeTool(deps, 'list_categories', async () => {

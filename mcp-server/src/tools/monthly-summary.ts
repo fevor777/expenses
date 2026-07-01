@@ -18,7 +18,7 @@ export function registerMonthlySummaryTool(
     'monthly_summary',
     {
       description:
-        'Return a summary for the current calendar month. This tool is not budget-based and includes all expenses in the month-to-date window.',
+        'Return an aggregated summary for the current calendar month. This tool is calendar-month-based, not budget-based. It includes all expenses in the current month-to-date window. Optional input: includeCategoryBreakdown.',
       inputSchema: monthlySummarySchema,
       outputSchema: monthSummaryResultSchema,
     },

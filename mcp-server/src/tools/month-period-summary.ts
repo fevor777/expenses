@@ -18,7 +18,7 @@ export function registerMonthPeriodSummaryTool(
     'month_period_summary',
     {
       description:
-        'Return a summary for a specific calendar month identified by year and month. This tool is not budget-based and includes all expenses in that full month.',
+        'Return an aggregated summary for one specific calendar month identified by year and month. This tool is calendar-month-based, not budget-based. It includes all expenses in that full month. Optional input: includeCategoryBreakdown.',
       inputSchema: monthPeriodSummarySchema,
       outputSchema: monthPeriodSummaryResultSchema,
     },

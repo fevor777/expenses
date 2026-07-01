@@ -4,7 +4,7 @@ import { buildRollingBudgetFrame, summarizeExpensesForFrame, } from '../domain/s
 import { executeTool, jsonResult } from './shared.js';
 export function registerBudgetSummaryTool(server, deps) {
     server.registerTool('budget_summary', {
-        description: 'Return the current rolling budget summary for the active budget period. Remaining budget uses only expenses where includeInBalance is true, and the active frame is derived from the configured budget start date and duration.',
+        description: 'Return an aggregated summary for the current active budget period. This tool is budget-based, not calendar-month-based. Remaining budget uses only expenses where includeInBalance is true. Optional input: includeCategoryBreakdown.',
         inputSchema: monthlySummarySchema,
         outputSchema: budgetSummaryResultSchema,
     }, async (input) => {

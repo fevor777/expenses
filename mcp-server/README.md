@@ -25,6 +25,8 @@ Standalone MCP runtime for the Expenses app. It exposes Firestore-backed tools o
 
 Expense tools that create, update, or list expenses also support `tagIds`, so MCP clients can attach existing tags to expenses and filter by them.
 
+Tool descriptions and input field descriptions are intentionally literal and low-ambiguity. They are written for weaker MCP clients that rely on shallow keyword matching when choosing a tool or filling arguments.
+
 In `AUTH_MODE=oauth`, the server resolves the authenticated OAuth user to a Firebase user and scopes all queries to that Firebase uid. In legacy bearer mode, queries remain hard-scoped to `EXPENSES_OWNER_UID`.
 
 ## Prompt templates
@@ -42,9 +44,12 @@ Budget-oriented summary tools use budget semantics, not calendar-month semantics
 - the active budget frame comes from the configured budget start date and period length
 - therefore the budget period may start/end on dates that do not match the start/end of a calendar month
 
-`monthly_summary` is different: it returns a current calendar month summary and is not tied to budget settings.
+Choose summary tools with the same terminology used in the tool descriptions:
 
-`month_period_summary` returns a full arbitrary calendar month by `year` and `month`, also independent from budget settings.
+- `budget_summary`: aggregated summary for the current active budget period
+- `budget_period_summary`: aggregated summary for one budget period selected by `periodOffset`
+- `monthly_summary`: aggregated summary for the current calendar month
+- `month_period_summary`: aggregated summary for one specific calendar month selected by `year` and `month`
 
 ## Environment
 

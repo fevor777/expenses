@@ -2,7 +2,12 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { updateTagResultSchema } from '../domain/output-schemas.js';
 import { updateTagSchema } from '../domain/schemas.js';
 import type { ToolDependencies } from './shared.js';
-import { createMutationAnnotations, executeTool, jsonResult } from './shared.js';
+import {
+  assertAtLeastOneDefinedField,
+  createMutationAnnotations,
+  executeTool,
+  jsonResult,
+} from './shared.js';
 
 export function registerUpdateTagTool(
   server: McpServer,
@@ -12,7 +17,7 @@ export function registerUpdateTagTool(
     'update_tag',
     {
       description:
-        'Update an existing expense tag, including its name and star flag.',
+        'Update one existing expense tag for the authenticated user. Required input: id plus at least one field to change. Mutable fields: name and star.',
       inputSchema: updateTagSchema,
       outputSchema: updateTagResultSchema,
       annotations: createMutationAnnotations('Tags: Update', {
@@ -22,6 +27,12 @@ export function registerUpdateTagTool(
     },
     async input => {
       return executeTool(deps, 'update_tag', async () => {
+        assertAtLeastOneDefinedField(
+          input,
+          ['name', 'star'],
+          'At least one tag field must be provided'
+        );
+
         const tag = await deps.tagsRepository.update(input);
         return jsonResult({ status: 'updated', id: tag.id, tag });
       });

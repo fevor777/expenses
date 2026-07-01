@@ -11,7 +11,8 @@ export function registerDeleteTagTool(
   server.registerTool(
     'delete_tag',
     {
-      description: 'Delete an expense tag by id.',
+      description:
+        'Delete one expense tag for the authenticated user. Required input: id.',
       inputSchema: tagIdSchema,
       outputSchema: deleteTagResultSchema,
       annotations: createMutationAnnotations('Tags: Delete', {

@@ -12,7 +12,7 @@ export function registerGetBudgetTool(
     'get_budget',
     {
       description:
-        'Return the current budget settings for the authenticated Firebase user.',
+        'Return the current budget settings for the authenticated user. This tool takes no input arguments.',
       outputSchema: getBudgetResultSchema,
     },
     async () => {

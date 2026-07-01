@@ -3,7 +3,7 @@ import { savingsValueSchema } from '../domain/schemas.js';
 import { executeTool, jsonResult } from './shared.js';
 export function registerUpdateSavingsTool(server, deps) {
     server.registerTool('update_savings', {
-        description: 'Update the savings value for the authenticated Firebase user.',
+        description: 'Update the authenticated user\'s savings value. Required input: value.',
         inputSchema: savingsValueSchema,
         outputSchema: updateSavingsResultSchema,
     }, async (input) => {

@@ -13,7 +13,7 @@ export function registerListExpensesTool(
     'list_expenses',
     {
       description:
-        'List expenses using the same date, category, description, and tag semantics as the Angular application.',
+        'Return raw expense records for the authenticated user for a custom time window. Use this tool for daily, weekly, or custom period analysis when you need individual expenses, not an aggregated summary. For daily analysis, pass startDate and endDate for that day. Optional filters: categories, description, tagIds, limit, and sort.',
       inputSchema: expenseFilterSchema,
       outputSchema: expenseCollectionResultShape,
     },

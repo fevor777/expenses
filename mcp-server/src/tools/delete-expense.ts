@@ -12,7 +12,7 @@ export function registerDeleteExpenseTool(
     'delete_expense',
     {
       description:
-        'Delete an existing expense by id for the authenticated Firebase user.',
+        'Delete one expense record for the authenticated user. Required input: id.',
       inputSchema: expenseIdSchema,
       outputSchema: deleteExpenseResultSchema,
     },

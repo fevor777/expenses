@@ -123,6 +123,18 @@ export function createMutationAnnotations(
   };
 }
 
+export function assertAtLeastOneDefinedField<T extends Record<string, unknown>>(
+  input: T,
+  fields: Array<keyof T>,
+  message: string
+): void {
+  if (fields.some(field => input[field] !== undefined)) {
+    return;
+  }
+
+  throw new Error(message);
+}
+
 function classifyToolError(error: unknown): ToolErrorPayload | null {
   const message = error instanceof Error ? error.message : String(error);
 
@@ -137,7 +149,10 @@ function classifyToolError(error: unknown): ToolErrorPayload | null {
 
   if (
     message === 'Tag name is required' ||
-    message === 'startDate must be less than or equal to endDate'
+    message === 'startDate must be less than or equal to endDate' ||
+    message === 'At least one mutable field must be provided' ||
+    message === 'At least one tag field must be provided' ||
+    message === 'At least one budget field must be provided'
   ) {
     return {
       error: {

@@ -12,7 +12,7 @@ export function registerUpdateSavingsTool(
     'update_savings',
     {
       description:
-        'Update the savings value for the authenticated Firebase user.',
+        'Update the authenticated user\'s savings value. Required input: value.',
       inputSchema: savingsValueSchema,
       outputSchema: updateSavingsResultSchema,
     },

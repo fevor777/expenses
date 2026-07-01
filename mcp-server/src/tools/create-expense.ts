@@ -11,7 +11,8 @@ export function registerCreateExpenseTool(
   server.registerTool(
     'create_expense',
     {
-      description: 'Create a new expense for the authenticated Firebase user.',
+      description:
+        'Create one expense record for the authenticated user. Required input: amount, category, and date. Optional input: currency, description, tagIds, and includeInBalance.',
       inputSchema: createExpenseSchema,
       outputSchema: createExpenseResultSchema,
     },

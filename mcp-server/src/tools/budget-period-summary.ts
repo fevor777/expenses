@@ -18,7 +18,7 @@ export function registerBudgetPeriodSummaryTool(
     'budget_period_summary',
     {
       description:
-        'Return a budget summary for a shifted budget period. Use periodOffset 0 for the current period, -1 for the previous period. Remaining budget uses only expenses where includeInBalance is true, and period boundaries are shifted copies of the configured budget start date and duration.',
+        'Return an aggregated summary for one budget period selected by periodOffset. This tool is budget-based, not calendar-month-based. Use periodOffset 0 for the current period and -1 for the previous period. Remaining budget uses only expenses where includeInBalance is true. Optional input: includeCategoryBreakdown.',
       inputSchema: budgetPeriodSummarySchema,
       outputSchema: budgetPeriodSummaryResultSchema,
     },

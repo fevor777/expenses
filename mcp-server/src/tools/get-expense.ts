@@ -12,7 +12,7 @@ export function registerGetExpenseTool(
     'get_expense',
     {
       description:
-        'Fetch a single expense by id for the authenticated Firebase user.',
+        'Return one expense record for the authenticated user. Required input: id.',
       inputSchema: expenseIdSchema,
       outputSchema: expenseResultSchema,
     },

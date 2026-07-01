@@ -3,7 +3,7 @@ import { expenseIdSchema } from '../domain/schemas.js';
 import { executeTool, jsonResult } from './shared.js';
 export function registerDeleteExpenseTool(server, deps) {
     server.registerTool('delete_expense', {
-        description: 'Delete an existing expense by id for the authenticated Firebase user.',
+        description: 'Delete one expense record for the authenticated user. Required input: id.',
         inputSchema: expenseIdSchema,
         outputSchema: deleteExpenseResultSchema,
     }, async (input) => {

@@ -3,7 +3,7 @@ import { resolveBudget } from '../domain/summaries.js';
 import { executeTool, jsonResult } from './shared.js';
 export function registerGetBudgetTool(server, deps) {
     server.registerTool('get_budget', {
-        description: 'Return the current budget settings for the authenticated Firebase user.',
+        description: 'Return the current budget settings for the authenticated user. This tool takes no input arguments.',
         outputSchema: getBudgetResultSchema,
     }, async () => {
         return executeTool(deps, 'get_budget', async () => {

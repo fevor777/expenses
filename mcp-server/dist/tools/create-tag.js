@@ -3,7 +3,7 @@ import { createTagSchema } from '../domain/schemas.js';
 import { createMutationAnnotations, executeTool, jsonResult } from './shared.js';
 export function registerCreateTagTool(server, deps) {
     server.registerTool('create_tag', {
-        description: 'Create a new expense tag.',
+        description: 'Create one expense tag for the authenticated user. Required input: name. Optional input: star.',
         inputSchema: createTagSchema,
         outputSchema: createTagResultSchema,
         annotations: createMutationAnnotations('Tags: Create', {

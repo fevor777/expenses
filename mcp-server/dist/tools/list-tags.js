@@ -2,7 +2,7 @@ import { tagCollectionResultSchema } from '../domain/output-schemas.js';
 import { createReadOnlyAnnotations, executeTool, jsonResult } from './shared.js';
 export function registerListTagsTool(server, deps) {
     server.registerTool('list_tags', {
-        description: 'List available expense tags.',
+        description: 'Return all expense tags for the authenticated user. This tool takes no input arguments.',
         outputSchema: tagCollectionResultSchema,
         annotations: createReadOnlyAnnotations('Tags: List'),
     }, async () => {
