@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 import {
   catchError,
   filter,
@@ -9,10 +11,8 @@ import {
   Observable,
   of,
   switchMap,
-  take,
   tap,
   throwError,
-  timeout,
 } from 'rxjs';
 
 import { canonicalizeTag, normalizeTagName, Tag } from '../model/tag.model';
@@ -130,15 +130,7 @@ export class TagService {
         this.markTagDeleted(deletedId);
         this.removeTagReferenceLocally(deletedId);
         return this.tagStoreService.deleteTag(deletedId);
-      }),
-      switchMap(deletedId =>
-        this.getTags(false).pipe(
-          take(1),
-          timeout({ first: 4000 }),
-          map(() => deletedId),
-          catchError(() => of(deletedId))
-        )
-      )
+      })
     );
   }
 
@@ -176,20 +168,28 @@ export class TagService {
           return of(void 0);
         }
 
-        return from(
-          Promise.all(
-            snapshot.docs.map(doc => {
+        const commitPromises: Promise<void>[] = [];
+        const batchSize = 500;
+
+        for (let index = 0; index < snapshot.docs.length; index += batchSize) {
+          const batch = this.fireStore.firestore.batch();
+          const docs = snapshot.docs.slice(index, index + batchSize);
+
+          docs.forEach(doc => {
               const data = doc.data() as Expense;
               const nextTagIds = (data.tagIds || []).filter(id => id !== tagId);
-              return doc.ref.set(
+              batch.update(
+                doc.ref,
                 nextTagIds.length > 0
-                  ? { ...data, tagIds: nextTagIds }
-                  : { ...data, tagIds: [] },
-                { merge: true }
+                  ? { tagIds: nextTagIds }
+                  : { tagIds: firebase.firestore.FieldValue.delete() }
               );
-            })
-          )
-        ).pipe(map(() => void 0));
+            });
+
+          commitPromises.push(batch.commit().then(() => void 0));
+        }
+
+        return from(Promise.all(commitPromises)).pipe(map(() => void 0));
       })
     );
   }
