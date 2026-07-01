@@ -1,7 +1,19 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { filter, from, map, Observable, of, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  filter,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+  take,
+  tap,
+  throwError,
+  timeout,
+} from 'rxjs';
 
 import { canonicalizeTag, normalizeTagName, Tag } from '../model/tag.model';
 import { withUserId } from './with-user-id.helper';
@@ -12,6 +24,7 @@ import { Expense } from '../model/expense.model';
   providedIn: 'root',
 })
 export class TagService {
+  private readonly deletedTagIdsStorageKey = 'deletedTagIds';
   private readonly tagsCollection;
 
   constructor(
@@ -25,6 +38,7 @@ export class TagService {
   addTag(name: string): Observable<Tag> {
     const id = this.fireStore.createId();
     const tag = canonicalizeTag({ id, name });
+    this.unmarkTagDeleted(id);
     const fallback = () => this.tagStoreService.addTag(tag);
     fallback();
     const request = (uid: string) =>
@@ -50,6 +64,13 @@ export class TagService {
           ),
           map(changes =>
             changes
+              .filter(change => {
+                const data = change.payload.doc.data() as Tag & {
+                  deleted?: boolean;
+                  deletedAt?: number;
+                };
+                return data?.deleted !== true && data?.deletedAt == null;
+              })
               .map(change =>
                 canonicalizeTag({
                   id: change.payload.doc.id,
@@ -57,6 +78,7 @@ export class TagService {
                 })
               )
               .filter(tag => !!tag.id && !!tag.normalizedName)
+                .filter(tag => !this.getDeletedTagIds().has(tag.id))
           ),
           tap(tags => {
             localStorage.setItem('tags', JSON.stringify(tags));
@@ -78,16 +100,46 @@ export class TagService {
   }
 
   deleteTag(id: string): Observable<string> {
-    const fallback = () => {
-      this.removeTagReferenceLocally(id);
-      return this.tagStoreService.deleteTag(id);
-    };
-    fallback();
-    const request = (uid: string) =>
-      this.removeTagReferenceRemotely(uid, id).pipe(
-        switchMap(() => from(this.tagsCollection.doc(id).delete()).pipe(map(() => id)))
+    const strictFallback = () =>
+      throwError(
+        () =>
+          new Error(
+            'Strict hard-delete requires authenticated remote access and successful Firestore deletion.'
+          )
       );
-    return withUserId(this.afAuth, request, fallback, fallback);
+
+    const request = (uid: string) =>
+      from(this.tagsCollection.doc(id).delete()).pipe(
+        map(() => id),
+        switchMap(deletedId =>
+          this.removeTagReferenceRemotely(uid, deletedId).pipe(
+            // Post-delete cleanup is best-effort and must not block delete success.
+            catchError(error => {
+              console.warn('Failed to remove tag references after hard delete', {
+                tagId: deletedId,
+                error,
+              });
+              return of(void 0);
+            }),
+            map(() => deletedId)
+          )
+        )
+      );
+    return withUserId(this.afAuth, request, strictFallback, strictFallback).pipe(
+      switchMap(deletedId => {
+        this.markTagDeleted(deletedId);
+        this.removeTagReferenceLocally(deletedId);
+        return this.tagStoreService.deleteTag(deletedId);
+      }),
+      switchMap(deletedId =>
+        this.getTags(false).pipe(
+          take(1),
+          timeout({ first: 4000 }),
+          map(() => deletedId),
+          catchError(() => of(deletedId))
+        )
+      )
+    );
   }
 
   normalizeName(name?: string): string {
@@ -140,5 +192,25 @@ export class TagService {
         ).pipe(map(() => void 0));
       })
     );
+  }
+
+  private getDeletedTagIds(): Set<string> {
+    const raw = JSON.parse(localStorage.getItem(this.deletedTagIdsStorageKey) || '[]') as string[];
+    return new Set(raw.filter(Boolean));
+  }
+
+  private markTagDeleted(id: string): void {
+    const deletedIds = this.getDeletedTagIds();
+    deletedIds.add(id);
+    localStorage.setItem(this.deletedTagIdsStorageKey, JSON.stringify(Array.from(deletedIds)));
+  }
+
+  private unmarkTagDeleted(id: string): void {
+    const deletedIds = this.getDeletedTagIds();
+    if (!deletedIds.has(id)) {
+      return;
+    }
+    deletedIds.delete(id);
+    localStorage.setItem(this.deletedTagIdsStorageKey, JSON.stringify(Array.from(deletedIds)));
   }
 }

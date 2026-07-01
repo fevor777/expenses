@@ -14,12 +14,18 @@ Standalone MCP runtime for the Expenses app. It exposes Firestore-backed tools o
 - `month_period_summary`
 - `export_expenses`
 - `list_categories`
+- `list_tags`
 - `get_budget`
 - `update_budget`
 - `get_savings`
 - `update_savings`
+- `create_tag`
+- `update_tag`
+- `delete_tag`
 - `create_expense`
 - `update_expense`
+
+Expense tools that create, update, list, search, or export expenses also support `tagIds`, so MCP clients can attach existing tags to expenses and filter by them.
 
 In `AUTH_MODE=oauth`, the server resolves the authenticated OAuth user to a Firebase user and scopes all queries to that Firebase uid. In legacy bearer mode, queries remain hard-scoped to `EXPENSES_OWNER_UID`.
 

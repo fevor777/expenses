@@ -1,4 +1,4 @@
-import type { Firestore, Query } from 'firebase-admin/firestore';
+import { FieldValue, type Firestore, type Query } from 'firebase-admin/firestore';
 import {
   canonicalizeTag,
   type CreateTagInput,
@@ -64,7 +64,12 @@ export class TagsRepository {
         const tagIds = Array.isArray(value.tagIds)
           ? value.tagIds.filter((tagId: unknown) => tagId !== id)
           : [];
-        return document.ref.set({ ...value, tagIds }, { merge: true });
+        return document.ref.set(
+          tagIds.length > 0
+            ? { ...value, tagIds }
+            : { ...value, tagIds: FieldValue.delete() },
+          { merge: true }
+        );
       })
     );
 

@@ -41,6 +41,7 @@ Notes:
 - Claude Code reads `MCP_BEARER_TOKEN` from your shell and uses `EXPENSES_MCP_URL` if you want to override `http://localhost:8080/mcp`.
 - VS Code prompts for the MCP URL and bearer token from `.vscode/mcp.json`.
 - Cursor reads `MCP_BEARER_TOKEN` from your environment and targets `http://localhost:8080/mcp` by default.
+- The MCP server exposes tag management tools (`list_tags`, `create_tag`, `update_tag`, `delete_tag`) and expense tools accept `tagIds`.
 
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

@@ -19,6 +19,7 @@ import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-le
 import { MorningReminderService, MorningReminderConfig } from '../common/service/morning-reminder.service';
 import { Tag, normalizeTagName } from '../common/model/tag.model';
 import { TagService } from '../common/service/tag.service';
+import { TagStoreService } from '../common/service/tag-store.service';
 
 @Component({
   selector: 'app-export',
@@ -82,7 +83,8 @@ export class ExportComponent implements OnDestroy {
     private afAuth: AngularFireAuth,
     private swipeLengthStore: GlobalSwipeLengthStoreService,
     private morningReminderService: MorningReminderService,
-    private tagService: TagService
+    private tagService: TagService,
+    private tagStoreService: TagStoreService
   ) {
     this.irregularBudgetService
       .getValue()
@@ -107,7 +109,13 @@ export class ExportComponent implements OnDestroy {
     this.morningReminderEnabled = morningConfig.enabled;
     this.morningStartHour = morningConfig.startHour;
     this.morningEndHour = morningConfig.endHour;
-    this.tags$ = this.tagService.getTags();
+    this.tags$ = this.tagStoreService.getTagsObs();
+    // Keep local store in sync with Firestore, but render from store for optimistic UI updates.
+    this.tagService
+      .getTags(false)
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe();
+
     this.tags$
       .pipe(takeUntil(this.destroySubject))
       .subscribe(tags => (this.tags = tags || []));

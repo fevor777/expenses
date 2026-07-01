@@ -1,3 +1,4 @@
+import { FieldValue } from 'firebase-admin/firestore';
 import { canonicalizeTag, } from '../domain/models.js';
 export class TagsRepository {
     firestore;
@@ -49,7 +50,9 @@ export class TagsRepository {
             const tagIds = Array.isArray(value.tagIds)
                 ? value.tagIds.filter((tagId) => tagId !== id)
                 : [];
-            return document.ref.set({ ...value, tagIds }, { merge: true });
+            return document.ref.set(tagIds.length > 0
+                ? { ...value, tagIds }
+                : { ...value, tagIds: FieldValue.delete() }, { merge: true });
         }));
         await this.firestore.collection('tags').doc(existing.id).delete();
         return existing.id;
@@ -71,6 +74,7 @@ export class TagsRepository {
             id,
             uid: String(value.uid ?? this.ownerUid),
             name: String(value.name ?? ''),
+            star: value.star === true,
         });
     }
 }

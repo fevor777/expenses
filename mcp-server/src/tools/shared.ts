@@ -1,5 +1,6 @@
 import type { Logger } from 'pino';
 import type { AppConfig } from '../config.js';
+import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import type { ExpensesRepository } from '../firestore/expenses.repository.js';
 import type { SettingsRepository } from '../firestore/settings.repository.js';
 import type { TagsRepository } from '../firestore/tags.repository.js';
@@ -53,5 +54,29 @@ export function jsonResult(payload: Record<string, unknown>) {
       },
     ],
     structuredContent: payload,
+  };
+}
+
+export function createReadOnlyAnnotations(title: string): ToolAnnotations {
+  return {
+    title,
+    readOnlyHint: true,
+    openWorldHint: false,
+  };
+}
+
+export function createMutationAnnotations(
+  title: string,
+  options?: {
+    destructiveHint?: boolean;
+    idempotentHint?: boolean;
+  }
+): ToolAnnotations {
+  return {
+    title,
+    readOnlyHint: false,
+    destructiveHint: options?.destructiveHint ?? false,
+    idempotentHint: options?.idempotentHint ?? false,
+    openWorldHint: false,
   };
 }
