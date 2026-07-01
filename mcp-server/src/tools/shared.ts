@@ -13,11 +13,24 @@ export type ToolDependencies = {
   tagsRepository: TagsRepository;
 };
 
-export async function executeTool<T>(
+type ToolErrorPayload = {
+  error: {
+    code: 'not_found' | 'invalid_input';
+    message: string;
+  };
+};
+
+type ToolResult<T extends Record<string, unknown>> = {
+  content: Array<{ type: 'text'; text: string }>;
+  structuredContent: T;
+  isError?: boolean;
+};
+
+export async function executeTool<T extends Record<string, unknown>>(
   deps: ToolDependencies,
   toolName: string,
-  operation: () => Promise<T>
-): Promise<T> {
+  operation: () => Promise<ToolResult<T>>
+): Promise<ToolResult<T | ToolErrorPayload>> {
   const startedAt = Date.now();
 
   try {
@@ -32,6 +45,22 @@ export async function executeTool<T>(
     );
     return result;
   } catch (error) {
+    const toolErrorPayload = classifyToolError(error);
+    if (toolErrorPayload) {
+      deps.logger.warn(
+        {
+          tool: toolName,
+          outcome: 'error',
+          durationMs: Date.now() - startedAt,
+          error: toolErrorPayload.error.message,
+          errorCode: toolErrorPayload.error.code,
+        },
+        'MCP tool returned a handled error result'
+      );
+
+      return toolErrorResult(toolErrorPayload);
+    }
+
     deps.logger.error(
       {
         tool: toolName,
@@ -45,7 +74,7 @@ export async function executeTool<T>(
   }
 }
 
-export function jsonResult(payload: Record<string, unknown>) {
+export function jsonResult<T extends Record<string, unknown>>(payload: T) {
   return {
     content: [
       {
@@ -54,6 +83,19 @@ export function jsonResult(payload: Record<string, unknown>) {
       },
     ],
     structuredContent: payload,
+  };
+}
+
+export function toolErrorResult(payload: ToolErrorPayload): ToolResult<ToolErrorPayload> {
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(payload, null, 2),
+      },
+    ],
+    structuredContent: payload,
+    isError: true,
   };
 }
 
@@ -79,4 +121,31 @@ export function createMutationAnnotations(
     idempotentHint: options?.idempotentHint ?? false,
     openWorldHint: false,
   };
+}
+
+function classifyToolError(error: unknown): ToolErrorPayload | null {
+  const message = error instanceof Error ? error.message : String(error);
+
+  if (/^(Expense|Tag) .+ not found$/u.test(message)) {
+    return {
+      error: {
+        code: 'not_found',
+        message,
+      },
+    };
+  }
+
+  if (
+    message === 'Tag name is required' ||
+    message === 'startDate must be less than or equal to endDate'
+  ) {
+    return {
+      error: {
+        code: 'invalid_input',
+        message,
+      },
+    };
+  }
+
+  return null;
 }

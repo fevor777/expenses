@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { createExpenseSchema, createExpenseShape } from '../domain/schemas.js';
+import { createExpenseResultSchema } from '../domain/output-schemas.js';
+import { createExpenseSchema } from '../domain/schemas.js';
 import type { ToolDependencies } from './shared.js';
 import { executeTool, jsonResult } from './shared.js';
 
@@ -7,22 +8,24 @@ export function registerCreateExpenseTool(
   server: McpServer,
   deps: ToolDependencies
 ): void {
-  server.tool(
+  server.registerTool(
     'create_expense',
-    'Create a new expense for the authenticated Firebase user.',
-    createExpenseShape,
+    {
+      description: 'Create a new expense for the authenticated Firebase user.',
+      inputSchema: createExpenseSchema,
+      outputSchema: createExpenseResultSchema,
+    },
     async input => {
-      const args = createExpenseSchema.parse(input);
       return executeTool(deps, 'create_expense', async () => {
         const expense = await deps.expensesRepository.create({
-          amount: args.amount,
-          category: args.category,
-          currency: args.currency ?? 'EUR',
-          date: args.date,
-          ...(args.description !== undefined ? { description: args.description } : {}),
-          ...(args.tagIds !== undefined ? { tagIds: args.tagIds } : {}),
-          ...(args.includeInBalance !== undefined
-            ? { includeInBalance: args.includeInBalance }
+          amount: input.amount,
+          category: input.category,
+          currency: input.currency ?? 'EUR',
+          date: input.date,
+          ...(input.description !== undefined ? { description: input.description } : {}),
+          ...(input.tagIds !== undefined ? { tagIds: input.tagIds } : {}),
+          ...(input.includeInBalance !== undefined
+            ? { includeInBalance: input.includeInBalance }
             : {}),
         });
 

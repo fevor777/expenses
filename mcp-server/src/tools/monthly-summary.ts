@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { monthSummaryResultSchema } from '../domain/output-schemas.js';
 import {
   monthlySummarySchema,
-  monthlySummaryShape,
 } from '../domain/schemas.js';
 import {
   buildCurrentMonthFrame,
@@ -14,12 +14,15 @@ export function registerMonthlySummaryTool(
   server: McpServer,
   deps: ToolDependencies
 ): void {
-  server.tool(
+  server.registerTool(
     'monthly_summary',
-    'Return a summary for the current calendar month. This tool is not budget-based and includes all expenses in the month-to-date window.',
-    monthlySummaryShape,
+    {
+      description:
+        'Return a summary for the current calendar month. This tool is not budget-based and includes all expenses in the month-to-date window.',
+      inputSchema: monthlySummarySchema,
+      outputSchema: monthSummaryResultSchema,
+    },
     async input => {
-      const args = monthlySummarySchema.parse(input);
       return executeTool(deps, 'monthly_summary', async () => {
         const frame = buildCurrentMonthFrame();
         const expenses = await deps.expensesRepository.listInRange(
@@ -29,7 +32,7 @@ export function registerMonthlySummaryTool(
         const summary = summarizeMonthlyExpenses(
           expenses,
           frame,
-          args.includeCategoryBreakdown ?? false
+          input.includeCategoryBreakdown ?? false
         );
 
         return jsonResult({ summary });

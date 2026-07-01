@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { budgetSummaryResultSchema } from '../domain/output-schemas.js';
 import {
   monthlySummarySchema,
-  monthlySummaryShape,
 } from '../domain/schemas.js';
 import {
   buildRollingBudgetFrame,
@@ -14,12 +14,15 @@ export function registerBudgetSummaryTool(
   server: McpServer,
   deps: ToolDependencies
 ): void {
-  server.tool(
+  server.registerTool(
     'budget_summary',
-    'Return the current rolling budget summary for the active budget period. Remaining budget uses only expenses where includeInBalance is true, and the active frame is derived from the configured budget start date and duration.',
-    monthlySummaryShape,
+    {
+      description:
+        'Return the current rolling budget summary for the active budget period. Remaining budget uses only expenses where includeInBalance is true, and the active frame is derived from the configured budget start date and duration.',
+      inputSchema: monthlySummarySchema,
+      outputSchema: budgetSummaryResultSchema,
+    },
     async input => {
-      const args = monthlySummarySchema.parse(input);
       return executeTool(deps, 'budget_summary', async () => {
         const budget = await deps.settingsRepository.getBudget();
         const savings = await deps.settingsRepository.getSavings();
@@ -33,7 +36,7 @@ export function registerBudgetSummaryTool(
           budget,
           savings,
           frame,
-          args.includeCategoryBreakdown ?? false
+          input.includeCategoryBreakdown ?? false
         );
 
         return jsonResult({ summary });

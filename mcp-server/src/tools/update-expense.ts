@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { updateExpenseSchema, updateExpenseShape } from '../domain/schemas.js';
+import { updateExpenseResultSchema } from '../domain/output-schemas.js';
+import { updateExpenseSchema } from '../domain/schemas.js';
 import type { ToolDependencies } from './shared.js';
 import { executeTool, jsonResult } from './shared.js';
 
@@ -7,14 +8,17 @@ export function registerUpdateExpenseTool(
   server: McpServer,
   deps: ToolDependencies
 ): void {
-  server.tool(
+  server.registerTool(
     'update_expense',
-    'Update mutable fields of an existing expense owned by the authenticated Firebase user.',
-    updateExpenseShape,
+    {
+      description:
+        'Update mutable fields of an existing expense owned by the authenticated Firebase user.',
+      inputSchema: updateExpenseSchema,
+      outputSchema: updateExpenseResultSchema,
+    },
     async input => {
-      const args = updateExpenseSchema.parse(input);
       return executeTool(deps, 'update_expense', async () => {
-        const expense = await deps.expensesRepository.update(args);
+        const expense = await deps.expensesRepository.update(input);
 
         return jsonResult({
           status: 'updated',

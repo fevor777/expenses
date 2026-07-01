@@ -1,13 +1,18 @@
-import { tagIdSchema, tagIdShape } from '../domain/schemas.js';
+import { deleteTagResultSchema } from '../domain/output-schemas.js';
+import { tagIdSchema } from '../domain/schemas.js';
 import { createMutationAnnotations, executeTool, jsonResult } from './shared.js';
 export function registerDeleteTagTool(server, deps) {
-    server.tool('delete_tag', 'Delete an expense tag by id.', tagIdShape, createMutationAnnotations('Tags: Delete', {
-        destructiveHint: true,
-        idempotentHint: true,
-    }), async (input) => {
-        const args = tagIdSchema.parse(input);
+    server.registerTool('delete_tag', {
+        description: 'Delete an expense tag by id.',
+        inputSchema: tagIdSchema,
+        outputSchema: deleteTagResultSchema,
+        annotations: createMutationAnnotations('Tags: Delete', {
+            destructiveHint: true,
+            idempotentHint: true,
+        }),
+    }, async (input) => {
         return executeTool(deps, 'delete_tag', async () => {
-            const id = await deps.tagsRepository.delete(args.id);
+            const id = await deps.tagsRepository.delete(input.id);
             return jsonResult({ status: 'deleted', id });
         });
     });

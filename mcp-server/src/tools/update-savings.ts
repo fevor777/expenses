@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { savingsValueSchema, savingsValueShape } from '../domain/schemas.js';
+import { updateSavingsResultSchema } from '../domain/output-schemas.js';
+import { savingsValueSchema } from '../domain/schemas.js';
 import type { ToolDependencies } from './shared.js';
 import { executeTool, jsonResult } from './shared.js';
 
@@ -7,14 +8,17 @@ export function registerUpdateSavingsTool(
   server: McpServer,
   deps: ToolDependencies
 ): void {
-  server.tool(
+  server.registerTool(
     'update_savings',
-    'Update the savings value for the authenticated Firebase user.',
-    savingsValueShape,
+    {
+      description:
+        'Update the savings value for the authenticated Firebase user.',
+      inputSchema: savingsValueSchema,
+      outputSchema: updateSavingsResultSchema,
+    },
     async input => {
-      const args = savingsValueSchema.parse(input);
       return executeTool(deps, 'update_savings', async () => {
-        const savings = await deps.settingsRepository.updateSavings(args.value);
+        const savings = await deps.settingsRepository.updateSavings(input.value);
 
         return jsonResult({
           status: 'updated',

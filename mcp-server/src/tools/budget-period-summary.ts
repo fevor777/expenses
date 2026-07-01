@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { budgetPeriodSummaryResultSchema } from '../domain/output-schemas.js';
 import {
   budgetPeriodSummarySchema,
-  budgetPeriodSummaryShape,
 } from '../domain/schemas.js';
 import {
   buildBudgetPeriodFrame,
@@ -14,14 +14,17 @@ export function registerBudgetPeriodSummaryTool(
   server: McpServer,
   deps: ToolDependencies
 ): void {
-  server.tool(
+  server.registerTool(
     'budget_period_summary',
-    'Return a budget summary for a shifted budget period. Use periodOffset 0 for the current period, -1 for the previous period. Remaining budget uses only expenses where includeInBalance is true, and period boundaries are shifted copies of the configured budget start date and duration.',
-    budgetPeriodSummaryShape,
+    {
+      description:
+        'Return a budget summary for a shifted budget period. Use periodOffset 0 for the current period, -1 for the previous period. Remaining budget uses only expenses where includeInBalance is true, and period boundaries are shifted copies of the configured budget start date and duration.',
+      inputSchema: budgetPeriodSummarySchema,
+      outputSchema: budgetPeriodSummaryResultSchema,
+    },
     async input => {
-      const args = budgetPeriodSummarySchema.parse(input);
       return executeTool(deps, 'budget_period_summary', async () => {
-        const periodOffset = args.periodOffset ?? 0;
+        const periodOffset = input.periodOffset ?? 0;
         const budget = await deps.settingsRepository.getBudget();
         const savings = await deps.settingsRepository.getSavings();
         const frame = buildBudgetPeriodFrame(budget, periodOffset);
@@ -34,7 +37,7 @@ export function registerBudgetPeriodSummaryTool(
           budget,
           savings,
           frame,
-          args.includeCategoryBreakdown ?? false
+          input.includeCategoryBreakdown ?? false
         );
 
         return jsonResult({
