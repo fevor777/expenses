@@ -1,36 +1,19 @@
 <div class="eem-backdrop" (click)="onBackdrop()"></div>
-<div
-  class="eem-wrapper"
-  (click)="$event.stopPropagation()"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Edit description dialog"
->
+<div class="eem-wrapper" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+  aria-label="Edit description dialog">
   <div class="eem-header">
     <span class="eem-title">{{ localDescription ? 'Edit' : 'Add' }} Description</span>
-    <button
-      type="button"
-      class="eem-close"
-      (click)="onBackdrop()"
-      aria-label="Close"
-    >
+    <button type="button" class="eem-close" (click)="onBackdrop()" aria-label="Close">
       ×
     </button>
   </div>
   <form (ngSubmit)="onApply()" class="eem-form">
-    <div class="desc-tags">
-      <button type="button" class="desc-tag" (click)="appendSuffix('!')">#лишнее</button>
-      <button type="button" class="desc-tag" (click)="appendSuffix('?')">#необязательное</button>
-    </div>
+    <app-tag-selector [selectedTagIds]="localSelectedTagIds"
+      (selectedTagIdsChange)="localSelectedTagIds = $event"></app-tag-selector>
     <label class="eem-field">
       <span class="eem-label">Description</span>
-      <textarea
-        [(ngModel)]="localDescription"
-        name="description"
-        rows="4"
-        placeholder="Enter description"
-        autofocus
-      ></textarea>
+      <textarea [(ngModel)]="localDescription" name="description" rows="4" placeholder="Enter description"
+        autofocus></textarea>
     </label>
     <div class="eem-actions">
       <button type="button" class="eem-btn" (click)="onBackdrop()">Cancel</button>

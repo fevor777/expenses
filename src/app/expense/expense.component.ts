@@ -327,8 +327,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.showCalendar = false;
   }
 
-  onDescriptionApply(description: string): void {
-    this.description = description;
+  onDescriptionApply(event: { description: string; tagIds: string[] }): void {
+    this.description = event.description;
+    this.selectedTagIds = event.tagIds;
     this.showDescriptionModal = false;
   }
 

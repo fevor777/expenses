@@ -1,23 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TagSelectorComponent } from '../../common/component/tag-selector/tag-selector.component';
+import { normalizeTagIds } from '../../common/model/tag.model';
 
 @Component({
   selector: 'app-description-edit-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TagSelectorComponent],
   templateUrl: './description-edit-modal.component.html',
   styleUrls: ['./description-edit-modal.component.scss']
 })
-export class DescriptionEditModalComponent {
+export class DescriptionEditModalComponent implements OnInit {
   @Input() description: string = '';
-  @Output() apply: EventEmitter<string> = new EventEmitter<string>();
+  @Input() selectedTagIds: string[] = [];
+  @Output() apply: EventEmitter<{ description: string; tagIds: string[] }> =
+    new EventEmitter<{ description: string; tagIds: string[] }>();
   @Output() cancel: EventEmitter<void> = new EventEmitter<void>();
 
   localDescription = '';
+  localSelectedTagIds: string[] = [];
 
   ngOnInit(): void {
     this.localDescription = this.description || '';
+    this.localSelectedTagIds = normalizeTagIds(this.selectedTagIds) || [];
   }
 
   onBackdrop(): void {
@@ -25,21 +31,10 @@ export class DescriptionEditModalComponent {
   }
 
   onApply(): void {
-    this.apply.emit(this.localDescription?.trim() || '');
-  }
-
-  appendSuffix(mark: '!' | '?') {
-    const trimmed = this.localDescription.trim();
-    const suffix = `, ${mark}`;
-    // Avoid double-adding same suffix at end
-    if (trimmed.endsWith(suffix)) {
-      return;
-    }
-    if (!trimmed) {
-      this.localDescription = suffix.substring(2); // just mark without leading comma if empty
-    } else {
-      this.localDescription = trimmed + suffix;
-    }
+    this.apply.emit({
+      description: this.localDescription?.trim() || '',
+      tagIds: this.localSelectedTagIds,
+    });
   }
 
   @HostListener('document:keydown', ['$event'])

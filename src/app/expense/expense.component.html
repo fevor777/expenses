@@ -77,6 +77,7 @@
 <app-description-edit-modal
   *ngIf="showDescriptionModal"
   [description]="description"
+  [selectedTagIds]="selectedTagIds"
   (apply)="onDescriptionApply($event)"
   (cancel)="onDescriptionCancel()"
 ></app-description-edit-modal>
