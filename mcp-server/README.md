@@ -12,6 +12,7 @@ Standalone MCP runtime for the Expenses app. It exposes Firestore-backed tools o
 - `get_expense`
 - `delete_expense`
 - `budget_summary`
+- `budget_summary_with_expenses_for_period`
 - `budget_period_summary`
 - `monthly_summary`
 - `month_period_summary`
@@ -51,6 +52,7 @@ Budget-oriented summary tools use budget semantics, not calendar-month semantics
 Choose summary tools with the same terminology used in the tool descriptions:
 
 - `budget_summary`: aggregated summary for the current active budget period
+- `budget_summary_with_expenses_for_period`: current active budget summary plus raw expenses for a requested period
 - `budget_period_summary`: aggregated summary for one budget period selected by `periodOffset`
 - `monthly_summary`: aggregated summary for the current calendar month
 - `month_period_summary`: aggregated summary for one specific calendar month selected by `year` and `month`

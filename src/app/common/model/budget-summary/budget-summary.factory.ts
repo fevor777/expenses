@@ -15,6 +15,10 @@ import {
 } from './budget-summary.pace';
 import { computeEnergyScore } from './budget-summary.energy';
 import {
+  countInclusiveCalendarDays,
+  countInclusiveDaysPassed,
+} from './budget-period.helper';
+import {
   RollingFrameBudget,
   BudgetSummarySnapshot,
   Clock,
@@ -128,8 +132,8 @@ export function createBudgetSummary(
     velocityOverrun: pace.overrun,
     velocityProjectedTotal: pace.projectedTotal,
     energyScore,
-  budgetExhaustion: exhaustionLabel,
-  exhaustDate: exhaustionMs,
+    budgetExhaustion: exhaustionLabel,
+    exhaustDate: exhaustionMs,
     extra: classification.extra,
     extraPct,
     daysSinceExtra: daysSince(classification.latest.extra),
@@ -161,32 +165,10 @@ export function computeFrameStats(
   frameFinish: number,
   now: Date
 ): TimeFrameStats {
-  const startDate = new Date(frameStart);
-  const finishDate = new Date(frameFinish);
-  const startDay = new Date(
-    startDate.getFullYear(),
-    startDate.getMonth(),
-    startDate.getDate()
-  ).getTime();
-  const finishDayEnd = new Date(
-    finishDate.getFullYear(),
-    finishDate.getMonth(),
-    finishDate.getDate(),
-    23,
-    59,
-    59,
-    999
-  ).getTime();
-  const totalDays = Math.max(
-    1,
-    Math.ceil((finishDayEnd - startDay) / (1000 * 60 * 60 * 24) - 1)
-  );
+  const totalDays = countInclusiveCalendarDays(frameStart, frameFinish);
   const daysPassed = Math.min(
     totalDays,
-    Math.max(
-      0,
-      Math.floor((now.getTime() - startDay) / (1000 * 60 * 60 * 24))
-    )
+    countInclusiveDaysPassed(frameStart, now.getTime())
   );
   const daysLeft = Math.max(totalDays - daysPassed, 0);
   return {
@@ -196,7 +178,7 @@ export function computeFrameStats(
     elapsedPct: (daysPassed / totalDays) * 100,
     now,
     start: frameStart,
-    finish: finishDayEnd,
+    finish: frameFinish,
   };
 }
 

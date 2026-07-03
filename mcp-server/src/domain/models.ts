@@ -64,6 +64,7 @@ export type UpdateBudgetInput = {
   value?: number;
   period?: number;
   periodStartTs?: number;
+  timezone?: string;
   minDayLimit?: number;
 };
 
@@ -72,6 +73,7 @@ export type BudgetDocument = {
   value: number;
   period: number;
   periodStartTs?: number;
+  timezone?: string;
   minDayLimit?: number;
 };
 
@@ -155,6 +157,7 @@ export function canonicalizeTag(
 }
 
 export function canonicalizeBudget(budget: BudgetDocument): BudgetDocument {
+  const timezone = budget.timezone?.trim();
   return {
     ...(budget.uid ? { uid: budget.uid } : {}),
     value: roundCurrency(budget.value),
@@ -162,6 +165,7 @@ export function canonicalizeBudget(budget: BudgetDocument): BudgetDocument {
     ...(budget.periodStartTs !== undefined
       ? { periodStartTs: Math.trunc(budget.periodStartTs) }
       : {}),
+    ...(timezone ? { timezone } : {}),
     ...(budget.minDayLimit !== undefined
       ? { minDayLimit: roundCurrency(budget.minDayLimit) }
       : {}),

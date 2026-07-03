@@ -32,6 +32,9 @@ export class SettingsRepository {
       ...(value.periodStartTs !== undefined
         ? { periodStartTs: Number(value.periodStartTs) }
         : {}),
+      ...(value.timezone !== undefined
+        ? { timezone: String(value.timezone).trim() }
+        : {}),
       ...(value.minDayLimit !== undefined
         ? { minDayLimit: Number(value.minDayLimit) }
         : {}),
@@ -48,6 +51,11 @@ export class SettingsRepository {
         ? { periodStartTs: input.periodStartTs }
         : existing?.periodStartTs !== undefined
           ? { periodStartTs: existing.periodStartTs }
+          : {}),
+      ...(input.timezone !== undefined
+        ? { timezone: input.timezone }
+        : existing?.timezone !== undefined
+          ? { timezone: existing.timezone }
           : {}),
       ...(input.minDayLimit !== undefined
         ? { minDayLimit: input.minDayLimit }

@@ -5,6 +5,11 @@ import {
   type ExpenseDocument,
   isExpenseIncludedInBalance,
 } from './models.js';
+import {
+  formatBudgetPeriodLabel,
+  getInclusivePeriodEndMs,
+  normalizePeriodDays,
+} from './budget-period.js';
 
 export type BudgetFrame = {
   start: number;
@@ -28,11 +33,15 @@ export type MonthlySummary = {
   budgetPeriodDays: number;
   budgetConfiguredPeriodDays: number;
   budgetConfiguredStartTs?: number;
+  daysPassed: number;
+  daysLeft: number;
+  daysLeftIncludingToday: number;
   totalSpend: number;
   irregularSpend: number;
   budgetedSpend: number;
   budgetCountsIncludeInBalanceOnly: boolean;
   remainingBudget: number;
+  recommendedDailyLimit: number;
   savings: number;
   expenseCount: number;
   irregularExpenseCount: number;
@@ -66,18 +75,20 @@ export function buildRollingBudgetFrame(
   nowMs = Date.now()
 ): BudgetFrame {
   const resolvedBudget = resolveBudget(budget);
-  const periodDays =
-    resolvedBudget.period > 0 ? Math.floor(resolvedBudget.period) : 30;
+  const periodDays = normalizePeriodDays(resolvedBudget.period);
   const start = resolvedBudget.periodStartTs
-    ? startOfDay(resolvedBudget.periodStartTs)
-    : startOfDay(nowMs - (periodDays - 1) * DAY_MS);
-  const finish = endOfDay(start + (periodDays - 1) * DAY_MS);
+    ?? startOfDay(nowMs - (periodDays - 1) * DAY_MS);
+  const finish = getInclusivePeriodEndMs(start, periodDays);
 
   return {
     start,
     finish,
     periodDays,
-    display: `${formatDayMonth(start)} - ${formatDayMonth(finish)} (${periodDays}d)`,
+    display: `${formatBudgetPeriodLabel(
+      start,
+      periodDays,
+      resolvedBudget.timezone
+    )} (${periodDays}d)`,
   };
 }
 
@@ -120,14 +131,18 @@ export function buildBudgetPeriodFrame(
   }
 
   const shiftMs = periodOffset * currentFrame.periodDays * DAY_MS;
-  const start = startOfDay(currentFrame.start + shiftMs);
-  const finish = endOfDay(currentFrame.finish + shiftMs);
+  const start = currentFrame.start + shiftMs;
+  const finish = currentFrame.finish + shiftMs;
 
   return {
     start,
     finish,
     periodDays: currentFrame.periodDays,
-    display: `${formatDayMonth(start)} - ${formatDayMonth(finish)} (${currentFrame.periodDays}d)`,
+    display: `${formatBudgetPeriodLabel(
+      start,
+      currentFrame.periodDays,
+      budget?.timezone
+    )} (${currentFrame.periodDays}d)`,
   };
 }
 
@@ -153,9 +168,11 @@ export function summarizeExpensesForFrame(
   budget: BudgetDocument | null | undefined,
   savings: number,
   frame: BudgetFrame,
-  includeCategoryBreakdown: boolean
+  includeCategoryBreakdown: boolean,
+  nowMs = Date.now()
 ): MonthlySummary {
   const resolvedBudget = resolveBudget(budget);
+  const frameStats = computeBudgetFrameStats(frame, nowMs);
   let totalSpend = 0;
   let irregularSpend = 0;
   let irregularExpenseCount = 0;
@@ -193,6 +210,7 @@ export function summarizeExpensesForFrame(
   const categoryBreakdown = includeCategoryBreakdown
     ? [...categoryTotals.values()].sort((left, right) => right.total - left.total)
     : undefined;
+  const remainingBudget = roundCurrency(resolvedBudget.value - irregularSpend);
 
   return {
     frameStart: frame.start,
@@ -204,11 +222,20 @@ export function summarizeExpensesForFrame(
     ...(resolvedBudget.periodStartTs !== undefined
       ? { budgetConfiguredStartTs: resolvedBudget.periodStartTs }
       : {}),
+    daysPassed: frameStats.daysPassed,
+    daysLeft: frameStats.daysLeft,
+    daysLeftIncludingToday: frameStats.daysLeftIncludingToday,
     totalSpend,
     irregularSpend,
     budgetedSpend: irregularSpend,
     budgetCountsIncludeInBalanceOnly: true,
-    remainingBudget: roundCurrency(resolvedBudget.value - irregularSpend),
+    remainingBudget,
+    recommendedDailyLimit:
+      frameStats.daysLeftIncludingToday > 0
+        ? roundCurrency(
+            Math.max(remainingBudget, 0) / frameStats.daysLeftIncludingToday
+          )
+        : 0,
     savings: roundCurrency(savings || 0),
     expenseCount: expenses.length,
     irregularExpenseCount,
@@ -280,6 +307,50 @@ function endOfDay(value: number): number {
     59,
     999
   ).getTime();
+}
+
+type BudgetFrameStats = {
+  daysPassed: number;
+  daysLeft: number;
+  daysLeftIncludingToday: number;
+};
+
+function computeBudgetFrameStats(
+  frame: BudgetFrame,
+  nowMs: number
+): BudgetFrameStats {
+  const startDay = startOfDay(frame.start);
+  const finishDay = startOfDay(frame.finish);
+  const todayDay = startOfDay(nowMs);
+  const totalDays = Math.max(1, Math.floor((finishDay - startDay) / DAY_MS) + 1);
+
+  if (todayDay < startDay) {
+    return {
+      daysPassed: 0,
+      daysLeft: totalDays,
+      daysLeftIncludingToday: totalDays,
+    };
+  }
+
+  if (todayDay > finishDay) {
+    return {
+      daysPassed: totalDays,
+      daysLeft: 0,
+      daysLeftIncludingToday: 0,
+    };
+  }
+
+  const daysPassed = Math.min(
+    totalDays,
+    Math.floor((todayDay - startDay) / DAY_MS) + 1
+  );
+  const daysLeft = Math.max(totalDays - daysPassed, 0);
+
+  return {
+    daysPassed,
+    daysLeft,
+    daysLeftIncludingToday: daysLeft + 1,
+  };
 }
 
 function formatDayMonth(value: number): string {

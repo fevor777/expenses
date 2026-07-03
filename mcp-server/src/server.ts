@@ -21,6 +21,7 @@ import { registerCreateTagTool } from './tools/create-tag.js';
 import { registerExportExpensesTool } from './tools/export-expenses.js';
 import { registerBudgetPeriodSummaryTool } from './tools/budget-period-summary.js';
 import { registerBudgetSummaryTool } from './tools/budget-summary.js';
+import { registerBudgetSummaryWithExpensesForPeriodTool } from './tools/budget-summary-with-expenses-for-period.js';
 import { registerGetCurrentTimeTool } from './tools/get-current-time.js';
 import { registerDeleteTagTool } from './tools/delete-tag.js';
 import { registerDeleteExpenseTool } from './tools/delete-expense.js';
@@ -133,6 +134,7 @@ function buildMcpServer(deps: ToolDependencies): McpServer {
   registerGetExpenseTool(server, deps);
   registerDeleteExpenseTool(server, deps);
   registerBudgetSummaryTool(server, deps);
+  registerBudgetSummaryWithExpensesForPeriodTool(server, deps);
   registerBudgetPeriodSummaryTool(server, deps);
   registerMonthlySummaryTool(server, deps);
   registerMonthPeriodSummaryTool(server, deps);

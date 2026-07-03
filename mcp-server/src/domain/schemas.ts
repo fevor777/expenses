@@ -347,6 +347,14 @@ export const updateBudgetShape = {
     .describe(
       'Optional budget period anchor date as a Unix timestamp in milliseconds.'
     ),
+  timezone: z
+    .string()
+    .trim()
+    .min(1)
+    .optional()
+    .describe(
+      'Optional IANA time zone id used to format budget period dates, such as Europe/Sofia.'
+    ),
   minDayLimit: z
     .number()
     .finite()

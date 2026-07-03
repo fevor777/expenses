@@ -16,6 +16,7 @@ export class IrregularBudgetStoreService {
 
   getValueObs(): Observable<Budget> {
     let v = JSON.parse(localStorage.getItem('irregularBudget') || '{}');
+    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     // Legacy migration: if periodStartTs missing but periodStart exists, derive a timestamp anchor
     if (v && !v.periodStartTs && v.periodStart) {
       const day = v.periodStart;
@@ -33,8 +34,11 @@ export class IrregularBudgetStoreService {
       }
       v = { ...v, periodStartTs: candidate.getTime() };
       delete v.periodStart;
-      localStorage.setItem('irregularBudget', JSON.stringify(v));
     }
+    if (v && !v.timezone) {
+      v = { ...v, timezone: browserTimezone };
+    }
+    localStorage.setItem('irregularBudget', JSON.stringify(v));
     this.updateValue(v);
     return this.value$;
   }

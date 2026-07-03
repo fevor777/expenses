@@ -27,7 +27,8 @@ export function registerBudgetPeriodSummaryTool(
         const periodOffset = input.periodOffset ?? 0;
         const budget = await deps.settingsRepository.getBudget();
         const savings = await deps.settingsRepository.getSavings();
-        const frame = buildBudgetPeriodFrame(budget, periodOffset);
+        const nowMs = Date.now();
+        const frame = buildBudgetPeriodFrame(budget, periodOffset, nowMs);
         const expenses = await deps.expensesRepository.listInRange(
           frame.start,
           frame.finish
@@ -37,7 +38,8 @@ export function registerBudgetPeriodSummaryTool(
           budget,
           savings,
           frame,
-          input.includeCategoryBreakdown ?? false
+          input.includeCategoryBreakdown ?? false,
+          nowMs
         );
 
         return jsonResult({

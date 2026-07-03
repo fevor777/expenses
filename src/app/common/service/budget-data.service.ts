@@ -66,7 +66,10 @@ export class BudgetDataService {
     const now = DateTime.now();
     // If we have a timestamp anchor, use it EXACTLY as frame start (no shifting to contain 'now').
     if (budget.periodStartTs && !isNaN(budget.periodStartTs)) {
-      const start = DateTime.fromMillis(budget.periodStartTs).startOf('day');
+      const zone = budget.timezone?.trim() || undefined;
+      const start = zone
+        ? DateTime.fromMillis(budget.periodStartTs, { zone }).startOf('day')
+        : DateTime.fromMillis(budget.periodStartTs).startOf('day');
       const finish = start
         .plus({ days: periodDays - 1 })
         .set({ hour: 23, minute: 59, second: 59, millisecond: 999 });

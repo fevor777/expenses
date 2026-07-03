@@ -20,6 +20,7 @@ import { MorningReminderService, MorningReminderConfig } from '../common/service
 import { Tag, normalizeTagName } from '../common/model/tag.model';
 import { TagService } from '../common/service/tag.service';
 import { TagStoreService } from '../common/service/tag-store.service';
+import { formatBudgetPeriodLabel } from '../common/model/budget-summary/budget-period.helper';
 
 @Component({
   selector: 'app-export',
@@ -44,6 +45,7 @@ export class ExportComponent implements OnDestroy {
   irregularBudgetValue: number = 0;
   // New timestamp-based start (ms). When set, overrides legacy day-of-month logic.
   budgetStartTs?: number;
+  budgetTimezone?: string;
   // Optional minimum number of days before exhaustion date is surfaced
   minDayLimit?: number;
 
@@ -63,14 +65,11 @@ export class ExportComponent implements OnDestroy {
   get budgetPeriodLabel(): string {
     const periodDays = Math.floor(this.budgetPeriodDuration);
     if (periodDays <= 0 || !this.budgetStartTs) return '';
-    const msPerDay = 86400000;
-    const start = new Date(this.budgetStartTs);
-    const end = new Date(start.getTime() + (periodDays) * msPerDay);
-    const fmt = new Intl.DateTimeFormat('en-US', {
-      month: 'long',
-      day: 'numeric',
-    });
-    return `${fmt.format(start)} - ${fmt.format(end)}`;
+    return formatBudgetPeriodLabel(
+      this.budgetStartTs,
+      periodDays,
+      this.budgetTimezone
+    );
   }
 
   private readonly destroySubject: Subject<void> = new Subject();
@@ -93,6 +92,7 @@ export class ExportComponent implements OnDestroy {
         this.irregularBudgetValue = v?.value || 0;
         this.budgetPeriodDuration = v?.period || 1;
         this.budgetStartTs = v?.periodStartTs;
+        this.budgetTimezone = v?.timezone;
         this.minDayLimit = v?.minDayLimit || 0;
       });
     this.savings$ = this.savingService.getSavings();
@@ -269,6 +269,9 @@ export class ExportComponent implements OnDestroy {
       value: this.irregularBudgetValue,
       period: Math.floor(this.budgetPeriodDuration),
       periodStartTs: this.budgetStartTs,
+      timezone:
+        this.budgetTimezone ||
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
       minDayLimit: this.minDayLimit,
     };
     this.irregularBudgetService

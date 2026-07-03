@@ -26,7 +26,8 @@ export function registerBudgetSummaryTool(
       return executeTool(deps, 'budget_summary', async () => {
         const budget = await deps.settingsRepository.getBudget();
         const savings = await deps.settingsRepository.getSavings();
-        const frame = buildRollingBudgetFrame(budget);
+        const nowMs = Date.now();
+        const frame = buildRollingBudgetFrame(budget, nowMs);
         const expenses = await deps.expensesRepository.listInRange(
           frame.start,
           frame.finish
@@ -36,7 +37,8 @@ export function registerBudgetSummaryTool(
           budget,
           savings,
           frame,
-          input.includeCategoryBreakdown ?? false
+          input.includeCategoryBreakdown ?? false,
+          nowMs
         );
 
         return jsonResult({ summary });

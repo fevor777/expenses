@@ -25,6 +25,7 @@ export const budgetDocumentShape = {
     value: z.number().finite().min(0),
     period: z.number().int().min(1).max(120),
     periodStartTs: z.number().int().nonnegative().optional(),
+    timezone: z.string().trim().min(1).optional(),
     minDayLimit: z.number().finite().min(0).optional(),
 };
 export const budgetDocumentSchema = z.object(budgetDocumentShape).strict();
@@ -188,11 +189,15 @@ export const monthlySummarySchema = z
     budgetPeriodDays: z.number().int().min(1),
     budgetConfiguredPeriodDays: z.number().int().min(1),
     budgetConfiguredStartTs: z.number().int().nonnegative().optional(),
+    daysPassed: z.number().int().min(0),
+    daysLeft: z.number().int().min(0),
+    daysLeftIncludingToday: z.number().int().min(0),
     totalSpend: z.number().finite(),
     irregularSpend: z.number().finite(),
     budgetedSpend: z.number().finite(),
     budgetCountsIncludeInBalanceOnly: z.boolean(),
     remainingBudget: z.number().finite(),
+    recommendedDailyLimit: z.number().finite(),
     savings: z.number().finite(),
     expenseCount: z.number().int().min(0),
     irregularExpenseCount: z.number().int().min(0),
@@ -219,6 +224,15 @@ export const monthlyExpenseSummarySchema = z
 export const budgetSummaryResultSchema = z
     .object({
     summary: monthlySummarySchema,
+})
+    .strict();
+export const budgetSummaryWithExpensesForPeriodResultSchema = z
+    .object({
+    budgetSummary: monthlySummarySchema,
+    dateRange: resolveDateRangeResultSchema,
+    filter: normalizedExpenseFilterSchema,
+    count: z.number().int().min(0),
+    expenses: z.array(expenseDocumentSchema),
 })
     .strict();
 export const budgetPeriodSummaryResultSchema = z
