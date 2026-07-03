@@ -87,6 +87,7 @@ function lineBudget(s: BudgetSummarySnapshot): string {
 function linePace(s: BudgetSummarySnapshot): string {
   const avg = fmtMoney(s.dailyAverage) + '€/д';
   const plan = s.budgetPerDay ? ` план ${fmtMoney(s.budgetPerDay)}€/д` : '';
+  
   const need =
     s.needPerDay !== undefined && s.needPerDay < s.budgetPerDay
       ? ` нужно ${fmtMoney(s.needPerDay)}€/д`
