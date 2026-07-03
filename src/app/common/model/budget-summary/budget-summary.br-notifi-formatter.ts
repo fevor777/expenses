@@ -116,7 +116,7 @@ function lineDailyAverage(s: BudgetSummarySnapshot) {
   const plan =
     s.budgetPerDay && s.budgetPerDay > 0 ? `п${fmt(s.budgetPerDay)}` : '';
   const need =
-    s.needPerDay && s.needPerDay < s.budgetPerDay
+    s.needPerDay !== undefined && s.needPerDay < s.budgetPerDay
       ? `н${fmt(s.needPerDay)}`
       : '';
   const extras = [plan, need].filter(Boolean).join(' ');

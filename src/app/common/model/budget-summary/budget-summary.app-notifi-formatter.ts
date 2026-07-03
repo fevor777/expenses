@@ -88,7 +88,9 @@ function linePace(s: BudgetSummarySnapshot): string {
   const avg = fmtMoney(s.dailyAverage) + '€/д';
   const plan = s.budgetPerDay ? ` план ${fmtMoney(s.budgetPerDay)}€/д` : '';
   const need =
-    s.needPerDay < s.budgetPerDay ? ` нужно ${fmtMoney(s.needPerDay)}€/д` : '';
+    s.needPerDay !== undefined && s.needPerDay < s.budgetPerDay
+      ? ` нужно ${fmtMoney(s.needPerDay)}€/д`
+      : '';
   return `<strong>•</strong> Темп: ср ${avg}${plan}${need}`;
 }
 
@@ -251,4 +253,3 @@ export function composeAppBudgetInfoMessageList(
     ? buildBasicList(summary, merged)
     : buildFullList(summary, merged);
 }
-

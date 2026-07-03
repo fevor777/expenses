@@ -67,26 +67,17 @@ export function computeNeedPerDay(
   frame: TimeFrameStats
 ): { needPerDay?: number; todaysNeedRatio?: number } {
   if (budget <= 0) return {};
-  const daysLeft = frame.daysLeft; // future days
-  const daysIncludingToday = daysLeft;
+  const remainingBudget = Math.max(budget - spentIrregular, 0);
+  const remainingFullDays = Math.max(frame.daysLeft, 0);
+  const daysIncludingToday = remainingFullDays + 1;
   if (daysIncludingToday <= 0) return {};
-  const spentBeforeToday = spentIrregular - todaysIrregular;
-  const remainingBeforeToday = budget - spentBeforeToday;
-  if (remainingBeforeToday <= 0) return {};
-  const baselineNeed = remainingBeforeToday / daysIncludingToday;
-  if (todaysIrregular <= baselineNeed) {
-    return {
-      needPerDay: round(baselineNeed),
-      todaysNeedRatio: todaysIrregular / baselineNeed,
-    };
+  const needPerDay = remainingBudget / daysIncludingToday;
+  if (needPerDay <= 0) {
+    return { needPerDay: 0, todaysNeedRatio: 0 };
   }
-  if (daysLeft <= 0) return {};
-  const remainingAfterToday = budget - spentIrregular;
-  if (remainingAfterToday <= 0) return {};
-  const futureNeed = remainingAfterToday / daysLeft;
   return {
-    needPerDay: round(futureNeed),
-    todaysNeedRatio: todaysIrregular / futureNeed,
+    needPerDay: round(needPerDay),
+    todaysNeedRatio: todaysIrregular / needPerDay,
   };
 }
 

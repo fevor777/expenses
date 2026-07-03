@@ -439,7 +439,7 @@ export class CalendarComponent implements OnDestroy {
     const frameDays = summary.meta?.frameDays ?? 0;
     this.stripDaysPassedFrame = `${passed}/${frameDays}`;
     this.stripDaysLeft = `${summary.daysLeft ?? 0}`;
-    this.stripNeedPerDay = summary.needPerDay
+    this.stripNeedPerDay = summary.needPerDay !== undefined
       ? `${this.fmtMoney(summary.needPerDay)}€/д`
       : '';
     this.stripNeedIcon =

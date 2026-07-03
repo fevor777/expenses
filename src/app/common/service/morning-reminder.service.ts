@@ -150,7 +150,7 @@ export class MorningReminderService {
 
     // Daily budget
     const dailyBudget = summary.budgetPerDay || 0;
-    const needPerDay = summary.needPerDay || dailyBudget;
+    const needPerDay = summary.needPerDay ?? dailyBudget;
     
     lines.push(`💰 Сегодня можно: ${this.fmt(needPerDay)}€`);
 
@@ -177,7 +177,7 @@ export class MorningReminderService {
     const lines: string[] = [];
 
     const dailyBudget = summary.budgetPerDay || 0;
-    const needPerDay = summary.needPerDay || dailyBudget;
+    const needPerDay = summary.needPerDay ?? dailyBudget;
 
     lines.push(`☀️ Доброе утро!`);
     lines.push(`💰 Дневной лимит: ${this.fmt(needPerDay)}€`);
