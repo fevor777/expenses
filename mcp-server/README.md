@@ -5,6 +5,10 @@ Standalone MCP runtime for the Expenses app. It exposes Firestore-backed tools o
 ## What it serves
 
 - `list_expenses`
+- `list_expenses_for_period`
+- `export_expenses`
+- `resolve_date_range`
+- `get_current_time`
 - `get_expense`
 - `delete_expense`
 - `budget_summary`

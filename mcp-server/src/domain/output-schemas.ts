@@ -74,6 +74,44 @@ export const expenseCollectionResultSchema = z
   .object(expenseCollectionResultShape)
   .strict();
 
+export const expenseExportResultSchema = z
+  .object({
+    status: z.literal('exported'),
+    count: z.number().int().min(0),
+    uri: z.string().trim().min(1),
+  })
+  .strict();
+
+export const getCurrentTimeResultSchema = z
+  .object({
+    epochMs: z.number().int().nonnegative(),
+    isoUtc: z.string().trim().min(1),
+    timezone: z.string().trim().min(1),
+    formatted: z.string().trim().min(1),
+  })
+  .strict();
+
+export const resolveDateRangeResultSchema = z
+  .object({
+    pattern: z.enum(['relative', 'calendar_range', 'absolute']),
+    startDate: z.number().int().nonnegative(),
+    endDate: z.number().int().nonnegative(),
+    startDateLocal: z.string().trim().min(1),
+    endDateLocal: z.string().trim().min(1),
+    timezone: z.string().trim().min(1).optional(),
+    periodDays: z.number().int().min(1),
+    rangeDisplay: z.string().trim().min(1),
+    patternMetadata: z.record(z.unknown()).optional(),
+  })
+  .strict();
+
+export const listExpensesForPeriodResultSchema = z
+  .object({
+    dateRange: resolveDateRangeResultSchema,
+    ...expenseCollectionResultShape,
+  })
+  .strict();
+
 export const expenseResultSchema = z
   .object({
     expense: expenseDocumentSchema,

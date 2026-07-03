@@ -12,6 +12,90 @@ export const noInputShape = {};
 
 export const noInputSchema = z.object(noInputShape).strict();
 
+export const currentTimeShape = {
+  timezone: z
+    .string()
+    .trim()
+    .min(1)
+    .describe('Required IANA time zone id such as Europe/Moscow.'),
+};
+
+export const currentTimeSchema = z.object(currentTimeShape).strict();
+
+export const resolveDateRangePatternSchema = z.enum([
+  'relative',
+  'calendar_range',
+  'absolute',
+]);
+
+export const relativeDateRangeTypeSchema = z.enum([
+  'today',
+  'yesterday',
+  'this_week',
+  'last_week',
+  'this_month',
+  'last_month',
+  'last_7_days',
+  'last_30_days',
+  'last_90_days',
+  'year_to_date',
+]);
+
+export const resolveDateRangeShape = {
+  pattern: resolveDateRangePatternSchema.describe(
+    'Required date range resolution mode. Use relative for named periods, calendar_range for YYYY-MM-DD boundaries, or absolute for existing Unix timestamps in milliseconds.'
+  ),
+  relativeType: relativeDateRangeTypeSchema
+    .optional()
+    .describe(
+      'Required when pattern is relative. Named period to resolve using the provided timezone.'
+    ),
+  startDateLocal: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/u, 'startDateLocal must use YYYY-MM-DD')
+    .optional()
+    .describe(
+      'Required when pattern is calendar_range. Inclusive local start date formatted as YYYY-MM-DD.'
+    ),
+  endDateLocal: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/u, 'endDateLocal must use YYYY-MM-DD')
+    .optional()
+    .describe(
+      'Required when pattern is calendar_range. Inclusive local end date formatted as YYYY-MM-DD.'
+    ),
+  timezone: z
+    .string()
+    .trim()
+    .min(1)
+    .optional()
+    .describe(
+      'Required for relative and calendar_range patterns. Provide an IANA time zone id such as Europe/Moscow.'
+    ),
+  startDate: z
+    .number()
+    .int()
+    .nonnegative()
+    .optional()
+    .describe(
+      'Required when pattern is absolute. Inclusive start of the date range as a Unix timestamp in milliseconds.'
+    ),
+  endDate: z
+    .number()
+    .int()
+    .nonnegative()
+    .optional()
+    .describe(
+      'Required when pattern is absolute. Inclusive end of the date range as a Unix timestamp in milliseconds.'
+    ),
+};
+
+export const resolveDateRangeSchema = z
+  .object(resolveDateRangeShape)
+  .strict();
+
 export const expenseFilterShape = {
   startDate: z
     .number()
@@ -72,6 +156,19 @@ export const expenseFilterShape = {
 
 export const expenseFilterSchema = z
   .object(expenseFilterShape)
+  .strict();
+
+export const listExpensesForPeriodShape = {
+  ...resolveDateRangeShape,
+  categories: expenseFilterShape.categories,
+  description: expenseFilterShape.description,
+  tagIds: expenseFilterShape.tagIds,
+  limit: expenseFilterShape.limit,
+  sort: expenseFilterShape.sort,
+};
+
+export const listExpensesForPeriodSchema = z
+  .object(listExpensesForPeriodShape)
   .strict();
 
 export const expenseIdShape = {

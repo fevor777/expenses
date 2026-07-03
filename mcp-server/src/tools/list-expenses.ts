@@ -13,7 +13,7 @@ export function registerListExpensesTool(
     'list_expenses',
     {
       description:
-        'Return raw expense records for the authenticated user for a custom time window. Use this tool for daily, weekly, or custom period analysis when you need individual expenses, not an aggregated summary. For daily analysis, pass startDate and endDate for that day. Optional filters: categories, description, tagIds, limit, and sort.',
+        'Return raw expense records for the authenticated user for a custom time window. Use this tool when startDate and endDate timestamps are already known. For relative or calendar-based periods such as today, yesterday, this_week, or last_month, prefer list_expenses_for_period instead. Use this tool for daily, weekly, or custom period analysis when you need individual expenses, not an aggregated summary. Optional filters: categories, description, tagIds, limit, and sort.',
       inputSchema: expenseFilterSchema,
       outputSchema: expenseCollectionResultShape,
     },

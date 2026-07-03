@@ -20,8 +20,32 @@ type ToolErrorPayload = {
   };
 };
 
+type TextToolContent = {
+  type: 'text';
+  text: string;
+};
+
+type JsonResourceContent = {
+  type: 'resource';
+  resource:
+    | {
+        uri: string;
+        text: string;
+        mimeType?: string;
+        _meta?: Record<string, unknown>;
+      }
+    | {
+        uri: string;
+        blob: string;
+        mimeType?: string;
+        _meta?: Record<string, unknown>;
+      };
+};
+
+type ToolContent = TextToolContent | JsonResourceContent;
+
 type ToolResult<T extends Record<string, unknown>> = {
-  content: Array<{ type: 'text'; text: string }>;
+  content: Array<ToolContent>;
   structuredContent: T;
   isError?: boolean;
 };
@@ -75,14 +99,48 @@ export async function executeTool<T extends Record<string, unknown>>(
 }
 
 export function jsonResult<T extends Record<string, unknown>>(payload: T) {
+  const text = serializeJsonPayload(payload);
+
   return {
     content: [
       {
         type: 'text' as const,
-        text: JSON.stringify(payload, null, 2),
+        text,
       },
     ],
     structuredContent: payload,
+  };
+}
+
+export function jsonResourceResult<
+  TPayload extends Record<string, unknown>,
+  TStructured extends Record<string, unknown> = TPayload
+>(
+  payload: TPayload,
+  options: {
+    uri: string;
+    message?: string;
+    structuredContent?: TStructured;
+  }
+): ToolResult<TStructured> {
+  const text = serializeJsonPayload(payload);
+
+  return {
+    content: [
+      {
+        type: 'text' as const,
+        text: options.message ?? 'JSON resource attached.',
+      },
+      {
+        type: 'resource' as const,
+        resource: {
+          uri: options.uri,
+          mimeType: 'application/json',
+          text,
+        },
+      },
+    ],
+    structuredContent: (options.structuredContent ?? payload) as TStructured,
   };
 }
 
@@ -91,7 +149,7 @@ export function toolErrorResult(payload: ToolErrorPayload): ToolResult<ToolError
     content: [
       {
         type: 'text',
-        text: JSON.stringify(payload, null, 2),
+        text: serializeJsonPayload(payload),
       },
     ],
     structuredContent: payload,
@@ -148,11 +206,13 @@ function classifyToolError(error: unknown): ToolErrorPayload | null {
   }
 
   if (
+    message.startsWith('Invalid resolve_date_range input: ') ||
     message === 'Tag name is required' ||
     message === 'startDate must be less than or equal to endDate' ||
     message === 'At least one mutable field must be provided' ||
     message === 'At least one tag field must be provided' ||
-    message === 'At least one budget field must be provided'
+    message === 'At least one budget field must be provided' ||
+    message.startsWith('Invalid timezone: ')
   ) {
     return {
       error: {
@@ -163,4 +223,8 @@ function classifyToolError(error: unknown): ToolErrorPayload | null {
   }
 
   return null;
+}
+
+function serializeJsonPayload(payload: Record<string, unknown>): string {
+  return JSON.stringify(payload, null, 2);
 }
