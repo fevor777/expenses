@@ -92,6 +92,22 @@ export const listExpensesForPeriodResultSchema = z
     ...expenseCollectionResultShape,
 })
     .strict();
+const { tagIds: _tagIds, ...expenseWithoutTagIdsShape } = expenseDocumentShape;
+export const expenseWithTagNamesShape = {
+    ...expenseWithoutTagIdsShape,
+    tagNames: z.array(z.string().trim().min(1)),
+};
+export const expenseWithTagNamesSchema = z
+    .object(expenseWithTagNamesShape)
+    .strict();
+export const listExpensesForPeriodWithTagNamesResultSchema = z
+    .object({
+    dateRange: resolveDateRangeResultSchema,
+    filter: normalizedExpenseFilterSchema,
+    count: z.number().int().min(0),
+    expenses: z.array(expenseWithTagNamesSchema),
+})
+    .strict();
 export const expenseResultSchema = z
     .object({
     expense: expenseDocumentSchema,
@@ -232,7 +248,7 @@ export const budgetSummaryWithExpensesForPeriodResultSchema = z
     dateRange: resolveDateRangeResultSchema,
     filter: normalizedExpenseFilterSchema,
     count: z.number().int().min(0),
-    expenses: z.array(expenseDocumentSchema),
+    expenses: z.array(expenseWithTagNamesSchema),
 })
     .strict();
 export const budgetPeriodSummaryResultSchema = z

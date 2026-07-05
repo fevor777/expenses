@@ -12,20 +12,34 @@ const budgetSummaryWithExpensesForPeriodInputSchema = listExpensesForPeriodSchem
 });
 export function registerBudgetSummaryWithExpensesForPeriodTool(server, deps) {
     server.registerTool('budget_summary_with_expenses_for_period', {
-        description: 'Return the current active budget summary together with raw expenses for a relative or calendar-based period in one call. Use this when you need both the budget snapshot and the detailed expense list without making two separate MCP tool calls. The budget summary always uses the current active budget period. The expense list uses the requested period. Remaining budget uses only expenses where includeInBalance is true. Optional input: includeCategoryBreakdown.',
+        description: 'Return the current active budget summary together with raw expenses for a relative or calendar-based period in one call. Use this when you need both the budget snapshot and the detailed expense list without making two separate MCP tool calls. The budget summary always uses the current active budget period. The expense list uses the requested period and includes tag names instead of tag ids. Remaining budget uses only expenses where includeInBalance is true. Optional input: includeCategoryBreakdown.',
         inputSchema: budgetSummaryWithExpensesForPeriodInputSchema,
         outputSchema: budgetSummaryWithExpensesForPeriodResultSchema,
     }, async (input) => {
         return executeTool(deps, 'budget_summary_with_expenses_for_period', async () => {
-            const budget = await deps.settingsRepository.getBudget();
-            const savings = await deps.settingsRepository.getSavings();
+            const [budget, savings, tags, expensesForPeriod] = await Promise.all([
+                deps.settingsRepository.getBudget(),
+                deps.settingsRepository.getSavings(),
+                deps.tagsRepository.list(),
+                listExpensesForPeriod(input, deps.expensesRepository, deps.config.maxResultLimit),
+            ]);
             const nowMs = Date.now();
             const frame = buildRollingBudgetFrame(budget, nowMs);
-            const expensesForPeriod = await listExpensesForPeriod(input, deps.expensesRepository, deps.config.maxResultLimit);
             const budgetSummary = summarizeExpensesForFrame(await deps.expensesRepository.listInRange(frame.start, frame.finish), budget, savings, frame, input.includeCategoryBreakdown ?? false, nowMs);
+            const tagNamesById = new Map(tags.map(tag => [tag.id, tag.name]));
+            const expenses = expensesForPeriod.expenses.map(expense => {
+                const { tagIds: _tagIds, ...rest } = expense;
+                return {
+                    ...rest,
+                    tagNames: expense.tagIds
+                        ?.map(tagId => tagNamesById.get(tagId))
+                        .filter((tagName) => Boolean(tagName)) ?? [],
+                };
+            });
             return jsonResult({
                 budgetSummary,
                 ...expensesForPeriod,
+                expenses,
             });
         });
     });
