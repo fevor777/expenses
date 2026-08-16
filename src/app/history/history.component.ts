@@ -159,7 +159,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
       this.currentFilter = {
         ...(filter || {
           categories: [],
-          date: this.dateFilterService.getInitialMonthValue(),
+          date: this.dateFilterService.getInitialDayValue(),
           description: '',
         }),
       };
@@ -453,7 +453,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   private initFilter(): void {
-    this.defaultDateValue = this.dateFilterService.getInitialMonthValue();
+    this.defaultDateValue = this.dateFilterService.getInitialDayValue();
     if (this.dateFilterService.dateFilter) {
       this.defaultFilter = {
         ...this.defaultFilter,
@@ -463,7 +463,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     } else {
       this.defaultFilter = {
         ...this.defaultFilter,
-        date: this.dateFilterService.getInitialMonthValue(),
+        date: this.dateFilterService.getInitialDayValue(),
       };
     }
     const categoryFilters = this.dateFilterService.categories;
