@@ -74,6 +74,65 @@
   transform: translateY(0);
 }
 
+.date-filter-custom {
+  position: relative;
+}
+
+.date-filter-custom-button,
+.date-filter-custom-actions button {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  padding: 5px 8px;
+}
+
+.date-filter-custom-button-active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.date-filter-custom-popover {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 235px;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+
+  label {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    align-items: center;
+    gap: 6px;
+  }
+
+  input {
+    min-width: 0;
+    font: inherit;
+  }
+}
+
+.date-filter-custom-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.date-filter-custom-error {
+  margin: 0;
+  color: #b3261e;
+  font-size: 12px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .statistics-period-compact,
   .statistics-period {

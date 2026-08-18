@@ -8,6 +8,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DateTime } from 'luxon';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -369,7 +370,25 @@ export class HistoryComponent implements OnInit, OnDestroy {
     let totalBuckets = 0;
     let aggregates: number[] = [];
     const now = new Date();
-    if (mode === Mode.DAY) {
+    if (mode === Mode.CUSTOM) {
+      const buckets = this.buildCustomCoverageBuckets(frame);
+      totalBuckets = buckets.length;
+      aggregates = new Array(totalBuckets).fill(0);
+      expenses.forEach(expense => {
+        const index = buckets.findIndex(
+          bucket =>
+            expense.date >= bucket.start.toMillis() &&
+            expense.date <= bucket.finish.toMillis()
+        );
+        if (index >= 0)
+          aggregates[index] = +(aggregates[index] + expense.amount).toFixed(2);
+      });
+      const nowValue = DateTime.now();
+      const currentBucket = buckets.findIndex(
+        bucket => nowValue >= bucket.start && nowValue <= bucket.finish
+      );
+      if (currentBucket >= 0) aggregates[currentBucket] = 0;
+    } else if (mode === Mode.DAY) {
       totalBuckets = 24;
       aggregates = new Array(totalBuckets).fill(0);
       expenses.forEach(e => {
@@ -450,6 +469,28 @@ export class HistoryComponent implements OnInit, OnDestroy {
     }
     this.totalBucketCount = totalBuckets;
     this.activeBucketCount = aggregates.filter(v => v !== 0).length;
+  }
+
+  private buildCustomCoverageBuckets(frame: DateFrame): DateFrame[] {
+    const start = frame.start.startOf('day');
+    const finish = frame.finish.endOf('day');
+    const days = Math.floor(finish.startOf('day').diff(start, 'days').days) + 1;
+    const granularity = days <= 31 ? 'day' : days <= 365 ? 'week' : 'month';
+    const buckets: DateFrame[] = [];
+    let cursor = start;
+
+    while (cursor <= finish) {
+      let bucketFinish =
+        granularity === 'day'
+          ? cursor.endOf('day')
+          : granularity === 'week'
+            ? cursor.endOf('week')
+            : cursor.endOf('month');
+      if (bucketFinish > finish) bucketFinish = finish;
+      buckets.push({ start: cursor, finish: bucketFinish, mode: Mode.CUSTOM });
+      cursor = bucketFinish.plus({ milliseconds: 1 }).startOf('day');
+    }
+    return buckets;
   }
 
   private initFilter(): void {
@@ -582,7 +623,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   private clearPendingStabilization(): void {
-    this.stabilizationTimeouts.forEach(timeoutId => window.clearTimeout(timeoutId));
+    this.stabilizationTimeouts.forEach(timeoutId =>
+      window.clearTimeout(timeoutId)
+    );
     this.stabilizationTimeouts = [];
   }
 

@@ -7,6 +7,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { NgIf } from '@angular/common';
+import { DateTime } from 'luxon';
 import { BaseChartDirective } from 'ng2-charts';
 import { Expense } from '../../../model/expense.model';
 import { DateFrame, Mode } from '../../filter/date/dateFrame.model';
@@ -51,6 +52,7 @@ export class MultiChartComponent implements OnChanges {
   selectedBarValue?: number | null;
   showBarIcons = false;
   private selectedBarIndex: number | null = null;
+  private customBuckets: DateFrame[] = [];
 
   // Template bridge for stricter typing
   onChartTypeSelect(v: string) {
@@ -94,7 +96,6 @@ export class MultiChartComponent implements OnChanges {
     legend: false,
   };
 
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses'] || changes['filter']) {
       this.selectedBarLabel = '';
@@ -130,6 +131,11 @@ export class MultiChartComponent implements OnChanges {
 
     const mode = filter.mode || Mode.DAY;
     const now = new Date();
+
+    if (mode === Mode.CUSTOM) {
+      this.calculateCustomChartData(expenses, filter);
+      return;
+    }
 
     if (mode === Mode.DAY) {
       this.allocateStructure(
@@ -298,6 +304,76 @@ export class MultiChartComponent implements OnChanges {
     return Math.round((existing + add) * 100) / 100;
   }
 
+  private calculateCustomChartData(
+    expenses: Expense[],
+    filter: DateFrame
+  ): void {
+    this.customBuckets = this.buildCustomBuckets(filter);
+    this.allocateStructure(
+      this.customBuckets.length,
+      this.customBuckets.map(bucket => bucket.display || '')
+    );
+
+    expenses.forEach(expense => {
+      const index = this.customBuckets.findIndex(
+        bucket =>
+          expense.date >= bucket.start.toMillis() &&
+          expense.date <= bucket.finish.toMillis()
+      );
+      if (index >= 0) {
+        this.chartOptions.datasets[0].data[index] = this.roundAdd(
+          this.chartOptions.datasets[0].data[index],
+          expense.amount
+        );
+      }
+    });
+
+    const now = DateTime.now();
+    const currentBucket = this.customBuckets.findIndex(
+      bucket => now >= bucket.start && now <= bucket.finish
+    );
+    if (currentBucket >= 0)
+      this.chartOptions.datasets[0].data[currentBucket] = 0;
+
+    this.postProcessForLineGaps();
+    this.applyStylePerType();
+    this.chartOptions = {
+      ...this.chartOptions,
+      datasets: [...this.chartOptions.datasets],
+    };
+    this.calculateNonZeroCount();
+  }
+
+  private buildCustomBuckets(filter: DateFrame): DateFrame[] {
+    const start = filter.start.startOf('day');
+    const finish = filter.finish.endOf('day');
+    const days = Math.floor(finish.startOf('day').diff(start, 'days').days) + 1;
+    const granularity = days <= 31 ? 'day' : days <= 365 ? 'week' : 'month';
+    const buckets: DateFrame[] = [];
+    let cursor = start;
+
+    while (cursor <= finish) {
+      let bucketFinish =
+        granularity === 'day'
+          ? cursor.endOf('day')
+          : granularity === 'week'
+            ? cursor.endOf('week')
+            : cursor.endOf('month');
+      if (bucketFinish > finish) bucketFinish = finish;
+      const display = cursor.hasSame(bucketFinish, 'day')
+        ? cursor.setLocale('ru').toFormat('d LLL')
+        : `${cursor.setLocale('ru').toFormat('d LLL')} - ${bucketFinish.setLocale('ru').toFormat('d LLL')}`;
+      buckets.push({
+        start: cursor,
+        finish: bucketFinish,
+        mode: Mode.CUSTOM,
+        display,
+      });
+      cursor = bucketFinish.plus({ milliseconds: 1 }).startOf('day');
+    }
+    return buckets;
+  }
+
   private calculateNonZeroCount(): void {
     const data = this.chartOptions.datasets[0].data;
     this.nonZeroCount = data.filter(
@@ -337,6 +413,7 @@ export class MultiChartComponent implements OnChanges {
     if (!this.filter) return '';
     const { mode, start } = this.filter;
     if (!mode || !start) return '';
+    if (mode === Mode.CUSTOM) return this.customBuckets[index]?.display || '';
     const s: any = start; // assume Luxon DateTime
     try {
       switch (mode) {
@@ -368,6 +445,10 @@ export class MultiChartComponent implements OnChanges {
   private buildDateFrameForIndex(index: number): DateFrame | null {
     if (!this.filter?.start || !this.filter.mode) return null;
     const { mode, start } = this.filter;
+    if (mode === Mode.CUSTOM) {
+      const bucket = this.customBuckets[index];
+      return bucket ? { ...bucket } : null;
+    }
     let bucketStart: any = start;
     let bucketEnd: any = start;
     switch (mode) {

@@ -55,6 +55,58 @@
     (select)="onDateSelect($event)"
     (toggleClick)="onDropdownToggleClick($event)"
   ></app-date-filter-drop-down>
+  <div *ngIf="!showCompact" class="date-filter-custom">
+    <button
+      type="button"
+      class="date-filter-custom-button"
+      [class.date-filter-custom-button-active]="
+        currentFilter?.value?.mode === Mode.CUSTOM
+      "
+      (click)="toggleCustomRange()"
+      aria-haspopup="dialog"
+      [attr.aria-expanded]="customRangeOpen"
+    >
+      Период
+    </button>
+    <div
+      *ngIf="customRangeOpen"
+      class="date-filter-custom-popover"
+      role="dialog"
+      aria-label="Выбор периода"
+    >
+      <label>
+        С
+        <input
+          type="date"
+          [(ngModel)]="customStartDate"
+          [max]="maxDate"
+          (ngModelChange)="onCustomDateChange()"
+        />
+      </label>
+      <label>
+        По
+        <input
+          type="date"
+          [(ngModel)]="customFinishDate"
+          [max]="maxDate"
+          (ngModelChange)="onCustomDateChange()"
+        />
+      </label>
+      <p *ngIf="customRangeError" class="date-filter-custom-error">
+        {{ customRangeError }}
+      </p>
+      <div class="date-filter-custom-actions">
+        <button type="button" (click)="toggleCustomRange()">Отмена</button>
+        <button
+          type="button"
+          (click)="applyCustomRange()"
+          [disabled]="isCustomRangeInvalid"
+        >
+          Применить
+        </button>
+      </div>
+    </div>
+  </div>
   <i
     *ngIf="currentFilter?.display != defaultLabel"
     (click)="onRefresh()"

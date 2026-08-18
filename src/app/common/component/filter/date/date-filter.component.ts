@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   Component,
   EventEmitter,
@@ -25,7 +26,7 @@ import { DateFilterService } from './date-filter.service';
   templateUrl: './date-filter.component.html',
   styleUrl: './date-filter.component.scss',
   standalone: true,
-  imports: [CommonModule, DateFilterDropDownComponent],
+  imports: [CommonModule, FormsModule, DateFilterDropDownComponent],
 })
 export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() value: DateFrame;
@@ -52,6 +53,11 @@ export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
   private scrollThreshold = 10; // px before compact view activates
   private onScrollHandler = () => this.evaluateScrollPosition();
   compactLabel: string = '';
+  customRangeOpen = false;
+  customStartDate = '';
+  customFinishDate = '';
+  customRangeError = '';
+  readonly maxDate = DateTime.now().toISODate() || '';
 
   constructor(
     private dateFilterService: DateFilterService,
@@ -103,6 +109,65 @@ export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
 
   onDropdownToggleClick(mode: Mode): void {
     this.clickedMode = mode;
+  }
+
+  toggleCustomRange(): void {
+    if (this.customRangeOpen) {
+      this.customRangeOpen = false;
+      return;
+    }
+
+    const today = DateTime.now().startOf('day');
+    const source = this.currentFilter?.value;
+    const start = source?.start?.startOf('day') || today.startOf('month');
+    const finish = source?.finish?.startOf('day') || today;
+    this.customStartDate = start.toISODate() || '';
+    this.customFinishDate = (finish > today ? today : finish).toISODate() || '';
+    this.customRangeError = '';
+    this.customRangeOpen = true;
+    this.clickedMode = Mode.CUSTOM;
+  }
+
+  onCustomDateChange(): void {
+    this.customRangeError = '';
+  }
+
+  get isCustomRangeInvalid(): boolean {
+    if (!this.customStartDate || !this.customFinishDate) {
+      return true;
+    }
+    const start = DateTime.fromISO(this.customStartDate);
+    const finish = DateTime.fromISO(this.customFinishDate);
+    return !start.isValid || !finish.isValid || start > finish;
+  }
+
+  applyCustomRange(): void {
+    const start = DateTime.fromISO(this.customStartDate).startOf('day');
+    const finish = DateTime.fromISO(this.customFinishDate).endOf('day');
+    const todayFinish = DateTime.now().endOf('day');
+
+    if (!start.isValid || !finish.isValid) {
+      this.customRangeError = 'Выберите обе даты.';
+      return;
+    }
+    if (start > finish) {
+      this.customRangeError = 'Дата начала не может быть позже даты окончания.';
+      return;
+    }
+    if (finish > todayFinish) {
+      this.customRangeError = 'Нельзя выбрать будущую дату.';
+      return;
+    }
+
+    const display = `${start.setLocale('ru').toFormat('d MMMM yyyy')} - ${finish
+      .setLocale('ru')
+      .toFormat('d MMMM yyyy')}`;
+    this.clickedMode = Mode.CUSTOM;
+    this.setCurrentState({ start, finish, mode: Mode.CUSTOM, display });
+    this.changeFilter.emit(this.currentFilter.value);
+    this.customRangeOpen = false;
+    this.buildCompactLabel();
+    this.evaluateScrollPosition();
   }
 
   onCompactClick(): void {

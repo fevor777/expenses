@@ -5,6 +5,7 @@ export enum Mode {
   WEEK = 'week',
   MONTH = 'month',
   YEAR = 'year',
+  CUSTOM = 'custom',
 }
 
 export type DateFrame = {
