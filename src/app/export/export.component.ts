@@ -208,6 +208,7 @@ export class ExportComponent implements OnDestroy {
       date: data.date || 0,
       description: data.description || '',
       tagIds: data.tagIds || [],
+      includeInBalance: String(data.includeInBalance) || '',
       tags: this.getTagNames(data.tagIds).join('|'),
     };
   }
