@@ -7,6 +7,11 @@ import { filter, from, map, Observable } from 'rxjs';
 
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { Expense } from '../model/expense.model';
+import {
+  BalanceFilter,
+  DEFAULT_BALANCE_FILTER,
+  matchesBalanceFilter,
+} from '../model/balance-filter.model';
 import { canonicalizeTagIds, normalizeTagIds } from '../model/tag.model';
 import { ExpenseStoreService } from './expense-store.service';
 import { withUserId } from './with-user-id.helper';
@@ -41,7 +46,8 @@ export class ExpenseService {
     category?: string[],
     descriptionFilter?: string,
     useCache = true,
-    tagIds?: string[]
+    tagIds?: string[],
+    balanceFilter: BalanceFilter = DEFAULT_BALANCE_FILTER
   ): Observable<Expense[]> {
     const desc = (descriptionFilter || '').trim().toLowerCase();
     const normalizedTagIds = normalizeTagIds(tagIds);
@@ -57,12 +63,19 @@ export class ExpenseService {
         (expense.tagIds || []).some(tagId => normalizedTagIds.includes(tagId))
       );
     };
+    const applyBalanceFilter = (expenses: Expense[]) => {
+      if (balanceFilter === DEFAULT_BALANCE_FILTER) return expenses;
+      return expenses.filter(expense =>
+        matchesBalanceFilter(expense.includeInBalance, balanceFilter)
+      );
+    };
     const fallback = () =>
       this.expenseStoreService.getExpensesObs(
         dateFilter,
         category,
         descriptionFilter,
-        normalizedTagIds
+        normalizedTagIds,
+        balanceFilter
       );
     const request = (userId: string) =>
       this.getExpensesFromFirebase(
@@ -74,7 +87,8 @@ export class ExpenseService {
       ).pipe(
         map(expenses => expenses.map(expense => canonicalizeTagIds(expense))),
         map(applyDescriptionFilter),
-        map(applyTagFilter)
+        map(applyTagFilter),
+        map(applyBalanceFilter)
       );
     return withUserId(this.afAuth, request, fallback, fallback);
   }

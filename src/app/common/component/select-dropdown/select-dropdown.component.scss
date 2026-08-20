@@ -193,5 +193,6 @@
 }
 
 .select-dropdown--inline .select-dropdown__body {
-  flex: 1 1 220px;
+  flex: 1 1 auto;
+  min-width: 100px;
 }

@@ -24,6 +24,15 @@
         <span class="mf-key">Tags:</span>
         <span class="mf-value">{{ selectedTagIds.length }}</span>
       </div>
+      <div
+        class="mf-group"
+        *ngIf="selectedBalanceFilter !== 'all'"
+      >
+        <span class="mf-key">Баланс:</span>
+        <span class="mf-value">{{
+          getBalanceFilterLabel(selectedBalanceFilter)
+        }}</span>
+      </div>
       <div class="mf-group">
         <span class="mf-key">Категории:</span>
         <span class="mf-value">{{ getCategoryFilters() || 'Все' }}</span>
@@ -137,6 +146,19 @@
           [compact]="true"
           (selectedTagIdsChange)="emitTagFilters($event)"
         ></app-tag-selector>
+      </div>
+      <div class="mf-field">
+        <app-select-dropdown
+          [options]="balanceFilterOptions"
+          [selectedValue]="selectedBalanceFilter"
+          mode="single"
+          label="Баланс"
+          placeholder="Все"
+          [allowClear]="false"
+          [compact]="true"
+          [inline]="true"
+          (selectedValueChange)="emitBalanceFilter($event)"
+        ></app-select-dropdown>
       </div>
       <div class="mf-field">
         <app-category-filter

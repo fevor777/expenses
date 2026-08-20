@@ -41,6 +41,7 @@ import { BudgetSummaryService } from '../common/service/budget-summary.service';
 import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 import { TagService } from '../common/service/tag.service';
+import { DEFAULT_BALANCE_FILTER } from '../common/model/balance-filter.model';
 
 @Component({
   selector: 'app-history',
@@ -162,6 +163,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
           categories: [],
           date: this.dateFilterService.getInitialDayValue(),
           description: '',
+          balanceFilter: DEFAULT_BALANCE_FILTER,
         }),
       };
     }
@@ -254,6 +256,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.dateFilterService.categories = this.currentFilter?.categories;
     this.dateFilterService.description = this.currentFilter?.description;
     this.dateFilterService.tagIds = this.currentFilter?.tagIds;
+    this.dateFilterService.balanceFilter = this.currentFilter?.balanceFilter;
     this.dateFilterService.dateFilter = this.currentFilter?.date;
     this.router.navigate(['/statistics']);
   }
@@ -307,7 +310,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
         this.currentFilter?.categories,
         this.currentFilter?.description,
         true,
-        this.currentFilter?.tagIds
+        this.currentFilter?.tagIds,
+        this.currentFilter?.balanceFilter
       )
       .pipe(map(expenses => this.calculateAmountsAndModifyExpenses(expenses)));
   }
@@ -538,6 +542,13 @@ export class HistoryComponent implements OnInit, OnDestroy {
       };
       this.dateFilterService.tagIds = undefined;
     }
+
+    this.defaultFilter = {
+      ...this.defaultFilter,
+      balanceFilter:
+        this.dateFilterService.balanceFilter || DEFAULT_BALANCE_FILTER,
+    };
+    this.dateFilterService.balanceFilter = undefined;
 
     this.currentFilter = {
       ...this.defaultFilter,

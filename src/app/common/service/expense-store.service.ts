@@ -5,6 +5,11 @@ import { canonicalizeTagIds, normalizeTagIds } from '../model/tag.model';
 import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { getExpensesFromTo } from '../../statistics/functions/expense-helpers';
 import { MultiFilter } from '../component/filter/multi/multi-filter.component';
+import {
+  BalanceFilter,
+  DEFAULT_BALANCE_FILTER,
+  matchesBalanceFilter,
+} from '../model/balance-filter.model';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +30,8 @@ export class ExpenseStoreService {
     dateFilter?: DateFrame,
     category?: string[],
     descriptionFilter?: string,
-    tagIds?: string[]
+    tagIds?: string[],
+    balanceFilter: BalanceFilter = DEFAULT_BALANCE_FILTER
   ): Observable<Expense[]> {
     let expensesFromLocStorage = JSON.parse(
       localStorage.getItem('expenses') || '[]'
@@ -35,13 +41,15 @@ export class ExpenseStoreService {
       dateFilter,
       category,
       descriptionFilter,
-      tagIds
+      tagIds,
+      balanceFilter
     );
     this.filter = {
       date: dateFilter,
       categories: category,
       description: descriptionFilter,
       tagIds: normalizeTagIds(tagIds) || [],
+      balanceFilter,
     } as MultiFilter;
     this.updateExpenses(expensesFromLocStorage);
     return this.expenses$;
@@ -73,7 +81,8 @@ export class ExpenseStoreService {
       this.filter?.date,
       this.filter?.categories,
       this.filter?.description,
-      this.filter?.tagIds
+      this.filter?.tagIds,
+      this.filter?.balanceFilter
     );
     this.updateExpenses(expenseList);
     return of(normalizedExpense);
@@ -96,7 +105,8 @@ export class ExpenseStoreService {
       this.filter?.date,
       this.filter?.categories,
       this.filter?.description,
-      this.filter?.tagIds
+      this.filter?.tagIds,
+      this.filter?.balanceFilter
     );
     this.updateExpenses(updatedExpenses);
     return of(normalizedExpense);
@@ -115,7 +125,8 @@ export class ExpenseStoreService {
       this.filter?.date,
       this.filter?.categories,
       this.filter?.description,
-      this.filter?.tagIds
+      this.filter?.tagIds,
+      this.filter?.balanceFilter
     );
     this.updateExpenses(updatedExpenses);
     return of(id);
@@ -126,7 +137,8 @@ export class ExpenseStoreService {
     dateFilter?: DateFrame,
     category?: string[],
     descriptionFilter?: string,
-    tagIds?: string[]
+    tagIds?: string[],
+    balanceFilter: BalanceFilter = DEFAULT_BALANCE_FILTER
   ): Expense[] {
     let filteredExpenses: Expense[] = [];
     if (Array.isArray(expenses) && expenses.length > 0) {
@@ -157,6 +169,12 @@ export class ExpenseStoreService {
       if (normalizedTagIds?.length) {
         filteredExpenses = filteredExpenses.filter(expense =>
           (expense.tagIds || []).some(tagId => normalizedTagIds.includes(tagId))
+        );
+      }
+
+      if (balanceFilter !== DEFAULT_BALANCE_FILTER) {
+        filteredExpenses = filteredExpenses.filter(expense =>
+          matchesBalanceFilter(expense.includeInBalance, balanceFilter)
         );
       }
     }

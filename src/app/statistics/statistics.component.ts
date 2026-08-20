@@ -33,6 +33,14 @@ import { MicroVisualsComponent } from '../period-summary/micro/micro-visuals.com
 import { CategoryTypeFiltersComponent } from './category-type-filters/category-type-filters.component';
 import { CategoryFilterComponent } from '../common/component/filter/category/category-filter.component';
 import { TagSelectorComponent } from '../common/component/tag-selector/tag-selector.component';
+import {
+  BalanceFilter,
+  DEFAULT_BALANCE_FILTER,
+} from '../common/model/balance-filter.model';
+import {
+  SelectDropdownComponent,
+  SelectDropdownOption,
+} from '../common/component/select-dropdown/select-dropdown.component';
 // Dynamic swipe length from store (fallback constant inside service defaults)
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 import { PeriodSummaryIconComponent } from '../common/component/period-summary-icon/period-summary-icon.component';
@@ -68,6 +76,7 @@ import { SpinnerComponent } from '../common/component/spinner/spinner.component'
     CategoryTypeFiltersComponent,
     CategoryFilterComponent,
     TagSelectorComponent,
+    SelectDropdownComponent,
     PeriodSummaryIconComponent,
     SpinnerComponent,
   ],
@@ -113,10 +122,16 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   filteredExpenses: Expense[] = [];
   descriptionSearch: string = '';
   selectedTagIds: string[] = [];
+  selectedBalanceFilter: BalanceFilter = DEFAULT_BALANCE_FILTER;
   // categoryFilterValuesStore: string[] = [];
   categoryFilterValues: string[] = [];
   isHowSuggestionDateButton: boolean = false;
   isFirstLoad: boolean = true;
+  readonly balanceFilterOptions: SelectDropdownOption[] = [
+    { value: 'all', label: 'Все' },
+    { value: 'budget', label: 'Бюджетные' },
+    { value: 'nonBudget', label: 'Внебюджетные' },
+  ];
 
   // collapse state for category filters and bars
   collapsed: Record<
@@ -251,6 +266,10 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       this.selectedTagIds = [...tagIds];
       this.dateFilterService.tagIds = undefined;
     }
+
+    this.selectedBalanceFilter =
+      this.dateFilterService.balanceFilter || DEFAULT_BALANCE_FILTER;
+    this.dateFilterService.balanceFilter = undefined;
   }
 
   onDescriptionSearchChange(value: string): void {
@@ -316,6 +335,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     }
     this.dateFilterService.description = this.descriptionSearch;
     this.dateFilterService.tagIds = this.selectedTagIds;
+    this.dateFilterService.balanceFilter = this.selectedBalanceFilter;
     this.dateFilterService.dateFilter = dateFrame || this.currentFilter;
     this.router.navigate(['/history']);
   }
@@ -342,7 +362,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
         categories,
         this.descriptionSearch,
         useCache,
-        this.selectedTagIds
+        this.selectedTagIds,
+        this.selectedBalanceFilter
       )
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(expenses => {
@@ -456,6 +477,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.excludedCategories = [];
     this.descriptionSearch = '';
     this.selectedTagIds = [];
+    this.selectedBalanceFilter = DEFAULT_BALANCE_FILTER;
     this.updateCategoriesFilterValues([]);
     this.currentFilter = { ...this.initialFilterValue };
     this.calculateCategoryTotals(null, false);
@@ -463,6 +485,12 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   onTagIdsChange(tagIds: string[]): void {
     this.selectedTagIds = tagIds || [];
+    this.calculateCategoryTotals();
+  }
+
+  onBalanceFilterChange(balanceFilter: string | null): void {
+    this.selectedBalanceFilter =
+      (balanceFilter as BalanceFilter) || DEFAULT_BALANCE_FILTER;
     this.calculateCategoryTotals();
   }
 

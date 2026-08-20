@@ -72,13 +72,21 @@
   justify-content: center;
   background: var(--color-bg);
 }
-.statistics-filter--tags {
+.statistics-filter--secondary {
   padding: 2px 4px 4px;
-  justify-content: center;
+  gap: 10px;
+  align-items: stretch;
 }
 
-.statistics-filter--tags app-tag-selector {
-  width: 200px;
+.statistics-filter-control {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.statistics-filter-control app-tag-selector,
+.statistics-filter-control app-select-dropdown {
+  display: block;
+  width: 100%;
   max-width: 100%;
 }
 .statistics-total-amount {

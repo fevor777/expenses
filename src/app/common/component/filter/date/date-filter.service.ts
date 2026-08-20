@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { DateTime } from 'luxon';
 
 import { DateFrame, Mode } from './dateFrame.model';
+import { BalanceFilter } from '../../../model/balance-filter.model';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,7 @@ export class DateFilterService {
   dateFilter: DateFrame;
   description?: string; // persisted description filter when navigating between pages
   tagIds?: string[];
+  balanceFilter?: BalanceFilter;
 
   getInitialDayValue(): DateFrame {
     return {

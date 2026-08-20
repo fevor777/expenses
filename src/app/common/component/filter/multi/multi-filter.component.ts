@@ -25,12 +25,21 @@ import { Router } from '@angular/router';
 import { DateFilterService } from '../date/date-filter.service';
 import { PeriodSummaryIconComponent } from "../../period-summary-icon/period-summary-icon.component";
 import { TagSelectorComponent } from '../../tag-selector/tag-selector.component';
+import {
+  BalanceFilter,
+  DEFAULT_BALANCE_FILTER,
+} from '../../../model/balance-filter.model';
+import {
+  SelectDropdownComponent,
+  SelectDropdownOption,
+} from '../../select-dropdown/select-dropdown.component';
 
 export type MultiFilter = {
   categories: string[];
   date: DateFrame;
   description?: string; // substring filter for expense description
   tagIds?: string[];
+  balanceFilter?: BalanceFilter;
 };
 
 @Component({
@@ -45,7 +54,8 @@ export type MultiFilter = {
     CategoryFilterComponent,
     PeriodSummaryIconComponent,
     TagSelectorComponent,
-],
+    SelectDropdownComponent,
+  ],
 })
 export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, AfterViewInit {
   @Input() value: MultiFilter;
@@ -72,8 +82,14 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
   expandFilters: boolean = false;
   descriptionFilter: string = '';
   selectedTagIds: string[] = [];
+  selectedBalanceFilter: BalanceFilter = DEFAULT_BALANCE_FILTER;
   showCompact: boolean = false; // toggled by scroll
   compactSummary: string = '';
+  readonly balanceFilterOptions: SelectDropdownOption[] = [
+    { value: 'all', label: 'Все' },
+    { value: 'budget', label: 'Бюджетные' },
+    { value: 'nonBudget', label: 'Внебюджетные' },
+  ];
   private scrollThreshold = 10; // px before compact view shows
   private onScrollHandler = () => this.evaluateScrollPosition();
 
@@ -106,6 +122,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       this.predefineCategories = this.value.categories;
       this.descriptionFilter = this.value.description || '';
       this.selectedTagIds = this.value.tagIds || [];
+      this.selectedBalanceFilter =
+        this.value.balanceFilter || DEFAULT_BALANCE_FILTER;
     }
   }
 
@@ -128,7 +146,12 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
     const tagsPart = this.selectedTagIds?.length
       ? `; tags: ${this.selectedTagIds.length}`
       : '';
-    this.compactSummary = `${datePart} • ${catPart}${descPart}${tagsPart}`.trim();
+    const balancePart =
+      this.selectedBalanceFilter !== DEFAULT_BALANCE_FILTER
+        ? `; ${this.getBalanceFilterLabel(this.selectedBalanceFilter)}`
+        : '';
+    this.compactSummary =
+      `${datePart} • ${catPart}${descPart}${tagsPart}${balancePart}`.trim();
   }
 
   private evaluateScrollPosition(): void {
@@ -146,11 +169,13 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
     this.selectedCategories = [];
     this.descriptionFilter = '';
     this.selectedTagIds = [];
+    this.selectedBalanceFilter = DEFAULT_BALANCE_FILTER;
     this.selectedFilters.emit({
       categories: [],
       date: this.defaultDateValue,
       description: '',
       tagIds: [],
+      balanceFilter: DEFAULT_BALANCE_FILTER,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -163,6 +188,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       date: dateFilter,
       description: this.descriptionFilter?.trim(),
       tagIds: this.selectedTagIds,
+      balanceFilter: this.selectedBalanceFilter,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -175,6 +201,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       date: this.dateFilter,
       description: this.descriptionFilter?.trim(),
       tagIds: this.selectedTagIds,
+      balanceFilter: this.selectedBalanceFilter,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -186,6 +213,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       date: this.dateFilter,
       description: this.descriptionFilter?.trim(),
       tagIds: this.selectedTagIds,
+      balanceFilter: this.selectedBalanceFilter,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -198,6 +226,21 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       date: this.dateFilter,
       description: this.descriptionFilter?.trim(),
       tagIds: this.selectedTagIds,
+      balanceFilter: this.selectedBalanceFilter,
+    });
+    this.buildCompactSummary();
+    this.evaluateScrollPosition();
+  }
+
+  emitBalanceFilter(balanceFilter: string | null): void {
+    this.selectedBalanceFilter =
+      (balanceFilter as BalanceFilter) || DEFAULT_BALANCE_FILTER;
+    this.selectedFilters.emit({
+      categories: this.selectedCategories,
+      date: this.dateFilter,
+      description: this.descriptionFilter?.trim(),
+      tagIds: this.selectedTagIds,
+      balanceFilter: this.selectedBalanceFilter,
     });
     this.buildCompactSummary();
     this.evaluateScrollPosition();
@@ -245,7 +288,15 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
     if (this.selectedTagIds?.length) {
       this.dateFilterService.tagIds = [...this.selectedTagIds];
     }
+    this.dateFilterService.balanceFilter = this.selectedBalanceFilter;
     this.router.navigate(['/history']);
+  }
+
+  getBalanceFilterLabel(balanceFilter: BalanceFilter): string {
+    return (
+      this.balanceFilterOptions.find(option => option.value === balanceFilter)
+        ?.label || 'Все'
+    );
   }
 
   navigateToStatistics(event: MouseEvent): void {

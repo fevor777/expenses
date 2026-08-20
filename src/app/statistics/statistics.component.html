@@ -15,15 +15,30 @@
       ></app-search-input>
       <span class="app-link statistics-home-link" routerLink="/">Home ></span>
     </div>
-    <div class="statistics-filter statistics-filter--tags">
-      <app-tag-selector
-        [selectedTagIds]="selectedTagIds"
-        variant="dropdown"
-        label="Tags:"
-        emptyLabel="Create tags in Settings"
-        [compact]="true"
-        (selectedTagIdsChange)="onTagIdsChange($event)"
-      ></app-tag-selector>
+    <div class="statistics-filter statistics-filter--secondary">
+      <div class="statistics-filter-control">
+        <app-tag-selector
+          [selectedTagIds]="selectedTagIds"
+          variant="dropdown"
+          label="Tags:"
+          emptyLabel="Create tags in Settings"
+          [compact]="true"
+          (selectedTagIdsChange)="onTagIdsChange($event)"
+        ></app-tag-selector>
+      </div>
+      <div class="statistics-filter-control">
+        <app-select-dropdown
+          [options]="balanceFilterOptions"
+          [selectedValue]="selectedBalanceFilter"
+          mode="single"
+          label="Баланс"
+          placeholder="Все"
+          [allowClear]="false"
+          [compact]="true"
+          [inline]="true"
+          (selectedValueChange)="onBalanceFilterChange($event)"
+        ></app-select-dropdown>
+      </div>
     </div>
     <app-date-filter
       class="statistics-filter"
