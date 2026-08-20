@@ -20,7 +20,7 @@
         <span class="mf-key">Description:</span>
         <span class="mf-value mf-value--quoted">"{{ descriptionFilter }}"</span>
       </div>
-      <div class="mf-group" *ngIf="selectedTagIds.length > 0">
+      <div class="mf-group">
         <span class="mf-key">Tags:</span>
         <span class="mf-value">{{ selectedTagIds.length }}</span>
       </div>
@@ -131,6 +131,7 @@
       <div class="mf-field">
         <app-tag-selector
           [selectedTagIds]="selectedTagIds"
+          variant="dropdown"
           label="Tags"
           emptyLabel="No tags in settings"
           [compact]="true"

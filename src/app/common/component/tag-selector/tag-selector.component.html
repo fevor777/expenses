@@ -1,40 +1,58 @@
-<div
-  class="tag-selector"
-  [class.tag-selector--compact]="compact"
-  [class.tag-selector--inline]="inline"
->
+<ng-container *ngIf="variant === 'dropdown'; else chipsTemplate">
+  <app-select-dropdown
+    class="tag-selector"
+    mode="multi"
+    [options]="dropdownOptions"
+    [selectedValues]="localSelectedTagIds"
+    [label]="hideLabel ? '' : label"
+    placeholder="Select tags"
+    [emptyLabel]="emptyLabel"
+    [allowClear]="allowClear"
+    [compact]="compact"
+    [inline]="inline"
+    (selectedValuesChange)="onSelectedValuesChange($event)"
+  ></app-select-dropdown>
+</ng-container>
+
+<ng-template #chipsTemplate>
   <div
-    class="tag-selector__header"
-    *ngIf="!hideLabel || (allowClear && localSelectedTagIds.length > 0)"
+    class="tag-selector"
+    [class.tag-selector--compact]="compact"
+    [class.tag-selector--inline]="inline"
   >
-    <span class="tag-selector__label" *ngIf="!hideLabel">{{ label }}</span>
-    <button
-      *ngIf="allowClear && localSelectedTagIds.length > 0"
-      type="button"
-      class="tag-selector__clear"
-      (click)="clearSelection()"
+    <div
+      class="tag-selector__header"
+      *ngIf="!hideLabel || (allowClear && localSelectedTagIds.length > 0)"
     >
-      Clear
-    </button>
-  </div>
+      <span class="tag-selector__label" *ngIf="!hideLabel">{{ label }}</span>
+      <button
+        *ngIf="allowClear && localSelectedTagIds.length > 0"
+        type="button"
+        class="tag-selector__clear"
+        (click)="clearSelection()"
+      >
+        Clear
+      </button>
+    </div>
 
-  <div class="tag-selector__empty" *ngIf="tags.length === 0">
-    {{ emptyLabel }}
-  </div>
+    <div class="tag-selector__empty" *ngIf="tags.length === 0">
+      {{ emptyLabel }}
+    </div>
 
-  <div class="tag-selector__empty" *ngIf="tags.length > 0 && visibleTags.length === 0">
-    {{ emptyLabel }}
-  </div>
+    <div class="tag-selector__empty" *ngIf="tags.length > 0 && visibleTags.length === 0">
+      {{ emptyLabel }}
+    </div>
 
-  <div class="tag-selector__chips" *ngIf="visibleTags.length > 0">
-    <button
-      type="button"
-      class="tag-selector__chip"
-      *ngFor="let tag of visibleTags"
-      [class.tag-selector__chip--selected]="isSelected(tag.id)"
-      (click)="toggleTag(tag.id)"
-    >
-      {{ tag.name }}
-    </button>
+    <div class="tag-selector__chips" *ngIf="visibleTags.length > 0">
+      <button
+        type="button"
+        class="tag-selector__chip"
+        *ngFor="let tag of visibleTags"
+        [class.tag-selector__chip--selected]="isSelected(tag.id)"
+        (click)="toggleTag(tag.id)"
+      >
+        {{ tag.name }}
+      </button>
+    </div>
   </div>
-</div>
+</ng-template>

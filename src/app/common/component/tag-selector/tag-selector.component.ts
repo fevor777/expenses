@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
 import { Tag, normalizeTagIds } from '../../model/tag.model';
 import { TagService } from '../../service/tag.service';
+import { SelectDropdownComponent, SelectDropdownOption } from '../select-dropdown/select-dropdown.component';
+
+export type TagSelectorVariant = 'chips' | 'dropdown';
 
 @Component({
   selector: 'app-tag-selector',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, SelectDropdownComponent],
   templateUrl: './tag-selector.component.html',
   styleUrls: ['./tag-selector.component.scss'],
 })
@@ -21,6 +23,7 @@ export class TagSelectorComponent implements OnChanges {
   @Input() hideLabel = false;
   @Input() inline = false;
   @Input() starredOnly = false;
+  @Input() variant: TagSelectorVariant = 'chips';
 
   @Output() selectedTagIdsChange = new EventEmitter<string[]>();
 
@@ -47,6 +50,15 @@ export class TagSelectorComponent implements OnChanges {
     return this.tags.filter(tag => tag.star === true);
   }
 
+  get dropdownOptions(): SelectDropdownOption[] {
+    return this.visibleTags
+      .filter(tag => !!tag.id)
+      .map(tag => ({
+        value: tag.id as string,
+        label: tag.name,
+      }));
+  }
+
   isSelected(tagId?: string): boolean {
     return !!tagId && this.localSelectedTagIds.includes(tagId);
   }
@@ -67,6 +79,11 @@ export class TagSelectorComponent implements OnChanges {
 
   clearSelection(): void {
     this.localSelectedTagIds = [];
+    this.emitSelection();
+  }
+
+  onSelectedValuesChange(selectedValues: string[]): void {
+    this.localSelectedTagIds = normalizeTagIds(selectedValues) || [];
     this.emitSelection();
   }
 

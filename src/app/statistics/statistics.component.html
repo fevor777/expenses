@@ -18,9 +18,9 @@
     <div class="statistics-filter statistics-filter--tags">
       <app-tag-selector
         [selectedTagIds]="selectedTagIds"
+        variant="dropdown"
         label="Tags:"
         emptyLabel="Create tags in Settings"
-        [inline]="true"
         [compact]="true"
         (selectedTagIdsChange)="onTagIdsChange($event)"
       ></app-tag-selector>

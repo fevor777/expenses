@@ -1,0 +1,194 @@
+.select-dropdown {
+  --select-dropdown-min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.select-dropdown__body {
+  position: relative;
+  width: 100%;
+  min-width: var(--select-dropdown-min-width);
+}
+
+.select-dropdown__trigger {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.select-dropdown__trigger:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.select-dropdown__trigger--open {
+  border-color: color-mix(in srgb, var(--color-primary) 55%, white 45%);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.select-dropdown__trigger--placeholder {
+  color: var(--color-text-secondary);
+}
+
+.select-dropdown__trigger-text {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-dropdown__chevron {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.select-dropdown__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.select-dropdown__empty {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.select-dropdown__panel-action {
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.select-dropdown__panel-action:hover {
+  background: color-mix(in srgb, var(--color-primary) 10%, white 90%);
+}
+
+.select-dropdown__option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.select-dropdown__option-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.select-dropdown__option-indicator {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+}
+
+.select-dropdown__option-indicator--selected {
+  opacity: 1;
+}
+
+.select-dropdown__option-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-dropdown__option-meta {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.select-dropdown__option--selected {
+  background: color-mix(in srgb, var(--color-primary) 14%, white 86%);
+  color: color-mix(in srgb, var(--color-primary) 72%, #5b3a00 28%);
+  font-weight: 600;
+}
+
+.select-dropdown__option--disabled,
+.select-dropdown__trigger:disabled,
+.select-dropdown--disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.select-dropdown--compact {
+  --select-dropdown-min-width: 160px;
+}
+
+.select-dropdown--compact .select-dropdown__trigger {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.select-dropdown--compact .select-dropdown__panel-action,
+.select-dropdown--compact .select-dropdown__empty,
+.select-dropdown--compact .select-dropdown__option,
+.select-dropdown--compact .select-dropdown__option-meta {
+  font-size: 11px;
+}
+
+.select-dropdown--inline {
+  width: 100%;
+}
+
+.select-dropdown--inline .select-dropdown__body {
+  flex: 1 1 220px;
+}

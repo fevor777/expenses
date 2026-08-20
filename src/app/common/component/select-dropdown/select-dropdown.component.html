@@ -1,0 +1,59 @@
+<div
+  class="select-dropdown"
+  [class.select-dropdown--compact]="compact"
+  [class.select-dropdown--inline]="inline"
+  [class.select-dropdown--disabled]="disabled"
+  (click)="onContainerClick($event)"
+>
+  <div class="select-dropdown__body">
+    <button
+      type="button"
+      class="select-dropdown__trigger"
+      [class.select-dropdown__trigger--open]="isOpen"
+      [class.select-dropdown__trigger--placeholder]="!hasSelection"
+      [disabled]="disabled"
+      (click)="toggleDropdown()"
+    >
+      <span class="select-dropdown__trigger-text" [title]="triggerLabel">{{ triggerLabel }}</span>
+      <span class="select-dropdown__chevron" aria-hidden="true">{{ isOpen ? '▴' : '▾' }}</span>
+    </button>
+
+    <div class="select-dropdown__panel" *ngIf="isOpen">
+      <button
+        *ngIf="allowClear"
+        type="button"
+        class="select-dropdown__panel-action"
+        (click)="clearSelection($event)"
+      >
+        Clear
+      </button>
+
+      <div class="select-dropdown__empty" *ngIf="options.length === 0">
+        {{ emptyLabel }}
+      </div>
+
+      <button
+        *ngFor="let option of options; trackBy: trackByValue"
+        type="button"
+        class="select-dropdown__option"
+        [class.select-dropdown__option--selected]="isSelected(option.value)"
+        [class.select-dropdown__option--disabled]="option.disabled"
+        [disabled]="option.disabled"
+        (click)="selectOption(option)"
+      >
+        <span class="select-dropdown__option-main">
+          <span
+            class="select-dropdown__option-indicator"
+            *ngIf="mode === 'multi'"
+            [class.select-dropdown__option-indicator--selected]="isSelected(option.value)"
+            aria-hidden="true"
+          >
+            ✓
+          </span>
+          <span class="select-dropdown__option-label" [title]="option.label">{{ option.label }}</span>
+        </span>
+        <span class="select-dropdown__option-meta" *ngIf="option.meta">{{ option.meta }}</span>
+      </button>
+    </div>
+  </div>
+</div>
