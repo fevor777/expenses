@@ -7,13 +7,14 @@ import {
   Output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Categories, Category } from '../../common/model/categories';
+import { ResolvedCategory } from '../../common/model/category.model';
 import { Expense } from '../../common/model/expense.model';
 import { normalizeTagIds } from '../../common/model/tag.model';
 import { ExpenseService } from '../../common/service/expense.service';
 import { first, Subject, Subscription, takeUntil } from 'rxjs';
 import { SpinnerComponent } from '../../common/component/spinner/spinner.component';
 import { TagSelectorComponent } from '../../common/component/tag-selector/tag-selector.component';
+import { CategoryService } from '../../common/service/category.service';
 
 @Component({
   selector: 'app-expense-edit-modal',
@@ -40,14 +41,24 @@ export class ExpenseEditModalComponent {
   // HTML datetime-local formatted string (yyyy-MM-ddTHH:mm)
   dateLocal: string = '';
 
-  readonly categories: Category[] = Categories;
+  categories: ResolvedCategory[] = [];
+  private allCategories: ResolvedCategory[] = [];
 
   private latestSub?: Subscription;
   isLoadingLatest = false; // controls spinner when loading the latest expense
 
-  constructor(private expenseService: ExpenseService) {}
+  constructor(
+    private expenseService: ExpenseService,
+    private categoryService: CategoryService
+  ) {}
 
   ngOnInit(): void {
+    this.categoryService.allCategories$
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(categories => {
+        this.allCategories = categories;
+        this.refreshSelectableCategories();
+      });
     if (this.isLoadLatestExpenses) {
       this.isLoadingLatest = true;
       // Subscribe once to get the latest expense (uses cache first by default)
@@ -74,6 +85,8 @@ export class ExpenseEditModalComponent {
 
   ngOnDestroy(): void {
     this.latestSub?.unsubscribe();
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 
   private populateLocalFieldsFromExpense(): void {
@@ -81,6 +94,7 @@ export class ExpenseEditModalComponent {
     this.amount = this.expense.amount;
     this.description = this.expense.description || '';
     this.category = this.expense.category;
+    this.refreshSelectableCategories();
     this.tagIds = this.expense.tagIds || [];
     try {
       const d = new Date(this.expense.date);
@@ -113,6 +127,11 @@ export class ExpenseEditModalComponent {
       tagIds: normalizeTagIds(this.tagIds),
       date: this.parseDateLocalToEpoch(this.dateLocal, this.expense.date),
     };
+    if (this.category !== this.expense.category) {
+      updated.includeInBalance = this.allCategories.find(
+        category => category.id === this.category
+      )?.includeInBalance;
+    }
     this.apply.emit(updated);
   }
 
@@ -133,6 +152,12 @@ export class ExpenseEditModalComponent {
     const date = new Date(value);
     const t = date.getTime();
     return isNaN(t) ? fallback : t;
+  }
+
+  private refreshSelectableCategories(): void {
+    this.categories = this.allCategories.filter(
+      category => !category.hidden || category.id === this.expense?.category
+    );
   }
 
   @HostListener('document:keydown', ['$event'])

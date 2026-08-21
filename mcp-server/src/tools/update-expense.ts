@@ -24,11 +24,28 @@ export function registerUpdateExpenseTool(
       return executeTool(deps, 'update_expense', async () => {
         assertAtLeastOneDefinedField(
           input,
-          ['amount', 'category', 'currency', 'date', 'description', 'tagIds', 'includeInBalance'],
+          [
+            'amount',
+            'category',
+            'currency',
+            'date',
+            'description',
+            'tagIds',
+            'includeInBalance',
+          ],
           'At least one mutable field must be provided'
         );
 
-        const expense = await deps.expensesRepository.update(input);
+        const category =
+          input.category !== undefined
+            ? await deps.categoriesProvider.requireById(input.category)
+            : undefined;
+        const expense = await deps.expensesRepository.update({
+          ...input,
+          ...(category !== undefined && input.includeInBalance === undefined
+            ? { includeInBalance: category.includeInBalance }
+            : {}),
+        });
 
         return jsonResult({
           status: 'updated',

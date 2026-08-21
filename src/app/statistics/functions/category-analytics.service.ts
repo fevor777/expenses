@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Expense } from '../../common/model/expense.model';
-import {
-  getCategoryById,
-  getCategoryNameById,
-} from '../../common/model/categories';
+import { CategoryService } from '../../common/service/category.service';
+import { ResolvedCategory } from '../../common/model/category.model';
 
 export interface CategoryAggregate {
   category: string;
@@ -16,18 +14,28 @@ export interface CategoryAggregate {
 
 @Injectable({ providedIn: 'root' })
 export class CategoryAnalyticsService {
+  private categoriesById = new Map<string, ResolvedCategory>();
+
+  constructor(categoryService: CategoryService) {
+    categoryService.allCategories$.subscribe(categories => {
+      this.categoriesById = new Map(
+        categories.map(category => [category.id, category])
+      );
+    });
+  }
+
   buildAggregates(expenses: Expense[]): CategoryAggregate[] {
     const map: Record<string, CategoryAggregate> = {};
     expenses?.forEach(e => {
       if (!map[e.category]) {
-        const cat = getCategoryById(e.category);
+        const category = this.categoriesById.get(e.category);
         map[e.category] = {
           category: e.category,
-          name: getCategoryNameById(e.category),
+          name: category?.name || `Unknown category (${e.category})`,
           total: 0,
           count: 0,
           avg: 0,
-          color: cat?.color,
+          color: category?.color,
         };
       }
       const agg = map[e.category];

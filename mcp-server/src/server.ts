@@ -13,8 +13,10 @@ import { resolveRequestOwnerUid } from './firebase-user-resolver.js';
 import { getFirestoreClient } from './firestore/client.js';
 import { registerExpenseAnalysisPrompts } from './prompts/expense-analysis.js';
 import { ExpensesRepository } from './firestore/expenses.repository.js';
+import { CategoriesRepository } from './firestore/categories.repository.js';
 import { SettingsRepository } from './firestore/settings.repository.js';
 import { TagsRepository } from './firestore/tags.repository.js';
+import { ResolvedCategoriesProvider } from './domain/categories.js';
 import { registerOAuthBrokerRoutes } from './oauth-broker.js';
 import { registerCreateExpenseTool } from './tools/create-expense.js';
 import { registerCreateTagTool } from './tools/create-tag.js';
@@ -91,14 +93,22 @@ export function createHttpApp(config: AppConfig, logger: Logger): Express {
     }
   });
 
-  app.use((error: unknown, _req: Request, res: Response, _next: express.NextFunction) => {
-    const message = error instanceof Error ? error.message : 'Unexpected error';
-    const statusCode = getErrorStatusCode(error);
-    logger.error({ error: message, statusCode }, 'Unhandled request error');
-    if (!res.headersSent) {
-      res.status(statusCode).json({ error: message });
+  app.use(
+    (
+      error: unknown,
+      _req: Request,
+      res: Response,
+      _next: express.NextFunction
+    ) => {
+      const message =
+        error instanceof Error ? error.message : 'Unexpected error';
+      const statusCode = getErrorStatusCode(error);
+      logger.error({ error: message, statusCode }, 'Unhandled request error');
+      if (!res.headersSent) {
+        res.status(statusCode).json({ error: message });
+      }
     }
-  });
+  );
 
   return app;
 }
@@ -109,10 +119,13 @@ function createToolDependencies(
   firestore: ReturnType<typeof getFirestoreClient>,
   ownerUid: string
 ): ToolDependencies {
+  const categoriesRepository = new CategoriesRepository(firestore, ownerUid);
+
   return {
     config,
     logger,
     expensesRepository: new ExpensesRepository(firestore, ownerUid),
+    categoriesProvider: new ResolvedCategoriesProvider(categoriesRepository),
     settingsRepository: new SettingsRepository(firestore, ownerUid),
     tagsRepository: new TagsRepository(firestore, ownerUid),
   };

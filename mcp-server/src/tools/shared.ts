@@ -4,11 +4,13 @@ import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import type { ExpensesRepository } from '../firestore/expenses.repository.js';
 import type { SettingsRepository } from '../firestore/settings.repository.js';
 import type { TagsRepository } from '../firestore/tags.repository.js';
+import type { ResolvedCategoriesProvider } from '../domain/categories.js';
 
 export type ToolDependencies = {
   config: AppConfig;
   logger: Logger;
   expensesRepository: ExpensesRepository;
+  categoriesProvider: ResolvedCategoriesProvider;
   settingsRepository: SettingsRepository;
   tagsRepository: TagsRepository;
 };
@@ -114,7 +116,7 @@ export function jsonResult<T extends Record<string, unknown>>(payload: T) {
 
 export function jsonResourceResult<
   TPayload extends Record<string, unknown>,
-  TStructured extends Record<string, unknown> = TPayload
+  TStructured extends Record<string, unknown> = TPayload,
 >(
   payload: TPayload,
   options: {
@@ -144,7 +146,9 @@ export function jsonResourceResult<
   };
 }
 
-export function toolErrorResult(payload: ToolErrorPayload): ToolResult<ToolErrorPayload> {
+export function toolErrorResult(
+  payload: ToolErrorPayload
+): ToolResult<ToolErrorPayload> {
   return {
     content: [
       {
@@ -212,6 +216,7 @@ function classifyToolError(error: unknown): ToolErrorPayload | null {
     message === 'At least one mutable field must be provided' ||
     message === 'At least one tag field must be provided' ||
     message === 'At least one budget field must be provided' ||
+    message.startsWith('Unknown or inactive category id: ') ||
     message.startsWith('Invalid timezone: ')
   ) {
     return {

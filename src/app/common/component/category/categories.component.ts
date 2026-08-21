@@ -10,10 +10,13 @@ import {
   ViewChild,
   ElementRef,
   NgZone,
+  OnDestroy,
 } from '@angular/core';
-import { Categories, Category } from '../../model/categories';
+import { Category } from '../../model/category.model';
 import { CommonModule } from '@angular/common';
 import { GlobalSwipeLengthStoreService } from '../../service/global-swipe-length-store.service';
+import { CategoryService } from '../../service/category.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-categories',
@@ -22,7 +25,9 @@ import { GlobalSwipeLengthStoreService } from '../../service/global-swipe-length
   standalone: true,
   imports: [CommonModule],
 })
-export class CategoriesComponent implements AfterViewInit, OnChanges {
+export class CategoriesComponent
+  implements AfterViewInit, OnChanges, OnDestroy
+{
   @Input() isContentDown: boolean;
   @Input() enteredAmount: string;
 
@@ -34,7 +39,9 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   // Emits desired expanded state (true => expand to full list, false => collapse back)
   @Output() clickMore: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  categories: Category[] = [...Categories];
+  categories: Category[] = [];
+  private allCategories: Category[] = [];
+  private readonly destroy$ = new Subject<void>();
 
   showMore: boolean = false;
 
@@ -60,7 +67,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
   private globalSwipeLength = 70;
   constructor(
     private ngZone: NgZone,
-    private swipeLengthStore: GlobalSwipeLengthStoreService
+    private swipeLengthStore: GlobalSwipeLengthStoreService,
+    private categoryService: CategoryService
   ) {}
 
   @HostListener('window:resize', ['$event'])
@@ -90,7 +98,7 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     if (changes['isContentDown']) {
       if (this.isContentDown) {
         // Expanded state: show full list
-        this.categories = [...Categories];
+        this.categories = [...this.allCategories];
         this.showMore = true;
         this.pendingRafMeasure = false; // reset
       } else {
@@ -102,9 +110,27 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
+    this.categoryService.categories$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(categories => {
+        this.allCategories = categories;
+        this.categories = this.isContentDown
+          ? [...categories]
+          : categories.slice(
+              0,
+              this.collapsedVisibleCount || categories.length
+            );
+        this.scheduleCollapsedMeasurement(true);
+      });
     if (!this.isContentDown) {
       this.scheduleCollapsedMeasurement();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    clearTimeout(this.resizeTimeout);
   }
 
   onCategoryClick(category: string): void {
@@ -167,8 +193,8 @@ export class CategoriesComponent implements AfterViewInit, OnChanges {
     if (forceRecalculateCollapsed || !this.collapsedVisibleCount) {
       this.collapsedVisibleCount = collapsedCount;
     }
-    this.showMore = Categories.length > this.collapsedVisibleCount;
-    const newSlice = [...Categories].slice(0, this.collapsedVisibleCount);
+    this.showMore = this.allCategories.length > this.collapsedVisibleCount;
+    const newSlice = this.allCategories.slice(0, this.collapsedVisibleCount);
     // Avoid unnecessary array replacement if slice identical length and same last id
     if (
       this.categories.length !== newSlice.length ||

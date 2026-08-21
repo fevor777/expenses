@@ -11,19 +11,18 @@ import {
   NgZone,
   ElementRef,
   ViewChild,
-  AfterViewInit
+  AfterViewInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { getCategoryNameById } from '../../../model/categories';
 import { DateFrame, Mode } from '../date/dateFrame.model';
 import { DateTime } from 'luxon';
 import { DateFilterComponent } from '../date/date-filter.component';
 import { CategoryFilterComponent } from '../category/category-filter.component';
-import { Observable, Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { DateFilterService } from '../date/date-filter.service';
-import { PeriodSummaryIconComponent } from "../../period-summary-icon/period-summary-icon.component";
+import { PeriodSummaryIconComponent } from '../../period-summary-icon/period-summary-icon.component';
 import { TagSelectorComponent } from '../../tag-selector/tag-selector.component';
 import {
   BalanceFilter,
@@ -33,6 +32,7 @@ import {
   SelectDropdownComponent,
   SelectDropdownOption,
 } from '../../select-dropdown/select-dropdown.component';
+import { CategoryService } from '../../../service/category.service';
 
 export type MultiFilter = {
   categories: string[];
@@ -57,7 +57,9 @@ export type MultiFilter = {
     SelectDropdownComponent,
   ],
 })
-export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, AfterViewInit {
+export class MultiFilterComponent
+  implements OnChanges, OnInit, OnDestroy, AfterViewInit
+{
   @Input() value: MultiFilter;
   @Input() totalAmount: number;
   @Input() defaultDateValue: DateFrame;
@@ -70,7 +72,8 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
   @Output() selectedFilters: EventEmitter<MultiFilter> = new EventEmitter();
   @Output() navigateToStatisticsIconClick: EventEmitter<void> =
     new EventEmitter();
-  @Output() expandStateChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() expandStateChange: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
   // Enable compact summary activation on scroll (history page)
   @Input() enableCompactOnScroll: boolean = false;
 
@@ -92,22 +95,35 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
   ];
   private scrollThreshold = 10; // px before compact view shows
   private onScrollHandler = () => this.evaluateScrollPosition();
+  private categoryNames = new Map<string, string>();
 
   private unsubscribe: Subject<void> = new Subject();
 
   constructor(
     private router: Router,
     private dateFilterService: DateFilterService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private categoryService: CategoryService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.categoryService.allCategories$
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(categories => {
+        this.categoryNames = new Map(
+          categories.map(category => [category.id, category.name])
+        );
+        this.buildCompactSummary();
+      });
+  }
 
   ngAfterViewInit(): void {
     if (this.enableCompactOnScroll) {
       // Run outside Angular; enter only when toggling state
       this.ngZone.runOutsideAngular(() => {
-        window.addEventListener('scroll', this.onScrollHandler, { passive: true });
+        window.addEventListener('scroll', this.onScrollHandler, {
+          passive: true,
+        });
       });
       // Initial build
       this.buildCompactSummary();
@@ -128,7 +144,9 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
   }
 
   getCategoryFilters(): string {
-    return this.selectedCategories.map(getCategoryNameById).join(', ');
+    return this.selectedCategories
+      .map(id => this.getCategoryName(id))
+      .join(', ');
   }
 
   private buildCompactSummary(): void {
@@ -137,7 +155,7 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
     const catPart = categories?.length
       ? categories
           .slice(0, 2)
-          .map(getCategoryNameById)
+          .map(id => this.getCategoryName(id))
           .join(', ') + (categories.length > 2 ? '…' : '')
       : 'Все категории';
     const descPart = this.descriptionFilter?.trim()
@@ -154,9 +172,16 @@ export class MultiFilterComponent implements OnChanges, OnInit, OnDestroy, After
       `${datePart} • ${catPart}${descPart}${tagsPart}${balancePart}`.trim();
   }
 
+  private getCategoryName(id: string): string {
+    return this.categoryNames.get(id) || `Unknown category (${id})`;
+  }
+
   private evaluateScrollPosition(): void {
     const y = window.scrollY || document.documentElement.scrollTop || 0;
-    const shouldShow = this.enableCompactOnScroll && y > this.scrollThreshold && !this.expandFilters;
+    const shouldShow =
+      this.enableCompactOnScroll &&
+      y > this.scrollThreshold &&
+      !this.expandFilters;
     if (shouldShow !== this.showCompact) {
       this.ngZone.run(() => (this.showCompact = shouldShow));
     }

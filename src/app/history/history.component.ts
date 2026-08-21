@@ -30,7 +30,6 @@ import {
   MultiFilter,
   MultiFilterComponent,
 } from '../common/component/filter/multi/multi-filter.component';
-import { getCategoryById } from '../common/model/categories';
 import { Expense } from '../common/model/expense.model';
 import { BalanceService } from '../common/service/balance.service';
 import { ExpenseService } from '../common/service/expense.service';
@@ -42,6 +41,8 @@ import { ExpenseEditModalComponent } from './edit/expense-edit-modal.component';
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 import { TagService } from '../common/service/tag.service';
 import { DEFAULT_BALANCE_FILTER } from '../common/model/balance-filter.model';
+import { CategoryService } from '../common/service/category.service';
+import { ResolvedCategory } from '../common/model/category.model';
 
 @Component({
   selector: 'app-history',
@@ -87,6 +88,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   editingExpense: Expense | null = null;
   showEditModal: boolean = false;
   tagNamesById: Record<string, string> = {};
+  categoriesById: Record<string, ResolvedCategory> = {};
 
   error: any;
 
@@ -98,7 +100,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private dateFilterService: DateFilterService,
     private expenseSummaryService: BudgetSummaryService,
     private swipeLengthStore: GlobalSwipeLengthStoreService,
-    private tagService: TagService
+    private tagService: TagService,
+    private categoryService: CategoryService
   ) {}
 
   // Fixed wrapper dynamic offset
@@ -127,6 +130,15 @@ export class HistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.categoryService
+      .getAllCategories()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(categories => {
+        this.categoriesById = (categories || []).reduce(
+          (acc, category) => ({ ...acc, [category.id]: category }),
+          {} as Record<string, ResolvedCategory>
+        );
+      });
     this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
     this.tagService
       .getTags()

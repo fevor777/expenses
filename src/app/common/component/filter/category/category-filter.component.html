@@ -1,18 +1,22 @@
 <div class="category-filter">
   <span *ngIf="!hideCategoryTitle">Категория:</span>
-  <br *ngIf="!hideCategoryTitle"/>
-  <button *ngIf="!hideReset" (click)="clearCategoryFilters()" class="category-filter-clear">
+  <br *ngIf="!hideCategoryTitle" />
+  <button
+    *ngIf="!hideReset"
+    (click)="clearCategoryFilters()"
+    class="category-filter-clear"
+  >
     Очистить все фильтры
   </button>
-  <br *ngIf="!hideReset"/>
+  <br *ngIf="!hideReset" />
   <div class="category-filter-checkbox category-filter-checkbox-main">
     <input
       type="checkbox"
       (change)="filterCategory(regularValue)"
       value="regular"
       id="category-regular"
-      [checked]="filterCategories.regular"
-      [(ngModel)]="filterCategories.regular"
+      [checked]="filterCategories['regular']"
+      [(ngModel)]="filterCategories['regular']"
     />
     <label for="category-regular">Регулярное</label>
   </div>
@@ -37,8 +41,8 @@
       (change)="filterCategory(irregularValue)"
       value="irregular"
       id="category-irregular"
-      [checked]="filterCategories.irregular"
-      [(ngModel)]="filterCategories.irregular"
+      [checked]="filterCategories['irregular']"
+      [(ngModel)]="filterCategories['irregular']"
     />
     <label for="category-irregular">Нерегулярное</label>
   </div>

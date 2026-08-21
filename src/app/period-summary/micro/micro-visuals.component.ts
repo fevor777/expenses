@@ -7,10 +7,14 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  OnDestroy,
+  OnInit,
 } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { Expense } from '../../common/model/expense.model';
 import { DateFrame } from '../../common/component/filter/date/dateFrame.model';
-import { getCategoryNameById } from '../../common/model/categories';
+import { CategoryService } from '../../common/service/category.service';
 
 interface CategoryStat {
   id: string;
@@ -107,7 +111,11 @@ interface CategoryStat {
       </table>
       <div *ngIf="hasMoreRows" class="show-more-container">
         <button class="show-more-btn" (click)="toggleShowAll()">
-          {{ showAllRows ? 'Показать меньше' : 'Показать все (' + stats.length + ')' }}
+          {{
+            showAllRows
+              ? 'Показать меньше'
+              : 'Показать все (' + stats.length + ')'
+          }}
         </button>
       </div>
     </div>
@@ -246,7 +254,7 @@ interface CategoryStat {
     `,
   ],
 })
-export class MicroVisualsComponent implements OnChanges {
+export class MicroVisualsComponent implements OnChanges, OnInit, OnDestroy {
   @Input() expenses: Expense[] = [];
   @Input() topN: number = 5;
   @Input() selectedCategories: string[] = [];
@@ -263,20 +271,45 @@ export class MicroVisualsComponent implements OnChanges {
   private lastExpensesRef: Expense[] | null = null;
   private lastExpensesLength = 0;
   private lastDateFrameRef: DateFrame | undefined = undefined;
-  
+  private categoryNames = new Map<string, string>();
+  private readonly destroy$ = new Subject<void>();
+
   // Performance optimization: limit visible rows and implement virtual scrolling
   maxVisibleRows = 50;
   showAllRows = false;
 
+  constructor(
+    private categoryService: CategoryService,
+    private changeDetector: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.categoryService.allCategories$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(categories => {
+        this.categoryNames = new Map(
+          categories.map(category => [category.id, category.name])
+        );
+        this.recompute();
+        this.changeDetector.markForCheck();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['expenses'] || changes['dateFrame']) {
       // More aggressive optimization - check if meaningful changes occurred
-      const expensesChanged = changes['expenses'] && 
-        (this.lastExpensesRef !== this.expenses || 
-         this.lastExpensesLength !== this.expenses?.length);
-      const dateFrameChanged = changes['dateFrame'] && 
-        this.lastDateFrameRef !== this.dateFrame;
-        
+      const expensesChanged =
+        changes['expenses'] &&
+        (this.lastExpensesRef !== this.expenses ||
+          this.lastExpensesLength !== this.expenses?.length);
+      const dateFrameChanged =
+        changes['dateFrame'] && this.lastDateFrameRef !== this.dateFrame;
+
       if (expensesChanged || dateFrameChanged) {
         this.lastExpensesRef = this.expenses;
         this.lastExpensesLength = this.expenses?.length || 0;
@@ -356,24 +389,33 @@ export class MicroVisualsComponent implements OnChanges {
       Array.from(totals.values()).reduce((s, v) => s + v, 0) || 1;
     const stats: CategoryStat[] = Array.from(catMap.entries()).map(
       ([id, series]) => {
-        const name = getCategoryNameById(id);
+        const name = this.categoryNames.get(id) || `Unknown category (${id})`;
         const total = +series.reduce((s, v) => s + v, 0).toFixed(2);
         const percent = +((total / grandTotal) * 100).toFixed(2); // retained if needed later
         const max = Math.max(...series, 0);
         const activeCount = series.reduce((c, v) => c + (v > 0 ? 1 : 0), 0);
         const entryCount = entryCounts.get(id) || 0;
         const trendDelta = activeCount; // keep current meaning similar to before conceptually
-        
+
         // Cache computed display values for better template performance
-        const formattedTotal = total.toLocaleString('en-US', { 
-          minimumFractionDigits: 2, 
-          maximumFractionDigits: 2 
+        const formattedTotal = total.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         });
         const activeCountDisplay = `${activeCount}/${this.dateKeys.length} • ${entryCount}`;
-        
-        return { 
-          id, name, total, percent, series, max, trendDelta, activeCount, entryCount,
-          formattedTotal, activeCountDisplay
+
+        return {
+          id,
+          name,
+          total,
+          percent,
+          series,
+          max,
+          trendDelta,
+          activeCount,
+          entryCount,
+          formattedTotal,
+          activeCountDisplay,
         };
       }
     );
@@ -391,21 +433,21 @@ export class MicroVisualsComponent implements OnChanges {
         stat.cachedSparkPoints = '';
         continue;
       }
-      
+
       const width = Math.min(len - 1, this.maxSparkSpan);
       stat.cachedSparkWidth = width;
-      
+
       const max = stat.max || 1;
       const denom = len - 1 || 1;
       const points: string[] = new Array(len);
-      
+
       for (let i = 0; i < len; i++) {
         const v = stat.series[i];
         const x = (i / denom) * width;
         const y = 18 - (v / max) * 16;
         points[i] = `${x.toFixed(2)},${y.toFixed(2)}`;
       }
-      
+
       stat.cachedSparkPoints = points.join(' ');
     }
   }

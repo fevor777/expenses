@@ -18,16 +18,19 @@ export function registerCreateExpenseTool(
     },
     async input => {
       return executeTool(deps, 'create_expense', async () => {
+        const category = await deps.categoriesProvider.requireById(
+          input.category
+        );
         const expense = await deps.expensesRepository.create({
           amount: input.amount,
           category: input.category,
           currency: input.currency ?? 'EUR',
           date: input.date,
-          ...(input.description !== undefined ? { description: input.description } : {}),
-          ...(input.tagIds !== undefined ? { tagIds: input.tagIds } : {}),
-          ...(input.includeInBalance !== undefined
-            ? { includeInBalance: input.includeInBalance }
+          ...(input.description !== undefined
+            ? { description: input.description }
             : {}),
+          ...(input.tagIds !== undefined ? { tagIds: input.tagIds } : {}),
+          includeInBalance: input.includeInBalance ?? category.includeInBalance,
         });
 
         return jsonResult({

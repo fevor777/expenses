@@ -63,6 +63,11 @@ export class ExpenseService {
         (expense.tagIds || []).some(tagId => normalizedTagIds.includes(tagId))
       );
     };
+    const applyCategoryFilter = (expenses: Expense[]) => {
+      if (!Array.isArray(category) || category.length === 0) return expenses;
+      const categoryIds = new Set(category);
+      return expenses.filter(expense => categoryIds.has(expense.category));
+    };
     const applyBalanceFilter = (expenses: Expense[]) => {
       if (balanceFilter === DEFAULT_BALANCE_FILTER) return expenses;
       return expenses.filter(expense =>
@@ -86,6 +91,7 @@ export class ExpenseService {
         normalizedTagIds
       ).pipe(
         map(expenses => expenses.map(expense => canonicalizeTagIds(expense))),
+        map(applyCategoryFilter),
         map(applyDescriptionFilter),
         map(applyTagFilter),
         map(applyBalanceFilter)
@@ -95,7 +101,8 @@ export class ExpenseService {
 
   updateExpense(expense: Expense): Observable<unknown> {
     const normalizedExpense = canonicalizeTagIds(expense);
-    const fallback = () => this.expenseStoreService.updateExpense(normalizedExpense);
+    const fallback = () =>
+      this.expenseStoreService.updateExpense(normalizedExpense);
     const request = () => {
       const payload: Record<string, unknown> = {
         ...normalizedExpense,
@@ -105,7 +112,9 @@ export class ExpenseService {
         payload['tagIds'] = firebase.firestore.FieldValue.delete();
       }
 
-      return from(this.expensesCollection.doc(normalizedExpense.id).update(payload));
+      return from(
+        this.expensesCollection.doc(normalizedExpense.id).update(payload)
+      );
     };
     return withUserId(this.afAuth, request, fallback, fallback);
   }
@@ -171,11 +180,19 @@ export class ExpenseService {
             .where('date', '<=', dateFilter.finish.valueOf());
         }
 
-        if (Array.isArray(category) && category.length > 0) {
+        if (
+          Array.isArray(category) &&
+          category.length > 0 &&
+          category.length <= 30
+        ) {
           query = query.where('category', 'in', category);
         }
 
-        if ((!category || category.length === 0) && Array.isArray(tagIds) && tagIds.length > 0) {
+        if (
+          (!category || category.length === 0) &&
+          Array.isArray(tagIds) &&
+          tagIds.length > 0
+        ) {
           query = query.where('tagIds', 'array-contains-any', tagIds);
         }
 

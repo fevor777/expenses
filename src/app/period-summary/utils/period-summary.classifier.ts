@@ -1,9 +1,6 @@
 import { DateTime } from 'luxon';
 import { Expense } from '../../common/model/expense.model';
 import {
-  getCategoryNameById,
-} from '../../common/model/categories';
-import {
   CategoryAggregate,
   PeriodFrameMeta,
   PeriodMetricsSnapshot,
@@ -11,7 +8,8 @@ import {
 
 export function buildPeriodMetrics(
   frame: PeriodFrameMeta,
-  expenses: Expense[]
+  expenses: Expense[],
+  categoryNames: ReadonlyMap<string, string>
 ): PeriodMetricsSnapshot {
   let total = 0;
   let count = expenses.length;
@@ -60,7 +58,7 @@ export function buildPeriodMetrics(
   const categories: CategoryAggregate[] = Array.from(catMap.entries())
     .map(([id, v]) => ({
       id,
-      name: getCategoryNameById(id),
+      name: categoryNames.get(id) || `Unknown category (${id})`,
       amount: round2(v.sum),
       count: v.count,
       percent: total ? (v.sum / total) * 100 : 0,

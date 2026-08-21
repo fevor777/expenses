@@ -19,10 +19,7 @@ import { DateTime } from 'luxon';
 import { Mode } from '../common/component/filter/date/dateFrame.model';
 import { NotificationService } from '../common/component/notification/notification.service';
 import { ExpressionEvaluator } from '../common/expression-evaluator';
-import {
-  getCategoryById,
-  getCategoryNameById,
-} from '../common/model/categories';
+import { ResolvedCategory } from '../common/model/category.model';
 import { Currency } from '../common/model/currency';
 import { Expense } from '../common/model/expense.model';
 import { BalanceDateService } from '../common/service/balance-date.service';
@@ -43,6 +40,7 @@ import { lineRemaining } from '../common/model/budget-summary/budget-summary.br-
 import { MorningReminderService } from '../common/service/morning-reminder.service';
 import { TagSelectorComponent } from '../common/component/tag-selector/tag-selector.component';
 import { normalizeTagIds } from '../common/model/tag.model';
+import { CategoryService } from '../common/service/category.service';
 
 @Component({
   selector: 'app-expense',
@@ -89,6 +87,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   showEditLatestModal: boolean = false;
 
   private unsubscribe: Subject<void> = new Subject();
+  private categoriesById = new Map<string, ResolvedCategory>();
 
   // Global long press logic removed
 
@@ -99,10 +98,19 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private balanceDateService: BalanceDateService,
     private dateFilterService: DateFilterService,
     private expenseSummaryService: BudgetSummaryService,
-    private morningReminderService: MorningReminderService
+    private morningReminderService: MorningReminderService,
+    private categoryService: CategoryService
   ) {}
 
   ngOnInit(): void {
+    this.categoryService
+      .getAllCategories()
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(categories => {
+        this.categoriesById = new Map(
+          categories.map(category => [category.id, category])
+        );
+      });
     this.isAmountsLoading = true;
     this.expenseService
       .getExpenses(this.dateFilterService.getInitialMonthValue())
@@ -148,7 +156,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         amount: amount,
         currency: 'EUR',
         date: Date.now(),
-        includeInBalance: getCategoryById(categoryName)?.includeInBalance,
+        includeInBalance:
+          this.categoriesById.get(categoryName)?.includeInBalance,
         description: originalDescription || undefined,
         tagIds: normalizeTagIds(this.selectedTagIds),
       };
@@ -215,7 +224,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         mode: Mode.DAY,
       };
       // Preserve description/category context if user has typed something
-      if (this.description) this.dateFilterService.description = this.description;
+      if (this.description)
+        this.dateFilterService.description = this.description;
     }
     this.router.navigate(['/history']);
   }
@@ -229,7 +239,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         display: date.toLocaleDateString('ru-RU'),
         mode: Mode.DAY,
       };
-      if (this.description) this.dateFilterService.description = this.description;
+      if (this.description)
+        this.dateFilterService.description = this.description;
     }
     this.router.navigate(['/statistics']);
   }
@@ -380,7 +391,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       : '';
 
     const inAppMessage =
-      `Добавлено: ${amount} € - ${getCategoryNameById(categoryName)}<br><br>` +
+      `Добавлено: ${amount} € - ${this.categoryName(categoryName)}<br><br>` +
       `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
       `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
       `Всего за месяц: ${monthlyTotal} €` +
@@ -397,6 +408,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
             date: Date.now(),
           },
     });
+  }
+
+  private categoryName(id: string): string {
+    return this.categoriesById.get(id)?.name || `Unknown category (${id})`;
   }
 
   onSendBrowserNotification() {

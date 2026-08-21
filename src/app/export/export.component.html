@@ -95,7 +95,11 @@
           placeholder="e.g. groceries"
           (keyup.enter)="addTag()"
         />
-        <button type="button" class="btn btn-primary bsd-save" (click)="addTag()">
+        <button
+          type="button"
+          class="btn btn-primary bsd-save"
+          (click)="addTag()"
+        >
           Add
         </button>
       </div>
@@ -112,7 +116,9 @@
         <div class="tag-settings__item" *ngFor="let tag of tags$ | async">
           <div class="tag-settings__meta">
             <span class="badge">{{ tag.name }}</span>
-            <span class="tag-settings__normalized">{{ tag.normalizedName }}</span>
+            <span class="tag-settings__normalized">{{
+              tag.normalizedName
+            }}</span>
             <label class="tag-settings__star-toggle">
               <input
                 type="checkbox"
@@ -123,15 +129,28 @@
             </label>
           </div>
           <div class="tag-settings__actions">
-            <button type="button" class="btn btn-secondary bsd-save" (click)="renameTag(tag)">
+            <button
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="renameTag(tag)"
+            >
               Rename
             </button>
-            <button type="button" class="btn btn-secondary bsd-save" (click)="deleteTag(tag)">
+            <button
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="deleteTag(tag)"
+            >
               Delete
             </button>
           </div>
         </div>
       </div>
+    </div>
+  </app-tab>
+  <app-tab key="categories" label="Categories">
+    <div class="category-settings-tab">
+      <app-category-settings></app-category-settings>
     </div>
   </app-tab>
   <app-tab key="budget" label="Budget">

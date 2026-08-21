@@ -30,7 +30,11 @@
   <div class="history-content" #historyContent>
     <!-- Loading spinner overlay (kept lightweight; accessible text for screen readers) -->
     <div class="history-loading" *ngIf="isLoading">
-      <app-spinner [size]="52" color="#ffcd85" [started]="isLoading"></app-spinner>
+      <app-spinner
+        [size]="52"
+        color="#ffcd85"
+        [started]="isLoading"
+      ></app-spinner>
     </div>
     <div *ngIf="error">{{ error }}</div>
     <ng-container
@@ -45,6 +49,7 @@
           *ngFor="let item of expenses"
           [item]="item"
           [tagNamesById]="tagNamesById"
+          [categoriesById]="categoriesById"
           [totalAmountPerDays]="getTotalAmountPerDay(item.date)"
           (editIconClick)="updateExpense($event)"
           (filterByCategory)="filterByCategory($event)"

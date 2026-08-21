@@ -13,11 +13,7 @@ import { first, Subject, takeUntil } from 'rxjs';
 import { DateFilterComponent } from '../common/component/filter/date/date-filter.component';
 import { DateFilterService } from '../common/component/filter/date/date-filter.service';
 import { DateFrame } from '../common/component/filter/date/dateFrame.model';
-import {
-  Categories,
-  getCategoryById,
-  getCategoryNameById,
-} from '../common/model/categories';
+import { ResolvedCategory } from '../common/model/category.model';
 import { Expense } from '../common/model/expense.model';
 import { CategoryListNamePipe } from '../common/pipe/category-list-name.pipe';
 import { ExpenseService } from '../common/service/expense.service';
@@ -52,6 +48,7 @@ import {
   group,
 } from '@angular/animations';
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
+import { CategoryService } from '../common/service/category.service';
 
 @Component({
   selector: 'app-statistics',
@@ -84,15 +81,21 @@ import { SpinnerComponent } from '../common/component/spinner/spinner.component'
     trigger('amountValueChange', [
       transition('* => *', [
         style({ opacity: 0, transform: 'translateY(-8px) scale(.9)' }),
-        animate('390ms cubic-bezier(.22,.61,.36,1)', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
-      ])
+        animate(
+          '390ms cubic-bezier(.22,.61,.36,1)',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        ),
+      ]),
     ]),
     trigger('amountFlash', [
       transition('* => *', [
         style({ filter: 'brightness(1.35)', opacity: 0.9 }),
-        animate('290ms ease-out', style({ filter: 'brightness(1)', opacity: 1 }))
-      ])
-    ])
+        animate(
+          '290ms ease-out',
+          style({ filter: 'brightness(1)', opacity: 1 })
+        ),
+      ]),
+    ]),
   ],
 })
 export class StatisticsComponent implements OnDestroy, AfterViewInit {
@@ -105,7 +108,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   totalAmount: number = 0;
   regularAmount: number = 0;
   irregularAmount: number = 0;
-  readonly getCategoryNameByIdFunc = getCategoryNameById;
+  categories: ResolvedCategory[] = [];
+  readonly getCategoryNameByIdFunc = (id: string) => this.getCategoryName(id);
   excludedCategories: string[] = [];
   currentCategories: string[] = [];
   private readonly destroySubject: Subject<void> = new Subject();
@@ -185,8 +189,16 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     private router: Router,
     private expenseService: ExpenseService,
     private dateFilterService: DateFilterService,
-    private swipeLengthStore: GlobalSwipeLengthStoreService
+    private swipeLengthStore: GlobalSwipeLengthStoreService,
+    private categoryService: CategoryService
   ) {
+    this.categoryService.categories$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(categories => (this.categories = categories));
+    this.categoryService
+      .getCategories()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe();
     this.initialFilterValue = this.dateFilterService.getInitialDayValue();
     this.initFilter();
   }
@@ -220,10 +232,10 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   private updateCategoriesFilterValues(filters: string[]): void {
     const isAllSelected =
-      filters.length === 0 || filters.length === Categories.length;
+      filters.length === 0 || filters.length === this.categories.length;
     const isAllCategoriesSelected =
       this.categoryFilterValues.length === 0 ||
-      this.categoryFilterValues.length === Categories.length;
+      this.categoryFilterValues.length === this.categories.length;
     if (isAllSelected && isAllCategoriesSelected) {
       return;
     }
@@ -248,9 +260,11 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     }
     const categoryFilters = this.dateFilterService.categories;
     if (Array.isArray(categoryFilters) && categoryFilters.length > 0) {
-      this.excludedCategories = Categories.filter(
-        category => !this.dateFilterService.categories.includes(category?.id)
-      ).map(category => category.id);
+      this.excludedCategories = this.categories
+        .filter(
+          category => !this.dateFilterService.categories.includes(category?.id)
+        )
+        .map(category => category.id);
       this.updateCategoriesFilterValues(this.dateFilterService.categories);
       this.dateFilterService.categories = undefined;
     }
@@ -385,7 +399,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
           categoryMap[expense.category] =
             Math.round((categoryMap[expense.category] + expense.amount) * 100) /
             100;
-          if (!getCategoryById(expense.category)?.includeInBalance) {
+          if (!expense.includeInBalance) {
             this.regularAmount =
               Math.round((this.regularAmount + expense.amount) * 100) / 100;
           } else {
@@ -511,9 +525,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.regularCategoriesCheckboxValue = value;
     if (!value) {
       if (this.irregularCategoriesCheckboxValue) {
-        const regularCategories = Categories.filter(
-          category => !category.includeInBalance
-        ).map(category => category.id);
+        const regularCategories = this.categories
+          .filter(category => !category.includeInBalance)
+          .map(category => category.id);
         this.excludedCategories = [...regularCategories];
         this.updateCategoriesFilterValuesByExcluded(this.excludedCategories);
         this.calculateCategoryTotals(null, false);
@@ -537,11 +551,11 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     let filters = [];
     if (
       excludedCategories.length !== 0 &&
-      excludedCategories.length !== Categories.length
+      excludedCategories.length !== this.categories.length
     ) {
-      filters = Categories.map(category => category.id).filter(
-        id => !excludedCategories.includes(id)
-      );
+      filters = this.categories
+        .map(category => category.id)
+        .filter(id => !excludedCategories.includes(id));
     }
     this.updateCategoriesFilterValues(filters);
   }
@@ -550,9 +564,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.irregularCategoriesCheckboxValue = value;
     if (!value) {
       if (this.regularCategoriesCheckboxValue) {
-        const irregularCategories = Categories.filter(
-          category => category.includeInBalance
-        ).map(category => category.id);
+        const irregularCategories = this.categories
+          .filter(category => category.includeInBalance)
+          .map(category => category.id);
         this.excludedCategories = [...irregularCategories];
         this.updateCategoriesFilterValuesByExcluded(this.excludedCategories);
         this.calculateCategoryTotals(null, false);
@@ -573,9 +587,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   }
 
   filterByCategory(category: string): void {
-    const filteredCategories = Categories.map(cat => cat.id).filter(
-      item => item !== category
-    );
+    const filteredCategories = this.categories
+      .map(cat => cat.id)
+      .filter(item => item !== category);
     const updatedCategorises = Array.from(
       new Set([...this.excludedCategories, ...filteredCategories])
     );
@@ -588,7 +602,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     const updatedExcludedCategories = Array.from(
       new Set([...this.excludedCategories, ...categories])
     );
-    if (updatedExcludedCategories.length === Categories.length) {
+    if (updatedExcludedCategories.length === this.categories.length) {
       this.excludedCategories = [];
       this.updateCategoriesFilterValues([]);
       this.irregularCategoriesCheckboxValue = true;
@@ -604,9 +618,9 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     if (this.excludedCategories?.length === 0) {
       return [];
     }
-    return Categories.filter(
-      category => !this.excludedCategories.includes(category?.id)
-    ).map(category => category.id);
+    return this.categories
+      .filter(category => !this.excludedCategories.includes(category?.id))
+      .map(category => category.id);
   }
 
   onCategoryFilterSelected(categories: string[]): void {
@@ -616,7 +630,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       // empty array means all categories
       this.excludedCategories = [];
     } else {
-      const allIds = Categories.map(c => c.id);
+      const allIds = this.categories.map(c => c.id);
       this.excludedCategories = allIds.filter(id => !categories.includes(id));
     }
     this.categoryFilterValues = categories;
@@ -627,6 +641,13 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     this.destroySubject.next();
     this.destroySubject.complete();
     this.teardownDynamicLayout();
+  }
+
+  private getCategoryName(id: string): string {
+    return (
+      this.categories.find(category => category.id === id)?.name ||
+      `Unknown category (${id})`
+    );
   }
 
   // -------- Fixed wrapper height -> content offset --------

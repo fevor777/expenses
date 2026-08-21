@@ -28,11 +28,11 @@ export class HammerConfig extends HammerGestureConfig {
   declarations: [AppComponent],
   imports: [
     BrowserModule,
-  BrowserAnimationsModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HammerModule,
     AngularFireModule.initializeApp(firebaseConfig),
-    AngularFirestoreModule,
+    AngularFirestoreModule.enablePersistence({ synchronizeTabs: true }),
     AngularFireFunctionsModule,
     NotificationComponent,
   ],

@@ -39,10 +39,15 @@ export const budgetDocumentSchema = z.object(budgetDocumentShape).strict();
 export const categoryDefinitionShape = {
   id: categoryIdSchema,
   name: z.string().trim().min(1),
+  icon: z.string(),
+  color: z.string().trim().min(1),
   includeInBalance: z.boolean(),
+  source: z.enum(['default', 'default-override', 'custom']),
 };
 
-export const categoryDefinitionSchema = z.object(categoryDefinitionShape).strict();
+export const categoryDefinitionSchema = z
+  .object(categoryDefinitionShape)
+  .strict();
 
 export const normalizedExpenseFilterShape = {
   startDate: z.number().int().nonnegative().optional(),

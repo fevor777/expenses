@@ -42,21 +42,34 @@ export class ExpensesRepository {
     }
 
     const snapshot = await query.get();
-    const expenses = snapshot.docs.map(document => this.mapExpense(document.id, document.data()));
-    const filteredByDescription = applyDescriptionFilter(expenses, filter.description);
-    const filteredByTags = applyTagIdsFilter(filteredByDescription, filter.tagIds);
+    const expenses = snapshot.docs.map(document =>
+      this.mapExpense(document.id, document.data())
+    );
+    const filteredByDescription = applyDescriptionFilter(
+      expenses,
+      filter.description
+    );
+    const filteredByTags = applyTagIdsFilter(
+      filteredByDescription,
+      filter.tagIds
+    );
 
     return filteredByTags.slice(0, filter.limit);
   }
 
-  async listInRange(startDate: number, endDate: number): Promise<ExpenseDocument[]> {
+  async listInRange(
+    startDate: number,
+    endDate: number
+  ): Promise<ExpenseDocument[]> {
     const snapshot = await this.baseQuery()
       .where('date', '>=', startDate)
       .where('date', '<=', endDate)
       .orderBy('date', 'desc')
       .get();
 
-    return snapshot.docs.map(document => this.mapExpense(document.id, document.data()));
+    return snapshot.docs.map(document =>
+      this.mapExpense(document.id, document.data())
+    );
   }
 
   async getById(id: string): Promise<ExpenseDocument | null> {
@@ -94,7 +107,10 @@ export class ExpensesRepository {
       uid: this.ownerUid,
     });
 
-    await this.firestore.collection('expenses').doc(existing.id).set(updatedExpense);
+    await this.firestore
+      .collection('expenses')
+      .doc(existing.id)
+      .set(updatedExpense);
     return updatedExpense;
   }
 
@@ -109,7 +125,9 @@ export class ExpensesRepository {
   }
 
   private baseQuery(): Query {
-    return this.firestore.collection('expenses').where('uid', '==', this.ownerUid);
+    return this.firestore
+      .collection('expenses')
+      .where('uid', '==', this.ownerUid);
   }
 
   private mapExpense(
@@ -121,13 +139,15 @@ export class ExpensesRepository {
       id,
       uid: String(value.uid ?? this.ownerUid),
       amount: Number(value.amount ?? 0),
-      category: value.category,
+      category: String(value.category ?? ''),
       currency: String(value.currency ?? 'EUR'),
       date: Number(value.date ?? 0),
       description:
         typeof value.description === 'string' ? value.description : undefined,
       tagIds: Array.isArray(value.tagIds)
-        ? value.tagIds.filter((tagId: unknown): tagId is string => typeof tagId === 'string')
+        ? value.tagIds.filter(
+            (tagId: unknown): tagId is string => typeof tagId === 'string'
+          )
         : undefined,
       includeInBalance:
         typeof value.includeInBalance === 'boolean'

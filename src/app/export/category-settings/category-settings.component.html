@@ -1,0 +1,339 @@
+<section class="category-settings" aria-labelledby="category-settings-title">
+  <header class="category-settings__header">
+    <div>
+      <p class="category-settings__eyebrow">Catalog</p>
+      <h2 id="category-settings-title">Manage categories</h2>
+    </div>
+    <p>
+      Customize how new expenses are grouped without changing existing records.
+    </p>
+  </header>
+
+  <form class="category-add" (ngSubmit)="addCategory()" novalidate>
+    <div class="category-section-heading">
+      <div>
+        <h3>Add category</h3>
+        <span>Create a category for your own expense workflow.</span>
+      </div>
+    </div>
+
+    <div class="category-form-grid">
+      <label class="category-field category-field--name">
+        <span>Name</span>
+        <input
+          type="text"
+          name="categoryName"
+          [(ngModel)]="draft.name"
+          maxlength="60"
+          placeholder="e.g. Groceries"
+          [disabled]="createSaving"
+        />
+      </label>
+
+      <label class="category-field">
+        <span>Icon</span>
+        <span class="category-icon-select">
+          <i [class]="draft.icon" aria-hidden="true"></i>
+          <select
+            name="categoryIcon"
+            [(ngModel)]="draft.icon"
+            [disabled]="createSaving"
+          >
+            <option *ngFor="let icon of iconOptions" [value]="icon.value">
+              {{ icon.label }}
+            </option>
+          </select>
+        </span>
+      </label>
+
+      <label class="category-field category-field--color">
+        <span>Color</span>
+        <span class="category-color-input">
+          <input
+            type="color"
+            name="categoryColorPicker"
+            [(ngModel)]="draft.color"
+            [disabled]="createSaving"
+            aria-label="Category color"
+          />
+          <input
+            type="text"
+            name="categoryColor"
+            [(ngModel)]="draft.color"
+            [disabled]="createSaving"
+            aria-label="Category color value"
+          />
+        </span>
+      </label>
+
+      <label class="category-balance-toggle">
+        <input
+          type="checkbox"
+          name="categoryBalance"
+          [(ngModel)]="draft.includeInBalance"
+          [disabled]="createSaving"
+        />
+        <span>
+          <strong>Include in balance</strong>
+          <small>Count new expenses in budget totals</small>
+        </span>
+      </label>
+
+      <button
+        type="submit"
+        class="btn btn-primary category-add__submit"
+        [disabled]="createSaving"
+      >
+        {{ createSaving ? 'Adding...' : 'Add category' }}
+      </button>
+    </div>
+
+    <p class="category-error" *ngIf="createError" role="alert">
+      {{ createError }}
+    </p>
+  </form>
+
+  <div class="category-loading" *ngIf="loading$ | async" role="status">
+    <span class="category-loading__dot"></span>
+    Refreshing categories...
+  </div>
+
+  <section
+    class="category-list-section"
+    aria-labelledby="active-categories-title"
+  >
+    <div class="category-section-heading">
+      <div>
+        <h3 id="active-categories-title">Active categories</h3>
+        <span>{{ activeCategories.length }} available in expense forms</span>
+      </div>
+    </div>
+
+    <div
+      class="category-list"
+      *ngIf="activeCategories.length; else noActiveCategories"
+    >
+      <article
+        class="category-card"
+        *ngFor="let category of activeCategories; trackBy: trackByCategory"
+        [class.category-card--saving]="isSaving(category.id)"
+      >
+        <div class="category-card__identity">
+          <span
+            class="category-card__icon"
+            [style.--category-color]="category.color"
+          >
+            <i [class]="category.icon" aria-hidden="true"></i>
+          </span>
+          <span class="category-card__text">
+            <strong>{{ category.name }}</strong>
+            <small>{{ category.id }}</small>
+          </span>
+        </div>
+
+        <div class="category-card__badges">
+          <span class="category-badge category-badge--source">{{
+            sourceLabel(category)
+          }}</span>
+          <span
+            class="category-badge"
+            [class.category-badge--included]="category.includeInBalance"
+            [class.category-badge--excluded]="!category.includeInBalance"
+          >
+            {{ category.includeInBalance ? 'included' : 'excluded' }}
+          </span>
+        </div>
+
+        <div class="category-card__actions">
+          <button
+            type="button"
+            class="btn category-button"
+            (click)="openEditor(category)"
+            [disabled]="isSaving(category.id)"
+          >
+            Edit
+          </button>
+          <button
+            *ngIf="category.source === 'custom'; else hideButton"
+            type="button"
+            class="btn category-button category-button--danger"
+            (click)="archiveCategory(category)"
+            [disabled]="isSaving(category.id)"
+          >
+            {{ isSaving(category.id) ? 'Archiving...' : 'Archive' }}
+          </button>
+          <ng-template #hideButton>
+            <button
+              type="button"
+              class="btn category-button"
+              (click)="hideCategory(category)"
+              [disabled]="isSaving(category.id)"
+            >
+              {{ isSaving(category.id) ? 'Hiding...' : 'Hide' }}
+            </button>
+          </ng-template>
+        </div>
+
+        <p
+          class="category-error category-card__error"
+          *ngIf="actionErrors[category.id]"
+          role="alert"
+        >
+          {{ actionErrors[category.id] }}
+        </p>
+      </article>
+    </div>
+
+    <ng-template #noActiveCategories>
+      <p class="category-empty">No active categories.</p>
+    </ng-template>
+  </section>
+
+  <section
+    class="category-list-section"
+    aria-labelledby="hidden-categories-title"
+  >
+    <div class="category-section-heading">
+      <div>
+        <h3 id="hidden-categories-title">Hidden categories</h3>
+        <span>Hidden items stay attached to existing expenses.</span>
+      </div>
+    </div>
+
+    <div
+      class="category-list category-list--hidden"
+      *ngIf="hiddenCategories.length; else noHiddenCategories"
+    >
+      <article
+        class="category-card category-card--hidden"
+        *ngFor="let category of hiddenCategories; trackBy: trackByCategory"
+      >
+        <div class="category-card__identity">
+          <span
+            class="category-card__icon"
+            [style.--category-color]="category.color"
+          >
+            <i [class]="category.icon" aria-hidden="true"></i>
+          </span>
+          <span class="category-card__text">
+            <strong>{{ category.name }}</strong>
+            <small>{{ category.id }}</small>
+          </span>
+        </div>
+        <span class="category-badge category-badge--hidden">hidden</span>
+        <div class="category-card__actions">
+          <button
+            type="button"
+            class="btn category-button"
+            (click)="restoreCategory(category)"
+            [disabled]="isSaving(category.id)"
+          >
+            {{ isSaving(category.id) ? 'Restoring...' : 'Restore' }}
+          </button>
+        </div>
+        <p
+          class="category-error category-card__error"
+          *ngIf="actionErrors[category.id]"
+          role="alert"
+        >
+          {{ actionErrors[category.id] }}
+        </p>
+      </article>
+    </div>
+
+    <ng-template #noHiddenCategories>
+      <p class="category-empty">No hidden categories.</p>
+    </ng-template>
+  </section>
+</section>
+
+<div
+  class="category-editor-backdrop"
+  *ngIf="editingCategory"
+  (click)="closeEditor()"
+>
+  <section
+    class="category-editor"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="category-editor-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="category-editor__header">
+      <div>
+        <p class="category-settings__eyebrow">
+          {{ sourceLabel(editingCategory) }}
+        </p>
+        <h2 id="category-editor-title">Edit category</h2>
+      </div>
+      <button
+        type="button"
+        class="category-editor__close"
+        (click)="closeEditor()"
+        aria-label="Close editor"
+      >
+        &times;
+      </button>
+    </header>
+
+    <div
+      class="category-editor__preview"
+      [style.--category-color]="editDraft.color"
+    >
+      <i [class]="editDraft.icon" aria-hidden="true"></i>
+      <span>{{ editDraft.name || 'Category preview' }}</span>
+    </div>
+
+    <label class="category-field">
+      <span>Name</span>
+      <input type="text" [(ngModel)]="editDraft.name" maxlength="60" />
+    </label>
+
+    <label class="category-field">
+      <span>Icon</span>
+      <span class="category-icon-select">
+        <i [class]="editDraft.icon" aria-hidden="true"></i>
+        <select [(ngModel)]="editDraft.icon">
+          <option *ngFor="let icon of iconOptions" [value]="icon.value">
+            {{ icon.label }}
+          </option>
+        </select>
+      </span>
+    </label>
+
+    <label class="category-field category-field--color">
+      <span>Color</span>
+      <span class="category-color-input">
+        <input
+          type="color"
+          [(ngModel)]="editDraft.color"
+          aria-label="Edited category color"
+        />
+        <input
+          type="text"
+          [(ngModel)]="editDraft.color"
+          aria-label="Edited category color value"
+        />
+      </span>
+    </label>
+
+    <label class="category-balance-toggle category-balance-toggle--editor">
+      <input type="checkbox" [(ngModel)]="editDraft.includeInBalance" />
+      <span>
+        <strong>Include in balance</strong>
+        <small>Applies to newly created expenses</small>
+      </span>
+    </label>
+
+    <p class="category-error" *ngIf="editorError" role="alert">
+      {{ editorError }}
+    </p>
+
+    <footer class="category-editor__actions">
+      <button type="button" class="btn" (click)="closeEditor()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveCategory()">
+        {{ isSaving(editingCategory.id) ? 'Saving...' : 'Save changes' }}
+      </button>
+    </footer>
+  </section>
+</div>

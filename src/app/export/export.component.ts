@@ -16,11 +16,15 @@ import { BalanceDateService } from '../common/service/balance-date.service';
 import { Budget } from '../common/model/budget.model';
 import { FormsModule } from '@angular/forms';
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
-import { MorningReminderService, MorningReminderConfig } from '../common/service/morning-reminder.service';
+import {
+  MorningReminderService,
+  MorningReminderConfig,
+} from '../common/service/morning-reminder.service';
 import { Tag, normalizeTagName } from '../common/model/tag.model';
 import { TagService } from '../common/service/tag.service';
 import { TagStoreService } from '../common/service/tag-store.service';
 import { formatBudgetPeriodLabel } from '../common/model/budget-summary/budget-period.helper';
+import { CategorySettingsComponent } from './category-settings/category-settings.component';
 
 @Component({
   selector: 'app-export',
@@ -33,6 +37,7 @@ import { formatBudgetPeriodLabel } from '../common/model/budget-summary/budget-p
     TabsContainerComponent,
     TabComponent,
     FormsModule,
+    CategorySettingsComponent,
   ],
 })
 export class ExportComponent implements OnDestroy {
@@ -198,7 +203,9 @@ export class ExportComponent implements OnDestroy {
     this.destroySubject.complete();
   }
 
-  private formatData(data: Expense): Record<string, string | number | string[]> {
+  private formatData(
+    data: Expense
+  ): Record<string, string | number | string[]> {
     return {
       id: data?.id || '',
       uid: data?.uid || '',
@@ -219,9 +226,7 @@ export class ExportComponent implements OnDestroy {
     }
 
     const tagsById = new Map(this.tags.map(tag => [tag.id, tag.name]));
-    return tagIds
-      .map(tagId => tagsById.get(tagId) || tagId)
-      .filter(Boolean);
+    return tagIds.map(tagId => tagsById.get(tagId) || tagId).filter(Boolean);
   }
 
   private exportToFile(data: any[]): void {
@@ -271,8 +276,7 @@ export class ExportComponent implements OnDestroy {
       period: Math.floor(this.budgetPeriodDuration),
       periodStartTs: this.budgetStartTs,
       timezone:
-        this.budgetTimezone ||
-        Intl.DateTimeFormat().resolvedOptions().timeZone,
+        this.budgetTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
       minDayLimit: this.minDayLimit,
     };
     this.irregularBudgetService
@@ -285,7 +289,9 @@ export class ExportComponent implements OnDestroy {
 
   onSaveSwipeLength(): void {
     if (Number.isFinite(this.swipeLengthInput) && this.swipeLengthInput > 0) {
-      this.swipeLengthValue = this.swipeLengthStore.saveSwipeLength(this.swipeLengthInput);
+      this.swipeLengthValue = this.swipeLengthStore.saveSwipeLength(
+        this.swipeLengthInput
+      );
     } else {
       // Reset input to current valid value if invalid provided
       this.swipeLengthInput = this.swipeLengthValue;
@@ -303,9 +309,13 @@ export class ExportComponent implements OnDestroy {
   }
 
   onSaveMorningReminder(): void {
-    if (this.morningStartHour >= 0 && this.morningStartHour < 24 &&
-        this.morningEndHour >= 0 && this.morningEndHour < 24 &&
-        this.morningStartHour < this.morningEndHour) {
+    if (
+      this.morningStartHour >= 0 &&
+      this.morningStartHour < 24 &&
+      this.morningEndHour >= 0 &&
+      this.morningEndHour < 24 &&
+      this.morningStartHour < this.morningEndHour
+    ) {
       this.morningReminderService.saveConfig({
         enabled: this.morningReminderEnabled,
         startHour: this.morningStartHour,

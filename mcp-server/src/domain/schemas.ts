@@ -1,12 +1,6 @@
 import { z } from 'zod';
-import { CATEGORY_DEFINITIONS } from './models.js';
 
-const categoryIds = CATEGORY_DEFINITIONS.map(category => category.id) as [
-  (typeof CATEGORY_DEFINITIONS)[number]['id'],
-  ...(typeof CATEGORY_DEFINITIONS)[number]['id'][]
-];
-
-export const categoryIdSchema = z.enum(categoryIds);
+export const categoryIdSchema = z.string().trim().min(1);
 
 export const noInputShape = {};
 
@@ -92,9 +86,7 @@ export const resolveDateRangeShape = {
     ),
 };
 
-export const resolveDateRangeSchema = z
-  .object(resolveDateRangeShape)
-  .strict();
+export const resolveDateRangeSchema = z.object(resolveDateRangeShape).strict();
 
 export const expenseFilterShape = {
   startDate: z
@@ -154,9 +146,7 @@ export const expenseFilterShape = {
     ),
 };
 
-export const expenseFilterSchema = z
-  .object(expenseFilterShape)
-  .strict();
+export const expenseFilterSchema = z.object(expenseFilterShape).strict();
 
 export const listExpensesForPeriodShape = {
   ...resolveDateRangeShape,
@@ -222,11 +212,7 @@ export const createExpenseShape = {
 export const createExpenseSchema = z.object(createExpenseShape).strict();
 
 export const updateExpenseShape = {
-  id: z
-    .string()
-    .trim()
-    .min(1)
-    .describe('Required expense id to update.'),
+  id: z.string().trim().min(1).describe('Required expense id to update.'),
   amount: z
     .number()
     .positive()
@@ -269,27 +255,16 @@ export const updateExpenseShape = {
     ),
 };
 
-export const updateExpenseSchema = z
-  .object(updateExpenseShape)
-  .strict();
+export const updateExpenseSchema = z.object(updateExpenseShape).strict();
 
 export const tagIdShape = {
-  id: z
-    .string()
-    .trim()
-    .min(1)
-    .describe('Tag id to delete.'),
+  id: z.string().trim().min(1).describe('Tag id to delete.'),
 };
 
 export const tagIdSchema = z.object(tagIdShape).strict();
 
 export const createTagShape = {
-  name: z
-    .string()
-    .trim()
-    .min(1)
-    .max(80)
-    .describe('Required tag name.'),
+  name: z.string().trim().min(1).max(80).describe('Required tag name.'),
   star: z
     .boolean()
     .optional()
@@ -299,11 +274,7 @@ export const createTagShape = {
 export const createTagSchema = z.object(createTagShape).strict();
 
 export const updateTagShape = {
-  id: z
-    .string()
-    .trim()
-    .min(1)
-    .describe('Required tag id to update.'),
+  id: z.string().trim().min(1).describe('Required tag id to update.'),
   name: z
     .string()
     .trim()
@@ -311,15 +282,10 @@ export const updateTagShape = {
     .max(80)
     .optional()
     .describe('Optional new tag name.'),
-  star: z
-    .boolean()
-    .optional()
-    .describe('Optional new star flag for the tag.'),
+  star: z.boolean().optional().describe('Optional new star flag for the tag.'),
 };
 
-export const updateTagSchema = z
-  .object(updateTagShape)
-  .strict();
+export const updateTagSchema = z.object(updateTagShape).strict();
 
 export const listTagsShape = {};
 
@@ -363,9 +329,7 @@ export const updateBudgetShape = {
     .describe('Optional minimum daily budget limit value.'),
 };
 
-export const updateBudgetSchema = z
-  .object(updateBudgetShape)
-  .strict();
+export const updateBudgetSchema = z.object(updateBudgetShape).strict();
 
 export const savingsValueShape = {
   value: z
@@ -386,9 +350,7 @@ export const monthlySummaryShape = {
     ),
 };
 
-export const monthlySummarySchema = z
-  .object(monthlySummaryShape)
-  .strict();
+export const monthlySummarySchema = z.object(monthlySummaryShape).strict();
 
 export const monthPeriodSummaryShape = {
   year: z

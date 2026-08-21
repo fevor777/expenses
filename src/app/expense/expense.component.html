@@ -13,8 +13,8 @@
   </app-expense-header>
 
   <app-categories
-    *ngIf="showNumberBoard; else categoriesWithScroll"
-    [style.overflow]="'hidden'"
+    [isContentDown]="!showNumberBoard"
+    [style.overflow]="showNumberBoard ? 'hidden' : null"
     (categoryClick)="onCategoryClick($event)"
     (clickMore)="!$event ? onShowNumberBoard() : onHideNumberBoard()"
     appSwipe
@@ -25,19 +25,6 @@
     [enteredAmount]="enteredAmount"
   >
   </app-categories>
-  <ng-template #categoriesWithScroll>
-    <app-categories
-      *ngIf="!showNumberBoard"
-      (categorySwipeRight)="navigateToStatistics()"
-      (categorySwipeLeft)="navigateToHistory()"
-      (clickMore)="!$event ? onShowNumberBoard() : onHideNumberBoard()"
-      (categorySwipeUp)="onShowNumberBoard()"
-      (categoryClick)="onCategoryClick($event)"
-      [isContentDown]="true"
-      [enteredAmount]="enteredAmount"
-    >
-    </app-categories>
-  </ng-template>
 
   <app-expense-number-board
     *ngIf="showNumberBoard"

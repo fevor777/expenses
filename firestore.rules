@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsExistingDocument() {
+      return signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    function ownsIncomingDocument() {
+      return signedIn() && request.resource.data.uid == request.auth.uid;
+    }
+
+    match /expenses/{expenseId} {
+      allow read, delete: if ownsExistingDocument();
+      allow create: if ownsIncomingDocument();
+      allow update: if ownsExistingDocument() && ownsIncomingDocument();
+    }
+
+    match /tags/{tagId} {
+      allow read, delete: if ownsExistingDocument();
+      allow create: if ownsIncomingDocument();
+      allow update: if ownsExistingDocument() && ownsIncomingDocument();
+    }
+
+    match /{collectionName}/{uid} {
+      allow read, write: if signedIn()
+        && request.auth.uid == uid
+        && collectionName in ['balance', 'balance-date', 'irregularBudget', 'savings'];
+    }
+
+    match /users/{uid}/category-overrides/{categoryId} {
+      allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
+    }
+  }
+}

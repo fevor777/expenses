@@ -72,7 +72,8 @@ export function buildFrame(
       const lastMonthDate = now.minus({ months: 1 });
       const start = lastMonthDate.startOf('month');
       const finish = lastMonthDate.endOf('month');
-      const elapsedDays = finish.startOf('day').diff(start.startOf('day'), 'days').days + 1;
+      const elapsedDays =
+        finish.startOf('day').diff(start.startOf('day'), 'days').days + 1;
       return {
         key,
         title: 'Прошлый месяц',
@@ -87,7 +88,8 @@ export function buildFrame(
 
 export function createPeriodSnapshot(
   frame: PeriodFrameMeta,
-  expenses: Expense[]
+  expenses: Expense[],
+  categoryNames: ReadonlyMap<string, string>
 ): PeriodMetricsSnapshot {
-  return buildPeriodMetrics(frame, expenses);
+  return buildPeriodMetrics(frame, expenses, categoryNames);
 }

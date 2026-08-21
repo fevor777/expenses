@@ -2,10 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-import {
-  getCategoryById,
-  getCategoryNameById,
-} from '../../common/model/categories';
+import { ResolvedCategory } from '../../common/model/category.model';
 import { HistoryExpense } from '../history-expense';
 
 @Component({
@@ -19,16 +16,17 @@ export class HistoryItemComponent {
   @Input() item: HistoryExpense;
   @Input() totalAmountPerDays: number;
   @Input() tagNamesById: Record<string, string> = {};
+  @Input() categoriesById: Record<string, ResolvedCategory> = {};
 
-  @Output() editIconClick: EventEmitter<HistoryExpense> =
-    new EventEmitter();
+  @Output() editIconClick: EventEmitter<HistoryExpense> = new EventEmitter();
   @Output() filterByCategory: EventEmitter<string> = new EventEmitter();
   @Output() deleteLabelClick: EventEmitter<HistoryExpense> = new EventEmitter();
   @Output() excludeFromBudgetClick: EventEmitter<HistoryExpense> =
     new EventEmitter();
 
-  readonly getCategoryNameByIdFunc = getCategoryNameById;
-  readonly getCategoryByIdFunc = getCategoryById;
+  getCategoryName(id: string): string {
+    return this.categoriesById[id]?.name || `Unknown category (${id})`;
+  }
 
   onEditIconClick(expense: HistoryExpense): void {
     this.editIconClick.emit(expense);

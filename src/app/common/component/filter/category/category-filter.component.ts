@@ -3,13 +3,17 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
+  OnInit,
   OnChanges,
   Output,
   SimpleChanges,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Categories } from '../../../model/categories';
+import { ResolvedCategory } from '../../../model/category.model';
+import { CategoryService } from '../../../service/category.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-category-filter',
@@ -18,7 +22,7 @@ import { Categories } from '../../../model/categories';
   standalone: true,
   imports: [CommonModule, FormsModule],
 })
-export class CategoryFilterComponent implements OnChanges {
+export class CategoryFilterComponent implements OnInit, OnChanges, OnDestroy {
   @Input() value: string[];
   @Input() hideCategoryTitle: boolean;
   @Input() hideReset: boolean;
@@ -26,15 +30,34 @@ export class CategoryFilterComponent implements OnChanges {
 
   readonly regularValue: string = 'regular';
   readonly irregularValue: string = 'irregular';
-  filterCategories: any = Categories.reduce((acc, category) => {
-    acc[category.id] = false;
-    return acc;
-  }, {});
+  filterCategories: Record<string, boolean> = {};
 
-  categories = {
-    regular: Categories.filter(category => !category.includeInBalance),
-    irregular: Categories.filter(category => category.includeInBalance),
+  categories: { regular: ResolvedCategory[]; irregular: ResolvedCategory[] } = {
+    regular: [],
+    irregular: [],
   };
+  private activeCategories: ResolvedCategory[] = [];
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(private categoryService: CategoryService) {}
+
+  ngOnInit(): void {
+    this.categoryService.categories$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(categories => {
+        this.activeCategories = categories;
+        this.categories = {
+          regular: categories.filter(category => !category.includeInBalance),
+          irregular: categories.filter(category => category.includeInBalance),
+        };
+        this.rebuildFilterState();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['value'] && Array.isArray(this.value)) {
@@ -45,18 +68,15 @@ export class CategoryFilterComponent implements OnChanges {
           key !== this.irregularValue
       )?.length;
       const isValueAll =
-        this.value.length === 0 || this.value.length === Categories.length;
+        this.value.length === 0 ||
+        this.value.length === this.activeCategories.length;
       const isFilterAll =
-        currentLenght === 0 || currentLenght === Categories.length;
+        currentLenght === 0 || currentLenght === this.activeCategories.length;
       if (currentLenght === this.value.length || (isValueAll && isFilterAll)) {
         return;
       }
       this.initiateFilterCategory();
-      this.filterCategories = Categories.reduce((acc, category) => {
-        acc[category.id] =
-          this.value.length > 0 ? this.value.includes(category.id) : false;
-        return acc;
-      }, {});
+      this.rebuildFilterState();
       this.checkMainCategory();
     }
   }
@@ -92,7 +112,7 @@ export class CategoryFilterComponent implements OnChanges {
     this.checkMainCategory();
     let selectedCategories = this.getSelectedCategories();
     selectedCategories =
-      selectedCategories?.length === Categories.length
+      selectedCategories?.length === this.activeCategories.length
         ? []
         : selectedCategories;
     this.selectedCategories.emit(selectedCategories);
@@ -104,12 +124,14 @@ export class CategoryFilterComponent implements OnChanges {
   } {
     const regularIds = this.categories.regular.map(category => category.id);
     const irregularIds = this.categories.irregular.map(category => category.id);
-    const regularChecked = regularIds.every(id => this.filterCategories[id]);
-    const irregularChecked = irregularIds.every(
-      id => this.filterCategories[id]
-    );
-    this.filterCategories.regular = regularChecked;
-    this.filterCategories.irregular = irregularChecked;
+    const regularChecked =
+      regularIds.length > 0 &&
+      regularIds.every(id => this.filterCategories[id]);
+    const irregularChecked =
+      irregularIds.every(id => this.filterCategories[id]) &&
+      irregularIds.length > 0;
+    this.filterCategories['regular'] = regularChecked;
+    this.filterCategories['irregular'] = irregularChecked;
     return {
       regularChecked,
       irregularChecked,
@@ -133,7 +155,22 @@ export class CategoryFilterComponent implements OnChanges {
     for (const key in this.filterCategories) {
       this.filterCategories[key] = false;
     }
-    this.filterCategories.irregular = false;
-    this.filterCategories.regular = false;
+    this.filterCategories['irregular'] = false;
+    this.filterCategories['regular'] = false;
+  }
+
+  private rebuildFilterState(): void {
+    const selected = Array.isArray(this.value) ? this.value : [];
+    this.filterCategories = this.activeCategories.reduce<
+      Record<string, boolean>
+    >(
+      (acc, category) => {
+        acc[category.id] =
+          selected.length > 0 && selected.includes(category.id);
+        return acc;
+      },
+      { regular: false, irregular: false }
+    );
+    this.checkMainCategory();
   }
 }

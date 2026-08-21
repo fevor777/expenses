@@ -1,7 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 
-import { getCategoryNameById } from '../../common/model/categories';
+import { CategoryService } from '../../common/service/category.service';
 
 @Component({
   selector: 'app-statistics-bar',
@@ -11,7 +23,7 @@ import { getCategoryNameById } from '../../common/model/categories';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StatisticsBarComponent implements OnInit, OnChanges {
+export class StatisticsBarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() category: string;
   @Input() amount: number;
   @Input() percentage: number;
@@ -28,8 +40,24 @@ export class StatisticsBarComponent implements OnInit, OnChanges {
   formattedPercentage: string = '';
 
   isVisible: boolean = true;
+  private categoryNames = new Map<string, string>();
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(
+    private categoryService: CategoryService,
+    private changeDetector: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
+    this.categoryService.allCategories$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(categories => {
+        this.categoryNames = new Map(
+          categories.map(category => [category.id, category.name])
+        );
+        this.updateCachedValues();
+        this.changeDetector.markForCheck();
+      });
     this.updateCachedValues();
   }
 
@@ -42,8 +70,15 @@ export class StatisticsBarComponent implements OnInit, OnChanges {
 
   private updateCachedValues(): void {
     // Cache computed values that don't change during component lifecycle
-    this.categoryName = getCategoryNameById(this.category);
+    this.categoryName =
+      this.categoryNames.get(this.category) ||
+      `Unknown category (${this.category})`;
     this.formattedPercentage = this.percentage.toFixed(2) + '%';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onCategoryLabelClick(categoryId: string): void {

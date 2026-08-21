@@ -1,23 +1,143 @@
 export const CATEGORY_DEFINITIONS = [
-  { id: 'subscriptions', name: 'Подписка', includeInBalance: false },
-  { id: 'entertainments', name: 'Развлечение', includeInBalance: true },
-  { id: 'nicotine', name: 'Сигареты', includeInBalance: true },
-  { id: 'travel', name: 'Путешествие', includeInBalance: true },
-  { id: 'home', name: 'Для дома', includeInBalance: true },
-  { id: 'alcohol', name: 'Выпивка', includeInBalance: true },
-  { id: 'meal', name: 'Питание', includeInBalance: true },
-  { id: 'bus', name: 'Общ. транспорт', includeInBalance: true },
-  { id: 'utility-bills', name: 'Коммуналка', includeInBalance: false },
-  { id: 'pharmacy', name: 'Медицина', includeInBalance: true },
-  { id: 'barbershop', name: 'Парикмахерская', includeInBalance: true },
-  { id: 'electronics', name: 'Электроника', includeInBalance: true },
-  { id: 'clothes', name: 'Одежда', includeInBalance: true },
-  { id: 'another', name: 'Разное', includeInBalance: true },
-  { id: 'sport', name: 'Спорт', includeInBalance: false },
-  { id: 'rental-payment', name: 'Аренда жилья', includeInBalance: false },
+  {
+    id: 'subscriptions',
+    name: 'Подписка',
+    icon: 'fas fa-newspaper',
+    color: '#FFC107',
+    includeInBalance: false,
+  },
+  {
+    id: 'entertainments',
+    name: 'Развлечение',
+    icon: 'fas fa-film',
+    color: '#795548',
+    includeInBalance: true,
+  },
+  {
+    id: 'nicotine',
+    name: 'Сигареты',
+    icon: 'fas fa-smoking',
+    color: '#FF5722',
+    includeInBalance: true,
+  },
+  {
+    id: 'travel',
+    name: 'Путешествие',
+    icon: 'fas fa-plane',
+    color: '#009688',
+    includeInBalance: true,
+  },
+  {
+    id: 'home',
+    name: 'Для дома',
+    icon: 'fas fa-home',
+    color: '#9C27B0',
+    includeInBalance: true,
+  },
+  {
+    id: 'alcohol',
+    name: 'Выпивка',
+    icon: 'fas fa-wine-bottle',
+    color: '#FF5722',
+    includeInBalance: true,
+  },
+  {
+    id: 'meal',
+    name: 'Питание',
+    icon: 'fa-solid fa-bell-concierge',
+    color: '#474747',
+    includeInBalance: true,
+  },
+  {
+    id: 'bus',
+    name: 'Общ. транспорт',
+    icon: 'fas fa-bus',
+    color: '#3F51B5',
+    includeInBalance: true,
+  },
+  {
+    id: 'utility-bills',
+    name: 'Коммуналка',
+    icon: 'fas fa-water',
+    color: '#2196F3',
+    includeInBalance: false,
+  },
+  {
+    id: 'pharmacy',
+    name: 'Медицина',
+    icon: 'fas fa-prescription-bottle-alt',
+    color: '#2196F3',
+    includeInBalance: true,
+  },
+  {
+    id: 'barbershop',
+    name: 'Парикмахерская',
+    icon: 'fas fa-cut',
+    color: '#FFC107',
+    includeInBalance: true,
+  },
+  {
+    id: 'electronics',
+    name: 'Электроника',
+    icon: 'fas fa-tablet-alt',
+    color: '#9E9E9E',
+    includeInBalance: true,
+  },
+  {
+    id: 'clothes',
+    name: 'Одежда',
+    icon: 'fas fa-tshirt',
+    color: '#a99e00',
+    includeInBalance: true,
+  },
+  {
+    id: 'another',
+    name: 'Разное',
+    icon: 'fas fa-random',
+    color: '#FF5722',
+    includeInBalance: true,
+  },
+  {
+    id: 'sport',
+    name: 'Спорт',
+    icon: 'fas fa-dumbbell',
+    color: '#607D8B',
+    includeInBalance: false,
+  },
+  {
+    id: 'rental-payment',
+    name: 'Аренда жилья',
+    icon: 'fas fa-building',
+    color: '#673AB7',
+    includeInBalance: false,
+  },
 ] as const;
 
-export type CategoryId = (typeof CATEGORY_DEFINITIONS)[number]['id'];
+export type BuiltInCategoryId = (typeof CATEGORY_DEFINITIONS)[number]['id'];
+export type CategoryId = string;
+
+export type CategoryOverrideDocument = {
+  id: string;
+  source: 'default-override' | 'custom';
+  baseCategoryId?: string;
+  name?: string;
+  icon?: string;
+  color?: string;
+  includeInBalance?: boolean;
+  isDeleted?: boolean;
+  normalizedName?: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type ResolvedCategory = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  includeInBalance: boolean;
+  source: 'default' | 'default-override' | 'custom';
+};
 
 export type ExpenseDocument = {
   id: string;
@@ -90,9 +210,7 @@ export function getDefaultIncludeInBalance(categoryId: CategoryId): boolean {
   return getCategoryDefinition(categoryId)?.includeInBalance ?? false;
 }
 
-export function normalizeDescription(
-  description?: string
-): string | undefined {
+export function normalizeDescription(description?: string): string | undefined {
   const value = description?.trim();
   return value ? value : undefined;
 }
@@ -177,5 +295,7 @@ export function roundCurrency(value: number): number {
 }
 
 export function isExpenseIncludedInBalance(expense: ExpenseDocument): boolean {
-  return expense.includeInBalance ?? getDefaultIncludeInBalance(expense.category);
+  return (
+    expense.includeInBalance ?? getDefaultIncludeInBalance(expense.category)
+  );
 }

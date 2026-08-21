@@ -20,7 +20,9 @@ button {
   border-radius: var(--radius-sm);
   background: var(--color-bg-alt);
   font-size: 14px;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
 }
 .budget-start-row .bsd-input:focus {
   outline: none;
@@ -80,7 +82,7 @@ button {
 }
 .toggle-slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 20px;
   width: 20px;
   left: 3px;
@@ -90,7 +92,7 @@ button {
   border-radius: 50%;
 }
 .toggle-switch input:checked + .toggle-slider {
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 .toggle-switch input:checked + .toggle-slider:before {
   transform: translateX(24px);
@@ -172,4 +174,9 @@ button {
   gap: 6px;
   font-size: 12px;
   color: var(--color-text-secondary);
+}
+
+.category-settings-tab {
+  width: min(920px, 100%);
+  margin: 12px auto 24px;
 }

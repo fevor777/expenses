@@ -1,19 +1,13 @@
-export type Category = {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  includeInBalance: boolean;
-};
+import { Category, ResolvedCategory } from './category.model';
 
-export const getCategoryNameById = (id: string): string => {
-  const category = Categories.find(category => category.id === id);
-  return category ? category.name : '';
-};
-
-export const getCategoryById = (id: string): Category => {
-  return Categories.find(category => category.id === id);
-};
+export type {
+  Category,
+  CategoryInput,
+  CategoryOverrideDocument,
+  CategoryPatch,
+  CategorySource,
+  ResolvedCategory,
+} from './category.model';
 
 export const Categories: Category[] = [
   {
@@ -129,3 +123,23 @@ export const Categories: Category[] = [
     includeInBalance: false,
   },
 ];
+
+let resolvedCategoriesForLegacyHelpers: readonly Category[] = Categories;
+
+export const getCategoryNameById = (id: string): string => {
+  const category = getCategoryById(id);
+  return category ? category.name : `Unknown category (${id})`;
+};
+
+export const getCategoryById = (id: string): Category | undefined => {
+  return resolvedCategoriesForLegacyHelpers.find(
+    category => category.id === id
+  );
+};
+
+// Keeps synchronous consumers working while UI flows migrate to CategoryService.
+export function setResolvedCategoriesForLegacyHelpers(
+  categories: readonly ResolvedCategory[]
+): void {
+  resolvedCategoriesForLegacyHelpers = categories;
+}
