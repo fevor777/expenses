@@ -9,8 +9,8 @@ import {
   switchMap,
   takeUntil,
   tap,
-  map,
   combineLatest,
+  first,
 } from 'rxjs';
 
 import { CategoriesComponent } from '../common/component/category/categories.component';
@@ -41,6 +41,8 @@ import { MorningReminderService } from '../common/service/morning-reminder.servi
 import { TagSelectorComponent } from '../common/component/tag-selector/tag-selector.component';
 import { normalizeTagIds } from '../common/model/tag.model';
 import { CategoryService } from '../common/service/category.service';
+import { BudgetLimitSummary } from '../common/model/budget.model';
+import { BudgetLimitSummaryService } from '../common/service/budget-limit-summary.service';
 
 @Component({
   selector: 'app-expense',
@@ -99,7 +101,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     private dateFilterService: DateFilterService,
     private expenseSummaryService: BudgetSummaryService,
     private morningReminderService: MorningReminderService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private budgetLimitSummaryService: BudgetLimitSummaryService
   ) {}
 
   ngOnInit(): void {
@@ -173,11 +176,18 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           switchMap(addedExpense =>
             combineLatest([
               this.expenseSummaryService.buildCurrentBudgetSummary(),
+              this.budgetLimitSummaryService
+                .getCurrentLimitSummaries()
+                .pipe(first()),
               of(addedExpense),
             ])
           ),
           tap(
-            ([summary, addedExpense]: [BudgetSummaryBuildResult, Expense]) => {
+            ([summary, budgetLimitSummaries, addedExpense]: [
+              BudgetSummaryBuildResult,
+              BudgetLimitSummary[],
+              Expense,
+            ]) => {
               this.notificationService.summaryBuildResultCache = summary;
               this.onShowNumberBoard();
               this.showNotification(
@@ -185,14 +195,20 @@ export class ExpenseComponent implements OnInit, OnDestroy {
                 amount,
                 addedExpense,
                 originalDescription,
-                summary
+                summary,
+                budgetLimitSummaries
               );
             }
           ),
-          switchMap(([summary]: [BudgetSummaryBuildResult, Expense]) =>
-            this.expenseSummaryService.sendBrowserNotificationByBudgetSummary(
-              summary
-            )
+          switchMap(
+            ([summary]: [
+              BudgetSummaryBuildResult,
+              BudgetLimitSummary[],
+              Expense,
+            ]) =>
+              this.expenseSummaryService.sendBrowserNotificationByBudgetSummary(
+                summary
+              )
           ),
           takeUntil(this.unsubscribe)
         )
@@ -379,7 +395,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     amount,
     addedExpense?: Expense,
     originalDescription?: string,
-    summary?: BudgetSummaryBuildResult
+    summary?: BudgetSummaryBuildResult,
+    budgetLimitSummaries: BudgetLimitSummary[] = []
   ): void {
     const todaysAmountByCategory = this.getTodaysAmount(categoryName);
     const monthlyAmountByCategory =
@@ -389,13 +406,18 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     const budgetLine = budget
       ? `<br><br>${lineRemaining(summary?.summary)}<br><br>`
       : '';
+    const limitLines = formatExpenseBudgetLimitLines(
+      addedExpense,
+      budgetLimitSummaries
+    );
 
     const inAppMessage =
       `Добавлено: ${amount} € - ${this.categoryName(categoryName)}<br><br>` +
       `Сегодня по категории: ${todaysAmountByCategory} €<br><br>` +
       `За месяц по категории: ${monthlyAmountByCategory} €<br><br>` +
       `Всего за месяц: ${monthlyTotal} €` +
-      budgetLine;
+      budgetLine +
+      (limitLines ? `${limitLines}` : '');
 
     this.notificationService.showMessage(inAppMessage, 'info', {
       context: 'expense-added',
@@ -499,4 +521,58 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   }
 
   // Global touch listeners for long press removed
+}
+
+export function formatExpenseBudgetLimitLines(
+  expense: Pick<Expense, 'category' | 'tagIds'> | undefined,
+  summaries: readonly BudgetLimitSummary[]
+): string {
+  if (!expense) {
+    return '';
+  }
+
+  const tagIds = new Set(expense.tagIds || []);
+  const matchingSummaries = summaries.filter(
+    summary =>
+      (summary.type === 'category' && summary.targetId === expense.category) ||
+      (summary.type === 'tag' && tagIds.has(summary.targetId))
+  );
+  if (matchingSummaries.length === 0) {
+    return '';
+  }
+
+  const lines = matchingSummaries.map(summary => {
+    const typeLabel = summary.type === 'category' ? 'категории' : 'тега';
+    const status = summary.exceeded
+      ? `Превышен на ${formatLimitMoney(Math.abs(summary.rawRemaining))} €`
+      : `Осталось ${formatLimitMoney(summary.rawRemaining)} €`;
+    return `Лимит ${typeLabel} «${escapeNotificationHtml(
+      summary.targetLabel
+    )}»: <br>${formatLimitMoney(summary.spent)} / ${formatLimitMoney(
+      summary.budget
+    )} € · ${status} (${formatLimitMoney(summary.percentUsed)}%)`;
+  });
+
+  return `<strong>Лимиты бюджета:</strong><br>${lines.join('<br>')}`;
+}
+
+function formatLimitMoney(value: number): string {
+  if (!Number.isFinite(value)) {
+    return '0';
+  }
+
+  return String(Math.round(value * 100) / 100);
+}
+
+function escapeNotificationHtml(value: string): string {
+  return value.replace(/[&<>'"]/g, character => {
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;',
+    };
+    return entities[character];
+  });
 }
