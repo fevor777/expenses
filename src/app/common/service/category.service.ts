@@ -530,6 +530,12 @@ export class CategoryService {
     budgetDocRef: firebase.firestore.DocumentReference<Budget>
   ): firebase.firestore.WriteBatch[] {
     const batches: firebase.firestore.WriteBatch[] = [];
+    // The Firestore query is intentionally repeated here as a defensive
+    // check. A stale/over-broad snapshot must never cause expenses from other
+    // categories to be rewritten during an id rename.
+    const matchingExpenseDocs = expenseDocs.filter(
+      doc => doc.data().category === currentId
+    );
     const firstBatch = this.fireStore.firestore.batch();
     firstBatch.set(categoriesRef.doc(document.id), document);
     firstBatch.delete(categoriesRef.doc(currentId));
@@ -543,7 +549,7 @@ export class CategoryService {
     batches.push(firstBatch);
 
     const batchSize = 450;
-    expenseDocs.forEach((doc, index) => {
+    matchingExpenseDocs.forEach((doc, index) => {
       const batchIndex = Math.floor(index / batchSize);
       const batch = batches[batchIndex] ?? this.fireStore.firestore.batch();
       batch.update(doc.ref, { category: document.id });

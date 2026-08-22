@@ -211,6 +211,13 @@ describe('CategoryService', () => {
         currency: 'EUR',
         date: 1,
       },
+      {
+        id: 'expense-2',
+        amount: 20,
+        category: 'meal',
+        currency: 'EUR',
+        date: 2,
+      },
     ]);
     budgetStore.addValueObs({
       value: 600,
@@ -235,12 +242,61 @@ describe('CategoryService', () => {
     expect(expenseStore.getStoredExpenses()[0]?.category).toBe(
       'custom_family-gifts'
     );
+    expect(expenseStore.getStoredExpenses()[1]?.category).toBe('meal');
     expect(budgetStore.getValue().limits).toEqual([
       {
         id: 'category:custom_family-gifts',
         type: 'category',
         targetId: 'custom_family-gifts',
         value: 50,
+      },
+    ]);
+  });
+
+  it('filters unrelated expense documents before building remote rename batches', () => {
+    const batches: Array<{
+      updates: Array<{ ref: unknown; data: unknown }>;
+      set: jasmine.Spy;
+      delete: jasmine.Spy;
+    }> = [];
+    (fireStore as unknown as { firestore: { batch: () => unknown } }).firestore = {
+      batch: () => {
+        const batch = {
+          updates: [] as Array<{ ref: unknown; data: unknown }>,
+          set: jasmine.createSpy('set'),
+          delete: jasmine.createSpy('delete'),
+          update(ref: unknown, data: unknown) {
+            batch.updates.push({ ref, data });
+          },
+        };
+        batches.push(batch);
+        return batch;
+      },
+    };
+
+    const categoryRef = { doc: (id: string) => `category:${id}` };
+    const expenseDoc = (category: string, ref: string) => ({
+      data: () => ({ category }),
+      ref,
+    });
+    const document = customOverride('custom_family-gifts', 'Подарки');
+
+    (service as any).buildRenameBatches(
+      categoryRef,
+      'custom_gifts',
+      document,
+      [
+        expenseDoc('custom_gifts', 'expense:matching'),
+        expenseDoc('meal', 'expense:unrelated'),
+      ],
+      undefined,
+      'budget:user-1'
+    );
+
+    expect(batches.flatMap(batch => batch.updates)).toEqual([
+      {
+        ref: 'expense:matching',
+        data: { category: 'custom_family-gifts' },
       },
     ]);
   });
