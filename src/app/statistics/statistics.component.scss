@@ -17,7 +17,9 @@
   .statistics-content {
     width: 100%; /* margin-top applied dynamically in TS */
     /* Opacity-only animation (replacing previous margin-top transition) */
-    transition: opacity 390ms, margin-top 390ms cubic-bezier(0.3, 0.8, 0.3, 1); /* was 560ms for slower shift */
+    transition:
+      opacity 390ms,
+      margin-top 390ms cubic-bezier(0.3, 0.8, 0.3, 1); /* was 560ms for slower shift */
     will-change: opacity, margin-top;
     opacity: 0.6; /* start hidden, then fade in on init */
   }
@@ -38,7 +40,7 @@
   flex-direction: column;
   background: var(--color-bg);
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 .statistics-nav {
   display: flex;
@@ -95,9 +97,9 @@
   will-change: transform, opacity, filter;
 }
 .statistics-total-amount-currency {
-  font-size: .8em;
+  font-size: 0.8em;
   margin-left: 2px;
-  opacity: .85;
+  opacity: 0.85;
 }
 .statistic-category-label {
   margin: 4px 0;
@@ -218,6 +220,113 @@
   height: calc(100% - 22px);
 }
 
+.stats-budget-limits {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 10px 4px 4px;
+}
+
+.stats-budget-limits__hint {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.stats-budget-limits__list {
+  display: grid;
+  gap: 12px;
+}
+
+.stats-budget-limit {
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-bg-alt) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stats-budget-limit--exceeded {
+  border-color: #f04438;
+  box-shadow: inset 0 0 0 1px rgba(240, 68, 56, 0.12);
+}
+
+.stats-budget-limit__head,
+.stats-budget-limit__title-row,
+.stats-budget-limit__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stats-budget-limit__head {
+  justify-content: space-between;
+}
+
+.stats-budget-limit__title-row {
+  justify-content: flex-start;
+}
+
+.stats-budget-limit__type,
+.stats-budget-limit__status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.stats-budget-limit__type {
+  border: 1px solid #fdb022;
+  background: #fffaeb;
+  color: #b54708;
+}
+
+.stats-budget-limit__status {
+  background: #fff1f3;
+  color: #b42318;
+}
+
+.stats-budget-limit__status--exceeded {
+  background: #fde7e9;
+}
+
+.stats-budget-limit__title,
+.stats-budget-limit__amounts {
+  color: var(--color-text);
+}
+
+.stats-budget-limit__title {
+  font-weight: 600;
+}
+
+.stats-budget-limit__amounts {
+  font-size: 18px;
+}
+
+.stats-budget-limit__bar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.stats-budget-limit__bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff9b3d 0%, #e35d04 100%);
+}
+
+.stats-budget-limit--exceeded .stats-budget-limit__bar-fill {
+  background: linear-gradient(90deg, #ff6b6b 0%, #d92d20 100%);
+}
+
+.stats-budget-limit__meta {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
 /* Dark theme base */
 :where(.dark, [data-theme='dark']) .statistics {
   background: var(--color-bg);
@@ -227,5 +336,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .statistics-content { transition: none; }
+  .statistics-content {
+    transition: none;
+  }
 }

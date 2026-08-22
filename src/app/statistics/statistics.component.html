@@ -228,6 +228,69 @@
         <app-irregular-summary
           *ngIf="!collapsed.irregularSummary"
         ></app-irregular-summary>
+        <div
+          class="stats-budget-limits"
+          *ngIf="!collapsed.irregularSummary && budgetLimitSummaries.length > 0"
+        >
+          <div class="stats-budget-limits__hint">
+            Лимиты рассчитаны за текущий бюджетный период и учитывают только
+            расходы с <code>includeInBalance = true</code>.
+          </div>
+          <div class="stats-budget-limits__list">
+            <article
+              class="stats-budget-limit"
+              *ngFor="
+                let summary of budgetLimitSummaries;
+                trackBy: trackByBudgetLimitSummary
+              "
+              [class.stats-budget-limit--exceeded]="summary.exceeded"
+            >
+              <div class="stats-budget-limit__head">
+                <div class="stats-budget-limit__title-row">
+                  <span class="stats-budget-limit__type">{{
+                    summary.type
+                  }}</span>
+                  <span class="stats-budget-limit__title">{{
+                    summary.targetLabel
+                  }}</span>
+                  <span
+                    class="stats-budget-limit__status"
+                    *ngIf="summary.orphaned"
+                  >
+                    orphaned
+                  </span>
+                  <span
+                    class="stats-budget-limit__status stats-budget-limit__status--exceeded"
+                    *ngIf="summary.exceeded"
+                  >
+                    exceeded
+                  </span>
+                </div>
+                <strong class="stats-budget-limit__amounts">
+                  {{ summary.spent | number: '1.0-2' }} /
+                  {{ summary.budget | number: '1.0-2' }}
+                </strong>
+              </div>
+              <div class="stats-budget-limit__bar">
+                <div
+                  class="stats-budget-limit__bar-fill"
+                  [style.width.%]="getBudgetLimitProgressWidth(summary)"
+                ></div>
+              </div>
+              <div class="stats-budget-limit__meta">
+                <span
+                  >Осталось: {{ summary.rawRemaining | number: '1.0-2' }}</span
+                >
+                <span>{{ summary.percentUsed | number: '1.0-2' }}%</span>
+                <span>{{ summary.expenseCount }} расходов</span>
+              </div>
+            </article>
+          </div>
+          <div class="stats-budget-limits__hint">
+            Лимиты тегов независимы и могут пересекаться, если у расхода
+            несколько тегов.
+          </div>
+        </div>
       </app-collapsed-panel>
     </div>
   </div>

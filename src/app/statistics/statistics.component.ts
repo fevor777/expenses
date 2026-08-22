@@ -50,6 +50,8 @@ import {
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 import { CategoryService } from '../common/service/category.service';
 import { BudgetDataService } from '../common/service/budget-data.service';
+import { BudgetLimitSummary } from '../common/model/budget.model';
+import { BudgetLimitSummaryService } from '../common/service/budget-limit-summary.service';
 
 @Component({
   selector: 'app-statistics',
@@ -128,6 +130,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   descriptionSearch: string = '';
   selectedTagIds: string[] = [];
   selectedBalanceFilter: BalanceFilter = DEFAULT_BALANCE_FILTER;
+  budgetLimitSummaries: BudgetLimitSummary[] = [];
   // categoryFilterValuesStore: string[] = [];
   categoryFilterValues: string[] = [];
   isHowSuggestionDateButton: boolean = false;
@@ -192,7 +195,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     private dateFilterService: DateFilterService,
     private swipeLengthStore: GlobalSwipeLengthStoreService,
     private categoryService: CategoryService,
-    private budgetDataService: BudgetDataService
+    private budgetDataService: BudgetDataService,
+    private budgetLimitSummaryService: BudgetLimitSummaryService
   ) {
     this.categoryService.categories$
       .pipe(takeUntil(this.destroySubject))
@@ -201,6 +205,10 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       .getCategories()
       .pipe(takeUntil(this.destroySubject))
       .subscribe();
+    this.budgetLimitSummaryService
+      .getCurrentLimitSummaries()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(summaries => (this.budgetLimitSummaries = summaries));
     this.initialFilterValue = this.dateFilterService.getInitialDayValue();
     this.initFilter();
   }
@@ -436,6 +444,14 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   ) {
     // Category id is stable; using it prevents re-rendering unchanged bars.
     return item.category;
+  }
+
+  trackByBudgetLimitSummary(_: number, summary: BudgetLimitSummary): string {
+    return summary.id;
+  }
+
+  getBudgetLimitProgressWidth(summary: BudgetLimitSummary): number {
+    return Math.max(0, Math.min(100, summary.percentUsed));
   }
 
   touchStartX: number = 0;
