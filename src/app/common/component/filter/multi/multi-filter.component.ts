@@ -33,6 +33,7 @@ import {
   SelectDropdownOption,
 } from '../../select-dropdown/select-dropdown.component';
 import { CategoryService } from '../../../service/category.service';
+import { BudgetDataService } from '../../../service/budget-data.service';
 
 export type MultiFilter = {
   categories: string[];
@@ -103,7 +104,8 @@ export class MultiFilterComponent
     private router: Router,
     private dateFilterService: DateFilterService,
     private ngZone: NgZone,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private budgetDataService: BudgetDataService
   ) {}
 
   ngOnInit(): void {
@@ -195,80 +197,49 @@ export class MultiFilterComponent
     this.descriptionFilter = '';
     this.selectedTagIds = [];
     this.selectedBalanceFilter = DEFAULT_BALANCE_FILTER;
-    this.selectedFilters.emit({
-      categories: [],
-      date: this.defaultDateValue,
-      description: '',
-      tagIds: [],
-      balanceFilter: DEFAULT_BALANCE_FILTER,
-    });
-    this.buildCompactSummary();
-    this.evaluateScrollPosition();
+    this.emitCurrentFilters([], this.defaultDateValue, '');
   }
 
   emitDateFilter(dateFilter: DateFrame): void {
     this.dateFilter = dateFilter;
-    this.selectedFilters.emit({
-      categories: this.selectedCategories,
-      date: dateFilter,
-      description: this.descriptionFilter?.trim(),
-      tagIds: this.selectedTagIds,
-      balanceFilter: this.selectedBalanceFilter,
-    });
-    this.buildCompactSummary();
-    this.evaluateScrollPosition();
+    this.emitCurrentFilters();
   }
 
   emitCategoryFilters(selectedCategories: string[]): void {
     this.selectedCategories = selectedCategories;
-    this.selectedFilters.emit({
-      categories: selectedCategories,
-      date: this.dateFilter,
-      description: this.descriptionFilter?.trim(),
-      tagIds: this.selectedTagIds,
-      balanceFilter: this.selectedBalanceFilter,
-    });
-    this.buildCompactSummary();
-    this.evaluateScrollPosition();
+    this.emitCurrentFilters();
   }
 
   emitDescriptionFilter(): void {
-    this.selectedFilters.emit({
-      categories: this.selectedCategories,
-      date: this.dateFilter,
-      description: this.descriptionFilter?.trim(),
-      tagIds: this.selectedTagIds,
-      balanceFilter: this.selectedBalanceFilter,
-    });
-    this.buildCompactSummary();
-    this.evaluateScrollPosition();
+    this.emitCurrentFilters();
   }
 
   emitTagFilters(selectedTagIds: string[]): void {
     this.selectedTagIds = selectedTagIds || [];
-    this.selectedFilters.emit({
-      categories: this.selectedCategories,
-      date: this.dateFilter,
-      description: this.descriptionFilter?.trim(),
-      tagIds: this.selectedTagIds,
-      balanceFilter: this.selectedBalanceFilter,
-    });
-    this.buildCompactSummary();
-    this.evaluateScrollPosition();
+    this.emitCurrentFilters();
   }
 
   emitBalanceFilter(balanceFilter: string | null): void {
     this.selectedBalanceFilter =
       (balanceFilter as BalanceFilter) || DEFAULT_BALANCE_FILTER;
-    this.selectedFilters.emit({
-      categories: this.selectedCategories,
-      date: this.dateFilter,
-      description: this.descriptionFilter?.trim(),
-      tagIds: this.selectedTagIds,
-      balanceFilter: this.selectedBalanceFilter,
-    });
-    this.buildCompactSummary();
-    this.evaluateScrollPosition();
+    if (this.selectedBalanceFilter === 'budget') {
+      this.budgetDataService
+        .getCurrentBudgetFilterFrame()
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(frame => {
+          this.dateFilter = frame;
+          this.emitCurrentFilters();
+        });
+      return;
+    }
+
+    this.emitCurrentFilters();
+  }
+
+  onBudgetPeriodShortcut(frame: DateFrame): void {
+    this.selectedBalanceFilter = 'budget';
+    this.dateFilter = frame;
+    this.emitCurrentFilters();
   }
 
   toggleExpandFilters(event: MouseEvent): void {
@@ -327,6 +298,22 @@ export class MultiFilterComponent
   navigateToStatistics(event: MouseEvent): void {
     event.stopPropagation();
     this.navigateToStatisticsIconClick.emit();
+  }
+
+  private emitCurrentFilters(
+    categories = this.selectedCategories,
+    date = this.dateFilter,
+    description = this.descriptionFilter?.trim()
+  ): void {
+    this.selectedFilters.emit({
+      categories,
+      date,
+      description,
+      tagIds: this.selectedTagIds,
+      balanceFilter: this.selectedBalanceFilter,
+    });
+    this.buildCompactSummary();
+    this.evaluateScrollPosition();
   }
 
   ngOnDestroy(): void {

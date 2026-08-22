@@ -88,10 +88,18 @@
         <input
           type="date"
           [(ngModel)]="customFinishDate"
+          [min]="customStartDate"
           [max]="maxDate"
           (ngModelChange)="onCustomDateChange()"
         />
       </label>
+      <button
+        type="button"
+        class="date-filter-custom-shortcut"
+        (click)="useBudgetPeriodStart()"
+      >
+        Бюджет
+      </button>
       <p *ngIf="customRangeError" class="date-filter-custom-error">
         {{ customRangeError }}
       </p>

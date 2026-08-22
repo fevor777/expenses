@@ -79,7 +79,8 @@
 }
 
 .date-filter-custom-button,
-.date-filter-custom-actions button {
+.date-filter-custom-actions button,
+.date-filter-custom-shortcut {
   border: 1px solid var(--color-border);
   border-radius: 6px;
   background: var(--color-bg);
@@ -125,6 +126,13 @@
   display: flex;
   justify-content: flex-end;
   gap: 6px;
+}
+
+.date-filter-custom-shortcut {
+  justify-self: start;
+  padding: 3px 8px;
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 .date-filter-custom-error {

@@ -48,6 +48,7 @@
       [defaultValue]="initialFilterValue"
       [enableCompactOnScroll]="false"
       (changeFilter)="onFilterChange($event)"
+      (budgetPeriodShortcut)="onBudgetPeriodShortcut($event)"
     >
       <ng-container app-date-filter-icons>
         <i

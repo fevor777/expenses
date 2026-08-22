@@ -49,6 +49,7 @@ import {
 } from '@angular/animations';
 import { SpinnerComponent } from '../common/component/spinner/spinner.component';
 import { CategoryService } from '../common/service/category.service';
+import { BudgetDataService } from '../common/service/budget-data.service';
 
 @Component({
   selector: 'app-statistics',
@@ -190,7 +191,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     private expenseService: ExpenseService,
     private dateFilterService: DateFilterService,
     private swipeLengthStore: GlobalSwipeLengthStoreService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private budgetDataService: BudgetDataService
   ) {
     this.categoryService.categories$
       .pipe(takeUntil(this.destroySubject))
@@ -505,7 +507,26 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   onBalanceFilterChange(balanceFilter: string | null): void {
     this.selectedBalanceFilter =
       (balanceFilter as BalanceFilter) || DEFAULT_BALANCE_FILTER;
+    if (this.selectedBalanceFilter === 'budget') {
+      this.budgetDataService
+        .getCurrentBudgetFilterFrame()
+        .pipe(first(), takeUntil(this.destroySubject))
+        .subscribe(frame => {
+          this.currentFilter = frame;
+          this.calculateCategoryTotals();
+          this.scheduleLayoutStabilization(1);
+        });
+      return;
+    }
+
     this.calculateCategoryTotals();
+  }
+
+  onBudgetPeriodShortcut(frame: DateFrame): void {
+    this.selectedBalanceFilter = 'budget';
+    this.currentFilter = frame;
+    this.calculateCategoryTotals();
+    this.scheduleLayoutStabilization(1);
   }
 
   onCategoriesRefresh(): void {

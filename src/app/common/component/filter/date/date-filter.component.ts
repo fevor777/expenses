@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   Input,
@@ -9,8 +10,8 @@ import {
   Output,
   SimpleChanges,
   NgZone,
-  AfterViewInit,
 } from '@angular/core';
+import { first } from 'rxjs';
 import { DateTime } from 'luxon';
 
 import { SelectOption } from '../../../model/select-option';
@@ -19,6 +20,7 @@ import {
   DateFilterDropDownChange,
   DateFilterDropDownComponent,
 } from '../dropdown/date-filter-drop-down.component';
+import { BudgetDataService } from '../../../service/budget-data.service';
 import { DateFilterService } from './date-filter.service';
 
 @Component({
@@ -33,6 +35,7 @@ export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() isHowSuggestionButton: boolean = false;
   @Input() defaultValue: DateFrame;
   @Output() changeFilter: EventEmitter<DateFrame> = new EventEmitter();
+  @Output() budgetPeriodShortcut: EventEmitter<DateFrame> = new EventEmitter();
   // Enable compact on scroll (statistics page only)
   @Input() enableCompactOnScroll: boolean = false;
 
@@ -61,7 +64,8 @@ export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
 
   constructor(
     private dateFilterService: DateFilterService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private budgetDataService: BudgetDataService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -130,6 +134,23 @@ export class DateFilterComponent implements OnInit, OnChanges, AfterViewInit {
 
   onCustomDateChange(): void {
     this.customRangeError = '';
+  }
+
+  useBudgetPeriodStart(): void {
+    this.budgetDataService
+      .getCurrentBudgetFilterFrame()
+      .pipe(first())
+      .subscribe(frame => {
+        this.customStartDate = frame.start.toISODate() || '';
+        this.customFinishDate = frame.finish.toISODate() || '';
+        this.customRangeError = '';
+        this.clickedMode = Mode.CUSTOM;
+        this.setCurrentState(frame);
+        this.budgetPeriodShortcut.emit(frame);
+        this.customRangeOpen = false;
+        this.buildCompactLabel();
+        this.evaluateScrollPosition();
+      });
   }
 
   get isCustomRangeInvalid(): boolean {

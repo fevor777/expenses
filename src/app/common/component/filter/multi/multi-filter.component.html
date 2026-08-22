@@ -126,6 +126,7 @@
           [defaultValue]="defaultDateValue"
           [value]="dateFilter"
           (changeFilter)="emitDateFilter($event)"
+          (budgetPeriodShortcut)="onBudgetPeriodShortcut($event)"
         ></app-date-filter>
       </div>
       <div class="mf-field mf-field--description">

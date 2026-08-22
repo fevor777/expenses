@@ -5,7 +5,7 @@ import { first, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { ExpenseService } from './expense.service';
 import { IrregularBudgetService } from './irregular-budget.service';
 import { Expense } from '../model/expense.model';
-import { DateFrame } from '../component/filter/date/dateFrame.model';
+import { DateFrame, Mode } from '../component/filter/date/dateFrame.model';
 import { DateTime } from 'luxon';
 import { Budget } from '../model/budget.model';
 
@@ -55,6 +55,13 @@ export class BudgetDataService {
     );
   }
 
+  getCurrentBudgetFilterFrame(): Observable<DateFrame> {
+    return this.irregularBudgetService.getValue().pipe(
+      first(),
+      map(budget => this.toBudgetFilterFrame(this.buildRollingFrame(budget)))
+    );
+  }
+
   /**
    * Build a rolling DateFrame where the start day within a month is user-defined (balance date value),
    * and the end is the day before the next period start. Example: value '8' => 8 Sep .. 7 Oct (inclusive).
@@ -91,6 +98,19 @@ export class BudgetDataService {
       finish,
       mode: undefined,
       display: `${start.toFormat('d LLL')} – ${finish.toFormat('d LLL')} (${periodDays}д)`,
+    };
+  }
+
+  private toBudgetFilterFrame(frame: DateFrame): DateFrame {
+    const start = frame.start.startOf('day');
+    const finish = frame.finish.endOf('day');
+    return {
+      start,
+      finish,
+      mode: Mode.CUSTOM,
+      display: `${start.setLocale('ru').toFormat('d MMMM yyyy')} - ${finish
+        .setLocale('ru')
+        .toFormat('d MMMM yyyy')}`,
     };
   }
 }
