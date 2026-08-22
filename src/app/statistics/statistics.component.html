@@ -225,9 +225,6 @@
         <div slot="header" class="stats-section-header">
           <span class="stats-section-title">Бюджет</span>
         </div>
-        <app-irregular-summary
-          *ngIf="!collapsed.irregularSummary"
-        ></app-irregular-summary>
         <div
           class="stats-budget-limits"
           *ngIf="!collapsed.irregularSummary && budgetLimitSummaries.length > 0"
@@ -291,6 +288,9 @@
             несколько тегов.
           </div>
         </div>
+        <app-irregular-summary
+          *ngIf="!collapsed.irregularSummary"
+        ></app-irregular-summary>
       </app-collapsed-panel>
     </div>
   </div>
