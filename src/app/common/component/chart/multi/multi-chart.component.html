@@ -19,9 +19,10 @@
   </div>
   <div class="chart-summary">
     <!-- Clarified labels: nonZeroCount = filled buckets; totalCount = non-zero expense entries -->
-    <span class="app-multi-chart-label">
-      {{ nonZeroCount }}/{{ periodBucketCount }} • {{ totalCount }}
-    </span>
+    <div class="app-multi-chart-label app-multi-chart-label--stacked">
+      <span>{{ nonZeroCount }}/{{ periodBucketCount }} • {{ totalCount }}</span>
+      <span>Среднее: {{ averageBucketAmount }}€</span>
+    </div>
     <span class="app-multi-chart-label" *ngIf="selectedBarLabel">
       {{ selectedBarLabel }}: {{ selectedBarValue ?? 0 }}€
       <i *ngIf="showBarIcons" class="fa-solid fa-list app-multi-chart-label-icons" (click)="onHistoryIconClick()"></i>

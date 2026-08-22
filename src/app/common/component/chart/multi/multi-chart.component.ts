@@ -50,6 +50,7 @@ export class MultiChartComponent implements OnChanges {
   // Selected bar info (date range + value)
   selectedBarLabel?: string;
   selectedBarValue?: number | null;
+  averageBucketAmount = 0;
   showBarIcons = false;
   private selectedBarIndex: number | null = null;
   private customBuckets: DateFrame[] = [];
@@ -379,6 +380,16 @@ export class MultiChartComponent implements OnChanges {
     this.nonZeroCount = data.filter(
       (value: number | null) => value != null && value !== 0
     ).length;
+    const nonZeroValues = data.filter(
+      (value: number | null): value is number => value != null && value !== 0
+    );
+    this.averageBucketAmount = nonZeroValues.length
+      ? Math.round(
+          (nonZeroValues.reduce((sum, value) => sum + value, 0) /
+            nonZeroValues.length) *
+            100
+        ) / 100
+      : 0;
     this.totalCount = this.expenses?.filter(
       (value: Expense) => value?.amount != null && value?.amount !== 0
     )?.length;

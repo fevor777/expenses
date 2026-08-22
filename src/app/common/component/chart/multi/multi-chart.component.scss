@@ -16,6 +16,9 @@
   text-align: center;
   display: flex;
   justify-content: space-evenly;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .app-multi-chart-label {
@@ -26,6 +29,16 @@
   background: var(--seg-accent-bg, rgba(110, 125, 150, 0.08));
   border-radius: 12px;
   border: 1px solid var(--seg-border, rgba(110, 125, 150, 0.22));
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &.app-multi-chart-label--stacked {
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
 
   .app-multi-chart-label-icons {
     padding: 0px 12px;
