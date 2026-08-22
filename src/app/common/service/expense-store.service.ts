@@ -26,6 +26,12 @@ export class ExpenseStoreService {
     return this.expenseSubject.value;
   }
 
+  getStoredExpenses(): Expense[] {
+    return JSON.parse(localStorage.getItem('expenses') || '[]').map(
+      (expense: Expense) => canonicalizeTagIds(expense)
+    );
+  }
+
   getExpensesObs(
     dateFilter?: DateFrame,
     category?: string[],
@@ -59,6 +65,22 @@ export class ExpenseStoreService {
     this.expenseSubject.next(expenses);
   }
 
+  replaceStoredExpenses(expenses: Expense[]): void {
+    const normalizedExpenses = expenses.map(expense =>
+      canonicalizeTagIds(expense)
+    );
+    localStorage.setItem('expenses', JSON.stringify(normalizedExpenses));
+    const filteredExpenses = this.filterExpenses(
+      normalizedExpenses,
+      this.filter?.date,
+      this.filter?.categories,
+      this.filter?.description,
+      this.filter?.tagIds,
+      this.filter?.balanceFilter
+    );
+    this.updateExpenses(filteredExpenses);
+  }
+
   /**
    * Returns the newest expense (by date descending) from the currently cached list.
    * Assumes expenses already stored are in any order; we sort defensively.
@@ -71,64 +93,30 @@ export class ExpenseStoreService {
   }
 
   addExpense(expense: Expense): Observable<Expense> {
-    const jsonInLocalStorage = localStorage.getItem('expenses');
     const normalizedExpense = canonicalizeTagIds(expense);
-    let expenseList = jsonInLocalStorage ? JSON.parse(jsonInLocalStorage) : [];
+    let expenseList = this.getStoredExpenses();
     expenseList.unshift(normalizedExpense);
-    localStorage.setItem('expenses', JSON.stringify(expenseList));
-    expenseList = this.filterExpenses(
-      expenseList.map((item: Expense) => canonicalizeTagIds(item)),
-      this.filter?.date,
-      this.filter?.categories,
-      this.filter?.description,
-      this.filter?.tagIds,
-      this.filter?.balanceFilter
-    );
-    this.updateExpenses(expenseList);
+    this.replaceStoredExpenses(expenseList);
     return of(normalizedExpense);
   }
 
   updateExpense(expense: Expense): Observable<Expense> {
     const normalizedExpense = canonicalizeTagIds(expense);
-    const expensesFromLocStorage = JSON.parse(
-      localStorage.getItem('expenses') || '[]'
-    );
-    let updatedExpenses = expensesFromLocStorage.map((exp: Expense) => {
+    const updatedExpenses = this.getStoredExpenses().map((exp: Expense) => {
       if (exp.id === normalizedExpense.id) {
         return normalizedExpense;
       }
       return canonicalizeTagIds(exp);
     });
-    localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
-    updatedExpenses = this.filterExpenses(
-      updatedExpenses,
-      this.filter?.date,
-      this.filter?.categories,
-      this.filter?.description,
-      this.filter?.tagIds,
-      this.filter?.balanceFilter
-    );
-    this.updateExpenses(updatedExpenses);
+    this.replaceStoredExpenses(updatedExpenses);
     return of(normalizedExpense);
   }
 
   deleteExpense(id: string): Observable<string> {
-    const expensesFromLocStorage = JSON.parse(
-      localStorage.getItem('expenses') || '[]'
-    );
-    let updatedExpenses = expensesFromLocStorage.filter(
+    const updatedExpenses = this.getStoredExpenses().filter(
       (expense: Expense) => expense.id !== id
     );
-    localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
-    updatedExpenses = this.filterExpenses(
-      updatedExpenses.map((expense: Expense) => canonicalizeTagIds(expense)),
-      this.filter?.date,
-      this.filter?.categories,
-      this.filter?.description,
-      this.filter?.tagIds,
-      this.filter?.balanceFilter
-    );
-    this.updateExpenses(updatedExpenses);
+    this.replaceStoredExpenses(updatedExpenses);
     return of(id);
   }
 

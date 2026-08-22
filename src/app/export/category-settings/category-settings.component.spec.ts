@@ -59,7 +59,7 @@ describe('CategorySettingsComponent', () => {
     service.getAllCategories.and.returnValue(of(categories$.value));
     service.createCategory.and.callFake(input =>
       of({
-        id: 'custom-groceries',
+        id: input.id,
         source: 'custom',
         hidden: false,
         normalizedName: 'groceries',
@@ -104,6 +104,7 @@ describe('CategorySettingsComponent', () => {
 
   it('creates a valid custom category and resets the draft', () => {
     component.draft = {
+      id: 'groceries',
       name: '  Groceries  ',
       icon: 'fas fa-basket-shopping',
       color: '#12AB34',
@@ -113,6 +114,7 @@ describe('CategorySettingsComponent', () => {
     component.addCategory();
 
     expect(service.createCategory).toHaveBeenCalledWith({
+      id: 'custom_groceries',
       name: 'Groceries',
       icon: 'fas fa-basket-shopping',
       color: '#12AB34',
@@ -122,28 +124,74 @@ describe('CategorySettingsComponent', () => {
   });
 
   it('rejects duplicate active names but ignores hidden names', () => {
+    component.draft.id = 'grocery-2';
     component.draft.name = ' meal ';
     component.addCategory();
     expect(service.createCategory).not.toHaveBeenCalled();
     expect(component.createError).toContain('already exists');
 
+    component.draft.id = 'travel-copy';
     component.draft.name = 'travel';
     component.addCategory();
     expect(service.createCategory).toHaveBeenCalled();
   });
 
-  it('updates a category through the editor', () => {
-    component.openEditor(defaultCategory);
-    component.editDraft.name = 'Dining';
+  it('updates a custom category id through the editor', () => {
+    const customCategory: ResolvedCategory = {
+      ...defaultCategory,
+      id: 'custom_groceries',
+      name: 'Groceries',
+      source: 'custom',
+      normalizedName: 'groceries',
+    };
+    categories$.next([defaultCategory, customCategory, hiddenCategory]);
+    fixture.detectChanges();
+
+    component.openEditor(customCategory);
+    component.editDraft.id = 'fresh-groceries';
+    component.editDraft.name = 'Fresh groceries';
     component.saveCategory();
 
-    expect(service.updateCategory).toHaveBeenCalledWith('meal', {
-      name: 'Dining',
-      icon: defaultCategory.icon,
-      color: defaultCategory.color,
-      includeInBalance: defaultCategory.includeInBalance,
+    expect(service.updateCategory).toHaveBeenCalledWith('custom_groceries', {
+      id: 'custom_fresh-groceries',
+      name: 'Fresh groceries',
+      icon: customCategory.icon,
+      color: customCategory.color,
+      includeInBalance: customCategory.includeInBalance,
     });
     expect(component.editingCategory).toBeNull();
+  });
+
+  it('rejects a duplicate custom category id', () => {
+    const customCategory: ResolvedCategory = {
+      ...defaultCategory,
+      id: 'custom_groceries',
+      name: 'Groceries',
+      source: 'custom',
+      normalizedName: 'groceries',
+    };
+    const secondCustomCategory: ResolvedCategory = {
+      ...defaultCategory,
+      id: 'custom_family-gifts',
+      name: 'Family gifts',
+      source: 'custom',
+      normalizedName: 'family gifts',
+      sortOrder: 3,
+    };
+    categories$.next([
+      defaultCategory,
+      customCategory,
+      secondCustomCategory,
+      hiddenCategory,
+    ]);
+    fixture.detectChanges();
+
+    component.openEditor(customCategory);
+    component.editDraft.id = 'family-gifts';
+    component.saveCategory();
+
+    expect(service.updateCategory).not.toHaveBeenCalled();
+    expect(component.editorError).toContain('already exists');
   });
 
   it('reorders categories through up/down controls', () => {

@@ -3,7 +3,9 @@ import {
   CategoryOverrideDocument,
   CategoryValidationError,
   mergeCategories,
+  normalizeCustomCategoryId,
   ResolvedCategory,
+  validateCustomCategoryId,
   validateCategoryInput,
 } from './category.model';
 
@@ -109,6 +111,7 @@ describe('category model', () => {
     expect(() =>
       validateCategoryInput(
         {
+          id: 'custom_food',
           name: '  ПИТАНИЕ  ',
           icon: 'fas fa-home',
           color: '#fff',
@@ -137,6 +140,7 @@ describe('category model', () => {
 
     const value = validateCategoryInput(
       {
+        id: 'custom_food',
         name: ' Питание ',
         icon: 'fas fa-home',
         color: '#fff',
@@ -150,6 +154,7 @@ describe('category model', () => {
 
   it('validates required fields, supported icons, colors, and boolean flags', () => {
     const valid = {
+      id: 'custom_gifts',
       name: 'Подарки',
       icon: 'fas fa-gift',
       color: '#123abc',
@@ -169,6 +174,29 @@ describe('category model', () => {
       validateCategoryInput({ ...valid, includeInBalance: undefined }, [])
     ).toThrowError(CategoryValidationError);
     expect(validateCategoryInput(valid, [])).toEqual(valid);
+  });
+
+  it('normalizes and validates custom ids', () => {
+    expect(normalizeCustomCategoryId(' Gifts & Family ')).toBe(
+      'custom_gifts-family'
+    );
+    expect(
+      validateCustomCategoryId('gifts', mergeCategories(defaults, []))
+    ).toBe('custom_gifts');
+  });
+
+  it('rejects duplicate or invalid custom ids', () => {
+    const categories = mergeCategories(defaults, [
+      customOverride('custom_gifts', 'Подарки'),
+    ]);
+
+    expect(() => validateCustomCategoryId('gifts', categories)).toThrowError(
+      CategoryValidationError,
+      'A category with this id already exists.'
+    );
+    expect(() => validateCustomCategoryId('!!!', categories)).toThrowError(
+      CategoryValidationError
+    );
   });
 
   function customOverride(id: string, name: string): CategoryOverrideDocument {

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 import {
   BehaviorSubject,
   catchError,
@@ -20,15 +22,24 @@ import {
 } from 'rxjs';
 
 import {
+  Budget,
+  buildBudgetLimitId,
+  canonicalizeBudget,
+} from '../model/budget.model';
+import {
   CategoryInput,
   CategoryOverrideDocument,
   CategoryPatch,
   CategoryValidationError,
   normalizeCategoryName,
+  validateCustomCategoryId,
   ResolvedCategory,
   validateCategoryInput,
 } from '../model/category.model';
 import { CategoryStoreService } from './category-store.service';
+import { Expense } from '../model/expense.model';
+import { ExpenseStoreService } from './expense-store.service';
+import { IrregularBudgetStoreService } from './irregular-budget-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +55,9 @@ export class CategoryService {
   constructor(
     private fireStore: AngularFirestore,
     private categoryStore: CategoryStoreService,
-    private afAuth: AngularFireAuth
+    private afAuth: AngularFireAuth,
+    private expenseStore: ExpenseStoreService,
+    private budgetStore: IrregularBudgetStoreService
   ) {
     this.categories$ = this.categoryStore.categories$;
     this.allCategories$ = this.categoryStore.allCategories$;
@@ -70,17 +83,20 @@ export class CategoryService {
 
   createCategory(input: CategoryInput): Observable<ResolvedCategory> {
     return defer(() => {
-      const id = `custom_${this.fireStore.createId()}`;
       return this.resolveUserId().pipe(
         switchMap(uid => {
           this.categoryStore.setScope(uid);
+          const normalizedId = validateCustomCategoryId(
+            input.id,
+            this.categoryStore.getAllCategories()
+          );
           const category = validateCategoryInput(
-            input,
+            { ...input, id: normalizedId },
             this.categoryStore.getCategories()
           );
           const now = Date.now();
           const document: CategoryOverrideDocument = {
-            id,
+            id: normalizedId,
             source: 'custom',
             ...category,
             sortOrder: this.nextSortOrder(),
@@ -91,7 +107,7 @@ export class CategoryService {
           };
 
           return this.optimisticWrite(uid, document).pipe(
-            map(() => this.requireCategory(id))
+            map(() => this.requireCategory(normalizedId))
           );
         })
       );
@@ -107,8 +123,17 @@ export class CategoryService {
         switchMap(uid => {
           this.categoryStore.setScope(uid);
           const current = this.requireCategory(id);
+          const nextId =
+            current.source === 'custom'
+              ? validateCustomCategoryId(
+                  patch.id ?? current.id,
+                  this.categoryStore.getAllCategories(),
+                  current.id
+                )
+              : current.id;
           const next = validateCategoryInput(
             {
+              id: nextId,
               name: patch.name ?? current.name,
               icon: patch.icon ?? current.icon,
               color: patch.color ?? current.color,
@@ -118,6 +143,26 @@ export class CategoryService {
             this.categoryStore.getCategories(),
             id
           );
+
+          if (current.source !== 'custom' && next.id !== current.id) {
+            throw new CategoryValidationError('invalid-category-source', 'id');
+          }
+
+          if (current.source === 'custom' && next.id !== current.id) {
+            return uid
+              ? this.renameCustomCategoryRemotely(uid, current, next).pipe(
+                  map(() => {
+                    this.applyLocalCustomCategoryRename(
+                      current.id,
+                      next.id,
+                      next
+                    );
+                    return this.requireCategory(next.id);
+                  })
+                )
+              : of(this.renameCustomCategoryLocally(current, next));
+          }
+
           const document = this.buildDocument(current, next);
 
           return this.optimisticWrite(uid, document).pipe(
@@ -158,6 +203,7 @@ export class CategoryService {
           const current = this.requireCategory(id);
           validateCategoryInput(
             {
+              id: current.id,
               name: current.name,
               icon: current.icon,
               color: current.color,
@@ -319,6 +365,60 @@ export class CategoryService {
     };
   }
 
+  private renameCustomCategoryLocally(
+    current: ResolvedCategory,
+    next: CategoryInput
+  ): ResolvedCategory {
+    this.applyLocalCustomCategoryRename(current.id, next.id, next);
+    return this.requireCategory(next.id);
+  }
+
+  private applyLocalCustomCategoryRename(
+    currentId: string,
+    nextId: string,
+    next: CategoryInput
+  ): void {
+    const previous = this.categoryStore.getOverride(currentId);
+    const document = this.buildCustomRenameDocument(currentId, next, previous);
+    this.categoryStore.setOverrides(
+      this.renameOverride(
+        this.categoryStore.getOverrides(),
+        currentId,
+        document
+      )
+    );
+    this.renameStoredExpenseCategories(currentId, nextId);
+    this.renameStoredBudgetLimit(currentId, nextId);
+  }
+
+  private buildCustomRenameDocument(
+    currentId: string,
+    category: CategoryInput,
+    previous?: CategoryOverrideDocument
+  ): CategoryOverrideDocument {
+    const now = Date.now();
+    return {
+      ...previous,
+      id: category.id,
+      source: 'custom',
+      name: category.name,
+      icon: category.icon,
+      color: category.color,
+      includeInBalance: category.includeInBalance,
+      sortOrder:
+        typeof previous?.sortOrder === 'number'
+          ? previous.sortOrder
+          : this.nextSortOrder(),
+      isDeleted: previous?.isDeleted === true,
+      normalizedName: normalizeCategoryName(category.name),
+      createdAt: previous?.createdAt ?? now,
+      updatedAt: now,
+      ...(previous?.baseCategoryId
+        ? { baseCategoryId: previous.baseCategoryId }
+        : {}),
+    };
+  }
+
   private buildReorderDocument(
     current: ResolvedCategory,
     sortOrder: number,
@@ -376,6 +476,152 @@ export class CategoryService {
         return throwError(() => error);
       })
     );
+  }
+
+  private renameCustomCategoryRemotely(
+    uid: string,
+    current: ResolvedCategory,
+    next: CategoryInput
+  ): Observable<void> {
+    const previous = this.categoryStore.getOverride(current.id);
+    const document = this.buildCustomRenameDocument(current.id, next, previous);
+    const categoriesRef = this.fireStore.collection<CategoryOverrideDocument>(
+      `users/${uid}/category-overrides`
+    ).ref;
+    const expensesQuery = this.fireStore.collection<Expense>('expenses', ref =>
+      ref.where('uid', '==', uid).where('category', '==', current.id)
+    ).ref;
+    const budgetDocRef = this.fireStore.doc<Budget>(
+      `irregularBudget/${uid}`
+    ).ref;
+
+    return from(
+      Promise.all([expensesQuery.get(), budgetDocRef.get()]).then(
+        ([expenseSnapshot, budgetSnapshot]) => {
+          const batches = this.buildRenameBatches(
+            categoriesRef,
+            current.id,
+            document,
+            expenseSnapshot.docs,
+            budgetSnapshot.exists
+              ? this.renameBudgetLimitTarget(
+                  canonicalizeBudget(budgetSnapshot.data() as Budget),
+                  current.id,
+                  next.id
+                )
+              : undefined,
+            budgetDocRef
+          );
+
+          return Promise.all(batches.map(batch => batch.commit())).then(
+            () => void 0
+          );
+        }
+      )
+    );
+  }
+
+  private buildRenameBatches(
+    categoriesRef: firebase.firestore.CollectionReference<CategoryOverrideDocument>,
+    currentId: string,
+    document: CategoryOverrideDocument,
+    expenseDocs: firebase.firestore.QueryDocumentSnapshot<Expense>[],
+    migratedBudget: Budget | undefined,
+    budgetDocRef: firebase.firestore.DocumentReference<Budget>
+  ): firebase.firestore.WriteBatch[] {
+    const batches: firebase.firestore.WriteBatch[] = [];
+    const firstBatch = this.fireStore.firestore.batch();
+    firstBatch.set(categoriesRef.doc(document.id), document);
+    firstBatch.delete(categoriesRef.doc(currentId));
+    if (migratedBudget?.limits) {
+      firstBatch.set(
+        budgetDocRef,
+        { limits: migratedBudget.limits },
+        { merge: true }
+      );
+    }
+    batches.push(firstBatch);
+
+    const batchSize = 450;
+    expenseDocs.forEach((doc, index) => {
+      const batchIndex = Math.floor(index / batchSize);
+      const batch = batches[batchIndex] ?? this.fireStore.firestore.batch();
+      batch.update(doc.ref, { category: document.id });
+      if (!batches[batchIndex]) {
+        batches[batchIndex] = batch;
+      }
+    });
+
+    return batches;
+  }
+
+  private renameOverride(
+    overrides: readonly CategoryOverrideDocument[],
+    currentId: string,
+    document: CategoryOverrideDocument
+  ): CategoryOverrideDocument[] {
+    return [
+      ...overrides.filter(
+        override => override.id !== currentId && override.id !== document.id
+      ),
+      document,
+    ];
+  }
+
+  private renameStoredExpenseCategories(
+    currentId: string,
+    nextId: string
+  ): void {
+    const updatedExpenses = this.expenseStore
+      .getStoredExpenses()
+      .map(expense =>
+        expense.category === currentId
+          ? { ...expense, category: nextId }
+          : expense
+      );
+    this.expenseStore.replaceStoredExpenses(updatedExpenses);
+  }
+
+  private renameStoredBudgetLimit(currentId: string, nextId: string): void {
+    const currentBudget = this.budgetStore.getValue();
+    const migratedBudget = this.renameBudgetLimitTarget(
+      currentBudget,
+      currentId,
+      nextId
+    );
+    if (migratedBudget === currentBudget) {
+      return;
+    }
+
+    this.budgetStore.addValueObs(migratedBudget);
+  }
+
+  private renameBudgetLimitTarget(
+    budget: Budget | undefined,
+    currentId: string,
+    nextId: string
+  ): Budget | undefined {
+    if (
+      !budget?.limits?.some(
+        limit => limit.type === 'category' && limit.targetId === currentId
+      )
+    ) {
+      return budget;
+    }
+
+    const limits = budget.limits.map(limit => {
+      if (limit.type !== 'category' || limit.targetId !== currentId) {
+        return limit;
+      }
+
+      return {
+        ...limit,
+        id: buildBudgetLimitId('category', nextId),
+        targetId: nextId,
+      };
+    });
+
+    return canonicalizeBudget({ ...budget, limits });
   }
 
   private optimisticBatchWrite(

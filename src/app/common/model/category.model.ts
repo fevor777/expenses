@@ -30,11 +30,13 @@ export type ResolvedCategory = Category & {
   sortOrder: number;
 };
 
-export type CategoryInput = Omit<Category, 'id'>;
+export type CategoryInput = Category;
 export type CategoryPatch = Partial<CategoryInput>;
 
 export type CategoryValidationCode =
   | 'required'
+  | 'invalid-id'
+  | 'duplicate-id'
   | 'invalid-name'
   | 'duplicate-name'
   | 'invalid-icon'
@@ -78,12 +80,26 @@ export const SUPPORTED_CATEGORY_ICONS: readonly string[] = [
   'fas fa-heart',
 ];
 
+const CUSTOM_CATEGORY_ID_PATTERN = /^custom_[a-z0-9]+(?:[a-z0-9_-]*[a-z0-9])?$/;
+
 export function normalizeCategoryName(name?: string | null): string {
   return normalizeCategoryDisplayName(name).toLowerCase();
 }
 
 export function normalizeCategoryDisplayName(name?: string | null): string {
   return (name || '').replace(/\s+/g, ' ').trim();
+}
+
+export function normalizeCustomCategoryId(id?: string | null): string {
+  const normalized = (id || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^custom[_-]?/u, '')
+    .replace(/[^a-z0-9_-]+/gu, '-')
+    .replace(/[-_]{2,}/gu, '-')
+    .replace(/^[-_]+|[-_]+$/gu, '');
+
+  return normalized ? `custom_${normalized}` : '';
 }
 
 export function mergeCategories(
@@ -208,6 +224,10 @@ export function validateCategoryInput(
     throw new CategoryValidationError('required');
   }
 
+  if (typeof input.id !== 'string' || !input.id.trim()) {
+    throw new CategoryValidationError('required', 'id');
+  }
+
   const name = normalizeCategoryDisplayName(input.name);
   const normalizedName = normalizeCategoryName(name);
   if (!normalizedName) {
@@ -244,11 +264,37 @@ export function validateCategoryInput(
   }
 
   return {
+    id: input.id.trim(),
     name,
     icon: input.icon,
     color: input.color.trim(),
     includeInBalance: input.includeInBalance,
   };
+}
+
+export function validateCustomCategoryId(
+  id: string,
+  categories: readonly ResolvedCategory[],
+  excludeId?: string
+): string {
+  const normalizedId = normalizeCustomCategoryId(id);
+  if (!normalizedId || normalizedId.length > 80) {
+    throw new CategoryValidationError('invalid-id', 'id');
+  }
+
+  if (!CUSTOM_CATEGORY_ID_PATTERN.test(normalizedId)) {
+    throw new CategoryValidationError('invalid-id', 'id');
+  }
+
+  if (
+    categories.some(
+      category => category.id !== excludeId && category.id === normalizedId
+    )
+  ) {
+    throw new CategoryValidationError('duplicate-id', 'id');
+  }
+
+  return normalizedId;
 }
 
 export function isValidCategoryColor(color?: string | null): boolean {
@@ -267,6 +313,8 @@ export function isValidCategoryColor(color?: string | null): boolean {
 function categoryValidationMessage(code: CategoryValidationCode): string {
   const messages: Record<CategoryValidationCode, string> = {
     required: 'Category value is required.',
+    'invalid-id': 'Category id must use latin letters, numbers, "-" or "_".',
+    'duplicate-id': 'A category with this id already exists.',
     'invalid-name': 'Category name is invalid.',
     'duplicate-name': 'An active category with this name already exists.',
     'invalid-icon': 'Category icon is not supported.',

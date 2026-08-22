@@ -2,6 +2,8 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BehaviorSubject, firstValueFrom, NEVER, of } from 'rxjs';
+import { ExpenseStoreService } from './expense-store.service';
+import { IrregularBudgetStoreService } from './irregular-budget-store.service';
 import { CategoryOverrideDocument } from '../model/category.model';
 
 import { CategoryStoreService } from './category-store.service';
@@ -13,10 +15,14 @@ describe('CategoryService', () => {
   let collection: jasmine.Spy;
   let fireStore: AngularFirestore;
   let service: CategoryService;
+  let expenseStore: ExpenseStoreService;
+  let budgetStore: IrregularBudgetStoreService;
 
   beforeEach(() => {
     localStorage.clear();
     store = new CategoryStoreService();
+    expenseStore = new ExpenseStoreService();
+    budgetStore = new IrregularBudgetStoreService();
     setDocument = jasmine.createSpy('set').and.resolveTo(undefined);
     collection = jasmine.createSpy('collection').and.returnValue({
       doc: () => ({ set: setDocument }),
@@ -29,19 +35,26 @@ describe('CategoryService', () => {
       authState: of({ uid: 'user-1' }),
       currentUser: Promise.resolve({ uid: 'user-1' }),
     } as unknown as AngularFireAuth;
-    service = new CategoryService(fireStore, store, auth);
+    service = new CategoryService(
+      fireStore,
+      store,
+      auth,
+      expenseStore,
+      budgetStore
+    );
   });
 
   it('runs authenticated optimistic CRUD with hide, restore, and archive semantics', async () => {
     const created = await firstValueFrom(
       service.createCategory({
+        id: 'gifts',
         name: 'Подарки',
         icon: 'fas fa-gift',
         color: '#123456',
         includeInBalance: true,
       })
     );
-    expect(created.id).toBe('custom_generated-id');
+    expect(created.id).toBe('custom_gifts');
     expect(created.source).toBe('custom');
 
     const updated = await firstValueFrom(
@@ -68,6 +81,7 @@ describe('CategoryService', () => {
     await firstValueFrom(service.hideCategory('home'));
     await firstValueFrom(
       service.createCategory({
+        id: 'gifts',
         name: 'Подарки',
         icon: 'fas fa-gift',
         color: '#123456',
@@ -76,15 +90,11 @@ describe('CategoryService', () => {
     );
 
     await firstValueFrom(
-      service.reorderCategories([
-        'custom_generated-id',
-        'meal',
-        'subscriptions',
-      ])
+      service.reorderCategories(['custom_gifts', 'meal', 'subscriptions'])
     );
 
     expect(store.getAllCategories().map(category => category.id)).toEqual([
-      'custom_generated-id',
+      'custom_gifts',
       'meal',
       'subscriptions',
       'entertainments',
@@ -111,6 +121,7 @@ describe('CategoryService', () => {
     await expectAsync(
       firstValueFrom(
         service.createCategory({
+          id: 'gifts',
           name: 'Подарки',
           icon: 'fas fa-gift',
           color: '#123456',
@@ -119,7 +130,7 @@ describe('CategoryService', () => {
       )
     ).toBeRejectedWithError('offline');
 
-    expect(store.getCategoryById('custom_generated-id')).toBeUndefined();
+    expect(store.getCategoryById('custom_gifts')).toBeUndefined();
   });
 
   it('switches the local cache scope when the authenticated user changes', fakeAsync(() => {
@@ -148,7 +159,9 @@ describe('CategoryService', () => {
     const scopedService = new CategoryService(
       scopedFirestore,
       scopedStore,
-      scopedAuth
+      scopedAuth,
+      new ExpenseStoreService(),
+      new IrregularBudgetStoreService()
     );
     const subscription = scopedService.getCategories().subscribe();
 
@@ -167,6 +180,70 @@ describe('CategoryService', () => {
     expect(scopedStore.getCategoryById(userTwoCategory.id)).toBeUndefined();
     subscription.unsubscribe();
   }));
+
+  it('renames a custom category locally together with expenses and category limits', async () => {
+    const localAuth = {
+      authState: of(null),
+      currentUser: Promise.resolve(null),
+    } as unknown as AngularFireAuth;
+    const localService = new CategoryService(
+      fireStore,
+      store,
+      localAuth,
+      expenseStore,
+      budgetStore
+    );
+
+    await firstValueFrom(
+      localService.createCategory({
+        id: 'gifts',
+        name: 'Подарки',
+        icon: 'fas fa-gift',
+        color: '#123456',
+        includeInBalance: true,
+      })
+    );
+    expenseStore.replaceStoredExpenses([
+      {
+        id: 'expense-1',
+        amount: 10,
+        category: 'custom_gifts',
+        currency: 'EUR',
+        date: 1,
+      },
+    ]);
+    budgetStore.addValueObs({
+      value: 600,
+      period: 30,
+      limits: [
+        {
+          id: 'category:custom_gifts',
+          type: 'category',
+          targetId: 'custom_gifts',
+          value: 50,
+        },
+      ],
+    });
+
+    const renamed = await firstValueFrom(
+      localService.updateCategory('custom_gifts', { id: 'family-gifts' })
+    );
+
+    expect(renamed.id).toBe('custom_family-gifts');
+    expect(store.getCategoryById('custom_gifts')).toBeUndefined();
+    expect(store.getCategoryById('custom_family-gifts')?.name).toBe('Подарки');
+    expect(expenseStore.getStoredExpenses()[0]?.category).toBe(
+      'custom_family-gifts'
+    );
+    expect(budgetStore.getValue().limits).toEqual([
+      {
+        id: 'category:custom_family-gifts',
+        type: 'category',
+        targetId: 'custom_family-gifts',
+        value: 50,
+      },
+    ]);
+  });
 
   function customOverride(id: string, name: string): CategoryOverrideDocument {
     return {

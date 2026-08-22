@@ -19,6 +19,19 @@
 
     <div class="category-form-grid">
       <label class="category-field category-field--name">
+        <span>ID</span>
+        <input
+          type="text"
+          name="categoryId"
+          [(ngModel)]="draft.id"
+          maxlength="80"
+          placeholder="e.g. groceries"
+          [disabled]="createSaving"
+        />
+        <small>{{ previewId(draft) }}</small>
+      </label>
+
+      <label class="category-field category-field--name">
         <span>Name</span>
         <input
           type="text"
@@ -300,6 +313,23 @@
       <i [class]="editDraft.icon" aria-hidden="true"></i>
       <span>{{ editDraft.name || 'Category preview' }}</span>
     </div>
+
+    <label class="category-field">
+      <span>ID</span>
+      <input
+        type="text"
+        [(ngModel)]="editDraft.id"
+        maxlength="80"
+        [disabled]="!canEditId(editingCategory)"
+      />
+      <small>
+        {{
+          canEditId(editingCategory)
+            ? previewId(editDraft, editingCategory.id)
+            : 'Default category ids stay fixed.'
+        }}
+      </small>
+    </label>
 
     <label class="category-field">
       <span>Name</span>

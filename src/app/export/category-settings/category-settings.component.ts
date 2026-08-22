@@ -4,15 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { Observable, Subject, finalize, first, takeUntil } from 'rxjs';
 
 import {
+  CategoryValidationError,
   CategoryInput,
   CategoryPatch,
   ResolvedCategory,
   isValidCategoryColor,
+  normalizeCustomCategoryId,
   normalizeCategoryName,
+  validateCustomCategoryId,
 } from '../../common/model/category.model';
 import { CategoryService } from '../../common/service/category.service';
 
 type CategoryForm = {
+  id: string;
   name: string;
   icon: string;
   color: string;
@@ -134,6 +138,7 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
   openEditor(category: ResolvedCategory): void {
     this.editingCategory = category;
     this.editDraft = {
+      id: category.id,
       name: category.name,
       icon: category.icon,
       color: category.color,
@@ -157,12 +162,12 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.editorError = this.validate(this.editDraft, category.id);
+    this.editorError = this.validate(this.editDraft, category);
     if (this.editorError) {
       return;
     }
 
-    const patch: CategoryPatch = this.toPayload(this.editDraft);
+    const patch: CategoryPatch = this.toPayload(this.editDraft, category.id);
     this.setSaving(category.id, true);
     this.categoryService
       .updateCategory(category.id, patch)
@@ -307,6 +312,14 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
       : category.source;
   }
 
+  canEditId(category: ResolvedCategory | null): boolean {
+    return category?.source === 'custom';
+  }
+
+  previewId(form: CategoryForm, fallbackId?: string): string {
+    return this.normalizeFormId(form, fallbackId) || 'custom_your-id';
+  }
+
   trackByCategory(_: number, category: ResolvedCategory): string {
     return category.id;
   }
@@ -348,7 +361,21 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
     this.savingCategoryIds.delete(id);
   }
 
-  private validate(form: CategoryForm, editingId?: string): string {
+  private validate(
+    form: CategoryForm,
+    editingCategory?: ResolvedCategory
+  ): string {
+    if (!editingCategory || editingCategory.source === 'custom') {
+      try {
+        validateCustomCategoryId(form.id, this.categories, editingCategory?.id);
+      } catch (error) {
+        if (error instanceof CategoryValidationError) {
+          return error.message;
+        }
+        return 'Enter a valid category id.';
+      }
+    }
+
     const name = form.name.trim();
     if (!name) {
       return 'Name is required.';
@@ -357,7 +384,7 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
     const normalizedName = normalizeCategoryName(name);
     const duplicate = this.activeCategories.some(
       category =>
-        category.id !== editingId &&
+        category.id !== editingCategory?.id &&
         normalizeCategoryName(category.name) === normalizedName
     );
     if (duplicate) {
@@ -375,8 +402,9 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  private toPayload(form: CategoryForm): CategoryInput {
+  private toPayload(form: CategoryForm, fallbackId?: string): CategoryInput {
     return {
+      id: this.normalizeFormId(form, fallbackId),
       name: form.name.trim().replace(/\s+/g, ' '),
       icon: form.icon,
       color: form.color.trim(),
@@ -386,6 +414,7 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
 
   private emptyForm(): CategoryForm {
     return {
+      id: '',
       name: '',
       icon: 'fas fa-basket-shopping',
       color: '#FFB400',
@@ -395,5 +424,13 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
 
   private errorMessage(error: unknown, fallback: string): string {
     return error instanceof Error && error.message ? error.message : fallback;
+  }
+
+  private normalizeFormId(form: CategoryForm, fallbackId?: string): string {
+    if (fallbackId && this.editingCategory?.source !== 'custom') {
+      return fallbackId;
+    }
+
+    return normalizeCustomCategoryId(form.id);
   }
 }
