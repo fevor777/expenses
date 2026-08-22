@@ -20,6 +20,7 @@ describe('CategorySettingsComponent', () => {
     icon: 'fa-solid fa-bell-concierge',
     color: '#474747',
     includeInBalance: true,
+    sortOrder: 0,
     source: 'default',
     hidden: false,
     normalizedName: 'meal',
@@ -30,6 +31,7 @@ describe('CategorySettingsComponent', () => {
     id: 'travel',
     name: 'Travel',
     icon: 'fas fa-plane',
+    sortOrder: 1,
     hidden: true,
     normalizedName: 'travel',
   };
@@ -47,6 +49,7 @@ describe('CategorySettingsComponent', () => {
         'hideCategory',
         'restoreCategory',
         'archiveCategory',
+        'reorderCategories',
       ]),
       {
         allCategories$: categories$,
@@ -60,6 +63,7 @@ describe('CategorySettingsComponent', () => {
         source: 'custom',
         hidden: false,
         normalizedName: 'groceries',
+        sortOrder: 2,
         ...input,
       })
     );
@@ -69,6 +73,7 @@ describe('CategorySettingsComponent', () => {
     service.hideCategory.and.returnValue(of('meal'));
     service.restoreCategory.and.returnValue(of('travel'));
     service.archiveCategory.and.returnValue(of('custom-groceries'));
+    service.reorderCategories.and.returnValue(of(void 0));
 
     await TestBed.configureTestingModule({
       imports: [CategorySettingsComponent],
@@ -139,6 +144,54 @@ describe('CategorySettingsComponent', () => {
       includeInBalance: defaultCategory.includeInBalance,
     });
     expect(component.editingCategory).toBeNull();
+  });
+
+  it('reorders categories through up/down controls', () => {
+    const secondCategory: ResolvedCategory = {
+      ...defaultCategory,
+      id: 'subscriptions',
+      name: 'Subscriptions',
+      normalizedName: 'subscriptions',
+      sortOrder: 1,
+    };
+    categories$.next([defaultCategory, secondCategory, hiddenCategory]);
+    fixture.detectChanges();
+
+    component.moveCategory(secondCategory, -1);
+
+    expect(service.reorderCategories).toHaveBeenCalledWith([
+      'subscriptions',
+      'meal',
+    ]);
+  });
+
+  it('disables move buttons on list edges', () => {
+    const secondCategory: ResolvedCategory = {
+      ...defaultCategory,
+      id: 'subscriptions',
+      name: 'Subscriptions',
+      normalizedName: 'subscriptions',
+      sortOrder: 1,
+    };
+    categories$.next([defaultCategory, secondCategory, hiddenCategory]);
+    fixture.detectChanges();
+
+    const activeActionRows = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.category-list:not(.category-list--hidden) .category-card__actions'
+      )
+    ) as HTMLElement[];
+    const firstButtons = Array.from(
+      activeActionRows[0].querySelectorAll('button')
+    ) as HTMLButtonElement[];
+    const secondButtons = Array.from(
+      activeActionRows[1].querySelectorAll('button')
+    ) as HTMLButtonElement[];
+
+    expect(firstButtons[0].disabled).toBeTrue();
+    expect(firstButtons[1].disabled).toBeFalse();
+    expect(secondButtons[0].disabled).toBeFalse();
+    expect(secondButtons[1].disabled).toBeTrue();
   });
 
   it('keeps action failures local to the affected category', () => {

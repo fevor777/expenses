@@ -16,6 +16,7 @@ export type CategoryOverrideDocument = {
   icon?: string;
   color?: string;
   includeInBalance?: boolean;
+  sortOrder?: number;
   isDeleted?: boolean;
   createdAt: number;
   updatedAt: number;
@@ -26,6 +27,7 @@ export type ResolvedCategory = Category & {
   source: CategorySource;
   hidden?: boolean;
   normalizedName?: string;
+  sortOrder: number;
 };
 
 export type CategoryInput = Omit<Category, 'id'>;
@@ -88,10 +90,54 @@ export function mergeCategories(
   defaults: readonly Category[],
   overrides: readonly CategoryOverrideDocument[]
 ): ResolvedCategory[] {
+  const explicitSortOrders = overrides
+    .map(override => normalizeSortOrder(override.sortOrder))
+    .filter((value): value is number => typeof value === 'number');
+  const implicitSortOrderStart = explicitSortOrders.length
+    ? Math.max(...explicitSortOrders) + 1
+    : 0;
+  const defaultIndexById = new Map(
+    defaults.map((category, index) => [category.id, index] as const)
+  );
   const overridesById = new Map(
     overrides
       .filter(override => !!override?.id)
       .map(override => [override.id, override] as const)
+  );
+  const customOverrides = overrides
+    .filter(override => {
+      if (
+        override.source !== 'custom' ||
+        defaultIndexById.has(override.id) ||
+        typeof override.name !== 'string' ||
+        typeof override.icon !== 'string' ||
+        typeof override.color !== 'string' ||
+        typeof override.includeInBalance !== 'boolean'
+      ) {
+        return false;
+      }
+
+      return !!normalizeCategoryDisplayName(override.name);
+    })
+    .sort((left, right) => {
+      const leftCreatedAt = normalizeTimestamp(left.createdAt);
+      const rightCreatedAt = normalizeTimestamp(right.createdAt);
+      if (leftCreatedAt !== rightCreatedAt) {
+        return leftCreatedAt - rightCreatedAt;
+      }
+
+      const leftName =
+        left.normalizedName || normalizeCategoryName(left.name || '');
+      const rightName =
+        right.normalizedName || normalizeCategoryName(right.name || '');
+      return (
+        leftName.localeCompare(rightName) || left.id.localeCompare(right.id)
+      );
+    });
+  const customFallbackOrderById = new Map(
+    customOverrides.map(
+      (override, index) => [override.id, defaults.length + index] as const
+    )
   );
   const resolved: ResolvedCategory[] = defaults.map(category => {
     const override = overridesById.get(category.id);
@@ -119,27 +165,14 @@ export function mergeCategories(
       source: isDefaultOverride ? 'default-override' : 'default',
       hidden: isDefaultOverride && override.isDeleted === true,
       normalizedName: normalizeCategoryName(name),
+      sortOrder:
+        normalizeSortOrder(override?.sortOrder) ??
+        implicitSortOrderStart + (defaultIndexById.get(category.id) ?? 0),
     };
   });
 
-  const defaultIds = new Set(defaults.map(category => category.id));
-  overrides.forEach(override => {
-    if (
-      override.source !== 'custom' ||
-      defaultIds.has(override.id) ||
-      typeof override.name !== 'string' ||
-      typeof override.icon !== 'string' ||
-      typeof override.color !== 'string' ||
-      typeof override.includeInBalance !== 'boolean'
-    ) {
-      return;
-    }
-
+  customOverrides.forEach(override => {
     const name = normalizeCategoryDisplayName(override.name);
-    if (!name) {
-      return;
-    }
-
     resolved.push({
       id: override.id,
       name,
@@ -149,13 +182,20 @@ export function mergeCategories(
       source: 'custom',
       hidden: override.isDeleted === true,
       normalizedName: normalizeCategoryName(name),
+      sortOrder:
+        normalizeSortOrder(override.sortOrder) ??
+        implicitSortOrderStart +
+          (customFallbackOrderById.get(override.id) ?? defaults.length),
     });
   });
 
-  return resolved.sort((left, right) =>
-    (left.normalizedName || normalizeCategoryName(left.name)).localeCompare(
-      right.normalizedName || normalizeCategoryName(right.name)
-    )
+  return resolved.sort(
+    (left, right) =>
+      left.sortOrder - right.sortOrder ||
+      (left.normalizedName || normalizeCategoryName(left.name)).localeCompare(
+        right.normalizedName || normalizeCategoryName(right.name)
+      ) ||
+      left.id.localeCompare(right.id)
   );
 }
 
@@ -237,4 +277,16 @@ function categoryValidationMessage(code: CategoryValidationCode): string {
       'This action is not valid for the category source.',
   };
   return messages[code];
+}
+
+function normalizeSortOrder(value?: number | null): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value
+    : undefined;
+}
+
+function normalizeTimestamp(value?: number | null): number {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value
+    : Number.MAX_SAFE_INTEGER;
 }

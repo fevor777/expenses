@@ -64,6 +64,47 @@ describe('CategoryService', () => {
     expect(collection).toHaveBeenCalledWith('users/user-1/category-overrides');
   });
 
+  it('reorders active categories while keeping hidden categories in place', async () => {
+    await firstValueFrom(service.hideCategory('home'));
+    await firstValueFrom(
+      service.createCategory({
+        name: 'Подарки',
+        icon: 'fas fa-gift',
+        color: '#123456',
+        includeInBalance: true,
+      })
+    );
+
+    await firstValueFrom(
+      service.reorderCategories([
+        'custom_generated-id',
+        'meal',
+        'subscriptions',
+      ])
+    );
+
+    expect(store.getAllCategories().map(category => category.id)).toEqual([
+      'custom_generated-id',
+      'meal',
+      'subscriptions',
+      'entertainments',
+      'nicotine',
+      'home',
+      'travel',
+      'alcohol',
+      'bus',
+      'utility-bills',
+      'pharmacy',
+      'barbershop',
+      'electronics',
+      'clothes',
+      'another',
+      'sport',
+      'rental-payment',
+    ]);
+    expect(store.getCategoryById('home')?.hidden).toBeTrue();
+  });
+
   it('rolls back an optimistic change when Firestore rejects the write', async () => {
     setDocument.and.rejectWith(new Error('offline'));
 
@@ -136,6 +177,7 @@ describe('CategoryService', () => {
       color: '#123456',
       includeInBalance: true,
       normalizedName: name.toLocaleLowerCase(),
+      sortOrder: 99,
       createdAt: 1,
       updatedAt: 1,
     };

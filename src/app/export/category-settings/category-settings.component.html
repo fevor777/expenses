@@ -118,6 +118,7 @@
         *ngFor="let category of activeCategories; trackBy: trackByCategory"
         [class.category-card--saving]="isSaving(category.id)"
       >
+        <span class="category-card__order">{{ displayOrder(category) }}</span>
         <div class="category-card__identity">
           <span
             class="category-card__icon"
@@ -145,6 +146,22 @@
         </div>
 
         <div class="category-card__actions">
+          <button
+            type="button"
+            class="btn category-button"
+            (click)="moveCategory(category, -1)"
+            [disabled]="reorderSaving || !canMoveUp(category)"
+          >
+            Up
+          </button>
+          <button
+            type="button"
+            class="btn category-button"
+            (click)="moveCategory(category, 1)"
+            [disabled]="reorderSaving || !canMoveDown(category)"
+          >
+            Down
+          </button>
           <button
             type="button"
             class="btn category-button"

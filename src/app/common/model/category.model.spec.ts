@@ -47,6 +47,7 @@ describe('category model', () => {
         icon: 'fa-solid fa-bell-concierge',
         source: 'default-override',
         hidden: true,
+        sortOrder: 0,
       })
     );
     expect(
@@ -68,6 +69,38 @@ describe('category model', () => {
     expect(
       result.find(category => category.id === 'custom_old')?.hidden
     ).toBeTrue();
+    expect(result.map(category => category.id)).toEqual([
+      'meal',
+      'home',
+      'custom_gifts',
+      'custom_old',
+    ]);
+  });
+
+  it('prefers explicit sortOrder over name sorting', () => {
+    const overrides: CategoryOverrideDocument[] = [
+      {
+        id: 'home',
+        source: 'default-override',
+        baseCategoryId: 'home',
+        sortOrder: 0,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+      {
+        id: 'meal',
+        source: 'default-override',
+        baseCategoryId: 'meal',
+        sortOrder: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    ];
+
+    const result = mergeCategories(defaults, overrides);
+
+    expect(result.map(category => category.id)).toEqual(['home', 'meal']);
+    expect(result.map(category => category.sortOrder)).toEqual([0, 1]);
   });
 
   it('normalizes fields and rejects a duplicate active name', () => {
@@ -147,6 +180,7 @@ describe('category model', () => {
       color: '#123456',
       includeInBalance: true,
       normalizedName: name.toLocaleLowerCase(),
+      sortOrder: undefined,
       createdAt: 1,
       updatedAt: 1,
     };

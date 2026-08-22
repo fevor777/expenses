@@ -83,6 +83,7 @@ export class CategoryService {
             id,
             source: 'custom',
             ...category,
+            sortOrder: this.nextSortOrder(),
             normalizedName: normalizeCategoryName(category.name),
             isDeleted: false,
             createdAt: now,
@@ -171,6 +172,38 @@ export class CategoryService {
             updatedAt: Date.now(),
           };
           return this.optimisticWrite(uid, document).pipe(map(() => id));
+        })
+      )
+    );
+  }
+
+  reorderCategories(orderedIds: readonly string[]): Observable<void> {
+    return defer(() =>
+      this.resolveUserId().pipe(
+        switchMap(uid => {
+          this.categoryStore.setScope(uid);
+          const allCategories = this.categoryStore.getAllCategories();
+          const activeCategories = allCategories.filter(
+            category => !category.hidden
+          );
+          if (activeCategories.length < 2) {
+            return of(void 0);
+          }
+
+          const normalizedActiveIds = this.normalizeOrderedIds(
+            orderedIds,
+            activeCategories
+          );
+          const mergedIds = this.mergeOrderedIdsWithHidden(
+            allCategories,
+            normalizedActiveIds
+          );
+          const now = Date.now();
+          const documents = mergedIds.map((id, sortOrder) =>
+            this.buildReorderDocument(this.requireCategory(id), sortOrder, now)
+          );
+
+          return this.optimisticBatchWrite(uid, documents);
         })
       )
     );
@@ -278,8 +311,44 @@ export class CategoryService {
       icon: category.icon,
       color: category.color,
       includeInBalance: category.includeInBalance,
+      sortOrder: this.resolvePersistedSortOrder(current, previous),
       isDeleted: previous?.isDeleted === true,
       normalizedName: normalizeCategoryName(category.name),
+      createdAt: previous?.createdAt ?? now,
+      updatedAt: now,
+    };
+  }
+
+  private buildReorderDocument(
+    current: ResolvedCategory,
+    sortOrder: number,
+    now: number
+  ): CategoryOverrideDocument {
+    const previous = this.categoryStore.getOverride(current.id);
+    if (current.source === 'custom') {
+      return {
+        ...previous,
+        id: current.id,
+        source: 'custom',
+        name: current.name,
+        icon: current.icon,
+        color: current.color,
+        includeInBalance: current.includeInBalance,
+        sortOrder,
+        isDeleted: current.hidden === true,
+        normalizedName: normalizeCategoryName(current.name),
+        createdAt: previous?.createdAt ?? now,
+        updatedAt: now,
+      };
+    }
+
+    return {
+      ...previous,
+      id: current.id,
+      source: 'default-override',
+      baseCategoryId: previous?.baseCategoryId ?? current.id,
+      sortOrder,
+      isDeleted: current.hidden === true,
       createdAt: previous?.createdAt ?? now,
       updatedAt: now,
     };
@@ -304,6 +373,34 @@ export class CategoryService {
       map(() => void 0),
       catchError(error => {
         this.categoryStore.restoreOverride(document.id, previous);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private optimisticBatchWrite(
+    uid: string | undefined,
+    documents: readonly CategoryOverrideDocument[]
+  ): Observable<void> {
+    const previousOverrides = this.categoryStore.getOverrides();
+    this.categoryStore.setOverrides(
+      this.mergeOverrides(previousOverrides, documents)
+    );
+    if (!uid) {
+      return of(void 0);
+    }
+
+    const collection = this.fireStore.collection<CategoryOverrideDocument>(
+      `users/${uid}/category-overrides`
+    );
+    return from(
+      Promise.all(
+        documents.map(document => collection.doc(document.id).set(document))
+      )
+    ).pipe(
+      map(() => void 0),
+      catchError(error => {
+        this.categoryStore.setOverrides(previousOverrides);
         return throwError(() => error);
       })
     );
@@ -345,6 +442,86 @@ export class CategoryService {
       }),
       distinctUntilChanged(),
       catchError(() => of(undefined))
+    );
+  }
+
+  private resolvePersistedSortOrder(
+    current: ResolvedCategory,
+    previous?: CategoryOverrideDocument
+  ): number | undefined {
+    if (typeof previous?.sortOrder === 'number') {
+      return previous.sortOrder;
+    }
+
+    return current.source === 'custom' ? current.sortOrder : undefined;
+  }
+
+  private normalizeOrderedIds(
+    orderedIds: readonly string[],
+    activeCategories: readonly ResolvedCategory[]
+  ): string[] {
+    const activeIds = new Set(activeCategories.map(category => category.id));
+    const normalized: string[] = [];
+    const seen = new Set<string>();
+
+    orderedIds.forEach(id => {
+      if (activeIds.has(id) && !seen.has(id)) {
+        seen.add(id);
+        normalized.push(id);
+      }
+    });
+
+    activeCategories.forEach(category => {
+      if (!seen.has(category.id)) {
+        normalized.push(category.id);
+      }
+    });
+
+    return normalized;
+  }
+
+  private mergeOrderedIdsWithHidden(
+    allCategories: readonly ResolvedCategory[],
+    orderedActiveIds: readonly string[]
+  ): string[] {
+    let activeIndex = 0;
+
+    return allCategories.map(category => {
+      if (category.hidden) {
+        return category.id;
+      }
+
+      const nextId = orderedActiveIds[activeIndex];
+      activeIndex += 1;
+      return nextId ?? category.id;
+    });
+  }
+
+  private mergeOverrides(
+    previousOverrides: readonly CategoryOverrideDocument[],
+    documents: readonly CategoryOverrideDocument[]
+  ): CategoryOverrideDocument[] {
+    const byId = new Map(
+      previousOverrides.map(override => [override.id, { ...override }] as const)
+    );
+    documents.forEach(document => {
+      byId.set(document.id, { ...document });
+    });
+    return Array.from(byId.values());
+  }
+
+  private nextSortOrder(): number {
+    const categories = this.categoryStore.getAllCategories();
+    if (!categories.length) {
+      return 0;
+    }
+
+    return (
+      Math.max(
+        ...categories.map(category =>
+          Number.isFinite(category.sortOrder) ? category.sortOrder : 0
+        )
+      ) + 1
     );
   }
 }

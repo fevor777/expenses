@@ -12,7 +12,7 @@ import {
 } from '../model/category.model';
 
 type CategoryCache = {
-  version: 1;
+  version: 2;
   overrides: CategoryOverrideDocument[];
   resolved: ResolvedCategory[];
 };
@@ -21,7 +21,7 @@ type CategoryCache = {
   providedIn: 'root',
 })
 export class CategoryStoreService {
-  private readonly storageKeyPrefix = 'category-cache-v1';
+  private readonly storageKeyPrefix = 'category-cache-v2';
   private readonly allCategoriesSubject = new BehaviorSubject<
     ResolvedCategory[]
   >(mergeCategories(Categories, []));
@@ -76,6 +76,10 @@ export class CategoryStoreService {
     return this.overrides.find(override => override.id === id);
   }
 
+  getOverrides(): CategoryOverrideDocument[] {
+    return this.overrides.map(override => ({ ...override }));
+  }
+
   setOverrides(overrides: readonly CategoryOverrideDocument[]): void {
     this.overrides = this.canonicalizeOverrides(overrides);
     this.persistAndPublish();
@@ -108,7 +112,7 @@ export class CategoryStoreService {
   private persistAndPublish(): void {
     const resolved = mergeCategories(Categories, this.overrides);
     this.writeCache({
-      version: 1,
+      version: 2,
       overrides: this.overrides,
       resolved,
     });
@@ -132,7 +136,14 @@ export class CategoryStoreService {
         override?.id &&
         (override.source === 'custom' || override.source === 'default-override')
       ) {
-        byId.set(override.id, { ...override });
+        byId.set(override.id, {
+          ...override,
+          sortOrder:
+            typeof override.sortOrder === 'number' &&
+            Number.isFinite(override.sortOrder)
+              ? override.sortOrder
+              : undefined,
+        });
       }
     });
     return Array.from(byId.values());
@@ -145,11 +156,11 @@ export class CategoryStoreService {
         return undefined;
       }
       const cache = JSON.parse(raw) as Partial<CategoryCache>;
-      if (cache.version !== 1 || !Array.isArray(cache.overrides)) {
+      if (cache.version !== 2 || !Array.isArray(cache.overrides)) {
         return undefined;
       }
       return {
-        version: 1,
+        version: 2,
         overrides: this.canonicalizeOverrides(cache.overrides),
         resolved: Array.isArray(cache.resolved) ? cache.resolved : [],
       };

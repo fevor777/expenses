@@ -34,6 +34,46 @@ describe('CategoryStoreService', () => {
     expect(store.getCategoryById(original.id)?.name).toBe('Сюрпризы');
   });
 
+  it('keeps explicit sortOrder across cache and publish cycles', () => {
+    const store = new CategoryStoreService();
+    store.setScope('user-1');
+
+    store.setOverrides([
+      {
+        id: 'meal',
+        source: 'default-override',
+        baseCategoryId: 'meal',
+        sortOrder: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+      {
+        id: 'home',
+        source: 'default-override',
+        baseCategoryId: 'home',
+        sortOrder: 0,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    ]);
+
+    expect(
+      store
+        .getCategories()
+        .slice(0, 2)
+        .map(category => category.id)
+    ).toEqual(['home', 'meal']);
+
+    const rehydrated = new CategoryStoreService();
+    rehydrated.setScope('user-1');
+    expect(
+      rehydrated
+        .getCategories()
+        .slice(0, 2)
+        .map(category => category.id)
+    ).toEqual(['home', 'meal']);
+  });
+
   it('hides and restores a default without losing history resolution', () => {
     const store = new CategoryStoreService();
     store.setScope('user-1');
@@ -93,6 +133,7 @@ describe('CategoryStoreService', () => {
       color: '#123456',
       includeInBalance: true,
       normalizedName: name.toLocaleLowerCase(),
+      sortOrder: 99,
       createdAt: 1,
       updatedAt: 1,
     };

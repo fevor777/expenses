@@ -61,6 +61,7 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
   createSaving = false;
   createError = '';
   editorError = '';
+  reorderSaving = false;
   actionErrors: Record<string, string> = {};
 
   private readonly savingCategoryIds = new Set<string>();
@@ -230,8 +231,74 @@ export class CategorySettingsComponent implements OnInit, OnDestroy {
     );
   }
 
+  moveCategory(category: ResolvedCategory, direction: -1 | 1): void {
+    if (this.reorderSaving || this.isSaving(category.id)) {
+      return;
+    }
+
+    const categories = this.activeCategories;
+    const currentIndex = categories.findIndex(item => item.id === category.id);
+    const targetIndex = currentIndex + direction;
+    if (
+      currentIndex < 0 ||
+      targetIndex < 0 ||
+      targetIndex >= categories.length
+    ) {
+      return;
+    }
+
+    const targetCategory = categories[targetIndex];
+    const orderedIds = categories.map(item => item.id);
+    [orderedIds[currentIndex], orderedIds[targetIndex]] = [
+      orderedIds[targetIndex],
+      orderedIds[currentIndex],
+    ];
+
+    delete this.actionErrors[category.id];
+    this.reorderSaving = true;
+    this.setSaving(category.id, true);
+    this.setSaving(targetCategory.id, true);
+    this.categoryService
+      .reorderCategories(orderedIds)
+      .pipe(
+        first(),
+        finalize(() => {
+          this.reorderSaving = false;
+          this.setSaving(category.id, false);
+          this.setSaving(targetCategory.id, false);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        error: error => {
+          this.actionErrors[category.id] = this.errorMessage(
+            error,
+            'Could not reorder categories.'
+          );
+        },
+      });
+  }
+
   isSaving(id: string): boolean {
     return this.savingCategoryIds.has(id);
+  }
+
+  canMoveUp(category: ResolvedCategory): boolean {
+    return this.activeCategories.findIndex(item => item.id === category.id) > 0;
+  }
+
+  canMoveDown(category: ResolvedCategory): boolean {
+    const index = this.activeCategories.findIndex(
+      item => item.id === category.id
+    );
+    return index > -1 && index < this.activeCategories.length - 1;
+  }
+
+  displayOrder(category: ResolvedCategory): number {
+    const index = this.activeCategories.findIndex(
+      item => item.id === category.id
+    );
+    return index > -1 ? index + 1 : category.sortOrder + 1;
   }
 
   sourceLabel(category: ResolvedCategory): string {
