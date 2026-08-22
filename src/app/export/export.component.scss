@@ -44,6 +44,40 @@ button {
   line-height: 1.2;
 }
 
+.statistics-default-panel-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(420px, 100%);
+  margin-top: 20px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-alt);
+}
+
+.statistics-default-panel-setting__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.statistics-default-panel-setting__select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.statistics-default-panel-setting__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
 /* Add padding to back label on export page only */
 :host ::ng-deep .history-back-link {
   /* scoped to export component */

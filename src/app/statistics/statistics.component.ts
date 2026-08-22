@@ -52,6 +52,10 @@ import { CategoryService } from '../common/service/category.service';
 import { BudgetDataService } from '../common/service/budget-data.service';
 import { BudgetLimitSummary } from '../common/model/budget.model';
 import { BudgetLimitSummaryService } from '../common/service/budget-limit-summary.service';
+import {
+  getInitialStatisticsCollapsedPanels,
+  StatisticsPanelId,
+} from './statistics-default-panel-setting';
 
 @Component({
   selector: 'app-statistics',
@@ -142,16 +146,8 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   ];
 
   // collapse state for category filters and bars
-  collapsed: Record<
-    'categoryFilters' | 'multiChart' | 'irregularSummary' | 'analytics',
-    boolean
-  > = {
-    // Only this panel expanded by default; others collapsed
-    categoryFilters: true,
-    multiChart: true,
-    irregularSummary: true,
-    analytics: false,
-  };
+  collapsed: Record<StatisticsPanelId, boolean> =
+    getInitialStatisticsCollapsedPanels();
 
   // Category view switch state (bars | micro | filter)
   categoryView: 'bars' | 'micro' | 'filter' = 'bars';
@@ -319,9 +315,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
     });
   }
 
-  toggle(
-    section: 'categoryFilters' | 'multiChart' | 'irregularSummary' | 'analytics'
-  ): void {
+  toggle(section: StatisticsPanelId): void {
     const currentlyCollapsed = this.collapsed[section];
     // Collapse all panels first (exclusive expansion behavior)
     Object.keys(this.collapsed).forEach(key => {

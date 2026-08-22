@@ -41,6 +41,12 @@ import {
   BudgetLimitSummaryService,
   buildBudgetLimitSummaries,
 } from '../common/service/budget-limit-summary.service';
+import {
+  readStatisticsDefaultExpandedPanel,
+  STATISTICS_DEFAULT_EXPANDED_PANEL_OPTIONS,
+  StatisticsDefaultExpandedPanel,
+  writeStatisticsDefaultExpandedPanel,
+} from '../statistics/statistics-default-panel-setting';
 
 @Component({
   selector: 'app-export',
@@ -96,6 +102,10 @@ export class ExportComponent implements OnDestroy {
   exportEndDate: string = '';
   exportRangeError: string = '';
   readonly maxExportDate: string = DateTime.now().toISODate() || '';
+  statisticsDefaultExpandedPanel: StatisticsDefaultExpandedPanel =
+    readStatisticsDefaultExpandedPanel();
+  readonly statisticsDefaultExpandedPanelOptions =
+    STATISTICS_DEFAULT_EXPANDED_PANEL_OPTIONS;
 
   // Display-only derived label for current period preview (e.g., "September 5 - October 8")
   get budgetPeriodLabel(): string {
@@ -207,6 +217,13 @@ export class ExportComponent implements OnDestroy {
     this.authService.signOut().then(() => {
       console.log('User logged out');
     });
+  }
+
+  onStatisticsDefaultExpandedPanelChange(
+    value: StatisticsDefaultExpandedPanel
+  ): void {
+    this.statisticsDefaultExpandedPanel = value;
+    writeStatisticsDefaultExpandedPanel(value);
   }
 
   exportCSV(): void {

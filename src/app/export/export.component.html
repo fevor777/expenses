@@ -81,6 +81,30 @@
           >
         </span>
       </div>
+      <section class="statistics-default-panel-setting">
+        <label
+          for="statisticsDefaultExpandedPanel"
+          class="statistics-default-panel-setting__label"
+        >
+          Стартовая панель статистики
+        </label>
+        <select
+          id="statisticsDefaultExpandedPanel"
+          class="statistics-default-panel-setting__select"
+          [ngModel]="statisticsDefaultExpandedPanel"
+          (ngModelChange)="onStatisticsDefaultExpandedPanelChange($event)"
+        >
+          <option
+            *ngFor="let option of statisticsDefaultExpandedPanelOptions"
+            [value]="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+        <p class="statistics-default-panel-setting__hint">
+          Применяется при следующем открытии страницы «Статистика».
+        </p>
+      </section>
     </div>
   </app-tab>
   <app-tab key="tags" label="Tags">
@@ -326,9 +350,7 @@
               (click)="addBudgetLimit('tag')"
             >
               {{
-                isEditingBudgetLimit('tag')
-                  ? 'Save tag limit'
-                  : 'Add tag limit'
+                isEditingBudgetLimit('tag') ? 'Save tag limit' : 'Add tag limit'
               }}
             </button>
             <button

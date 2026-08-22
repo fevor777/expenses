@@ -3,6 +3,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { Budget } from '../common/model/budget.model';
 import { ResolvedCategory } from '../common/model/category.model';
 import { Tag } from '../common/model/tag.model';
+import { STATISTICS_DEFAULT_EXPANDED_PANEL_STORAGE_KEY } from '../statistics/statistics-default-panel-setting';
 import { ExportComponent } from './export.component';
 
 describe('ExportComponent budget limits', () => {
@@ -87,6 +88,16 @@ describe('ExportComponent budget limits', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+    localStorage.removeItem(STATISTICS_DEFAULT_EXPANDED_PANEL_STORAGE_KEY);
+  });
+
+  it('persists a changed default statistics panel', () => {
+    component.onStatisticsDefaultExpandedPanelChange('irregularSummary');
+
+    expect(component.statisticsDefaultExpandedPanel).toBe('irregularSummary');
+    expect(
+      localStorage.getItem(STATISTICS_DEFAULT_EXPANDED_PANEL_STORAGE_KEY)
+    ).toBe('irregularSummary');
   });
 
   it('adds a category budget limit with deterministic id', () => {
