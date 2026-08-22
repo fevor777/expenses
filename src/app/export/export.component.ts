@@ -114,6 +114,7 @@ export class ExportComponent implements OnDestroy {
 
   private readonly destroySubject: Subject<void> = new Subject();
   private budgetLimitSummaryContext?: BudgetLimitSummaryContext;
+  private budgetFormDirty = false;
   private budgetLimitsDirty = false;
 
   constructor(
@@ -133,6 +134,9 @@ export class ExportComponent implements OnDestroy {
       .getValue()
       .pipe(takeUntil(this.destroySubject))
       .subscribe(v => {
+        if (this.budgetFormDirty) {
+          return;
+        }
         this.irregularBudgetValue = v?.value || 0;
         this.budgetPeriodDuration = v?.period || 1;
         this.budgetStartTs = v?.periodStartTs;
@@ -322,8 +326,10 @@ export class ExportComponent implements OnDestroy {
 
   onStartDateChange(ev: Event): void {
     const val = (ev.target as HTMLInputElement).value; // format yyyy-mm-dd
+    this.budgetFormDirty = true;
     if (!val) {
       this.budgetStartTs = undefined;
+      this.rebuildBudgetLimitSummaries();
       return;
     }
     const parts = val.split('-').map(p => parseInt(p, 10));
@@ -331,6 +337,7 @@ export class ExportComponent implements OnDestroy {
       const dt = new Date(parts[0], parts[1] - 1, parts[2]);
       this.budgetStartTs = dt.getTime();
     }
+    this.rebuildBudgetLimitSummaries();
   }
 
   onSaveBudget(): void {
@@ -347,11 +354,17 @@ export class ExportComponent implements OnDestroy {
       minDayLimit: this.minDayLimit,
       limits: this.budgetLimits.length > 0 ? this.budgetLimits : undefined,
     };
+    this.budgetFormDirty = false;
     this.budgetLimitsDirty = false;
     this.irregularBudgetService
       .addValue(budget)
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe();
+  }
+
+  onBudgetFieldChange(): void {
+    this.budgetFormDirty = true;
+    this.rebuildBudgetLimitSummaries();
   }
 
   addBudgetLimit(type: BudgetLimitType): void {
@@ -386,6 +399,7 @@ export class ExportComponent implements OnDestroy {
         )
       : [...this.budgetLimits, limit];
     this.budgetLimits.sort(this.sortBudgetLimits);
+    this.budgetFormDirty = true;
     this.budgetLimitsDirty = true;
 
     if (type === 'category') {
@@ -438,6 +452,7 @@ export class ExportComponent implements OnDestroy {
 
   deleteBudgetLimit(limitId: string): void {
     this.budgetLimits = this.budgetLimits.filter(limit => limit.id !== limitId);
+    this.budgetFormDirty = true;
     this.budgetLimitsDirty = true;
     if (this.editingBudgetLimitId === limitId) {
       this.editingBudgetLimitId = null;

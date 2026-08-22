@@ -131,6 +131,26 @@ describe('ExportComponent budget limits', () => {
     ]);
   });
 
+  it('keeps unsaved budget field edits while an old budget value arrives', () => {
+    component.irregularBudgetValue = 1200;
+    component.budgetPeriodDuration = 45;
+    component.minDayLimit = 3;
+    component.onBudgetFieldChange();
+
+    budget$.next({
+      value: 900,
+      period: 30,
+      periodStartTs: new Date(2026, 7, 1).getTime(),
+      timezone: 'Europe/Sofia',
+      minDayLimit: 1,
+      limits: [],
+    });
+
+    expect(component.irregularBudgetValue).toBe(1200);
+    expect(component.budgetPeriodDuration).toBe(45);
+    expect(component.minDayLimit).toBe(3);
+  });
+
   it('blocks duplicate limits for the same target', () => {
     component.budgetLimits = [
       {

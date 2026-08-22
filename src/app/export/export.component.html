@@ -162,6 +162,7 @@
           type="number"
           min="1"
           [(ngModel)]="irregularBudgetValue"
+          (ngModelChange)="onBudgetFieldChange()"
           class="bsd-input"
         />
       </div>
@@ -187,6 +188,7 @@
           min="1"
           max="60"
           [(ngModel)]="budgetPeriodDuration"
+          (ngModelChange)="onBudgetFieldChange()"
           class="bsd-input"
         />
       </div>
@@ -199,6 +201,7 @@
           type="number"
           min="1"
           [(ngModel)]="minDayLimit"
+          (ngModelChange)="onBudgetFieldChange()"
           class="bsd-input"
         />
       </div>
