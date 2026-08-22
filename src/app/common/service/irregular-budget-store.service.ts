@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Budget } from '../model/budget.model';
+import {
+  Budget,
+  canonicalizeBudget,
+} from '../model/budget.model';
 
 @Injectable({ providedIn: 'root' })
 export class IrregularBudgetStoreService {
-  private readonly valueSubject = new BehaviorSubject<Budget>({ uid: '', value: 600, period: 30 });
+  private readonly valueSubject = new BehaviorSubject<Budget>(
+    canonicalizeBudget({ uid: '', value: 600, period: 30 })
+  );
   readonly value$: Observable<Budget> = this.valueSubject.asObservable();
 
   getValue(): Budget {
@@ -38,16 +43,18 @@ export class IrregularBudgetStoreService {
     if (v && !v.timezone) {
       v = { ...v, timezone: browserTimezone };
     }
-    localStorage.setItem('irregularBudget', JSON.stringify(v));
-    this.updateValue(v);
+    const canonical = canonicalizeBudget(v, browserTimezone);
+    localStorage.setItem('irregularBudget', JSON.stringify(canonical));
+    this.updateValue(canonical);
     return this.value$;
   }
 
   addValueObs(v: Budget): Observable<Budget> {
     const clone = { ...v } as any;
     delete clone.periodStart; // ensure legacy field not persisted further
-    localStorage.setItem('irregularBudget', JSON.stringify(clone));
-    this.updateValue(v);
+    const canonical = canonicalizeBudget(clone);
+    localStorage.setItem('irregularBudget', JSON.stringify(canonical));
+    this.updateValue(canonical);
     return this.value$;
   }
 }

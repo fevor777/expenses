@@ -4,17 +4,24 @@ import { buildRollingBudgetFrame, summarizeExpensesForFrame, } from '../domain/s
 import { executeTool, jsonResult } from './shared.js';
 export function registerBudgetSummaryTool(server, deps) {
     server.registerTool('budget_summary', {
-        description: 'Return an aggregated summary for the current active budget period. This tool is budget-based, not calendar-month-based. Remaining budget uses only expenses where includeInBalance is true. Optional input: includeCategoryBreakdown.',
+        description: 'Return an aggregated summary for the current active budget period. This tool is budget-based, not calendar-month-based. Remaining budget and limit summaries use only expenses where includeInBalance is true. Optional input: includeCategoryBreakdown.',
         inputSchema: monthlySummarySchema,
         outputSchema: budgetSummaryResultSchema,
     }, async (input) => {
         return executeTool(deps, 'budget_summary', async () => {
-            const budget = await deps.settingsRepository.getBudget();
-            const savings = await deps.settingsRepository.getSavings();
+            const [budget, savings, categories, tags] = await Promise.all([
+                deps.settingsRepository.getBudget(),
+                deps.settingsRepository.getSavings(),
+                deps.categoriesProvider.list(),
+                deps.tagsRepository.list(),
+            ]);
             const nowMs = Date.now();
             const frame = buildRollingBudgetFrame(budget, nowMs);
             const expenses = await deps.expensesRepository.listInRange(frame.start, frame.finish);
-            const summary = summarizeExpensesForFrame(expenses, budget, savings, frame, input.includeCategoryBreakdown ?? false, nowMs);
+            const summary = summarizeExpensesForFrame(expenses, budget, savings, frame, input.includeCategoryBreakdown ?? false, nowMs, {
+                categories,
+                tags,
+            });
             return jsonResult({ summary });
         });
     });

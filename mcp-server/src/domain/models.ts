@@ -180,12 +180,22 @@ export type UpdateTagInput = {
   star?: boolean;
 };
 
+export type BudgetLimitType = 'category' | 'tag';
+
+export type BudgetLimitRule = {
+  id: string;
+  type: BudgetLimitType;
+  targetId: string;
+  value: number;
+};
+
 export type UpdateBudgetInput = {
   value?: number;
   period?: number;
   periodStartTs?: number;
   timezone?: string;
   minDayLimit?: number;
+  limits?: BudgetLimitRule[];
 };
 
 export type BudgetDocument = {
@@ -195,6 +205,7 @@ export type BudgetDocument = {
   periodStartTs?: number;
   timezone?: string;
   minDayLimit?: number;
+  limits?: BudgetLimitRule[];
 };
 
 export const DEFAULT_BUDGET: BudgetDocument = {
@@ -237,6 +248,61 @@ export function normalizeTagIds(tagIds?: string[]): string[] | undefined {
   return normalized.length > 0 ? normalized : undefined;
 }
 
+export function buildBudgetLimitRuleId(
+  type: BudgetLimitType,
+  targetId: string
+): string {
+  return `${type}:${targetId}`;
+}
+
+export function normalizeBudgetLimits(
+  limits?: BudgetLimitRule[] | null
+): BudgetLimitRule[] | undefined {
+  if (!Array.isArray(limits) || limits.length === 0) {
+    return undefined;
+  }
+
+  const normalized = new Map<string, BudgetLimitRule>();
+
+  for (const limit of limits) {
+    if (!limit || (limit.type !== 'category' && limit.type !== 'tag')) {
+      continue;
+    }
+
+    const targetId = limit.targetId?.trim();
+    if (!targetId) {
+      continue;
+    }
+
+    if (!Number.isFinite(limit.value) || limit.value < 0) {
+      continue;
+    }
+
+    const dedupeKey = `${limit.type}\u0000${targetId}`;
+    if (normalized.has(dedupeKey)) {
+      continue;
+    }
+
+    const normalizedId = limit.id?.trim() || buildBudgetLimitRuleId(limit.type, targetId);
+    normalized.set(dedupeKey, {
+      id: normalizedId,
+      type: limit.type,
+      targetId,
+      value: roundCurrency(limit.value),
+    });
+  }
+
+  const sorted = [...normalized.values()].sort((left, right) => {
+    if (left.type !== right.type) {
+      return left.type === 'category' ? -1 : 1;
+    }
+
+    return left.targetId.localeCompare(right.targetId);
+  });
+
+  return sorted.length > 0 ? sorted : undefined;
+}
+
 export function canonicalizeExpense(
   expense: ExpenseDocument | (CreateExpenseInput & { id: string; uid: string })
 ): ExpenseDocument {
@@ -276,6 +342,7 @@ export function canonicalizeTag(
 
 export function canonicalizeBudget(budget: BudgetDocument): BudgetDocument {
   const timezone = budget.timezone?.trim();
+  const limits = normalizeBudgetLimits(budget.limits);
   return {
     ...(budget.uid ? { uid: budget.uid } : {}),
     value: roundCurrency(budget.value),
@@ -287,6 +354,7 @@ export function canonicalizeBudget(budget: BudgetDocument): BudgetDocument {
     ...(budget.minDayLimit !== undefined
       ? { minDayLimit: roundCurrency(budget.minDayLimit) }
       : {}),
+    ...(limits ? { limits } : {}),
   };
 }
 

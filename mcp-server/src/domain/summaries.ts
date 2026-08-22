@@ -1,8 +1,13 @@
 import {
   DEFAULT_BUDGET,
+  normalizeBudgetLimits,
+  normalizeTagIds,
   roundCurrency,
   type BudgetDocument,
+  type BudgetLimitRule,
   type ExpenseDocument,
+  type ResolvedCategory,
+  type TagDocument,
   isExpenseIncludedInBalance,
 } from './models.js';
 import {
@@ -23,6 +28,20 @@ export type CategoryBreakdownItem = {
   total: number;
   irregularSpend: number;
   count: number;
+};
+
+export type BudgetLimitSummary = {
+  id: string;
+  type: 'category' | 'tag';
+  targetId: string;
+  targetLabel: string;
+  orphaned: boolean;
+  budget: number;
+  spent: number;
+  remaining: number;
+  percentUsed: number;
+  expenseCount: number;
+  exceeded: boolean;
 };
 
 export type MonthlySummary = {
@@ -46,6 +65,7 @@ export type MonthlySummary = {
   expenseCount: number;
   irregularExpenseCount: number;
   categoryBreakdown?: CategoryBreakdownItem[];
+  limitSummaries?: BudgetLimitSummary[];
 };
 
 export type ExpenseCategoryBreakdownItem = {
@@ -169,7 +189,11 @@ export function summarizeExpensesForFrame(
   savings: number,
   frame: BudgetFrame,
   includeCategoryBreakdown: boolean,
-  nowMs = Date.now()
+  nowMs = Date.now(),
+  options?: {
+    categories?: ResolvedCategory[];
+    tags?: TagDocument[];
+  }
 ): MonthlySummary {
   const resolvedBudget = resolveBudget(budget);
   const frameStats = computeBudgetFrameStats(frame, nowMs);
@@ -211,6 +235,11 @@ export function summarizeExpensesForFrame(
     ? [...categoryTotals.values()].sort((left, right) => right.total - left.total)
     : undefined;
   const remainingBudget = roundCurrency(resolvedBudget.value - irregularSpend);
+  const limitSummaries = summarizeBudgetLimitRules(
+    expenses,
+    resolvedBudget.limits,
+    options
+  );
 
   return {
     frameStart: frame.start,
@@ -240,7 +269,82 @@ export function summarizeExpensesForFrame(
     expenseCount: expenses.length,
     irregularExpenseCount,
     ...(categoryBreakdown ? { categoryBreakdown } : {}),
+    ...(limitSummaries ? { limitSummaries } : {}),
   };
+}
+
+export function summarizeBudgetLimitRules(
+  expenses: ExpenseDocument[],
+  limits: BudgetLimitRule[] | undefined,
+  options?: {
+    categories?: ResolvedCategory[];
+    tags?: TagDocument[];
+  }
+): BudgetLimitSummary[] | undefined {
+  const normalizedLimits = normalizeBudgetLimits(limits);
+  if (!normalizedLimits) {
+    return undefined;
+  }
+
+  const categoryTotals = new Map<string, { spent: number; expenseCount: number }>();
+  const tagTotals = new Map<string, { spent: number; expenseCount: number }>();
+
+  for (const expense of expenses) {
+    if (!isExpenseIncludedInBalance(expense)) {
+      continue;
+    }
+
+    const amount = expense.amount || 0;
+    accumulateLimitTotals(categoryTotals, expense.category, amount);
+
+    for (const tagId of normalizeTagIds(expense.tagIds) ?? []) {
+      accumulateLimitTotals(tagTotals, tagId, amount);
+    }
+  }
+
+  const categoryLabels = new Map(
+    (options?.categories ?? []).map(category => [category.id, category.name] as const)
+  );
+  const tagLabels = new Map(
+    (options?.tags ?? []).map(tag => [tag.id, tag.name] as const)
+  );
+
+  return normalizedLimits.map(limit => {
+    const totals =
+      limit.type === 'category'
+        ? categoryTotals.get(limit.targetId)
+        : tagTotals.get(limit.targetId);
+    const targetLabel =
+      limit.type === 'category'
+        ? categoryLabels.get(limit.targetId)
+        : tagLabels.get(limit.targetId);
+    const spent = roundCurrency(totals?.spent ?? 0);
+    const budgetValue = roundCurrency(limit.value);
+    const exceeded = spent > budgetValue;
+
+    return {
+      id: limit.id,
+      type: limit.type,
+      targetId: limit.targetId,
+      targetLabel:
+        targetLabel
+        ?? (limit.type === 'category'
+          ? `Unknown category (${limit.targetId})`
+          : `Deleted tag (${limit.targetId})`),
+      orphaned: targetLabel === undefined,
+      budget: budgetValue,
+      spent,
+      remaining: roundCurrency(Math.max(budgetValue - spent, 0)),
+      percentUsed:
+        budgetValue > 0
+          ? roundCurrency(Math.min((spent / budgetValue) * 100, 100))
+          : spent > 0
+            ? 100
+            : 0,
+      expenseCount: totals?.expenseCount ?? 0,
+      exceeded,
+    };
+  });
 }
 
 export function summarizeMonthlyExpenses(
@@ -351,6 +455,17 @@ function computeBudgetFrameStats(
     daysLeft,
     daysLeftIncludingToday: daysLeft + 1,
   };
+}
+
+function accumulateLimitTotals(
+  totals: Map<string, { spent: number; expenseCount: number }>,
+  key: string,
+  amount: number
+): void {
+  const current = totals.get(key) ?? { spent: 0, expenseCount: 0 };
+  current.spent = roundCurrency(current.spent + amount);
+  current.expenseCount += 1;
+  totals.set(key, current);
 }
 
 function formatDayMonth(value: number): string {

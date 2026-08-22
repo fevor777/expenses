@@ -206,6 +206,250 @@
         <span class="bsd-label">Period Preview:</span>
         <span class="bsd-value">{{ budgetPeriodLabel }}</span>
       </div>
+      <div class="budget-limits">
+        <div class="budget-limits__header">
+          <div>
+            <div class="budget-limits__title">Budget Limits</div>
+            <div class="budget-limits__hint">
+              Add optional limits for individual categories and tags. Changes
+              are saved together with the budget settings below.
+            </div>
+          </div>
+        </div>
+
+        <div class="budget-limits__forms">
+          <div class="budget-limits__card">
+            <div class="budget-limits__card-title">Add category limit</div>
+            <div class="budget-limits__form-row">
+              <label for="categoryLimitTarget" class="bsd-label"
+                >Category:</label
+              >
+              <select
+                id="categoryLimitTarget"
+                [(ngModel)]="categoryLimitTargetId"
+                (ngModelChange)="onBudgetLimitDraftChange('category')"
+                class="bsd-input budget-limits__select"
+              >
+                <option value="">Select category</option>
+                <option
+                  *ngFor="let category of activeBudgetCategories"
+                  [value]="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+            <div class="budget-limits__form-row">
+              <label for="categoryLimitValue" class="bsd-label">Limit:</label>
+              <input
+                id="categoryLimitValue"
+                type="number"
+                min="0"
+                step="0.01"
+                [(ngModel)]="categoryLimitValue"
+                (ngModelChange)="onBudgetLimitDraftChange('category')"
+                class="bsd-input budget-limits__amount"
+                placeholder="0"
+              />
+            </div>
+            <div class="budget-limits__error" *ngIf="categoryLimitError">
+              {{ categoryLimitError }}
+            </div>
+            <div
+              class="budget-limits__empty"
+              *ngIf="activeBudgetCategories.length === 0"
+            >
+              No active categories available.
+            </div>
+            <button
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="addBudgetLimit('category')"
+            >
+              {{
+                isEditingBudgetLimit('category')
+                  ? 'Save category limit'
+                  : 'Add category limit'
+              }}
+            </button>
+            <button
+              *ngIf="isEditingBudgetLimit('category')"
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="cancelBudgetLimitEdit('category')"
+            >
+              Cancel
+            </button>
+          </div>
+
+          <div class="budget-limits__card">
+            <div class="budget-limits__card-title">Add tag limit</div>
+            <div class="budget-limits__form-row">
+              <label for="tagLimitTarget" class="bsd-label">Tag:</label>
+              <select
+                id="tagLimitTarget"
+                [(ngModel)]="tagLimitTargetId"
+                (ngModelChange)="onBudgetLimitDraftChange('tag')"
+                class="bsd-input budget-limits__select"
+              >
+                <option value="">Select tag</option>
+                <option *ngFor="let tag of tags" [value]="tag.id">
+                  {{ tag.name }}
+                </option>
+              </select>
+            </div>
+            <div class="budget-limits__form-row">
+              <label for="tagLimitValue" class="bsd-label">Limit:</label>
+              <input
+                id="tagLimitValue"
+                type="number"
+                min="0"
+                step="0.01"
+                [(ngModel)]="tagLimitValue"
+                (ngModelChange)="onBudgetLimitDraftChange('tag')"
+                class="bsd-input budget-limits__amount"
+                placeholder="0"
+              />
+            </div>
+            <div class="budget-limits__error" *ngIf="tagLimitError">
+              {{ tagLimitError }}
+            </div>
+            <div class="budget-limits__empty" *ngIf="tags.length === 0">
+              No tags available.
+            </div>
+            <button
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="addBudgetLimit('tag')"
+            >
+              {{
+                isEditingBudgetLimit('tag')
+                  ? 'Save tag limit'
+                  : 'Add tag limit'
+              }}
+            </button>
+            <button
+              *ngIf="isEditingBudgetLimit('tag')"
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="cancelBudgetLimitEdit('tag')"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="budget-limits__list"
+          *ngIf="budgetLimits.length > 0; else noBudgetLimits"
+        >
+          <div
+            class="budget-limits__item"
+            *ngFor="let limit of budgetLimits; trackBy: trackByBudgetLimit"
+          >
+            <div class="budget-limits__item-meta">
+              <div class="budget-limits__item-main">
+                <span class="badge">{{ limit.type }}</span>
+                <span class="budget-limits__item-label">{{
+                  getBudgetLimitTargetLabel(limit)
+                }}</span>
+                <span
+                  class="budget-limits__orphaned"
+                  *ngIf="isBudgetLimitOrphaned(limit)"
+                >
+                  orphaned
+                </span>
+              </div>
+              <div class="budget-limits__item-value">
+                {{ limit.value | number: '1.0-2' }}
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="editBudgetLimit(limit)"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary bsd-save"
+              (click)="deleteBudgetLimit(limit.id)"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+        <ng-template #noBudgetLimits>
+          <div class="budget-limits__empty">No budget limits yet.</div>
+        </ng-template>
+
+        <div
+          class="budget-limit-summaries"
+          *ngIf="budgetLimitSummaries.length > 0"
+        >
+          <div class="budget-limits__title">Current period usage</div>
+          <div class="budget-limits__hint">
+            These summaries use the current budget period and count only
+            expenses with <code>includeInBalance = true</code>.
+          </div>
+          <div class="budget-limit-summaries__list">
+            <div
+              class="budget-limit-summary"
+              *ngFor="
+                let summary of budgetLimitSummaries;
+                trackBy: trackByBudgetLimitSummary
+              "
+              [class.budget-limit-summary--exceeded]="summary.exceeded"
+            >
+              <div class="budget-limit-summary__head">
+                <div class="budget-limit-summary__title-row">
+                  <span class="badge">{{ summary.type }}</span>
+                  <span class="budget-limit-summary__title">
+                    {{ summary.targetLabel }}
+                  </span>
+                  <span
+                    class="budget-limits__orphaned"
+                    *ngIf="summary.orphaned"
+                  >
+                    orphaned
+                  </span>
+                  <span
+                    class="budget-limit-summary__exceeded"
+                    *ngIf="summary.exceeded"
+                  >
+                    exceeded
+                  </span>
+                </div>
+                <div class="budget-limit-summary__amounts">
+                  {{ summary.spent | number: '1.0-2' }} /
+                  {{ summary.budget | number: '1.0-2' }}
+                </div>
+              </div>
+
+              <div class="budget-limit-summary__bar">
+                <div
+                  class="budget-limit-summary__bar-fill"
+                  [style.width.%]="getBudgetLimitProgressWidth(summary)"
+                ></div>
+              </div>
+
+              <div class="budget-limit-summary__meta">
+                <span>
+                  Remaining:
+                  {{ summary.rawRemaining | number: '1.0-2' }}
+                </span>
+                <span>{{ summary.percentUsed | number: '1.0-2' }}%</span>
+                <span>{{ summary.expenseCount }} expenses</span>
+              </div>
+            </div>
+          </div>
+          <div class="budget-limits__hint">
+            Tag limits are independent and may overlap when one expense has
+            multiple tags.
+          </div>
+        </div>
+      </div>
       <button
         type="button"
         (click)="onSaveBudget()"

@@ -4,6 +4,7 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnInit,
   OnChanges,
   Output,
   SimpleChanges,
@@ -26,7 +27,7 @@ import { Subject, takeUntil } from 'rxjs';
   imports: [CommonModule],
 })
 export class CategoriesComponent
-  implements AfterViewInit, OnChanges, OnDestroy
+  implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
   @Input() isContentDown: boolean;
   @Input() enteredAmount: string;
@@ -71,6 +72,21 @@ export class CategoriesComponent
     private categoryService: CategoryService
   ) {}
 
+  ngOnInit(): void {
+    this.categoryService.categories$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(categories => {
+        this.allCategories = categories;
+        this.categories = this.isContentDown
+          ? [...categories]
+          : categories.slice(
+              0,
+              this.collapsedVisibleCount || categories.length
+            );
+        this.scheduleCollapsedMeasurement(true);
+      });
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(_event: any): void {
     if (this.isContentDown) return; // only matters for collapsed state
@@ -110,18 +126,6 @@ export class CategoriesComponent
 
   ngAfterViewInit(): void {
     this.globalSwipeLength = this.swipeLengthStore.getSwipeLength();
-    this.categoryService.categories$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(categories => {
-        this.allCategories = categories;
-        this.categories = this.isContentDown
-          ? [...categories]
-          : categories.slice(
-              0,
-              this.collapsedVisibleCount || categories.length
-            );
-        this.scheduleCollapsedMeasurement(true);
-      });
     if (!this.isContentDown) {
       this.scheduleCollapsedMeasurement();
     }

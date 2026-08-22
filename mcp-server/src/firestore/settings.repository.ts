@@ -38,6 +38,19 @@ export class SettingsRepository {
       ...(value.minDayLimit !== undefined
         ? { minDayLimit: Number(value.minDayLimit) }
         : {}),
+      ...(Array.isArray(value.limits)
+        ? {
+            limits: value.limits.map((limit: Record<string, unknown>) => ({
+              id: String(limit.id ?? ''),
+              type:
+                limit.type === 'category' || limit.type === 'tag'
+                  ? limit.type
+                  : 'category',
+              targetId: String(limit.targetId ?? ''),
+              value: Number(limit.value),
+            })),
+          }
+        : {}),
     });
   }
 
@@ -61,6 +74,11 @@ export class SettingsRepository {
         ? { minDayLimit: input.minDayLimit }
         : existing?.minDayLimit !== undefined
           ? { minDayLimit: existing.minDayLimit }
+          : {}),
+      ...(input.limits !== undefined
+        ? { limits: input.limits }
+        : existing?.limits !== undefined
+          ? { limits: existing.limits }
           : {}),
     });
 

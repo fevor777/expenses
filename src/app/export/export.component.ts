@@ -12,7 +12,15 @@ import { SavingService } from '../common/service/saving.service';
 import { TabsContainerComponent } from '../common/tabs-container.component';
 import { TabComponent } from '../common/tab.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Budget } from '../common/model/budget.model';
+import {
+  Budget,
+  BudgetLimitRule,
+  BudgetLimitSummary,
+  BudgetLimitType,
+  buildBudgetLimitId,
+  canonicalizeBudget,
+  roundBudgetCurrency,
+} from '../common/model/budget.model';
 import { FormsModule } from '@angular/forms';
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
 import { DateTime } from 'luxon';
@@ -20,9 +28,19 @@ import { MorningReminderService } from '../common/service/morning-reminder.servi
 import { Tag, normalizeTagName } from '../common/model/tag.model';
 import { TagService } from '../common/service/tag.service';
 import { TagStoreService } from '../common/service/tag-store.service';
-import { DateFrame, Mode } from '../common/component/filter/date/dateFrame.model';
+import {
+  DateFrame,
+  Mode,
+} from '../common/component/filter/date/dateFrame.model';
 import { formatBudgetPeriodLabel } from '../common/model/budget-summary/budget-period.helper';
 import { CategorySettingsComponent } from './category-settings/category-settings.component';
+import { ResolvedCategory } from '../common/model/category.model';
+import { CategoryService } from '../common/service/category.service';
+import {
+  BudgetLimitSummaryContext,
+  BudgetLimitSummaryService,
+  buildBudgetLimitSummaries,
+} from '../common/service/budget-limit-summary.service';
 
 @Component({
   selector: 'app-export',
@@ -62,7 +80,17 @@ export class ExportComponent implements OnDestroy {
   morningEndHour: number = 11;
   tags$: Observable<Tag[]>;
   tags: Tag[] = [];
+  categories: ResolvedCategory[] = [];
   tagDraft: string = '';
+  budgetLimits: BudgetLimitRule[] = [];
+  categoryLimitTargetId: string = '';
+  categoryLimitValue: number | null = null;
+  categoryLimitError: string = '';
+  tagLimitTargetId: string = '';
+  tagLimitValue: number | null = null;
+  tagLimitError: string = '';
+  editingBudgetLimitId: string | null = null;
+  budgetLimitSummaries: BudgetLimitSummary[] = [];
   exportRangeEnabled: boolean = false;
   exportStartDate: string = '';
   exportEndDate: string = '';
@@ -80,7 +108,13 @@ export class ExportComponent implements OnDestroy {
     );
   }
 
+  get activeBudgetCategories(): ResolvedCategory[] {
+    return this.categories.filter(category => !category.hidden);
+  }
+
   private readonly destroySubject: Subject<void> = new Subject();
+  private budgetLimitSummaryContext?: BudgetLimitSummaryContext;
+  private budgetLimitsDirty = false;
 
   constructor(
     private expenseService: ExpenseService,
@@ -90,6 +124,8 @@ export class ExportComponent implements OnDestroy {
     private afAuth: AngularFireAuth,
     private swipeLengthStore: GlobalSwipeLengthStoreService,
     private morningReminderService: MorningReminderService,
+    private categoryService: CategoryService,
+    private budgetLimitSummaryService: BudgetLimitSummaryService,
     private tagService: TagService,
     private tagStoreService: TagStoreService
   ) {
@@ -102,6 +138,12 @@ export class ExportComponent implements OnDestroy {
         this.budgetStartTs = v?.periodStartTs;
         this.budgetTimezone = v?.timezone;
         this.minDayLimit = v?.minDayLimit || 0;
+        // A delayed store/Firestore emission must not overwrite limit edits
+        // that are waiting for the user to save the whole budget form.
+        if (!this.budgetLimitsDirty) {
+          this.budgetLimits = v?.limits ? [...v.limits] : [];
+        }
+        this.rebuildBudgetLimitSummaries();
       });
     this.savings$ = this.savingService.getSavings();
     this.savings$
@@ -127,6 +169,21 @@ export class ExportComponent implements OnDestroy {
     this.tags$
       .pipe(takeUntil(this.destroySubject))
       .subscribe(tags => (this.tags = tags || []));
+
+    this.categoryService
+      .getAllCategories()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe();
+    this.categoryService.allCategories$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(categories => (this.categories = categories || []));
+    this.budgetLimitSummaryService
+      .getCurrentBudgetWithLimitSummaries()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(context => {
+        this.budgetLimitSummaryContext = context;
+        this.rebuildBudgetLimitSummaries();
+      });
 
     this.initializeExportRange();
   }
@@ -288,11 +345,150 @@ export class ExportComponent implements OnDestroy {
       timezone:
         this.budgetTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
       minDayLimit: this.minDayLimit,
+      limits: this.budgetLimits.length > 0 ? this.budgetLimits : undefined,
     };
+    this.budgetLimitsDirty = false;
     this.irregularBudgetService
       .addValue(budget)
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe();
+  }
+
+  addBudgetLimit(type: BudgetLimitType): void {
+    const error = this.validateBudgetLimitDraft(type);
+    if (type === 'category') {
+      this.categoryLimitError = error;
+    } else {
+      this.tagLimitError = error;
+    }
+    if (error) {
+      return;
+    }
+
+    const targetId =
+      type === 'category' ? this.categoryLimitTargetId : this.tagLimitTargetId;
+    const rawValue =
+      type === 'category' ? this.categoryLimitValue : this.tagLimitValue;
+    if (!targetId || rawValue === null) {
+      return;
+    }
+
+    const limit: BudgetLimitRule = {
+      id: buildBudgetLimitId(type, targetId),
+      type,
+      targetId,
+      value: roundBudgetCurrency(rawValue),
+    };
+    const editingId = this.getEditingBudgetLimit(type)?.id;
+    this.budgetLimits = editingId
+      ? this.budgetLimits.map(current =>
+          current.id === editingId ? limit : current
+        )
+      : [...this.budgetLimits, limit];
+    this.budgetLimits.sort(this.sortBudgetLimits);
+    this.budgetLimitsDirty = true;
+
+    if (type === 'category') {
+      this.categoryLimitTargetId = '';
+      this.categoryLimitValue = null;
+      this.categoryLimitError = '';
+      this.editingBudgetLimitId = null;
+      this.rebuildBudgetLimitSummaries();
+      return;
+    }
+
+    this.tagLimitTargetId = '';
+    this.tagLimitValue = null;
+    this.tagLimitError = '';
+    this.editingBudgetLimitId = null;
+    this.rebuildBudgetLimitSummaries();
+  }
+
+  editBudgetLimit(limit: BudgetLimitRule): void {
+    this.editingBudgetLimitId = limit.id;
+    if (limit.type === 'category') {
+      this.categoryLimitTargetId = limit.targetId;
+      this.categoryLimitValue = limit.value;
+      this.categoryLimitError = '';
+      return;
+    }
+
+    this.tagLimitTargetId = limit.targetId;
+    this.tagLimitValue = limit.value;
+    this.tagLimitError = '';
+  }
+
+  cancelBudgetLimitEdit(type: BudgetLimitType): void {
+    if (!this.isEditingBudgetLimit(type)) {
+      return;
+    }
+
+    this.editingBudgetLimitId = null;
+    if (type === 'category') {
+      this.categoryLimitTargetId = '';
+      this.categoryLimitValue = null;
+      this.categoryLimitError = '';
+      return;
+    }
+
+    this.tagLimitTargetId = '';
+    this.tagLimitValue = null;
+    this.tagLimitError = '';
+  }
+
+  deleteBudgetLimit(limitId: string): void {
+    this.budgetLimits = this.budgetLimits.filter(limit => limit.id !== limitId);
+    this.budgetLimitsDirty = true;
+    if (this.editingBudgetLimitId === limitId) {
+      this.editingBudgetLimitId = null;
+    }
+    this.categoryLimitError = this.validateBudgetLimitDraft('category');
+    this.tagLimitError = this.validateBudgetLimitDraft('tag');
+    this.rebuildBudgetLimitSummaries();
+  }
+
+  onBudgetLimitDraftChange(type: BudgetLimitType): void {
+    if (type === 'category') {
+      this.categoryLimitError = this.validateBudgetLimitDraft(type);
+      return;
+    }
+
+    this.tagLimitError = this.validateBudgetLimitDraft(type);
+  }
+
+  getBudgetLimitTargetLabel(limit: BudgetLimitRule): string {
+    if (limit.type === 'category') {
+      const category = this.categories.find(item => item.id === limit.targetId);
+      return category ? category.name : `Unknown category (${limit.targetId})`;
+    }
+
+    const tag = this.tags.find(item => item.id === limit.targetId);
+    return tag ? tag.name : `Deleted tag (${limit.targetId})`;
+  }
+
+  isBudgetLimitOrphaned(limit: BudgetLimitRule): boolean {
+    if (limit.type === 'category') {
+      const category = this.categories.find(item => item.id === limit.targetId);
+      return !category || category.hidden === true;
+    }
+
+    return !this.tags.some(item => item.id === limit.targetId);
+  }
+
+  isEditingBudgetLimit(type: BudgetLimitType): boolean {
+    return this.getEditingBudgetLimit(type) !== undefined;
+  }
+
+  trackByBudgetLimitSummary(_: number, summary: BudgetLimitSummary): string {
+    return summary.id;
+  }
+
+  getBudgetLimitProgressWidth(summary: BudgetLimitSummary): number {
+    return Math.max(0, Math.min(100, summary.percentUsed));
+  }
+
+  trackByBudgetLimit(_: number, limit: BudgetLimitRule): string {
+    return limit.id;
   }
 
   // Legacy derivation removed – periodStartTs is now the single source of truth.
@@ -463,7 +659,8 @@ export class ExportComponent implements OnDestroy {
 
     if (start > finish) {
       if (showError) {
-        this.exportRangeError = 'Дата начала не может быть позже даты окончания.';
+        this.exportRangeError =
+          'Дата начала не может быть позже даты окончания.';
       }
       return undefined;
     }
@@ -492,5 +689,84 @@ export class ExportComponent implements OnDestroy {
     const start = dateFilter.start.toFormat('yyyy-MM-dd');
     const finish = dateFilter.finish.toFormat('yyyy-MM-dd');
     return `exported_data_${start}_${finish}.csv`;
+  }
+
+  private validateBudgetLimitDraft(type: BudgetLimitType): string {
+    const targetId =
+      type === 'category' ? this.categoryLimitTargetId : this.tagLimitTargetId;
+    const value =
+      type === 'category' ? this.categoryLimitValue : this.tagLimitValue;
+
+    if (!targetId) {
+      return `Select a ${type}.`;
+    }
+
+    const editingId = this.getEditingBudgetLimit(type)?.id;
+    if (
+      this.budgetLimits.some(
+        limit =>
+          limit.id !== editingId &&
+          limit.type === type &&
+          limit.targetId === targetId
+      )
+    ) {
+      return `A ${type} limit for this target already exists.`;
+    }
+
+    if (value === null || value === undefined || value === ('' as never)) {
+      return 'Enter a limit amount.';
+    }
+
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+      return 'Enter a valid amount greater than or equal to 0.';
+    }
+
+    return '';
+  }
+
+  private sortBudgetLimits(
+    left: BudgetLimitRule,
+    right: BudgetLimitRule
+  ): number {
+    if (left.type !== right.type) {
+      return left.type === 'category' ? -1 : 1;
+    }
+
+    return left.targetId.localeCompare(right.targetId);
+  }
+
+  private getEditingBudgetLimit(
+    type: BudgetLimitType
+  ): BudgetLimitRule | undefined {
+    if (!this.editingBudgetLimitId) {
+      return undefined;
+    }
+
+    return this.budgetLimits.find(
+      limit => limit.id === this.editingBudgetLimitId && limit.type === type
+    );
+  }
+
+  private rebuildBudgetLimitSummaries(): void {
+    if (!this.budgetLimitSummaryContext) {
+      this.budgetLimitSummaries = [];
+      return;
+    }
+
+    const budget = canonicalizeBudget({
+      ...this.budgetLimitSummaryContext.budget,
+      value: this.irregularBudgetValue,
+      period: this.budgetPeriodDuration,
+      periodStartTs: this.budgetStartTs,
+      timezone: this.budgetTimezone,
+      minDayLimit: this.minDayLimit,
+      limits: this.budgetLimits,
+    });
+    this.budgetLimitSummaries = buildBudgetLimitSummaries(
+      budget,
+      this.budgetLimitSummaryContext.expenses,
+      this.budgetLimitSummaryContext.categories,
+      this.budgetLimitSummaryContext.tags
+    );
   }
 }

@@ -35,9 +35,10 @@ export function registerBudgetSummaryWithExpensesForPeriodTool(
         deps,
         'budget_summary_with_expenses_for_period',
         async () => {
-          const [budget, savings, tags, expensesForPeriod] = await Promise.all([
+          const [budget, savings, categories, tags, expensesForPeriod] = await Promise.all([
             deps.settingsRepository.getBudget(),
             deps.settingsRepository.getSavings(),
+            deps.categoriesProvider.list(),
             deps.tagsRepository.list(),
             listExpensesForPeriod(
               input,
@@ -53,7 +54,11 @@ export function registerBudgetSummaryWithExpensesForPeriodTool(
             savings,
             frame,
             input.includeCategoryBreakdown ?? false,
-            nowMs
+            nowMs,
+            {
+              categories,
+              tags,
+            }
           );
           const tagNamesById = new Map<string, string>(
             tags.map(tag => [tag.id, tag.name] as const)

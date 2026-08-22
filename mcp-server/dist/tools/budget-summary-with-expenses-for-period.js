@@ -17,15 +17,19 @@ export function registerBudgetSummaryWithExpensesForPeriodTool(server, deps) {
         outputSchema: budgetSummaryWithExpensesForPeriodResultSchema,
     }, async (input) => {
         return executeTool(deps, 'budget_summary_with_expenses_for_period', async () => {
-            const [budget, savings, tags, expensesForPeriod] = await Promise.all([
+            const [budget, savings, categories, tags, expensesForPeriod] = await Promise.all([
                 deps.settingsRepository.getBudget(),
                 deps.settingsRepository.getSavings(),
+                deps.categoriesProvider.list(),
                 deps.tagsRepository.list(),
                 listExpensesForPeriod(input, deps.expensesRepository, deps.config.maxResultLimit),
             ]);
             const nowMs = Date.now();
             const frame = buildRollingBudgetFrame(budget, nowMs);
-            const budgetSummary = summarizeExpensesForFrame(await deps.expensesRepository.listInRange(frame.start, frame.finish), budget, savings, frame, input.includeCategoryBreakdown ?? false, nowMs);
+            const budgetSummary = summarizeExpensesForFrame(await deps.expensesRepository.listInRange(frame.start, frame.finish), budget, savings, frame, input.includeCategoryBreakdown ?? false, nowMs, {
+                categories,
+                tags,
+            });
             const tagNamesById = new Map(tags.map(tag => [tag.id, tag.name]));
             const expenses = expensesForPeriod.expenses.map(expense => {
                 const { tagIds: _tagIds, ...rest } = expense;

@@ -291,6 +291,29 @@ export const listTagsShape = {};
 
 export const listTagsSchema = z.object(listTagsShape).strict();
 
+export const budgetLimitRuleShape = {
+  id: z
+    .string()
+    .trim()
+    .min(1)
+    .describe('Deterministic limit rule id, for example category:meal.'),
+  type: z
+    .enum(['category', 'tag'])
+    .describe('Budget limit target type. Supported values: category or tag.'),
+  targetId: z
+    .string()
+    .trim()
+    .min(1)
+    .describe('Category id or tag id matched by this limit rule.'),
+  value: z
+    .number()
+    .finite()
+    .min(0)
+    .describe('Limit value for the matched category or tag.'),
+};
+
+export const budgetLimitRuleSchema = z.object(budgetLimitRuleShape).strict();
+
 export const updateBudgetShape = {
   value: z
     .number()
@@ -327,6 +350,12 @@ export const updateBudgetShape = {
     .min(0)
     .optional()
     .describe('Optional minimum daily budget limit value.'),
+  limits: z
+    .array(budgetLimitRuleSchema)
+    .optional()
+    .describe(
+      'Optional full replacement for budget limit rules. Use an empty array to clear all limits.'
+    ),
 };
 
 export const updateBudgetSchema = z.object(updateBudgetShape).strict();

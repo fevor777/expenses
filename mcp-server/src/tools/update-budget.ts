@@ -16,7 +16,7 @@ export function registerUpdateBudgetTool(
     'update_budget',
     {
       description:
-        'Update the authenticated user\'s budget settings. Provide at least one of: value, period, periodStartTs, timezone, or minDayLimit.',
+        'Update the authenticated user\'s budget settings. Provide at least one of: value, period, periodStartTs, timezone, minDayLimit, or limits.',
       inputSchema: updateBudgetSchema,
       outputSchema: updateBudgetResultSchema,
     },
@@ -24,7 +24,7 @@ export function registerUpdateBudgetTool(
       return executeTool(deps, 'update_budget', async () => {
         assertAtLeastOneDefinedField(
           input,
-          ['value', 'period', 'periodStartTs', 'timezone', 'minDayLimit'],
+          ['value', 'period', 'periodStartTs', 'timezone', 'minDayLimit', 'limits'],
           'At least one budget field must be provided'
         );
 

@@ -7,7 +7,7 @@ import { IrregularBudgetService } from './irregular-budget.service';
 import { Expense } from '../model/expense.model';
 import { DateFrame, Mode } from '../component/filter/date/dateFrame.model';
 import { DateTime } from 'luxon';
-import { Budget } from '../model/budget.model';
+import { Budget, canonicalizeBudget } from '../model/budget.model';
 
 /**
  * Minimal service requested: only provide (expenses for a period, budget value, date frame).
@@ -48,7 +48,7 @@ export class BudgetDataService {
         ([expenses, budget, frame]): BudgetPeriodData => ({
           dateFrame: frame,
           expenses,
-          budget: budget || { uid: '', value: 600, period: 30 },
+          budget: canonicalizeBudget(budget || { uid: '', value: 600, period: 30 }),
         })
       ),
       shareReplay({ bufferSize: 1, refCount: true })
@@ -68,15 +68,18 @@ export class BudgetDataService {
    * Fallback: If value empty/invalid => default calendar month frame from DateFilterService.
    */
   private buildRollingFrame(budget: Budget): DateFrame {
+    const canonicalBudget = canonicalizeBudget(budget);
     const periodDays =
-      budget.period && budget.period > 0 ? Math.floor(budget.period) : 30;
+      canonicalBudget.period && canonicalBudget.period > 0
+        ? Math.floor(canonicalBudget.period)
+        : 30;
     const now = DateTime.now();
     // If we have a timestamp anchor, use it EXACTLY as frame start (no shifting to contain 'now').
-    if (budget.periodStartTs && !isNaN(budget.periodStartTs)) {
-      const zone = budget.timezone?.trim() || undefined;
+    if (canonicalBudget.periodStartTs && !isNaN(canonicalBudget.periodStartTs)) {
+      const zone = canonicalBudget.timezone?.trim() || undefined;
       const start = zone
-        ? DateTime.fromMillis(budget.periodStartTs, { zone }).startOf('day')
-        : DateTime.fromMillis(budget.periodStartTs).startOf('day');
+        ? DateTime.fromMillis(canonicalBudget.periodStartTs, { zone }).startOf('day')
+        : DateTime.fromMillis(canonicalBudget.periodStartTs).startOf('day');
       const finish = start
         .plus({ days: periodDays - 1 })
         .set({ hour: 23, minute: 59, second: 59, millisecond: 999 });

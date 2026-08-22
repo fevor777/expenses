@@ -1,15 +1,15 @@
 import { listCategoriesResultSchema } from '../domain/output-schemas.js';
-import { CATEGORY_DEFINITIONS } from '../domain/models.js';
 import { executeTool, jsonResult } from './shared.js';
 export function registerListCategoriesTool(server, deps) {
     server.registerTool('list_categories', {
-        description: 'Return all valid expense categories and each category\'s default includeInBalance value. This tool takes no input arguments.',
+        description: "Return the authenticated user's active resolved expense categories, including default overrides and custom categories. This tool takes no input arguments.",
         outputSchema: listCategoriesResultSchema,
     }, async () => {
         return executeTool(deps, 'list_categories', async () => {
+            const categories = await deps.categoriesProvider.list();
             return jsonResult({
-                count: CATEGORY_DEFINITIONS.length,
-                categories: CATEGORY_DEFINITIONS,
+                count: categories.length,
+                categories,
             });
         });
     });

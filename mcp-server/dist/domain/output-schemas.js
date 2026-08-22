@@ -20,6 +20,13 @@ export const tagDocumentShape = {
     star: z.boolean(),
 };
 export const tagDocumentSchema = z.object(tagDocumentShape).strict();
+export const budgetLimitRuleShape = {
+    id: z.string().trim().min(1),
+    type: z.enum(['category', 'tag']),
+    targetId: z.string().trim().min(1),
+    value: z.number().finite().min(0),
+};
+export const budgetLimitRuleSchema = z.object(budgetLimitRuleShape).strict();
 export const budgetDocumentShape = {
     uid: z.string().trim().min(1).optional(),
     value: z.number().finite().min(0),
@@ -27,14 +34,20 @@ export const budgetDocumentShape = {
     periodStartTs: z.number().int().nonnegative().optional(),
     timezone: z.string().trim().min(1).optional(),
     minDayLimit: z.number().finite().min(0).optional(),
+    limits: z.array(budgetLimitRuleSchema).optional(),
 };
 export const budgetDocumentSchema = z.object(budgetDocumentShape).strict();
 export const categoryDefinitionShape = {
     id: categoryIdSchema,
     name: z.string().trim().min(1),
+    icon: z.string(),
+    color: z.string().trim().min(1),
     includeInBalance: z.boolean(),
+    source: z.enum(['default', 'default-override', 'custom']),
 };
-export const categoryDefinitionSchema = z.object(categoryDefinitionShape).strict();
+export const categoryDefinitionSchema = z
+    .object(categoryDefinitionShape)
+    .strict();
 export const normalizedExpenseFilterShape = {
     startDate: z.number().int().nonnegative().optional(),
     endDate: z.number().int().nonnegative().optional(),
@@ -196,6 +209,21 @@ export const budgetCategoryBreakdownItemSchema = z
     count: z.number().int().min(0),
 })
     .strict();
+export const budgetLimitSummaryItemSchema = z
+    .object({
+    id: z.string().trim().min(1),
+    type: z.enum(['category', 'tag']),
+    targetId: z.string().trim().min(1),
+    targetLabel: z.string().trim().min(1),
+    orphaned: z.boolean(),
+    budget: z.number().finite().min(0),
+    spent: z.number().finite().min(0),
+    remaining: z.number().finite().min(0),
+    percentUsed: z.number().finite().min(0),
+    expenseCount: z.number().int().min(0),
+    exceeded: z.boolean(),
+})
+    .strict();
 export const monthlySummarySchema = z
     .object({
     frameStart: z.number().int().nonnegative(),
@@ -218,6 +246,7 @@ export const monthlySummarySchema = z
     expenseCount: z.number().int().min(0),
     irregularExpenseCount: z.number().int().min(0),
     categoryBreakdown: z.array(budgetCategoryBreakdownItemSchema).optional(),
+    limitSummaries: z.array(budgetLimitSummaryItemSchema).optional(),
 })
     .strict();
 export const expenseCategoryBreakdownItemSchema = z

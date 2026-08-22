@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { from, map, Observable, tap } from 'rxjs';
 import { IrregularBudgetStoreService } from './irregular-budget-store.service';
 import { withUserId } from './with-user-id.helper';
-import { Budget } from '../model/budget.model';
+import { Budget, canonicalizeBudget } from '../model/budget.model';
 
 @Injectable({ providedIn: 'root' })
 export class IrregularBudgetService {
@@ -19,11 +19,14 @@ export class IrregularBudgetService {
   }
 
   addValue(value: Budget): Observable<Budget> {
-    const fallback = () => this.store.addValueObs(value);
+    const canonical = canonicalizeBudget(value);
+    const fallback = () => this.store.addValueObs(canonical);
     fallback();
     const request = (uid: string) => {
-      const obj = { ...value, uid };
-      return from(this.collection.doc(uid).set(obj)).pipe(map(() => value));
+      const obj = canonicalizeBudget({ ...canonical, uid });
+      return from(this.collection.doc(uid).set(obj)).pipe(
+        map(() => canonical)
+      );
     };
     return withUserId(this.afAuth, request, fallback, fallback);
   }
@@ -31,15 +34,10 @@ export class IrregularBudgetService {
   getValue(): Observable<Budget> {
     const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const attachTimezone = (value: Budget | null | undefined): Budget => {
-      const fallbackBudget: Budget = {
-        uid: '',
-        value: 600,
-        period: 30,
-        timezone: browserTimezone,
-      };
-      return value
-        ? { ...value, timezone: value.timezone || browserTimezone }
-        : fallbackBudget;
+      return canonicalizeBudget(
+        value || { uid: '', value: 600, period: 30 },
+        browserTimezone
+      );
     };
     const fallback = () => this.store.getValueObs().pipe(map(attachTimezone));
     const request = (uid: string) => {
@@ -47,9 +45,13 @@ export class IrregularBudgetService {
       return doc.valueChanges().pipe(
         tap(value => {
           if (!value) return;
-          this.store.addValueObs(value);
-          if (value.timezone) return;
-          const migrated = { ...value, timezone: browserTimezone };
+          const canonical = canonicalizeBudget(value, browserTimezone);
+          this.store.addValueObs(canonical);
+          if (JSON.stringify(value) === JSON.stringify(canonical)) return;
+          const migrated = canonicalizeBudget(
+            { ...value, timezone: browserTimezone },
+            browserTimezone
+          );
           void doc
             .set(migrated, { merge: true })
             .catch(error => console.warn('Failed to migrate budget timezone', error));
