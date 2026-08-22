@@ -180,3 +180,39 @@ button {
   width: min(920px, 100%);
   margin: 12px auto 24px;
 }
+
+.export-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(420px, 100%);
+}
+
+.export-settings__toggle {
+  justify-content: space-between;
+}
+
+.export-settings__range {
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-alt);
+}
+
+.export-settings__date-input {
+  width: 160px !important;
+}
+
+.export-settings__hint,
+.export-settings__error {
+  font-size: 12px;
+}
+
+.export-settings__hint {
+  color: var(--color-text-secondary);
+}
+
+.export-settings__error {
+  margin-top: 8px;
+  color: #b42318;
+}

@@ -217,8 +217,59 @@
   </app-tab>
   <app-tab key="export" label="Export">
     <div style="margin-top: 12px" *ngIf="user$ | async as user">
-      <button (click)="exportCSV()">Export from cloud to CSV!</button
-      ><br /><br />
+      <div class="export-settings">
+        <div class="budget-start-row export-settings__toggle">
+          <label class="bsd-label">Экспортировать только период:</label>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [checked]="exportRangeEnabled"
+              (change)="onExportRangeToggle($event)"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="export-settings__range" *ngIf="exportRangeEnabled">
+          <div class="budget-start-row">
+            <label for="exportStartDate" class="bsd-label">С:</label>
+            <input
+              id="exportStartDate"
+              type="date"
+              class="bsd-input export-settings__date-input"
+              [(ngModel)]="exportStartDate"
+              [max]="maxExportDate"
+              (ngModelChange)="onExportDateChange()"
+            />
+          </div>
+          <div class="budget-start-row">
+            <label for="exportEndDate" class="bsd-label">По:</label>
+            <input
+              id="exportEndDate"
+              type="date"
+              class="bsd-input export-settings__date-input"
+              [(ngModel)]="exportEndDate"
+              [min]="exportStartDate"
+              [max]="maxExportDate"
+              (ngModelChange)="onExportDateChange()"
+            />
+          </div>
+          <div class="export-settings__hint">
+            В CSV попадут только расходы из выбранного диапазона.
+          </div>
+          <div class="export-settings__error" *ngIf="exportRangeError">
+            {{ exportRangeError }}
+          </div>
+        </div>
+
+        <button (click)="exportCSV()" [disabled]="isExportRangeInvalid">
+          {{
+            exportRangeEnabled
+              ? 'Export selected period to CSV'
+              : 'Export all expenses to CSV'
+          }}
+        </button>
+      </div>
     </div>
   </app-tab>
   <app-tab key="auth" label="Auth">

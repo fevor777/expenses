@@ -12,17 +12,15 @@ import { SavingService } from '../common/service/saving.service';
 import { TabsContainerComponent } from '../common/tabs-container.component';
 import { TabComponent } from '../common/tab.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { BalanceDateService } from '../common/service/balance-date.service';
 import { Budget } from '../common/model/budget.model';
 import { FormsModule } from '@angular/forms';
 import { GlobalSwipeLengthStoreService } from '../common/service/global-swipe-length-store.service';
-import {
-  MorningReminderService,
-  MorningReminderConfig,
-} from '../common/service/morning-reminder.service';
+import { DateTime } from 'luxon';
+import { MorningReminderService } from '../common/service/morning-reminder.service';
 import { Tag, normalizeTagName } from '../common/model/tag.model';
 import { TagService } from '../common/service/tag.service';
 import { TagStoreService } from '../common/service/tag-store.service';
+import { DateFrame, Mode } from '../common/component/filter/date/dateFrame.model';
 import { formatBudgetPeriodLabel } from '../common/model/budget-summary/budget-period.helper';
 import { CategorySettingsComponent } from './category-settings/category-settings.component';
 
@@ -65,6 +63,11 @@ export class ExportComponent implements OnDestroy {
   tags$: Observable<Tag[]>;
   tags: Tag[] = [];
   tagDraft: string = '';
+  exportRangeEnabled: boolean = false;
+  exportStartDate: string = '';
+  exportEndDate: string = '';
+  exportRangeError: string = '';
+  readonly maxExportDate: string = DateTime.now().toISODate() || '';
 
   // Display-only derived label for current period preview (e.g., "September 5 - October 8")
   get budgetPeriodLabel(): string {
@@ -124,6 +127,8 @@ export class ExportComponent implements OnDestroy {
     this.tags$
       .pipe(takeUntil(this.destroySubject))
       .subscribe(tags => (this.tags = tags || []));
+
+    this.initializeExportRange();
   }
 
   // Method to trigger Google Sign-in
@@ -144,6 +149,11 @@ export class ExportComponent implements OnDestroy {
   }
 
   exportCSV(): void {
+    const exportFilter = this.getExportDateFrame();
+    if (this.exportRangeEnabled && !exportFilter) {
+      return;
+    }
+
     // const data = JSON.parse(localStorage.getItem('expenses') || '[]').map(
     //   (expense) => this.formatData(expense)
     // );
@@ -152,12 +162,12 @@ export class ExportComponent implements OnDestroy {
     // }
 
     this.expenseService
-      .getExpenses()
+      .getExpenses(exportFilter)
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe(expenses => {
         if (Array.isArray(expenses) && expenses?.length) {
           const data = expenses.map(exp => this.formatData(exp));
-          this.exportToFile(data);
+          this.exportToFile(data, exportFilter);
         }
       });
   }
@@ -229,13 +239,13 @@ export class ExportComponent implements OnDestroy {
     return tagIds.map(tagId => tagsById.get(tagId) || tagId).filter(Boolean);
   }
 
-  private exportToFile(data: any[]): void {
+  private exportToFile(data: any[], dateFilter?: DateFrame): void {
     const csvData = this.convertToCSV(data);
     const blob = new Blob([csvData], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'exported_data.csv';
+    anchor.download = this.getExportFileName(dateFilter);
     anchor.click();
     window.URL.revokeObjectURL(url);
   }
@@ -402,5 +412,85 @@ export class ExportComponent implements OnDestroy {
       .deleteTag(tag.id)
       .pipe(first(), takeUntil(this.destroySubject))
       .subscribe();
+  }
+
+  onExportRangeToggle(event: Event): void {
+    this.exportRangeEnabled = (event.target as HTMLInputElement).checked;
+    this.exportRangeError = '';
+  }
+
+  onExportDateChange(): void {
+    this.exportRangeError = '';
+  }
+
+  get isExportRangeInvalid(): boolean {
+    return this.exportRangeEnabled && !this.isExportRangeValid();
+  }
+
+  private initializeExportRange(): void {
+    const now = DateTime.now();
+    this.exportStartDate = now.startOf('month').toISODate() || '';
+    this.exportEndDate = now.toISODate() || '';
+  }
+
+  private isExportRangeValid(): boolean {
+    return this.getExportDateFrame(false) !== undefined;
+  }
+
+  private getExportDateFrame(showError = true): DateFrame | undefined {
+    if (!this.exportRangeEnabled) {
+      this.exportRangeError = '';
+      return undefined;
+    }
+
+    if (!this.exportStartDate || !this.exportEndDate) {
+      if (showError) {
+        this.exportRangeError = 'Выберите обе даты для экспорта.';
+      }
+      return undefined;
+    }
+
+    const start = DateTime.fromISO(this.exportStartDate).startOf('day');
+    const finish = DateTime.fromISO(this.exportEndDate).endOf('day');
+    const today = DateTime.now().endOf('day');
+
+    if (!start.isValid || !finish.isValid) {
+      if (showError) {
+        this.exportRangeError = 'Не удалось распознать выбранные даты.';
+      }
+      return undefined;
+    }
+
+    if (start > finish) {
+      if (showError) {
+        this.exportRangeError = 'Дата начала не может быть позже даты окончания.';
+      }
+      return undefined;
+    }
+
+    if (finish > today) {
+      if (showError) {
+        this.exportRangeError = 'Нельзя экспортировать будущий период.';
+      }
+      return undefined;
+    }
+
+    this.exportRangeError = '';
+    return {
+      start,
+      finish,
+      mode: Mode.CUSTOM,
+      display: `${this.exportStartDate} - ${this.exportEndDate}`,
+    };
+  }
+
+  private getExportFileName(dateFilter?: DateFrame): string {
+    if (!dateFilter) {
+      return 'exported_data.csv';
+    }
+
+    const start = dateFilter.start.toFormat('yyyy-MM-dd');
+    const finish = dateFilter.finish.toFormat('yyyy-MM-dd');
+    return `exported_data_${start}_${finish}.csv`;
   }
 }
