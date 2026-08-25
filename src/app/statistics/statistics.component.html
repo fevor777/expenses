@@ -230,6 +230,10 @@
           *ngIf="!collapsed.irregularSummary && budgetLimitSummaries.length > 0"
         >
           <div class="stats-budget-limits__hint">
+            До конца периода: <strong>{{ getBudgetPeriodDaysLeftLabel() }}</strong
+            >.
+          </div>
+          <div class="stats-budget-limits__hint">
             Лимиты рассчитаны за текущий бюджетный период и учитывают только
             расходы с <code>includeInBalance = true</code>.
           </div>
@@ -273,6 +277,11 @@
                   class="stats-budget-limit__bar-fill"
                   [style.width.%]="getBudgetLimitProgressWidth(summary)"
                 ></div>
+                <span
+                  class="stats-budget-limit__period-marker"
+                  [style.--budget-period-progress]="summary.periodProgress + '%'"
+                  aria-label="Пройденная часть бюджетного периода"
+                ></span>
               </div>
               <div class="stats-budget-limit__meta">
                 <span

@@ -1,8 +1,10 @@
 import { ResolvedCategory } from '../model/category.model';
+import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { Budget } from '../model/budget.model';
 import { Expense } from '../model/expense.model';
 import { Tag } from '../model/tag.model';
 import { buildBudgetLimitSummaries } from './budget-limit-summary.service';
+import { DateTime, Settings } from 'luxon';
 
 describe('buildBudgetLimitSummaries', () => {
   const categories: ResolvedCategory[] = [
@@ -31,6 +33,23 @@ describe('buildBudgetLimitSummaries', () => {
     { id: 'coffee', name: 'coffee', normalizedName: 'coffee' },
     { id: 'fun', name: 'fun', normalizedName: 'fun' },
   ];
+  const dateFrame: DateFrame = {
+    start: DateTime.fromISO('2026-08-10T00:00:00', { zone: 'Europe/Sofia' }),
+    finish: DateTime.fromISO('2026-08-14T23:59:59.999', {
+      zone: 'Europe/Sofia',
+    }),
+  };
+  const nowMillis = DateTime.fromISO('2026-08-12T09:30:00', {
+    zone: 'Europe/Sofia',
+  }).toMillis();
+
+  beforeEach(() => {
+    Settings.now = () => nowMillis;
+  });
+
+  afterEach(() => {
+    Settings.now = () => Date.now();
+  });
 
   it('uses only includeInBalance expenses and counts repeated tag matches independently', () => {
     const budget: Budget = {
@@ -68,7 +87,13 @@ describe('buildBudgetLimitSummaries', () => {
       },
     ];
 
-    const result = buildBudgetLimitSummaries(budget, expenses, categories, tags);
+    const result = buildBudgetLimitSummaries(
+      budget,
+      expenses,
+      categories,
+      tags,
+      dateFrame
+    );
 
     expect(result).toEqual([
       jasmine.objectContaining({
@@ -77,6 +102,7 @@ describe('buildBudgetLimitSummaries', () => {
         remaining: 65,
         rawRemaining: 65,
         percentUsed: 35,
+        periodProgress: 60,
         expenseCount: 2,
         exceeded: false,
         orphaned: false,
@@ -88,6 +114,7 @@ describe('buildBudgetLimitSummaries', () => {
         remaining: 15,
         rawRemaining: 15,
         percentUsed: 70,
+        periodProgress: 60,
         expenseCount: 2,
         exceeded: false,
         orphaned: false,
@@ -121,7 +148,13 @@ describe('buildBudgetLimitSummaries', () => {
       },
     ];
 
-    const result = buildBudgetLimitSummaries(budget, expenses, categories, tags);
+    const result = buildBudgetLimitSummaries(
+      budget,
+      expenses,
+      categories,
+      tags,
+      dateFrame
+    );
 
     expect(result).toEqual([
       jasmine.objectContaining({
@@ -129,6 +162,7 @@ describe('buildBudgetLimitSummaries', () => {
         orphaned: true,
         targetLabel: 'Скрытая',
         percentUsed: 100,
+        periodProgress: 60,
         exceeded: true,
       }),
       jasmine.objectContaining({
@@ -136,6 +170,7 @@ describe('buildBudgetLimitSummaries', () => {
         orphaned: true,
         targetLabel: 'Deleted tag (gone)',
         percentUsed: 100,
+        periodProgress: 60,
         exceeded: true,
       }),
     ]);

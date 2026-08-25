@@ -415,6 +415,9 @@
         >
           <div class="budget-limits__title">Current period usage</div>
           <div class="budget-limits__hint">
+            {{ getBudgetPeriodDaysLeftText() }}
+          </div>
+          <div class="budget-limits__hint">
             These summaries use the current budget period and count only
             expenses with <code>includeInBalance = true</code>.
           </div>
@@ -457,6 +460,11 @@
                   class="budget-limit-summary__bar-fill"
                   [style.width.%]="getBudgetLimitProgressWidth(summary)"
                 ></div>
+                <span
+                  class="budget-limit-summary__period-marker"
+                  [style.--budget-period-progress]="summary.periodProgress + '%'"
+                  aria-label="Budget period progress"
+                ></span>
               </div>
 
               <div class="budget-limit-summary__meta">

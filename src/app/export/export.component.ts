@@ -97,6 +97,7 @@ export class ExportComponent implements OnDestroy {
   tagLimitError: string = '';
   editingBudgetLimitId: string | null = null;
   budgetLimitSummaries: BudgetLimitSummary[] = [];
+  budgetPeriodDaysLeft: number | null = null;
   exportRangeEnabled: boolean = false;
   exportStartDate: string = '';
   exportEndDate: string = '';
@@ -196,6 +197,7 @@ export class ExportComponent implements OnDestroy {
       .pipe(takeUntil(this.destroySubject))
       .subscribe(context => {
         this.budgetLimitSummaryContext = context;
+        this.budgetPeriodDaysLeft = context.periodDaysLeft;
         this.rebuildBudgetLimitSummaries();
       });
 
@@ -519,6 +521,17 @@ export class ExportComponent implements OnDestroy {
     return Math.max(0, Math.min(100, summary.percentUsed));
   }
 
+  getBudgetPeriodDaysLeftText(): string {
+    const daysLeft = this.budgetPeriodDaysLeft;
+    if (daysLeft === null) {
+      return '';
+    }
+
+    return daysLeft === 1
+      ? '1 day left in the current budget period.'
+      : `${daysLeft} days left in the current budget period.`;
+  }
+
   trackByBudgetLimit(_: number, limit: BudgetLimitRule): string {
     return limit.id;
   }
@@ -798,7 +811,8 @@ export class ExportComponent implements OnDestroy {
       budget,
       this.budgetLimitSummaryContext.expenses,
       this.budgetLimitSummaryContext.categories,
-      this.budgetLimitSummaryContext.tags
+      this.budgetLimitSummaryContext.tags,
+      this.budgetLimitSummaryContext.dateFrame
     );
   }
 }

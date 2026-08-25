@@ -14,6 +14,10 @@ import { DateFrame } from '../component/filter/date/dateFrame.model';
 import { BudgetDataService } from './budget-data.service';
 import { CategoryService } from './category.service';
 import { TagService } from './tag.service';
+import {
+  computeBudgetPeriodDaysLeft,
+  computeBudgetPeriodProgress,
+} from '../model/budget-summary/budget-period.helper';
 
 export type BudgetLimitSummaryContext = {
   budget: Budget;
@@ -21,6 +25,7 @@ export type BudgetLimitSummaryContext = {
   expenses: Expense[];
   categories: ResolvedCategory[];
   tags: Tag[];
+  periodDaysLeft: number;
   limitSummaries: BudgetLimitSummary[];
 };
 
@@ -52,11 +57,13 @@ export class BudgetLimitSummaryService {
           expenses: rolling.expenses,
           categories,
           tags,
+          periodDaysLeft: computeBudgetPeriodDaysLeft(rolling.dateFrame),
           limitSummaries: buildBudgetLimitSummaries(
             budget,
             rolling.expenses,
             categories,
-            tags
+            tags,
+            rolling.dateFrame
           ),
         };
       }),
@@ -69,13 +76,17 @@ export function buildBudgetLimitSummaries(
   budget: Budget | null | undefined,
   expenses: readonly Expense[],
   categories: readonly ResolvedCategory[],
-  tags: readonly Tag[]
+  tags: readonly Tag[],
+  dateFrame?: DateFrame
 ): BudgetLimitSummary[] {
   const canonicalBudget = canonicalizeBudget(budget);
   const limits = canonicalBudget.limits;
   if (!limits?.length) {
     return [];
   }
+  const periodProgress = dateFrame
+    ? computeBudgetPeriodProgress(dateFrame)
+    : 0;
 
   const categoryTotals = new Map<string, { spent: number; expenseCount: number }>();
   const tagTotals = new Map<string, { spent: number; expenseCount: number }>();
@@ -95,7 +106,14 @@ export function buildBudgetLimitSummaries(
   }
 
   return limits.map(limit =>
-    buildBudgetLimitSummary(limit, categoryTotals, tagTotals, categoryById, tagById)
+    buildBudgetLimitSummary(
+      limit,
+      categoryTotals,
+      tagTotals,
+      categoryById,
+      tagById,
+      periodProgress
+    )
   );
 }
 
@@ -104,7 +122,8 @@ function buildBudgetLimitSummary(
   categoryTotals: Map<string, { spent: number; expenseCount: number }>,
   tagTotals: Map<string, { spent: number; expenseCount: number }>,
   categoryById: Map<string, ResolvedCategory>,
-  tagById: Map<string, Tag | undefined>
+  tagById: Map<string, Tag | undefined>,
+  periodProgress: number
 ): BudgetLimitSummary {
   const sourceTotals =
     limit.type === 'category' ? categoryTotals.get(limit.targetId) : tagTotals.get(limit.targetId);
@@ -133,6 +152,7 @@ function buildBudgetLimitSummary(
       remaining,
       rawRemaining,
       percentUsed,
+      periodProgress,
       expenseCount: sourceTotals?.expenseCount || 0,
       exceeded,
     };
@@ -150,6 +170,7 @@ function buildBudgetLimitSummary(
     remaining,
     rawRemaining,
     percentUsed,
+    periodProgress,
     expenseCount: sourceTotals?.expenseCount || 0,
     exceeded,
   };

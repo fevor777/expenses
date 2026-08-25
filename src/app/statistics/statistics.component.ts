@@ -135,6 +135,7 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
   selectedTagIds: string[] = [];
   selectedBalanceFilter: BalanceFilter = DEFAULT_BALANCE_FILTER;
   budgetLimitSummaries: BudgetLimitSummary[] = [];
+  budgetPeriodDaysLeft: number | null = null;
   // categoryFilterValuesStore: string[] = [];
   categoryFilterValues: string[] = [];
   isHowSuggestionDateButton: boolean = false;
@@ -202,9 +203,12 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.destroySubject))
       .subscribe();
     this.budgetLimitSummaryService
-      .getCurrentLimitSummaries()
+      .getCurrentBudgetWithLimitSummaries()
       .pipe(takeUntil(this.destroySubject))
-      .subscribe(summaries => (this.budgetLimitSummaries = summaries));
+      .subscribe(context => {
+        this.budgetLimitSummaries = context.limitSummaries;
+        this.budgetPeriodDaysLeft = context.periodDaysLeft;
+      });
     this.initialFilterValue = this.dateFilterService.getInitialDayValue();
     this.initFilter();
   }
@@ -446,6 +450,23 @@ export class StatisticsComponent implements OnDestroy, AfterViewInit {
 
   getBudgetLimitProgressWidth(summary: BudgetLimitSummary): number {
     return Math.max(0, Math.min(100, summary.percentUsed));
+  }
+
+  getBudgetPeriodDaysLeftLabel(): string {
+    const daysLeft = this.budgetPeriodDaysLeft;
+    if (daysLeft === null) {
+      return '';
+    }
+
+    const mod10 = daysLeft % 10;
+    const mod100 = daysLeft % 100;
+    if (mod10 === 1 && mod100 !== 11) {
+      return `${daysLeft} день`;
+    }
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+      return `${daysLeft} дня`;
+    }
+    return `${daysLeft} дней`;
   }
 
   touchStartX: number = 0;

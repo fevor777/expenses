@@ -1,4 +1,5 @@
 import { BehaviorSubject, of } from 'rxjs';
+import { DateTime } from 'luxon';
 
 import { Budget } from '../common/model/budget.model';
 import { ResolvedCategory } from '../common/model/category.model';
@@ -70,9 +71,18 @@ describe('ExportComponent budget limits', () => {
         getCurrentBudgetWithLimitSummaries: () =>
           of({
             budget: budget$.value,
+            dateFrame: {
+              start: DateTime.fromISO('2026-08-01T00:00:00', {
+                zone: 'Europe/Sofia',
+              }),
+              finish: DateTime.fromISO('2026-08-30T23:59:59.999', {
+                zone: 'Europe/Sofia',
+              }),
+            },
             expenses: [],
             categories: categories$.value,
             tags: tags$.value,
+            periodDaysLeft: 5,
             limitSummaries: [],
           }),
       } as never,

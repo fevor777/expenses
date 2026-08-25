@@ -18,6 +18,7 @@ export type BudgetLimitSummary = {
   remaining: number;
   rawRemaining: number;
   percentUsed: number;
+  periodProgress: number;
   expenseCount: number;
   exceeded: boolean;
 };

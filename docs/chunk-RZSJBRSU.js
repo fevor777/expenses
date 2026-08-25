@@ -1,1 +1,0 @@
-import{E as n,Ia as a,la as t}from"./chunk-6LF7YCZV.js";var i=class o{static \u0275fac=function(e){return new(e||o)};static \u0275cmp=n({type:o,selectors:[["app-period-summary-icon"]],standalone:!0,features:[a],decls:1,vars:0,consts:[[1,"fa-solid","fa-receipt"]],template:function(e,r){e&1&&t(0,"i",0)},encapsulation:2})};export{i as a};
